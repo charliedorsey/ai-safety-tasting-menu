@@ -1,0 +1,14 @@
+{
+  "package": "PAPER_B_TECHNIQUE_ATLAS_PASS_6_R0001_20261023",
+  "input_source_zip_sha256": "e8bccaf4c607a3b2458a47833bdd98f598a59229f7af0175927b994318d7b2a1",
+  "static_source_seal_result": "SEAL_PASS 683 HASHED_FILES",
+  "crosspass_references_checked": 136,
+  "distinct_source_files_checked": 70,
+  "machine_mechanism_cards": 62,
+  "physical_cells_reconciled": 12,
+  "browser_tests_passed": 66,
+  "full_lean_replay_performed": false,
+  "source_archive_altered": false,
+  "prior_pass_reports_byte_identical": true,
+  "bundle_internal_files_including_manifest_and_receipt": 19
+}

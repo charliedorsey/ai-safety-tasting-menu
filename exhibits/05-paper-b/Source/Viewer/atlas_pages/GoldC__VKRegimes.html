@@ -1,0 +1,458 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · GoldC/VKRegimes.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>GoldC/VKRegimes.lean</h1><p class="meta">LEAN/GoldC/VKRegimes.lean · 457 lines · SHA-256 c0c08ffcc931ae16a33772a1826cdb10b68fc0d512c358a8fbf29ba704a1a568</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import GoldC.VKCore</span>
+<span class="l" id="L2"><span class="n">2</span>import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds</span>
+<span class="l" id="L3"><span class="n">3</span></span>
+<span class="l" id="L4"><span class="n">4</span>/-!</span>
+<span class="l" id="L5"><span class="n">5</span># `GoldC.VKRegimes` — every Type I regime, conditional only on the uniform Vinogradov estimate</span>
+<span class="l" id="L6"><span class="n">6</span></span>
+<span class="l" id="L7"><span class="n">7</span>Mathlib-only.  **No axiom, no `sorry`.**</span>
+<span class="l" id="L8"><span class="n">8</span></span>
+<span class="l" id="L9"><span class="n">9</span>* `kusmin_landau_discrete` (**proved, unconditional**): if `z_{i+1} = z_i e(Δ_i)`, `|z_i| = 1`,</span>
+<span class="l" id="L10"><span class="n">10</span>  `λ ≤ Δ_i ≤ 1 - λ` and `Δ` is nondecreasing, then `|Σ_{i ≤ m} z_i| ≤ 2 + 3/(2λ)`.</span>
+<span class="l" id="L11"><span class="n">11</span>* `recipSum_small_T` (**proved, unconditional**): for the reciprocal phase in the window</span>
+<span class="l" id="L12"><span class="n">12</span>  `x+θ ∈ [L, 2L]` with `0 &lt; T ≤ L/2`: `|Σ e(TL/(x+θ))| ≤ 8L/T`.  (The Kusmin–Landau regime,</span>
+<span class="l" id="L13"><span class="n">13</span>  derived from exact difference algebra; no mean value theorem.)</span>
+<span class="l" id="L14"><span class="n">14</span>* `recipSum_all_regimes` (**conditional only on `UniformVinogradovEstimate`**): for every `A`,</span>
+<span class="l" id="L15"><span class="n">15</span>  all large `L`, all `T &gt; 0` (with `log L ≥ (log T)^σ` when `T ≥ L`):</span>
+<span class="l" id="L16"><span class="n">16</span>  `|Σ e(TL/(x+θ))| ≤ L (log L)^{-A} + 8L/T`.</span>
+<span class="l" id="L17"><span class="n">17</span>* `typeI_class_sum_all_regimes`: the same with the harmonic weights `1/(Q(j+θ))`.</span>
+<span class="l" id="L18"><span class="n">18</span>-/</span>
+<span class="l" id="L19"><span class="n">19</span></span>
+<span class="l" id="L20"><span class="n">20</span>open scoped BigOperators</span>
+<span class="l" id="L21"><span class="n">21</span>open Real Filter Topology Finset</span>
+<span class="l" id="L22"><span class="n">22</span></span>
+<span class="l" id="L23"><span class="n">23</span>namespace GoldC.VK</span>
+<span class="l" id="L24"><span class="n">24</span></span>
+<span class="l" id="L25"><span class="n">25</span>lemma eAdd_add (x y : ℝ) : eAdd (x + y) = eAdd x * eAdd y := by</span>
+<span class="l" id="L26"><span class="n">26</span>  unfold eAdd; push_cast; rw [← Complex.exp_add]; ring_nf</span>
+<span class="l" id="L27"><span class="n">27</span></span>
+<span class="l" id="L28"><span class="n">28</span>lemma eAdd_int (m : ℤ) : eAdd m = 1 := by</span>
+<span class="l" id="L29"><span class="n">29</span>  unfold eAdd</span>
+<span class="l" id="L30"><span class="n">30</span>  have : 2 * (Real.pi : ℂ) * Complex.I * ((m : ℝ) : ℂ) = (m : ℂ) * (2 * Real.pi * Complex.I) := by</span>
+<span class="l" id="L31"><span class="n">31</span>    push_cast; ring</span>
+<span class="l" id="L32"><span class="n">32</span>  rw [this, Complex.exp_int_mul_two_pi_mul_I]</span>
+<span class="l" id="L33"><span class="n">33</span></span>
+<span class="l" id="L34"><span class="n">34</span>lemma eAdd_nat (m : ℕ) : eAdd m = 1 := by exact_mod_cast eAdd_int m</span>
+<span class="l" id="L35"><span class="n">35</span></span>
+<span class="l" id="L36"><span class="n">36</span>/-! ## The Kusmin–Landau coefficient -/</span>
+<span class="l" id="L37"><span class="n">37</span></span>
+<span class="l" id="L38"><span class="n">38</span>/-- `1/(e(Δ) - 1) = -1/2 - (i/2) cot(πΔ)` for `0 &lt; Δ &lt; 1`. -/</span>
+<span class="l" id="L39"><span class="n">39</span>lemma inv_eAdd_sub_one {Δ : ℝ} (h0 : 0 &lt; Δ) (h1 : Δ &lt; 1) :</span>
+<span class="l" id="L40"><span class="n">40</span>    (eAdd Δ - 1)⁻¹ = -(1 / 2 : ℂ) - Complex.I / 2 *</span>
+<span class="l" id="L41"><span class="n">41</span>      ((Real.cos (π * Δ) / Real.sin (π * Δ) : ℝ) : ℂ) := by</span>
+<span class="l" id="L42"><span class="n">42</span>  have hs : 0 &lt; Real.sin (π * Δ) :=</span>
+<span class="l" id="L43"><span class="n">43</span>    Real.sin_pos_of_pos_of_lt_pi (mul_pos Real.pi_pos h0) (by nlinarith [Real.pi_pos])</span>
+<span class="l" id="L44"><span class="n">44</span>  have he : eAdd Δ = ((Real.cos (2 * (π * Δ)) : ℝ) : ℂ) +</span>
+<span class="l" id="L45"><span class="n">45</span>      ((Real.sin (2 * (π * Δ)) : ℝ) : ℂ) * Complex.I := by</span>
+<span class="l" id="L46"><span class="n">46</span>    unfold eAdd</span>
+<span class="l" id="L47"><span class="n">47</span>    have : 2 * (Real.pi : ℂ) * Complex.I * ((Δ : ℝ) : ℂ) = ((2 * (π * Δ) : ℝ) : ℂ) * Complex.I := by</span>
+<span class="l" id="L48"><span class="n">48</span>      push_cast; ring</span>
+<span class="l" id="L49"><span class="n">49</span>    rw [this, Complex.exp_mul_I, ← Complex.ofReal_cos, ← Complex.ofReal_sin]</span>
+<span class="l" id="L50"><span class="n">50</span>  apply inv_eq_of_mul_eq_one_left</span>
+<span class="l" id="L51"><span class="n">51</span>  rw [he, Real.cos_two_mul&#x27;, Real.sin_two_mul]</span>
+<span class="l" id="L52"><span class="n">52</span>  set s := Real.sin (π * Δ)</span>
+<span class="l" id="L53"><span class="n">53</span>  set c := Real.cos (π * Δ)</span>
+<span class="l" id="L54"><span class="n">54</span>  have hsc : s ^ 2 + c ^ 2 = 1 := Real.sin_sq_add_cos_sq _</span>
+<span class="l" id="L55"><span class="n">55</span>  have hs0 : (s : ℂ) ≠ 0 := by exact_mod_cast hs.ne&#x27;</span>
+<span class="l" id="L56"><span class="n">56</span>  push_cast</span>
+<span class="l" id="L57"><span class="n">57</span>  field_simp</span>
+<span class="l" id="L58"><span class="n">58</span>  have hsc&#x27; : (s : ℂ) ^ 2 + (c : ℂ) ^ 2 = 1 := by exact_mod_cast hsc</span>
+<span class="l" id="L59"><span class="n">59</span>  linear_combination ((s : ℂ) - Complex.I * (c : ℂ)) * hsc&#x27; +</span>
+<span class="l" id="L60"><span class="n">60</span>    (-2 * (s : ℂ) * (c : ℂ) ^ 2) * Complex.I_sq</span>
+<span class="l" id="L61"><span class="n">61</span></span>
+<span class="l" id="L62"><span class="n">62</span>/-- `cot(πΔ)` is nonincreasing on `(0,1)`. -/</span>
+<span class="l" id="L63"><span class="n">63</span>lemma cot_pi_antitone {x y : ℝ} (hx : 0 &lt; x) (hxy : x ≤ y) (hy : y &lt; 1) :</span>
+<span class="l" id="L64"><span class="n">64</span>    Real.cos (π * y) / Real.sin (π * y) ≤ Real.cos (π * x) / Real.sin (π * x) := by</span>
+<span class="l" id="L65"><span class="n">65</span>  have hsx : 0 &lt; Real.sin (π * x) :=</span>
+<span class="l" id="L66"><span class="n">66</span>    Real.sin_pos_of_pos_of_lt_pi (mul_pos Real.pi_pos hx) (by nlinarith [Real.pi_pos])</span>
+<span class="l" id="L67"><span class="n">67</span>  have hsy : 0 &lt; Real.sin (π * y) :=</span>
+<span class="l" id="L68"><span class="n">68</span>    Real.sin_pos_of_pos_of_lt_pi (mul_pos Real.pi_pos (by linarith)) (by nlinarith [Real.pi_pos])</span>
+<span class="l" id="L69"><span class="n">69</span>  rw [div_le_div_iff₀ hsy hsx]</span>
+<span class="l" id="L70"><span class="n">70</span>  have hd : 0 ≤ Real.sin (π * y - π * x) :=</span>
+<span class="l" id="L71"><span class="n">71</span>    Real.sin_nonneg_of_nonneg_of_le_pi (by nlinarith [Real.pi_pos]) (by nlinarith [Real.pi_pos])</span>
+<span class="l" id="L72"><span class="n">72</span>  rw [Real.sin_sub] at hd</span>
+<span class="l" id="L73"><span class="n">73</span>  linarith</span>
+<span class="l" id="L74"><span class="n">74</span></span>
+<span class="l" id="L75"><span class="n">75</span>/-- `sin(πΔ) ≥ 2λ` when `λ ≤ Δ ≤ 1 - λ`, `0 &lt; λ ≤ 1/2`. -/</span>
+<span class="l" id="L76"><span class="n">76</span>lemma sin_pi_ge {lam Δ : ℝ} (hl : 0 &lt; lam) (hΔ0 : lam ≤ Δ) (hΔ1 : Δ ≤ 1 - lam) :</span>
+<span class="l" id="L77"><span class="n">77</span>    2 * lam ≤ Real.sin (π * Δ) := by</span>
+<span class="l" id="L78"><span class="n">78</span>  rcases le_total Δ (1 / 2) with h | h</span>
+<span class="l" id="L79"><span class="n">79</span>  · have := Real.mul_le_sin (x := π * Δ) (by nlinarith [Real.pi_pos]) (by nlinarith [Real.pi_pos])</span>
+<span class="l" id="L80"><span class="n">80</span>    have e : 2 / π * (π * Δ) = 2 * Δ := by field_simp</span>
+<span class="l" id="L81"><span class="n">81</span>    rw [e] at this; linarith</span>
+<span class="l" id="L82"><span class="n">82</span>  · have hsym : Real.sin (π * Δ) = Real.sin (π * (1 - Δ)) := by</span>
+<span class="l" id="L83"><span class="n">83</span>      rw [show π * (1 - Δ) = π - π * Δ by ring, Real.sin_pi_sub]</span>
+<span class="l" id="L84"><span class="n">84</span>    have := Real.mul_le_sin (x := π * (1 - Δ)) (by nlinarith [Real.pi_pos])</span>
+<span class="l" id="L85"><span class="n">85</span>      (by nlinarith [Real.pi_pos])</span>
+<span class="l" id="L86"><span class="n">86</span>    have e : 2 / π * (π * (1 - Δ)) = 2 * (1 - Δ) := by field_simp</span>
+<span class="l" id="L87"><span class="n">87</span>    rw [e] at this; rw [hsym]; linarith</span>
+<span class="l" id="L88"><span class="n">88</span></span>
+<span class="l" id="L89"><span class="n">89</span>/-- Summation by parts with `Z 0 = 0`. -/</span>
+<span class="l" id="L90"><span class="n">90</span>lemma sum_by_parts_zero (c Z : ℕ → ℂ) (hZ : Z 0 = 0) (m : ℕ) :</span>
+<span class="l" id="L91"><span class="n">91</span>    ∑ i ∈ range (m + 1), c i * (Z (i + 1) - Z i) =</span>
+<span class="l" id="L92"><span class="n">92</span>      c m * Z (m + 1) - ∑ i ∈ range m, (c (i + 1) - c i) * Z (i + 1) := by</span>
+<span class="l" id="L93"><span class="n">93</span>  induction m with</span>
+<span class="l" id="L94"><span class="n">94</span>  | zero =&gt; simp [hZ]</span>
+<span class="l" id="L95"><span class="n">95</span>  | succ m ih =&gt;</span>
+<span class="l" id="L96"><span class="n">96</span>    rw [sum_range_succ, ih, sum_range_succ]</span>
+<span class="l" id="L97"><span class="n">97</span>    ring</span>
+<span class="l" id="L98"><span class="n">98</span></span>
+<span class="l" id="L99"><span class="n">99</span>/-- **Discrete Kusmin–Landau.** -/</span>
+<span class="l" id="L100"><span class="n">100</span>theorem kusmin_landau_discrete {z : ℕ → ℂ} {Δ : ℕ → ℝ} {lam : ℝ} (m : ℕ)</span>
+<span class="l" id="L101"><span class="n">101</span>    (hl : 0 &lt; lam) (hl2 : lam ≤ 1 / 2)</span>
+<span class="l" id="L102"><span class="n">102</span>    (hz : ∀ i, ‖z i‖ = 1)</span>
+<span class="l" id="L103"><span class="n">103</span>    (hstep : ∀ i &lt; m, z (i + 1) = z i * eAdd (Δ i))</span>
+<span class="l" id="L104"><span class="n">104</span>    (hΔ : ∀ i &lt; m, lam ≤ Δ i ∧ Δ i ≤ 1 - lam)</span>
+<span class="l" id="L105"><span class="n">105</span>    (hmono : ∀ i, i + 1 &lt; m → Δ i ≤ Δ (i + 1)) :</span>
+<span class="l" id="L106"><span class="n">106</span>    ‖∑ i ∈ range (m + 1), z i‖ ≤ 2 + 3 / (2 * lam) := by</span>
+<span class="l" id="L107"><span class="n">107</span>  rcases Nat.eq_zero_or_pos m with rfl | hm</span>
+<span class="l" id="L108"><span class="n">108</span>  · simp [hz]</span>
+<span class="l" id="L109"><span class="n">109</span>    have : 0 ≤ 3 / (2 * lam) := div_nonneg (by norm_num) (by linarith)</span>
+<span class="l" id="L110"><span class="n">110</span>    linarith</span>
+<span class="l" id="L111"><span class="n">111</span>  obtain ⟨m&#x27;, rfl⟩ : ∃ m&#x27;, m = m&#x27; + 1 := ⟨m - 1, by omega⟩</span>
+<span class="l" id="L112"><span class="n">112</span>  -- coefficients</span>
+<span class="l" id="L113"><span class="n">113</span>  set ct : ℕ → ℝ := fun i =&gt; Real.cos (π * Δ i) / Real.sin (π * Δ i) with hct</span>
+<span class="l" id="L114"><span class="n">114</span>  set c : ℕ → ℂ := fun i =&gt; (eAdd (Δ i) - 1)⁻¹ with hc</span>
+<span class="l" id="L115"><span class="n">115</span>  have hΔ01 : ∀ i &lt; m&#x27; + 1, 0 &lt; Δ i ∧ Δ i &lt; 1 := fun i hi =&gt;</span>
+<span class="l" id="L116"><span class="n">116</span>    ⟨lt_of_lt_of_le hl (hΔ i hi).1, by linarith [(hΔ i hi).2]⟩</span>
+<span class="l" id="L117"><span class="n">117</span>  have hcform : ∀ i &lt; m&#x27; + 1, c i = -(1 / 2 : ℂ) - Complex.I / 2 * (ct i : ℂ) := fun i hi =&gt;</span>
+<span class="l" id="L118"><span class="n">118</span>    inv_eAdd_sub_one (hΔ01 i hi).1 (hΔ01 i hi).2</span>
+<span class="l" id="L119"><span class="n">119</span>  have hsin : ∀ i &lt; m&#x27; + 1, 2 * lam ≤ Real.sin (π * Δ i) := fun i hi =&gt;</span>
+<span class="l" id="L120"><span class="n">120</span>    sin_pi_ge hl (hΔ i hi).1 (hΔ i hi).2</span>
+<span class="l" id="L121"><span class="n">121</span>  have hspos : ∀ i &lt; m&#x27; + 1, 0 &lt; Real.sin (π * Δ i) := fun i hi =&gt;</span>
+<span class="l" id="L122"><span class="n">122</span>    lt_of_lt_of_le (by linarith) (hsin i hi)</span>
+<span class="l" id="L123"><span class="n">123</span>  -- |cot| ≤ 1/sin ≤ 1/(2λ)</span>
+<span class="l" id="L124"><span class="n">124</span>  have hct_abs : ∀ i &lt; m&#x27; + 1, |ct i| ≤ 1 / (2 * lam) := by</span>
+<span class="l" id="L125"><span class="n">125</span>    intro i hi</span>
+<span class="l" id="L126"><span class="n">126</span>    simp only [hct]</span>
+<span class="l" id="L127"><span class="n">127</span>    rw [abs_div, abs_of_pos (hspos i hi), div_le_div_iff₀ (hspos i hi) (by linarith)]</span>
+<span class="l" id="L128"><span class="n">128</span>    have := Real.abs_cos_le_one (π * Δ i)</span>
+<span class="l" id="L129"><span class="n">129</span>    nlinarith [hsin i hi]</span>
+<span class="l" id="L130"><span class="n">130</span>  -- |c_i| = 1/(2 sin) ≤ 1/(4λ)... we only need ≤ 1/(2λ) crude: |c| ≤ 1/2 + |ct|/2</span>
+<span class="l" id="L131"><span class="n">131</span>  have hc_abs : ∀ i &lt; m&#x27; + 1, ‖c i‖ ≤ 1 / 2 + 1 / (4 * lam) := by</span>
+<span class="l" id="L132"><span class="n">132</span>    intro i hi</span>
+<span class="l" id="L133"><span class="n">133</span>    rw [hcform i hi]</span>
+<span class="l" id="L134"><span class="n">134</span>    calc ‖-(1 / 2 : ℂ) - Complex.I / 2 * (ct i : ℂ)‖ ≤ ‖-(1 / 2 : ℂ)‖ + ‖Complex.I / 2 * (ct i : ℂ)‖ :=</span>
+<span class="l" id="L135"><span class="n">135</span>          norm_sub_le _ _</span>
+<span class="l" id="L136"><span class="n">136</span>      _ = 1 / 2 + |ct i| / 2 := by</span>
+<span class="l" id="L137"><span class="n">137</span>          have e1 : ‖-(1 / 2 : ℂ)‖ = 1 / 2 := by</span>
+<span class="l" id="L138"><span class="n">138</span>            rw [norm_neg, norm_div, norm_one, Complex.norm_two]</span>
+<span class="l" id="L139"><span class="n">139</span>          have e2 : ‖Complex.I / 2 * ((ct i : ℝ) : ℂ)‖ = |ct i| / 2 := by</span>
+<span class="l" id="L140"><span class="n">140</span>            rw [norm_mul, norm_div, Complex.norm_I, Complex.norm_two, Complex.norm_real,</span>
+<span class="l" id="L141"><span class="n">141</span>              Real.norm_eq_abs]</span>
+<span class="l" id="L142"><span class="n">142</span>            ring</span>
+<span class="l" id="L143"><span class="n">143</span>          rw [e1, e2]</span>
+<span class="l" id="L144"><span class="n">144</span>      _ ≤ 1 / 2 + 1 / (4 * lam) := by</span>
+<span class="l" id="L145"><span class="n">145</span>          have := hct_abs i hi</span>
+<span class="l" id="L146"><span class="n">146</span>          have e : 1 / (2 * lam) / 2 = 1 / (4 * lam) := by field_simp; ring</span>
+<span class="l" id="L147"><span class="n">147</span>          linarith</span>
+<span class="l" id="L148"><span class="n">148</span>  -- z_i = c_i (z_{i+1} - z_i)</span>
+<span class="l" id="L149"><span class="n">149</span>  have hzc : ∀ i &lt; m&#x27; + 1, z i = c i * (z (i + 1) - z i) := by</span>
+<span class="l" id="L150"><span class="n">150</span>    intro i hi</span>
+<span class="l" id="L151"><span class="n">151</span>    have hne : eAdd (Δ i) - 1 ≠ 0 := by</span>
+<span class="l" id="L152"><span class="n">152</span>      intro h0</span>
+<span class="l" id="L153"><span class="n">153</span>      have : c i = 0 := by simp only [hc]; rw [h0, inv_zero]</span>
+<span class="l" id="L154"><span class="n">154</span>      rw [hcform i hi] at this</span>
+<span class="l" id="L155"><span class="n">155</span>      have hre := congrArg Complex.re this</span>
+<span class="l" id="L156"><span class="n">156</span>      simp at hre</span>
+<span class="l" id="L157"><span class="n">157</span>    rw [hstep i hi]</span>
+<span class="l" id="L158"><span class="n">158</span>    simp only [hc]</span>
+<span class="l" id="L159"><span class="n">159</span>    field_simp</span>
+<span class="l" id="L160"><span class="n">160</span>  -- Z_k = z_k - z_0</span>
+<span class="l" id="L161"><span class="n">161</span>  set Z : ℕ → ℂ := fun k =&gt; z k - z 0 with hZ</span>
+<span class="l" id="L162"><span class="n">162</span>  have hsum : ∑ i ∈ range (m&#x27; + 1), z i = ∑ i ∈ range (m&#x27; + 1), c i * (Z (i + 1) - Z i) := by</span>
+<span class="l" id="L163"><span class="n">163</span>    refine sum_congr rfl fun i hi =&gt; ?_</span>
+<span class="l" id="L164"><span class="n">164</span>    rw [hzc i (mem_range.1 hi)]</span>
+<span class="l" id="L165"><span class="n">165</span>    simp only [hZ]; ring</span>
+<span class="l" id="L166"><span class="n">166</span>  have hparts := sum_by_parts_zero c Z (by simp [hZ]) m&#x27;</span>
+<span class="l" id="L167"><span class="n">167</span>  have hZn : ∀ k, ‖Z k‖ ≤ 2 := by</span>
+<span class="l" id="L168"><span class="n">168</span>    intro k</span>
+<span class="l" id="L169"><span class="n">169</span>    calc ‖z k - z 0‖ ≤ ‖z k‖ + ‖z 0‖ := norm_sub_le _ _</span>
+<span class="l" id="L170"><span class="n">170</span>      _ = 2 := by rw [hz, hz]; norm_num</span>
+<span class="l" id="L171"><span class="n">171</span>  -- differences of c are purely imaginary: c_{i+1} - c_i = -(I/2)(ct_{i+1} - ct_i)</span>
+<span class="l" id="L172"><span class="n">172</span>  have hdiff : ∀ i &lt; m&#x27;, ‖c (i + 1) - c i‖ = (ct i - ct (i + 1)) / 2 := by</span>
+<span class="l" id="L173"><span class="n">173</span>    intro i hi</span>
+<span class="l" id="L174"><span class="n">174</span>    rw [hcform (i + 1) (by omega), hcform i (by omega)]</span>
+<span class="l" id="L175"><span class="n">175</span>    have hmon : ct (i + 1) ≤ ct i := by</span>
+<span class="l" id="L176"><span class="n">176</span>      simp only [hct]</span>
+<span class="l" id="L177"><span class="n">177</span>      exact cot_pi_antitone (hΔ01 i (by omega)).1 (hmono i (by omega)) (hΔ01 (i + 1) (by omega)).2</span>
+<span class="l" id="L178"><span class="n">178</span>    have e : -(1 / 2 : ℂ) - Complex.I / 2 * (ct (i + 1) : ℂ) -</span>
+<span class="l" id="L179"><span class="n">179</span>        (-(1 / 2 : ℂ) - Complex.I / 2 * (ct i : ℂ)) = Complex.I / 2 * ((ct i - ct (i + 1) : ℝ) : ℂ) := by</span>
+<span class="l" id="L180"><span class="n">180</span>      push_cast; ring</span>
+<span class="l" id="L181"><span class="n">181</span>    rw [e, norm_mul, norm_div, Complex.norm_I, Complex.norm_real, Real.norm_eq_abs,</span>
+<span class="l" id="L182"><span class="n">182</span>      abs_of_nonneg (by linarith)]</span>
+<span class="l" id="L183"><span class="n">183</span>    norm_num; ring</span>
+<span class="l" id="L184"><span class="n">184</span>  have htel : ∀ k ≤ m&#x27;, ∑ i ∈ range k, (ct i - ct (i + 1)) / 2 = (ct 0 - ct k) / 2 := by</span>
+<span class="l" id="L185"><span class="n">185</span>    intro k hk</span>
+<span class="l" id="L186"><span class="n">186</span>    induction k with</span>
+<span class="l" id="L187"><span class="n">187</span>    | zero =&gt; simp</span>
+<span class="l" id="L188"><span class="n">188</span>    | succ k ih =&gt; rw [sum_range_succ, ih (by omega)]; ring</span>
+<span class="l" id="L189"><span class="n">189</span>  have hlast : ‖z (m&#x27; + 1)‖ = 1 := hz _</span>
+<span class="l" id="L190"><span class="n">190</span>  rw [sum_range_succ, hsum, hparts]</span>
+<span class="l" id="L191"><span class="n">191</span>  calc ‖c m&#x27; * Z (m&#x27; + 1) - ∑ i ∈ range m&#x27;, (c (i + 1) - c i) * Z (i + 1) + z (m&#x27; + 1)‖</span>
+<span class="l" id="L192"><span class="n">192</span>      ≤ ‖c m&#x27; * Z (m&#x27; + 1)‖ + ‖∑ i ∈ range m&#x27;, (c (i + 1) - c i) * Z (i + 1)‖ + ‖z (m&#x27; + 1)‖ := by</span>
+<span class="l" id="L193"><span class="n">193</span>        refine (norm_add_le _ _).trans ?_</span>
+<span class="l" id="L194"><span class="n">194</span>        gcongr</span>
+<span class="l" id="L195"><span class="n">195</span>        exact norm_sub_le _ _</span>
+<span class="l" id="L196"><span class="n">196</span>    _ ≤ (1 / 2 + 1 / (4 * lam)) * 2 + (∑ i ∈ range m&#x27;, (ct i - ct (i + 1)) / 2) * 2 + 1 := by</span>
+<span class="l" id="L197"><span class="n">197</span>        gcongr</span>
+<span class="l" id="L198"><span class="n">198</span>        · rw [norm_mul]</span>
+<span class="l" id="L199"><span class="n">199</span>          exact mul_le_mul (hc_abs m&#x27; (by omega)) (hZn _) (norm_nonneg _)</span>
+<span class="l" id="L200"><span class="n">200</span>            (add_nonneg (by norm_num) (div_nonneg (by norm_num) (by linarith)))</span>
+<span class="l" id="L201"><span class="n">201</span>        · rw [sum_mul]</span>
+<span class="l" id="L202"><span class="n">202</span>          refine (norm_sum_le _ _).trans (sum_le_sum fun i hi =&gt; ?_)</span>
+<span class="l" id="L203"><span class="n">203</span>          rw [norm_mul, hdiff i (mem_range.1 hi)]</span>
+<span class="l" id="L204"><span class="n">204</span>          have hnn : 0 ≤ (ct i - ct (i + 1)) / 2 := by</span>
+<span class="l" id="L205"><span class="n">205</span>            rw [← hdiff i (mem_range.1 hi)]; exact norm_nonneg _</span>
+<span class="l" id="L206"><span class="n">206</span>          exact mul_le_mul_of_nonneg_left (hZn _) hnn</span>
+<span class="l" id="L207"><span class="n">207</span>        · exact hlast.le</span>
+<span class="l" id="L208"><span class="n">208</span>    _ = (1 / 2 + 1 / (4 * lam)) * 2 + (ct 0 - ct m&#x27;) + 1 := by</span>
+<span class="l" id="L209"><span class="n">209</span>        rw [htel m&#x27; le_rfl]; ring</span>
+<span class="l" id="L210"><span class="n">210</span>    _ ≤ 2 + 3 / (2 * lam) := by</span>
+<span class="l" id="L211"><span class="n">211</span>        have h0 := hct_abs 0 (by omega)</span>
+<span class="l" id="L212"><span class="n">212</span>        have hm := hct_abs m&#x27; (by omega)</span>
+<span class="l" id="L213"><span class="n">213</span>        have e1 : 1 / (4 * lam) * 2 = 1 / (2 * lam) := by field_simp; ring</span>
+<span class="l" id="L214"><span class="n">214</span>        have e2 : 3 / (2 * lam) = 1 / (2 * lam) + 2 * (1 / (2 * lam)) := by ring</span>
+<span class="l" id="L215"><span class="n">215</span>        have hl1 : 1 ≤ 1 / (2 * lam) := by rw [le_div_iff₀ (by linarith)]; linarith</span>
+<span class="l" id="L216"><span class="n">216</span>        rw [abs_le] at h0 hm</span>
+<span class="l" id="L217"><span class="n">217</span>        nlinarith</span>
+<span class="l" id="L218"><span class="n">218</span></span>
+<span class="l" id="L219"><span class="n">219</span>/-! ## Small `T`: the reciprocal phase in the Kusmin–Landau regime (unconditional) -/</span>
+<span class="l" id="L220"><span class="n">220</span></span>
+<span class="l" id="L221"><span class="n">221</span>/-- **Small-`T` regime, unconditional.** In the window `x + θ ∈ [L, 2L]` with `0 &lt; T ≤ L/2`:</span>
+<span class="l" id="L222"><span class="n">222</span>`|Σ e(TL/(x+θ))| ≤ 8L/T`. -/</span>
+<span class="l" id="L223"><span class="n">223</span>theorem recipSum_small_T {L T θ : ℝ} (a : ℤ) (n : ℕ) (hL : 0 &lt; L) (hT : 0 &lt; T)</span>
+<span class="l" id="L224"><span class="n">224</span>    (hTL : T ≤ L / 2) (hwin : ∀ x ∈ runIcc a n, L ≤ x + θ ∧ x + θ ≤ 2 * L) :</span>
+<span class="l" id="L225"><span class="n">225</span>    ‖expSum (recipPhase (T * L) θ) a n‖ ≤ 8 * L / T := by</span>
+<span class="l" id="L226"><span class="n">226</span>  have h8 : 1 ≤ 8 * L / T := by rw [le_div_iff₀ hT]; linarith</span>
+<span class="l" id="L227"><span class="n">227</span>  rcases Nat.eq_zero_or_pos n with rfl | hn</span>
+<span class="l" id="L228"><span class="n">228</span>  · simp [expSum]; linarith</span>
+<span class="l" id="L229"><span class="n">229</span>  obtain ⟨m, rfl⟩ : ∃ m, n = m + 1 := ⟨n - 1, by omega⟩</span>
+<span class="l" id="L230"><span class="n">230</span>  set y : ℕ → ℝ := fun i =&gt; (a : ℝ) + i + θ with hy</span>
+<span class="l" id="L231"><span class="n">231</span>  have hyw : ∀ i ≤ m, L ≤ y i ∧ y i ≤ 2 * L := by</span>
+<span class="l" id="L232"><span class="n">232</span>    intro i hi</span>
+<span class="l" id="L233"><span class="n">233</span>    have hx : (a : ℝ) + i ∈ runIcc a (m + 1) := by</span>
+<span class="l" id="L234"><span class="n">234</span>      refine ⟨by simp, ?_⟩</span>
+<span class="l" id="L235"><span class="n">235</span>      have : (i : ℝ) ≤ m := by exact_mod_cast hi</span>
+<span class="l" id="L236"><span class="n">236</span>      push_cast; linarith</span>
+<span class="l" id="L237"><span class="n">237</span>    have := hwin _ hx</span>
+<span class="l" id="L238"><span class="n">238</span>    simp only [hy]; exact this</span>
+<span class="l" id="L239"><span class="n">239</span>  set g : ℕ → ℝ := fun i =&gt; recipPhase (T * L) θ ((a : ℝ) + i) + ((a : ℝ) + i) with hg</span>
+<span class="l" id="L240"><span class="n">240</span>  set z : ℕ → ℂ := fun i =&gt; eAdd (g i) with hz</span>
+<span class="l" id="L241"><span class="n">241</span>  set Δ : ℕ → ℝ := fun i =&gt; g (i + 1) - g i with hΔ</span>
+<span class="l" id="L242"><span class="n">242</span>  set lam : ℝ := T / (4 * L) with hlam</span>
+<span class="l" id="L243"><span class="n">243</span>  have hlampos : 0 &lt; lam := div_pos hT (by linarith)</span>
+<span class="l" id="L244"><span class="n">244</span>  have hlamle : lam ≤ 1 / 2 := by</span>
+<span class="l" id="L245"><span class="n">245</span>    rw [hlam, div_le_iff₀ (by linarith)]; nlinarith</span>
+<span class="l" id="L246"><span class="n">246</span>  -- the sum equals Σ z_i</span>
+<span class="l" id="L247"><span class="n">247</span>  have hsum : expSum (recipPhase (T * L) θ) a (m + 1) = ∑ i ∈ range (m + 1), z i := by</span>
+<span class="l" id="L248"><span class="n">248</span>    unfold expSum</span>
+<span class="l" id="L249"><span class="n">249</span>    refine sum_congr rfl fun i _ =&gt; ?_</span>
+<span class="l" id="L250"><span class="n">250</span>    simp only [hz, hg]</span>
+<span class="l" id="L251"><span class="n">251</span>    rw [eAdd_add]</span>
+<span class="l" id="L252"><span class="n">252</span>    have : eAdd ((a : ℝ) + i) = 1 := by</span>
+<span class="l" id="L253"><span class="n">253</span>      have := eAdd_int (a + i); push_cast at this; exact this</span>
+<span class="l" id="L254"><span class="n">254</span>    rw [this, mul_one]</span>
+<span class="l" id="L255"><span class="n">255</span>  -- for i &lt; m both y_i and y_i + 1 lie in the window</span>
+<span class="l" id="L256"><span class="n">256</span>  have hyi1 : ∀ i, y (i + 1) = y i + 1 := by intro i; simp only [hy]; push_cast; ring</span>
+<span class="l" id="L257"><span class="n">257</span>  have hwin2 : ∀ i &lt; m, L ≤ y i ∧ y i + 1 ≤ 2 * L := by</span>
+<span class="l" id="L258"><span class="n">258</span>    intro i hi</span>
+<span class="l" id="L259"><span class="n">259</span>    exact ⟨(hyw i hi.le).1, by rw [← hyi1]; exact (hyw (i + 1) hi).2⟩</span>
+<span class="l" id="L260"><span class="n">260</span>  have hΔform : ∀ i &lt; m, Δ i = 1 - T * L / (y i * (y i + 1)) := by</span>
+<span class="l" id="L261"><span class="n">261</span>    intro i hi</span>
+<span class="l" id="L262"><span class="n">262</span>    have hpos : 0 &lt; y i := lt_of_lt_of_le hL (hwin2 i hi).1</span>
+<span class="l" id="L263"><span class="n">263</span>    simp only [hΔ, hg, recipPhase]</span>
+<span class="l" id="L264"><span class="n">264</span>    have e1 : (a : ℝ) + ((i + 1 : ℕ) : ℝ) + θ = y i + 1 := by simp only [hy]; push_cast; ring</span>
+<span class="l" id="L265"><span class="n">265</span>    have e2 : (a : ℝ) + (i : ℝ) + θ = y i := rfl</span>
+<span class="l" id="L266"><span class="n">266</span>    rw [e1, e2]</span>
+<span class="l" id="L267"><span class="n">267</span>    have hp1 : 0 &lt; y i + 1 := by linarith</span>
+<span class="l" id="L268"><span class="n">268</span>    field_simp</span>
+<span class="l" id="L269"><span class="n">269</span>    push_cast</span>
+<span class="l" id="L270"><span class="n">270</span>    ring</span>
+<span class="l" id="L271"><span class="n">271</span>  have hden : ∀ i &lt; m, L * L ≤ y i * (y i + 1) ∧ y i * (y i + 1) ≤ (2 * L) * (2 * L) := by</span>
+<span class="l" id="L272"><span class="n">272</span>    intro i hi</span>
+<span class="l" id="L273"><span class="n">273</span>    obtain ⟨h1, h2⟩ := hwin2 i hi</span>
+<span class="l" id="L274"><span class="n">274</span>    have h0 : 0 ≤ y i := by linarith</span>
+<span class="l" id="L275"><span class="n">275</span>    constructor</span>
+<span class="l" id="L276"><span class="n">276</span>    · nlinarith</span>
+<span class="l" id="L277"><span class="n">277</span>    · have : y i ≤ 2 * L := by linarith</span>
+<span class="l" id="L278"><span class="n">278</span>      nlinarith</span>
+<span class="l" id="L279"><span class="n">279</span>  have hq : ∀ i &lt; m, T / (4 * L) ≤ T * L / (y i * (y i + 1)) ∧</span>
+<span class="l" id="L280"><span class="n">280</span>      T * L / (y i * (y i + 1)) ≤ T / L := by</span>
+<span class="l" id="L281"><span class="n">281</span>    intro i hi</span>
+<span class="l" id="L282"><span class="n">282</span>    obtain ⟨d1, d2⟩ := hden i hi</span>
+<span class="l" id="L283"><span class="n">283</span>    have hdpos : 0 &lt; y i * (y i + 1) := lt_of_lt_of_le (mul_pos hL hL) d1</span>
+<span class="l" id="L284"><span class="n">284</span>    constructor</span>
+<span class="l" id="L285"><span class="n">285</span>    · rw [div_le_div_iff₀ (by linarith) hdpos]; nlinarith</span>
+<span class="l" id="L286"><span class="n">286</span>    · rw [div_le_div_iff₀ hdpos hL]; nlinarith</span>
+<span class="l" id="L287"><span class="n">287</span>  have hΔb : ∀ i &lt; m, lam ≤ Δ i ∧ Δ i ≤ 1 - lam := by</span>
+<span class="l" id="L288"><span class="n">288</span>    intro i hi</span>
+<span class="l" id="L289"><span class="n">289</span>    rw [hΔform i hi]</span>
+<span class="l" id="L290"><span class="n">290</span>    obtain ⟨q1, q2⟩ := hq i hi</span>
+<span class="l" id="L291"><span class="n">291</span>    have hTL&#x27; : T / L ≤ 1 / 2 := by rw [div_le_iff₀ hL]; linarith</span>
+<span class="l" id="L292"><span class="n">292</span>    constructor</span>
+<span class="l" id="L293"><span class="n">293</span>    · linarith</span>
+<span class="l" id="L294"><span class="n">294</span>    · simp only [hlam]; linarith</span>
+<span class="l" id="L295"><span class="n">295</span>  have hmono : ∀ i, i + 1 &lt; m → Δ i ≤ Δ (i + 1) := by</span>
+<span class="l" id="L296"><span class="n">296</span>    intro i hi</span>
+<span class="l" id="L297"><span class="n">297</span>    rw [hΔform i (by omega), hΔform (i + 1) hi, hyi1]</span>
+<span class="l" id="L298"><span class="n">298</span>    obtain ⟨d1, _⟩ := hden i (by omega)</span>
+<span class="l" id="L299"><span class="n">299</span>    have hdpos : 0 &lt; y i * (y i + 1) := lt_of_lt_of_le (mul_pos hL hL) d1</span>
+<span class="l" id="L300"><span class="n">300</span>    have hyp : 0 ≤ y i := by linarith [(hwin2 i (by omega)).1]</span>
+<span class="l" id="L301"><span class="n">301</span>    have hle : y i * (y i + 1) ≤ (y i + 1) * (y i + 1 + 1) := by nlinarith</span>
+<span class="l" id="L302"><span class="n">302</span>    have : T * L / ((y i + 1) * (y i + 1 + 1)) ≤ T * L / (y i * (y i + 1)) :=</span>
+<span class="l" id="L303"><span class="n">303</span>      div_le_div_of_nonneg_left (mul_nonneg hT.le hL.le) hdpos hle</span>
+<span class="l" id="L304"><span class="n">304</span>    linarith</span>
+<span class="l" id="L305"><span class="n">305</span>  have hstep : ∀ i &lt; m, z (i + 1) = z i * eAdd (Δ i) := by</span>
+<span class="l" id="L306"><span class="n">306</span>    intro i _</span>
+<span class="l" id="L307"><span class="n">307</span>    simp only [hz, hΔ]</span>
+<span class="l" id="L308"><span class="n">308</span>    rw [← eAdd_add]</span>
+<span class="l" id="L309"><span class="n">309</span>    congr 1</span>
+<span class="l" id="L310"><span class="n">310</span>    ring</span>
+<span class="l" id="L311"><span class="n">311</span>  have hKL := kusmin_landau_discrete (z := z) (Δ := Δ) m hlampos hlamle (fun i =&gt; norm_eAdd _)</span>
+<span class="l" id="L312"><span class="n">312</span>    hstep hΔb hmono</span>
+<span class="l" id="L313"><span class="n">313</span>  rw [hsum]</span>
+<span class="l" id="L314"><span class="n">314</span>  refine hKL.trans ?_</span>
+<span class="l" id="L315"><span class="n">315</span>  have e : 3 / (2 * lam) = 6 * L / T := by simp only [hlam]; field_simp; ring</span>
+<span class="l" id="L316"><span class="n">316</span>  rw [e]</span>
+<span class="l" id="L317"><span class="n">317</span>  have h2 : 2 ≤ L / T := by rw [le_div_iff₀ hT]; linarith</span>
+<span class="l" id="L318"><span class="n">318</span>  have : 2 ≤ 2 * L / T := by</span>
+<span class="l" id="L319"><span class="n">319</span>    have : L / T ≤ 2 * L / T := by</span>
+<span class="l" id="L320"><span class="n">320</span>      rw [div_le_div_iff_of_pos_right hT]; linarith</span>
+<span class="l" id="L321"><span class="n">321</span>    linarith</span>
+<span class="l" id="L322"><span class="n">322</span>  calc 2 + 6 * L / T ≤ 2 * L / T + 6 * L / T := by linarith</span>
+<span class="l" id="L323"><span class="n">323</span>    _ = 8 * L / T := by ring</span>
+<span class="l" id="L324"><span class="n">324</span></span>
+<span class="l" id="L325"><span class="n">325</span>/-! ## Middle regime and all regimes together -/</span>
+<span class="l" id="L326"><span class="n">326</span></span>
+<span class="l" id="L327"><span class="n">327</span>/-- Middle regime `L/2 &lt; T ≤ L`: the uniform estimate with `k = 1`, `B₀ = 2`. -/</span>
+<span class="l" id="L328"><span class="n">328</span>theorem recipSum_middle_T (hV : UniformVinogradovEstimate) :</span>
+<span class="l" id="L329"><span class="n">329</span>    ∃ c C : ℝ, 0 &lt; c ∧ 0 ≤ C ∧ ∀ (L T θ : ℝ) (a : ℤ) (n : ℕ),</span>
+<span class="l" id="L330"><span class="n">330</span>      2 ≤ L → L / 2 &lt; T → T ≤ L →</span>
+<span class="l" id="L331"><span class="n">331</span>      (∀ x ∈ runIcc a n, L ≤ x + θ ∧ x + θ ≤ 2 * L) →</span>
+<span class="l" id="L332"><span class="n">332</span>      ‖expSum (recipPhase (T * L) θ) a n‖ ≤ C * L * L ^ (-c) := by</span>
+<span class="l" id="L333"><span class="n">333</span>  obtain ⟨c, C, hc, hC, hb⟩ := hV 2 2 (by norm_num) (by norm_num)</span>
+<span class="l" id="L334"><span class="n">334</span>  refine ⟨c, C, hc, hC, fun L T θ a n hL hT1 hT2 hwin =&gt; ?_⟩</span>
+<span class="l" id="L335"><span class="n">335</span>  have hLpos : 0 &lt; L := by linarith</span>
+<span class="l" id="L336"><span class="n">336</span>  have hlen : (n : ℝ) - 1 ≤ L := by</span>
+<span class="l" id="L337"><span class="n">337</span>    rcases Nat.eq_zero_or_pos n with rfl | hn</span>
+<span class="l" id="L338"><span class="n">338</span>    · simp; linarith</span>
+<span class="l" id="L339"><span class="n">339</span>    have hn1 : (1 : ℝ) ≤ n := by exact_mod_cast hn</span>
+<span class="l" id="L340"><span class="n">340</span>    have ha : (a : ℝ) ∈ runIcc a n := ⟨le_refl _, by linarith⟩</span>
+<span class="l" id="L341"><span class="n">341</span>    have hb&#x27; : (a : ℝ) + n - 1 ∈ runIcc a n := ⟨by linarith, le_refl _⟩</span>
+<span class="l" id="L342"><span class="n">342</span>    linarith [(hwin _ ha).1, (hwin _ hb&#x27;).2]</span>
+<span class="l" id="L343"><span class="n">343</span>  have hsub : runIcc a n ⊆ Set.Ioi (-θ) := fun x hx =&gt; by</span>
+<span class="l" id="L344"><span class="n">344</span>    have := (hwin x hx).1; show -θ &lt; x; linarith</span>
+<span class="l" id="L345"><span class="n">345</span>  have hder : DerivHyp 2 L T (recipPhase (T * L) θ) (runIcc a n) := by</span>
+<span class="l" id="L346"><span class="n">346</span>    have h := recipPhase_derivHyp (X := T * L) (θ := θ) (mul_nonneg (by linarith) hLpos.le)</span>
+<span class="l" id="L347"><span class="n">347</span>      hLpos (runIcc a n) hwin</span>
+<span class="l" id="L348"><span class="n">348</span>    rwa [mul_div_assoc, div_self hLpos.ne&#x27;, mul_one] at h</span>
+<span class="l" id="L349"><span class="n">349</span>  have := hb L T 1 (recipPhase (T * L) θ) a n (Set.Ioi (-θ)) hL (by linarith) le_rfl</span>
+<span class="l" id="L350"><span class="n">350</span>    (by simpa using hT2) hlen isOpen_Ioi hsub (recipPhase_contDiffOn _ _) hder</span>
+<span class="l" id="L351"><span class="n">351</span>  simpa using this</span>
+<span class="l" id="L352"><span class="n">352</span></span>
+<span class="l" id="L353"><span class="n">353</span>/-- **All Type I regimes, conditional only on `UniformVinogradovEstimate`.**</span>
+<span class="l" id="L354"><span class="n">354</span>For every `A &gt; 0` and all large `L`, every `T &gt; 0` (with `log L ≥ (log T)^σ` required only when</span>
+<span class="l" id="L355"><span class="n">355</span>`T ≥ L`), every shift and every run in the window `x+θ ∈ [L, 2L]`:</span>
+<span class="l" id="L356"><span class="n">356</span>`|Σ e(TL/(x+θ))| ≤ L (log L)^{-A} + 8L/T`. -/</span>
+<span class="l" id="L357"><span class="n">357</span>theorem recipSum_all_regimes {σ : ℝ} (hσ : 2 / 3 &lt; σ) (hV : UniformVinogradovEstimate)</span>
+<span class="l" id="L358"><span class="n">358</span>    (A : ℝ) (hA : 0 &lt; A) :</span>
+<span class="l" id="L359"><span class="n">359</span>    ∃ L₁ : ℝ, ∀ (L T θ : ℝ) (a : ℤ) (n : ℕ),</span>
+<span class="l" id="L360"><span class="n">360</span>      L₁ ≤ L → 0 &lt; T → (L ≤ T → Real.log T ^ σ ≤ Real.log L) →</span>
+<span class="l" id="L361"><span class="n">361</span>      (∀ x ∈ runIcc a n, L ≤ x + θ ∧ x + θ ≤ 2 * L) →</span>
+<span class="l" id="L362"><span class="n">362</span>      ‖expSum (recipPhase (T * L) θ) a n‖ ≤ L * Real.log L ^ (-A) + 8 * L / T := by</span>
+<span class="l" id="L363"><span class="n">363</span>  obtain ⟨T₀, hT₀⟩ := reciprocalPhaseVK_of_uniform hσ hV A hA</span>
+<span class="l" id="L364"><span class="n">364</span>  obtain ⟨c, C, hc, hC, hmid⟩ := recipSum_middle_T hV</span>
+<span class="l" id="L365"><span class="n">365</span>  obtain ⟨y₀, hy₀1, hy₀⟩ := eventually_const_mul_exp_neg_le C c 1 A hc one_pos</span>
+<span class="l" id="L366"><span class="n">366</span>  refine ⟨max (max T₀ 2) (Real.exp y₀), fun L T θ a n hL hT hσL hwin =&gt; ?_⟩</span>
+<span class="l" id="L367"><span class="n">367</span>  have hL2 : 2 ≤ L := ((le_max_right _ _).trans (le_max_left _ _)).trans hL</span>
+<span class="l" id="L368"><span class="n">368</span>  have hLT₀ : T₀ ≤ L := ((le_max_left _ _).trans (le_max_left _ _)).trans hL</span>
+<span class="l" id="L369"><span class="n">369</span>  have hLpos : 0 &lt; L := by linarith</span>
+<span class="l" id="L370"><span class="n">370</span>  have hlogL : y₀ ≤ Real.log L := by</span>
+<span class="l" id="L371"><span class="n">371</span>    rw [Real.le_log_iff_exp_le hLpos]; exact (le_max_right _ _).trans hL</span>
+<span class="l" id="L372"><span class="n">372</span>  have hlogLpos : 0 &lt; Real.log L := lt_of_lt_of_le (by linarith) hlogL</span>
+<span class="l" id="L373"><span class="n">373</span>  have hpow_nn : 0 ≤ L * Real.log L ^ (-A) := mul_nonneg hLpos.le (Real.rpow_nonneg hlogLpos.le _)</span>
+<span class="l" id="L374"><span class="n">374</span>  have h8 : 0 ≤ 8 * L / T := div_nonneg (by linarith) hT.le</span>
+<span class="l" id="L375"><span class="n">375</span>  rcases le_or_gt T (L / 2) with hsmall | hbig</span>
+<span class="l" id="L376"><span class="n">376</span>  · have := recipSum_small_T a n hLpos hT hsmall hwin</span>
+<span class="l" id="L377"><span class="n">377</span>    linarith</span>
+<span class="l" id="L378"><span class="n">378</span>  rcases le_or_gt T L with hmidT | hlarge</span>
+<span class="l" id="L379"><span class="n">379</span>  · have hm := hmid L T θ a n hL2 hbig hmidT hwin</span>
+<span class="l" id="L380"><span class="n">380</span>    have hy := hy₀ (Real.log L) hlogL</span>
+<span class="l" id="L381"><span class="n">381</span>    have hrp : L ^ (-c) = Real.exp (-(c * Real.log L ^ (1 : ℝ))) := by</span>
+<span class="l" id="L382"><span class="n">382</span>      rw [Real.rpow_one, Real.rpow_def_of_pos hLpos]; ring_nf</span>
+<span class="l" id="L383"><span class="n">383</span>    calc ‖expSum (recipPhase (T * L) θ) a n‖ ≤ C * L * L ^ (-c) := hm</span>
+<span class="l" id="L384"><span class="n">384</span>      _ = L * (C * Real.exp (-(c * Real.log L ^ (1 : ℝ)))) := by rw [hrp]; ring</span>
+<span class="l" id="L385"><span class="n">385</span>      _ ≤ L * Real.log L ^ (-A) := mul_le_mul_of_nonneg_left hy hLpos.le</span>
+<span class="l" id="L386"><span class="n">386</span>      _ ≤ L * Real.log L ^ (-A) + 8 * L / T := by linarith</span>
+<span class="l" id="L387"><span class="n">387</span>  · have hvk := hT₀ L T θ a n (hLT₀.trans hlarge.le) hL2 hlarge.le (hσL hlarge.le) hwin</span>
+<span class="l" id="L388"><span class="n">388</span>    have hmono : Real.log T ^ (-A) ≤ Real.log L ^ (-A) :=</span>
+<span class="l" id="L389"><span class="n">389</span>      Real.rpow_le_rpow_of_nonpos hlogLpos (Real.log_le_log hLpos hlarge.le) (by linarith)</span>
+<span class="l" id="L390"><span class="n">390</span>    calc ‖expSum (recipPhase (T * L) θ) a n‖ ≤ L * Real.log T ^ (-A) := hvk</span>
+<span class="l" id="L391"><span class="n">391</span>      _ ≤ L * Real.log L ^ (-A) := mul_le_mul_of_nonneg_left hmono hLpos.le</span>
+<span class="l" id="L392"><span class="n">392</span>      _ ≤ L * Real.log L ^ (-A) + 8 * L / T := by linarith</span>
+<span class="l" id="L393"><span class="n">393</span></span>
+<span class="l" id="L394"><span class="n">394</span>/-- **Harmonic-weighted Type I class sum, all regimes, conditional only on the uniform</span>
+<span class="l" id="L395"><span class="n">395</span>Vinogradov estimate:** `|Σ_j e(TL/(j+θ)) / (Q(j+θ))| ≤ ((log L)^{-A} + 8/T)/Q`. -/</span>
+<span class="l" id="L396"><span class="n">396</span>theorem typeI_class_sum_all_regimes {σ : ℝ} (hσ : 2 / 3 &lt; σ) (hV : UniformVinogradovEstimate)</span>
+<span class="l" id="L397"><span class="n">397</span>    (A : ℝ) (hA : 0 &lt; A) :</span>
+<span class="l" id="L398"><span class="n">398</span>    ∃ L₁ : ℝ, ∀ (L T θ Q : ℝ) (a : ℤ) (n : ℕ),</span>
+<span class="l" id="L399"><span class="n">399</span>      L₁ ≤ L → 0 &lt; T → (L ≤ T → Real.log T ^ σ ≤ Real.log L) → 0 &lt; Q →</span>
+<span class="l" id="L400"><span class="n">400</span>      (∀ x ∈ runIcc a n, L ≤ x + θ ∧ x + θ ≤ 2 * L) →</span>
+<span class="l" id="L401"><span class="n">401</span>      ‖∑ i ∈ range n, ((1 / (Q * ((a : ℝ) + i + θ)) : ℝ) : ℂ) *</span>
+<span class="l" id="L402"><span class="n">402</span>          eAdd (recipPhase (T * L) θ ((a : ℝ) + i))‖ ≤</span>
+<span class="l" id="L403"><span class="n">403</span>        (Real.log L ^ (-A) + 8 / T) / Q := by</span>
+<span class="l" id="L404"><span class="n">404</span>  obtain ⟨L₁, hL₁⟩ := recipSum_all_regimes hσ hV A hA</span>
+<span class="l" id="L405"><span class="n">405</span>  refine ⟨max L₁ 1, fun L T θ Q a n hL hT hσL hQ hwin =&gt; ?_⟩</span>
+<span class="l" id="L406"><span class="n">406</span>  have hLpos : 0 &lt; L := lt_of_lt_of_le one_pos ((le_max_right _ _).trans hL)</span>
+<span class="l" id="L407"><span class="n">407</span>  have hprefix : ∀ m ≤ n, ∀ x ∈ runIcc a m, L ≤ x + θ ∧ x + θ ≤ 2 * L := by</span>
+<span class="l" id="L408"><span class="n">408</span>    intro m hm x hx</span>
+<span class="l" id="L409"><span class="n">409</span>    apply hwin</span>
+<span class="l" id="L410"><span class="n">410</span>    refine ⟨hx.1, hx.2.trans ?_⟩</span>
+<span class="l" id="L411"><span class="n">411</span>    have : (m : ℝ) ≤ n := by exact_mod_cast hm</span>
+<span class="l" id="L412"><span class="n">412</span>    linarith</span>
+<span class="l" id="L413"><span class="n">413</span>  by_cases hn : n = 0</span>
+<span class="l" id="L414"><span class="n">414</span>  · subst hn</span>
+<span class="l" id="L415"><span class="n">415</span>    simp only [range_zero, sum_empty, norm_zero]</span>
+<span class="l" id="L416"><span class="n">416</span>    have : 0 ≤ Real.log L ^ (-A) := Real.rpow_nonneg (Real.log_nonneg</span>
+<span class="l" id="L417"><span class="n">417</span>      ((le_max_right _ _).trans hL)) _</span>
+<span class="l" id="L418"><span class="n">418</span>    exact div_nonneg (add_nonneg this (div_nonneg (by norm_num) hT.le)) hQ.le</span>
+<span class="l" id="L419"><span class="n">419</span>  have haθ : L ≤ (a : ℝ) + θ := by</span>
+<span class="l" id="L420"><span class="n">420</span>    have ha : (a : ℝ) ∈ runIcc a n := by</span>
+<span class="l" id="L421"><span class="n">421</span>      refine ⟨le_refl _, ?_⟩</span>
+<span class="l" id="L422"><span class="n">422</span>      have : (1 : ℝ) ≤ n := by exact_mod_cast Nat.one_le_iff_ne_zero.2 hn</span>
+<span class="l" id="L423"><span class="n">423</span>      linarith</span>
+<span class="l" id="L424"><span class="n">424</span>    exact (hwin _ ha).1</span>
+<span class="l" id="L425"><span class="n">425</span>  have hpos : ∀ i : ℕ, 0 &lt; (a : ℝ) + i + θ := by</span>
+<span class="l" id="L426"><span class="n">426</span>    intro i; have : (0 : ℝ) ≤ i := Nat.cast_nonneg i; linarith</span>
+<span class="l" id="L427"><span class="n">427</span>  set w : ℕ → ℝ := fun i =&gt; 1 / (Q * ((a : ℝ) + i + θ)) with hw</span>
+<span class="l" id="L428"><span class="n">428</span>  have hw0 : ∀ i, 0 ≤ w i := fun i =&gt; by</span>
+<span class="l" id="L429"><span class="n">429</span>    simp only [hw]; exact div_nonneg zero_le_one (mul_pos hQ (hpos i)).le</span>
+<span class="l" id="L430"><span class="n">430</span>  have hwm : ∀ i, w (i + 1) ≤ w i := fun i =&gt; by</span>
+<span class="l" id="L431"><span class="n">431</span>    simp only [hw]</span>
+<span class="l" id="L432"><span class="n">432</span>    apply one_div_le_one_div_of_le (mul_pos hQ (hpos i))</span>
+<span class="l" id="L433"><span class="n">433</span>    apply mul_le_mul_of_nonneg_left _ hQ.le</span>
+<span class="l" id="L434"><span class="n">434</span>    push_cast; linarith</span>
+<span class="l" id="L435"><span class="n">435</span>  have hB : ∀ m ≤ n, ‖∑ i ∈ range m, eAdd (recipPhase (T * L) θ ((a : ℝ) + i))‖ ≤</span>
+<span class="l" id="L436"><span class="n">436</span>      L * Real.log L ^ (-A) + 8 * L / T := fun m hm =&gt;</span>
+<span class="l" id="L437"><span class="n">437</span>    hL₁ L T θ a m ((le_max_left _ _).trans hL) hT hσL (hprefix m hm)</span>
+<span class="l" id="L438"><span class="n">438</span>  have habel := abel_antitone (z := fun i =&gt; eAdd (recipPhase (T * L) θ ((a : ℝ) + i)))</span>
+<span class="l" id="L439"><span class="n">439</span>    (w := w) n hw0 hwm hB</span>
+<span class="l" id="L440"><span class="n">440</span>  have hw0le : w 0 ≤ 1 / (Q * L) := by</span>
+<span class="l" id="L441"><span class="n">441</span>    simp only [hw]</span>
+<span class="l" id="L442"><span class="n">442</span>    apply one_div_le_one_div_of_le (mul_pos hQ hLpos)</span>
+<span class="l" id="L443"><span class="n">443</span>    apply mul_le_mul_of_nonneg_left _ hQ.le</span>
+<span class="l" id="L444"><span class="n">444</span>    simpa using haθ</span>
+<span class="l" id="L445"><span class="n">445</span>  have hBnn : 0 ≤ L * Real.log L ^ (-A) + 8 * L / T := by</span>
+<span class="l" id="L446"><span class="n">446</span>    have : 0 ≤ Real.log L ^ (-A) := Real.rpow_nonneg (Real.log_nonneg</span>
+<span class="l" id="L447"><span class="n">447</span>      ((le_max_right _ _).trans hL)) _</span>
+<span class="l" id="L448"><span class="n">448</span>    exact add_nonneg (mul_nonneg hLpos.le this) (div_nonneg (by linarith) hT.le)</span>
+<span class="l" id="L449"><span class="n">449</span>  calc ‖∑ i ∈ range n, ((1 / (Q * ((a : ℝ) + i + θ)) : ℝ) : ℂ) *</span>
+<span class="l" id="L450"><span class="n">450</span>          eAdd (recipPhase (T * L) θ ((a : ℝ) + i))‖</span>
+<span class="l" id="L451"><span class="n">451</span>      = ‖∑ i ∈ range n, (w i : ℂ) * eAdd (recipPhase (T * L) θ ((a : ℝ) + i))‖ := rfl</span>
+<span class="l" id="L452"><span class="n">452</span>    _ ≤ w 0 * (L * Real.log L ^ (-A) + 8 * L / T) := habel</span>
+<span class="l" id="L453"><span class="n">453</span>    _ ≤ 1 / (Q * L) * (L * Real.log L ^ (-A) + 8 * L / T) :=</span>
+<span class="l" id="L454"><span class="n">454</span>        mul_le_mul_of_nonneg_right hw0le hBnn</span>
+<span class="l" id="L455"><span class="n">455</span>    _ = (Real.log L ^ (-A) + 8 / T) / Q := by field_simp</span>
+<span class="l" id="L456"><span class="n">456</span></span>
+<span class="l" id="L457"><span class="n">457</span>end GoldC.VK</span></pre></div></body></html>

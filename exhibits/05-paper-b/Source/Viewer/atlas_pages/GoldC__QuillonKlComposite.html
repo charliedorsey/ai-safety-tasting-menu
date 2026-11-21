@@ -1,0 +1,280 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · GoldC/QuillonKlComposite.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>GoldC/QuillonKlComposite.lean</h1><p class="meta">LEAN/GoldC/QuillonKlComposite.lean · 279 lines · SHA-256 7618f77785ec3c6337b126b23ef5d35b149ab215951545aedeabd37f7e320b49</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import Mathlib.NumberTheory.LegendreSymbol.AddCharacter</span>
+<span class="l" id="L2"><span class="n">2</span>import Mathlib.Analysis.SpecialFunctions.Complex.CircleAddChar</span>
+<span class="l" id="L3"><span class="n">3</span>import Mathlib.Data.ZMod.Units</span>
+<span class="l" id="L4"><span class="n">4</span>import GoldC.QuillonKloosterman</span>
+<span class="l" id="L5"><span class="n">5</span>import Mathlib.Tactic</span>
+<span class="l" id="L6"><span class="n">6</span></span>
+<span class="l" id="L7"><span class="n">7</span>/-!</span>
+<span class="l" id="L8"><span class="n">8</span># Quillon CSC3 F1b: twisted multiplicativity of Kloosterman sums (CRT)</span>
+<span class="l" id="L9"><span class="n">9</span></span>
+<span class="l" id="L10"><span class="n">10</span>`K_s(a,b) = Σ_{x ∈ (ℤ/s)ˣ} e((a x + b x⁻¹)/s)`, with `e(·/s) = ZMod.stdAddChar`.</span>
+<span class="l" id="L11"><span class="n">11</span></span>
+<span class="l" id="L12"><span class="n">12</span>* `stdAddChar_crt`: for coprime `m, n ≥ 1` and `z : ZMod (m n)`,</span>
+<span class="l" id="L13"><span class="n">13</span>  `e(z/(mn)) = e(z·n̄/m) · e(z·m̄/n)`.</span>
+<span class="l" id="L14"><span class="n">14</span>* `K_mul`: `K_{mn}(a,b) = K_m(a n̄, b n̄) · K_n(a m̄, b m̄)`. The residues of `a, b` are taken by cast.</span>
+<span class="l" id="L15"><span class="n">15</span></span>
+<span class="l" id="L16"><span class="n">16</span>No axiom, no `sorry`.</span>
+<span class="l" id="L17"><span class="n">17</span>-/</span>
+<span class="l" id="L18"><span class="n">18</span></span>
+<span class="l" id="L19"><span class="n">19</span>open scoped BigOperators</span>
+<span class="l" id="L20"><span class="n">20</span>open Finset</span>
+<span class="l" id="L21"><span class="n">21</span></span>
+<span class="l" id="L22"><span class="n">22</span>namespace GoldC.QuillonKl</span>
+<span class="l" id="L23"><span class="n">23</span></span>
+<span class="l" id="L24"><span class="n">24</span>/-- Kloosterman sum over the units of `ZMod s`. -/</span>
+<span class="l" id="L25"><span class="n">25</span>noncomputable def K (s : ℕ) [NeZero s] (a b : ZMod s) : ℂ :=</span>
+<span class="l" id="L26"><span class="n">26</span>  ∑ x : (ZMod s)ˣ, ZMod.stdAddChar (a * (x : ZMod s) + b * ((x⁻¹ : (ZMod s)ˣ) : ZMod s))</span>
+<span class="l" id="L27"><span class="n">27</span></span>
+<span class="l" id="L28"><span class="n">28</span>lemma crt_unit_sum {m n : ℕ} [NeZero m] [NeZero n] (h : m.Coprime n) :</span>
+<span class="l" id="L29"><span class="n">29</span>    ∃ k : ℤ, ((n * ((n : ZMod m)⁻¹).val + m * ((m : ZMod n)⁻¹).val : ℕ) : ℤ) = 1 + m * n * k := by</span>
+<span class="l" id="L30"><span class="n">30</span>  set n&#x27; := ((n : ZMod m)⁻¹).val</span>
+<span class="l" id="L31"><span class="n">31</span>  set m&#x27; := ((m : ZMod n)⁻¹).val</span>
+<span class="l" id="L32"><span class="n">32</span>  have hmn : 0 &lt; m * n := Nat.mul_pos (Nat.pos_of_ne_zero (NeZero.ne m))</span>
+<span class="l" id="L33"><span class="n">33</span>    (Nat.pos_of_ne_zero (NeZero.ne n))</span>
+<span class="l" id="L34"><span class="n">34</span>  rcases Nat.lt_or_ge 1 (m * n) with hlt | hle</span>
+<span class="l" id="L35"><span class="n">35</span>  · have h1 : n * n&#x27; + m * m&#x27; ≡ 1 [MOD m] := by</span>
+<span class="l" id="L36"><span class="n">36</span>      rw [← ZMod.natCast_eq_natCast_iff]</span>
+<span class="l" id="L37"><span class="n">37</span>      push_cast</span>
+<span class="l" id="L38"><span class="n">38</span>      rw [ZMod.natCast_self, zero_mul, add_zero, ZMod.natCast_val, ZMod.cast_id&#x27;, id,</span>
+<span class="l" id="L39"><span class="n">39</span>        ZMod.coe_mul_inv_eq_one n h.symm]</span>
+<span class="l" id="L40"><span class="n">40</span>    have h2 : n * n&#x27; + m * m&#x27; ≡ 1 [MOD n] := by</span>
+<span class="l" id="L41"><span class="n">41</span>      rw [← ZMod.natCast_eq_natCast_iff]</span>
+<span class="l" id="L42"><span class="n">42</span>      push_cast</span>
+<span class="l" id="L43"><span class="n">43</span>      rw [ZMod.natCast_self, zero_mul, zero_add, ZMod.natCast_val, ZMod.cast_id&#x27;, id,</span>
+<span class="l" id="L44"><span class="n">44</span>        ZMod.coe_mul_inv_eq_one m h]</span>
+<span class="l" id="L45"><span class="n">45</span>    have h3 : n * n&#x27; + m * m&#x27; ≡ 1 [MOD m * n] :=</span>
+<span class="l" id="L46"><span class="n">46</span>      (Nat.modEq_and_modEq_iff_modEq_mul h).1 ⟨h1, h2⟩</span>
+<span class="l" id="L47"><span class="n">47</span>    refine ⟨((n * n&#x27; + m * m&#x27;) / (m * n) : ℕ), ?_⟩</span>
+<span class="l" id="L48"><span class="n">48</span>    have := Nat.div_add_mod (n * n&#x27; + m * m&#x27;) (m * n)</span>
+<span class="l" id="L49"><span class="n">49</span>    unfold Nat.ModEq at h3</span>
+<span class="l" id="L50"><span class="n">50</span>    rw [h3, Nat.mod_eq_of_lt hlt] at this</span>
+<span class="l" id="L51"><span class="n">51</span>    have : ((n * n&#x27; + m * m&#x27; : ℕ) : ℤ) = ((m * n * ((n * n&#x27; + m * m&#x27;) / (m * n)) + 1 : ℕ) : ℤ) := by</span>
+<span class="l" id="L52"><span class="n">52</span>      rw [this]</span>
+<span class="l" id="L53"><span class="n">53</span>    rw [this]; push_cast; ring</span>
+<span class="l" id="L54"><span class="n">54</span>  · have h11 : m * n = 1 := by omega</span>
+<span class="l" id="L55"><span class="n">55</span>    have hm1 : m = 1 := Nat.eq_one_of_mul_eq_one_right h11</span>
+<span class="l" id="L56"><span class="n">56</span>    have hn1 : n = 1 := Nat.eq_one_of_mul_eq_one_left h11</span>
+<span class="l" id="L57"><span class="n">57</span>    subst hm1; subst hn1</span>
+<span class="l" id="L58"><span class="n">58</span>    have hn&#x27; : n&#x27; = 0 := Nat.lt_one_iff.mp (ZMod.val_lt _)</span>
+<span class="l" id="L59"><span class="n">59</span>    have hm&#x27; : m&#x27; = 0 := Nat.lt_one_iff.mp (ZMod.val_lt _)</span>
+<span class="l" id="L60"><span class="n">60</span>    refine ⟨-1, ?_⟩</span>
+<span class="l" id="L61"><span class="n">61</span>    rw [hn&#x27;, hm&#x27;]; norm_num</span>
+<span class="l" id="L62"><span class="n">62</span></span>
+<span class="l" id="L63"><span class="n">63</span>/-- The standard character factors through CRT. -/</span>
+<span class="l" id="L64"><span class="n">64</span>theorem stdAddChar_crt {m n : ℕ} [NeZero m] [NeZero n] (h : m.Coprime n) (z : ZMod (m * n)) :</span>
+<span class="l" id="L65"><span class="n">65</span>    haveI : NeZero (m * n) := ⟨Nat.mul_ne_zero (NeZero.ne m) (NeZero.ne n)⟩</span>
+<span class="l" id="L66"><span class="n">66</span>    ZMod.stdAddChar z =</span>
+<span class="l" id="L67"><span class="n">67</span>      ZMod.stdAddChar ((ZMod.castHom (dvd_mul_right m n) (ZMod m) z) * (n : ZMod m)⁻¹) *</span>
+<span class="l" id="L68"><span class="n">68</span>      ZMod.stdAddChar ((ZMod.castHom (dvd_mul_left n m) (ZMod n) z) * (m : ZMod n)⁻¹) := by</span>
+<span class="l" id="L69"><span class="n">69</span>  haveI : NeZero (m * n) := ⟨Nat.mul_ne_zero (NeZero.ne m) (NeZero.ne n)⟩</span>
+<span class="l" id="L70"><span class="n">70</span>  obtain ⟨k, hk⟩ := crt_unit_sum (m := m) (n := n) h</span>
+<span class="l" id="L71"><span class="n">71</span>  set n&#x27; := ((n : ZMod m)⁻¹).val</span>
+<span class="l" id="L72"><span class="n">72</span>  set m&#x27; := ((m : ZMod n)⁻¹).val</span>
+<span class="l" id="L73"><span class="n">73</span>  set v := z.val</span>
+<span class="l" id="L74"><span class="n">74</span>  have hz : z = ((v : ℤ) : ZMod (m * n)) := by simp [v]</span>
+<span class="l" id="L75"><span class="n">75</span>  have h1 : (ZMod.castHom (dvd_mul_right m n) (ZMod m) z) * (n : ZMod m)⁻¹ =</span>
+<span class="l" id="L76"><span class="n">76</span>      (((v * n&#x27; : ℕ) : ℤ) : ZMod m) := by</span>
+<span class="l" id="L77"><span class="n">77</span>    rw [hz]; simp [n&#x27;]</span>
+<span class="l" id="L78"><span class="n">78</span>  have h2 : (ZMod.castHom (dvd_mul_left n m) (ZMod n) z) * (m : ZMod n)⁻¹ =</span>
+<span class="l" id="L79"><span class="n">79</span>      (((v * m&#x27; : ℕ) : ℤ) : ZMod n) := by</span>
+<span class="l" id="L80"><span class="n">80</span>    rw [hz]; simp [m&#x27;]</span>
+<span class="l" id="L81"><span class="n">81</span>  rw [h1, h2, hz, ZMod.stdAddChar_coe, ZMod.stdAddChar_coe, ZMod.stdAddChar_coe,</span>
+<span class="l" id="L82"><span class="n">82</span>    ← Complex.exp_add]</span>
+<span class="l" id="L83"><span class="n">83</span>  -- exponent difference is 2πi·(v k)</span>
+<span class="l" id="L84"><span class="n">84</span>  have hmR : (m : ℂ) ≠ 0 := by exact_mod_cast NeZero.ne m</span>
+<span class="l" id="L85"><span class="n">85</span>  have hnR : (n : ℂ) ≠ 0 := by exact_mod_cast NeZero.ne n</span>
+<span class="l" id="L86"><span class="n">86</span>  have hkC : (n : ℂ) * n&#x27; + (m : ℂ) * m&#x27; = 1 + (m : ℂ) * n * k := by</span>
+<span class="l" id="L87"><span class="n">87</span>    have := congrArg (fun t : ℤ =&gt; (t : ℂ)) hk</span>
+<span class="l" id="L88"><span class="n">88</span>    push_cast at this; exact this</span>
+<span class="l" id="L89"><span class="n">89</span>  have key : 2 * (Real.pi : ℂ) * Complex.I * (((v * n&#x27; : ℕ) : ℤ) : ℂ) / (m : ℂ) +</span>
+<span class="l" id="L90"><span class="n">90</span>      2 * (Real.pi : ℂ) * Complex.I * (((v * m&#x27; : ℕ) : ℤ) : ℂ) / (n : ℂ) =</span>
+<span class="l" id="L91"><span class="n">91</span>      2 * (Real.pi : ℂ) * Complex.I * (((v : ℕ) : ℤ) : ℂ) / ((m * n : ℕ) : ℂ) +</span>
+<span class="l" id="L92"><span class="n">92</span>        ((v : ℤ) * k : ℤ) * (2 * Real.pi * Complex.I) := by</span>
+<span class="l" id="L93"><span class="n">93</span>    push_cast</span>
+<span class="l" id="L94"><span class="n">94</span>    calc 2 * (Real.pi : ℂ) * Complex.I * ((v : ℂ) * n&#x27;) / m +</span>
+<span class="l" id="L95"><span class="n">95</span>          2 * (Real.pi : ℂ) * Complex.I * ((v : ℂ) * m&#x27;) / n</span>
+<span class="l" id="L96"><span class="n">96</span>        = 2 * (Real.pi : ℂ) * Complex.I * v * ((n : ℂ) * n&#x27; + (m : ℂ) * m&#x27;) / ((m : ℂ) * n) := by</span>
+<span class="l" id="L97"><span class="n">97</span>          field_simp; try ring</span>
+<span class="l" id="L98"><span class="n">98</span>      _ = 2 * (Real.pi : ℂ) * Complex.I * v * (1 + (m : ℂ) * n * k) / ((m : ℂ) * n) := by</span>
+<span class="l" id="L99"><span class="n">99</span>          rw [hkC]</span>
+<span class="l" id="L100"><span class="n">100</span>      _ = _ := by field_simp; try ring</span>
+<span class="l" id="L101"><span class="n">101</span>  rw [key, Complex.exp_add, Complex.exp_int_mul_two_pi_mul_I, mul_one]</span>
+<span class="l" id="L102"><span class="n">102</span></span>
+<span class="l" id="L103"><span class="n">103</span>/-- **Twisted multiplicativity.** -/</span>
+<span class="l" id="L104"><span class="n">104</span>theorem K_mul {m n : ℕ} [NeZero m] [NeZero n] (h : m.Coprime n) (a b : ZMod (m * n)) :</span>
+<span class="l" id="L105"><span class="n">105</span>    haveI : NeZero (m * n) := ⟨Nat.mul_ne_zero (NeZero.ne m) (NeZero.ne n)⟩</span>
+<span class="l" id="L106"><span class="n">106</span>    K (m * n) a b =</span>
+<span class="l" id="L107"><span class="n">107</span>      K m (ZMod.castHom (dvd_mul_right m n) (ZMod m) a * (n : ZMod m)⁻¹)</span>
+<span class="l" id="L108"><span class="n">108</span>          (ZMod.castHom (dvd_mul_right m n) (ZMod m) b * (n : ZMod m)⁻¹) *</span>
+<span class="l" id="L109"><span class="n">109</span>        K n (ZMod.castHom (dvd_mul_left n m) (ZMod n) a * (m : ZMod n)⁻¹)</span>
+<span class="l" id="L110"><span class="n">110</span>          (ZMod.castHom (dvd_mul_left n m) (ZMod n) b * (m : ZMod n)⁻¹) := by</span>
+<span class="l" id="L111"><span class="n">111</span>  haveI : NeZero (m * n) := ⟨Nat.mul_ne_zero (NeZero.ne m) (NeZero.ne n)⟩</span>
+<span class="l" id="L112"><span class="n">112</span>  set f₁ := ZMod.castHom (dvd_mul_right m n) (ZMod m)</span>
+<span class="l" id="L113"><span class="n">113</span>  set f₂ := ZMod.castHom (dvd_mul_left n m) (ZMod n)</span>
+<span class="l" id="L114"><span class="n">114</span>  -- the unit equivalence</span>
+<span class="l" id="L115"><span class="n">115</span>  let E : (ZMod (m * n))ˣ ≃ (ZMod m)ˣ × (ZMod n)ˣ :=</span>
+<span class="l" id="L116"><span class="n">116</span>    ((Units.mapEquiv (ZMod.chineseRemainder h).toMulEquiv).trans MulEquiv.prodUnits).toEquiv</span>
+<span class="l" id="L117"><span class="n">117</span>  have hE1 : ∀ x : (ZMod (m * n))ˣ, ((E x).1 : ZMod m) = f₁ (x : ZMod (m * n)) := by</span>
+<span class="l" id="L118"><span class="n">118</span>    intro x; simp [E, f₁, ZMod.chineseRemainder, MulEquiv.prodUnits, ZMod.castHom_apply]</span>
+<span class="l" id="L119"><span class="n">119</span>  have hE2 : ∀ x : (ZMod (m * n))ˣ, ((E x).2 : ZMod n) = f₂ (x : ZMod (m * n)) := by</span>
+<span class="l" id="L120"><span class="n">120</span>    intro x; simp [E, f₂, ZMod.chineseRemainder, MulEquiv.prodUnits, ZMod.castHom_apply]</span>
+<span class="l" id="L121"><span class="n">121</span>  unfold K</span>
+<span class="l" id="L122"><span class="n">122</span>  rw [← Equiv.sum_comp E.symm, Fintype.sum_prod_type, Finset.sum_mul_sum]</span>
+<span class="l" id="L123"><span class="n">123</span>  refine Finset.sum_congr rfl fun x₁ _ =&gt; Finset.sum_congr rfl fun x₂ _ =&gt; ?_</span>
+<span class="l" id="L124"><span class="n">124</span>  set y := E.symm (x₁, x₂)</span>
+<span class="l" id="L125"><span class="n">125</span>  have hy : E y = (x₁, x₂) := by simp [y]</span>
+<span class="l" id="L126"><span class="n">126</span>  have hy1 : (x₁ : ZMod m) = f₁ (y : ZMod (m * n)) := by rw [← hE1, hy]</span>
+<span class="l" id="L127"><span class="n">127</span>  have hy2 : (x₂ : ZMod n) = f₂ (y : ZMod (m * n)) := by rw [← hE2, hy]</span>
+<span class="l" id="L128"><span class="n">128</span>  have hyi1 : ((x₁⁻¹ : (ZMod m)ˣ) : ZMod m) = f₁ ((y⁻¹ : (ZMod (m * n))ˣ) : ZMod (m * n)) := by</span>
+<span class="l" id="L129"><span class="n">129</span>    have : f₁ ((y⁻¹ : (ZMod (m * n))ˣ) : ZMod (m * n)) * f₁ (y : ZMod (m * n)) = 1 := by</span>
+<span class="l" id="L130"><span class="n">130</span>      rw [← map_mul, Units.inv_mul, map_one]</span>
+<span class="l" id="L131"><span class="n">131</span>    calc ((x₁⁻¹ : (ZMod m)ˣ) : ZMod m)</span>
+<span class="l" id="L132"><span class="n">132</span>        = ((x₁⁻¹ : (ZMod m)ˣ) : ZMod m) * (f₁ ((y⁻¹ : (ZMod (m * n))ˣ) : ZMod (m * n)) *</span>
+<span class="l" id="L133"><span class="n">133</span>            f₁ (y : ZMod (m * n))) := by rw [this, mul_one]</span>
+<span class="l" id="L134"><span class="n">134</span>      _ = f₁ ((y⁻¹ : (ZMod (m * n))ˣ) : ZMod (m * n)) *</span>
+<span class="l" id="L135"><span class="n">135</span>            (((x₁⁻¹ : (ZMod m)ˣ) : ZMod m) * (x₁ : ZMod m)) := by rw [hy1]; ring</span>
+<span class="l" id="L136"><span class="n">136</span>      _ = _ := by rw [Units.inv_mul, mul_one]</span>
+<span class="l" id="L137"><span class="n">137</span>  have hyi2 : ((x₂⁻¹ : (ZMod n)ˣ) : ZMod n) = f₂ ((y⁻¹ : (ZMod (m * n))ˣ) : ZMod (m * n)) := by</span>
+<span class="l" id="L138"><span class="n">138</span>    have : f₂ ((y⁻¹ : (ZMod (m * n))ˣ) : ZMod (m * n)) * f₂ (y : ZMod (m * n)) = 1 := by</span>
+<span class="l" id="L139"><span class="n">139</span>      rw [← map_mul, Units.inv_mul, map_one]</span>
+<span class="l" id="L140"><span class="n">140</span>    calc ((x₂⁻¹ : (ZMod n)ˣ) : ZMod n)</span>
+<span class="l" id="L141"><span class="n">141</span>        = ((x₂⁻¹ : (ZMod n)ˣ) : ZMod n) * (f₂ ((y⁻¹ : (ZMod (m * n))ˣ) : ZMod (m * n)) *</span>
+<span class="l" id="L142"><span class="n">142</span>            f₂ (y : ZMod (m * n))) := by rw [this, mul_one]</span>
+<span class="l" id="L143"><span class="n">143</span>      _ = f₂ ((y⁻¹ : (ZMod (m * n))ˣ) : ZMod (m * n)) *</span>
+<span class="l" id="L144"><span class="n">144</span>            (((x₂⁻¹ : (ZMod n)ˣ) : ZMod n) * (x₂ : ZMod n)) := by rw [hy2]; ring</span>
+<span class="l" id="L145"><span class="n">145</span>      _ = _ := by rw [Units.inv_mul, mul_one]</span>
+<span class="l" id="L146"><span class="n">146</span>  rw [stdAddChar_crt h, hy1, hy2, hyi1, hyi2]</span>
+<span class="l" id="L147"><span class="n">147</span>  congr 1</span>
+<span class="l" id="L148"><span class="n">148</span>  · congr 1; simp only [map_add, map_mul]; ring</span>
+<span class="l" id="L149"><span class="n">149</span>  · congr 1; simp only [map_add, map_mul]; ring</span>
+<span class="l" id="L150"><span class="n">150</span></span>
+<span class="l" id="L151"><span class="n">151</span></span>
+<span class="l" id="L152"><span class="n">152</span>/-! ## Prime moduli: link to `QuillonKloosterman` and the pointwise bound -/</span>
+<span class="l" id="L153"><span class="n">153</span></span>
+<span class="l" id="L154"><span class="n">154</span>/-- Over a prime field, the units sum is the nonzero-element sum. -/</span>
+<span class="l" id="L155"><span class="n">155</span>lemma K_prime_eq_kl (p : ℕ) [Fact p.Prime] (a b : ZMod p) :</span>
+<span class="l" id="L156"><span class="n">156</span>    K p a b = GoldC.QuillonKloosterman.kl ZMod.stdAddChar a b := by</span>
+<span class="l" id="L157"><span class="n">157</span>  unfold K GoldC.QuillonKloosterman.kl</span>
+<span class="l" id="L158"><span class="n">158</span>  refine Finset.sum_bij&#x27; (fun x _ =&gt; (x : ZMod p))</span>
+<span class="l" id="L159"><span class="n">159</span>    (fun y hy =&gt; Units.mk0 y (Finset.ne_of_mem_erase hy)) ?_ ?_ ?_ ?_ ?_</span>
+<span class="l" id="L160"><span class="n">160</span>  · intro x _; exact Finset.mem_erase.2 ⟨x.ne_zero, Finset.mem_univ _⟩</span>
+<span class="l" id="L161"><span class="n">161</span>  · intro y _; exact Finset.mem_univ _</span>
+<span class="l" id="L162"><span class="n">162</span>  · intro x _; exact Units.mk0_val x _</span>
+<span class="l" id="L163"><span class="n">163</span>  · intro y _; rfl</span>
+<span class="l" id="L164"><span class="n">164</span>  · intro x _; rw [Units.val_inv_eq_inv_val]</span>
+<span class="l" id="L165"><span class="n">165</span></span>
+<span class="l" id="L166"><span class="n">166</span>lemma norm_K_le_card (s : ℕ) [NeZero s] (a b : ZMod s) : ‖K s a b‖ ≤ s := by</span>
+<span class="l" id="L167"><span class="n">167</span>  unfold K</span>
+<span class="l" id="L168"><span class="n">168</span>  refine (norm_sum_le _ _).trans ?_</span>
+<span class="l" id="L169"><span class="n">169</span>  have h1 : ∀ x : (ZMod s)ˣ, ‖ZMod.stdAddChar (a * (x : ZMod s) +</span>
+<span class="l" id="L170"><span class="n">170</span>      b * ((x⁻¹ : (ZMod s)ˣ) : ZMod s))‖ = 1 := fun x =&gt;</span>
+<span class="l" id="L171"><span class="n">171</span>    by simp [ZMod.stdAddChar_apply]</span>
+<span class="l" id="L172"><span class="n">172</span>  rw [Finset.sum_congr rfl fun x _ =&gt; h1 x, Finset.sum_const, Finset.card_univ, nsmul_eq_mul,</span>
+<span class="l" id="L173"><span class="n">173</span>    mul_one]</span>
+<span class="l" id="L174"><span class="n">174</span>  have : Fintype.card (ZMod s)ˣ ≤ s := by</span>
+<span class="l" id="L175"><span class="n">175</span>    rw [ZMod.card_units_eq_totient]; exact Nat.totient_le s</span>
+<span class="l" id="L176"><span class="n">176</span>  exact_mod_cast this</span>
+<span class="l" id="L177"><span class="n">177</span></span>
+<span class="l" id="L178"><span class="n">178</span>/-- **Prime bound**: `‖K_p(a,b)‖⁴ ≤ 3p³·(p if a = 0 else 1)`. -/</span>
+<span class="l" id="L179"><span class="n">179</span>theorem K_prime_bound (p : ℕ) [hp : Fact p.Prime] (a b : ZMod p) :</span>
+<span class="l" id="L180"><span class="n">180</span>    ‖K p a b‖ ^ 4 ≤ 3 * (p : ℝ) ^ 3 * (if a = 0 then (p : ℝ) else 1) := by</span>
+<span class="l" id="L181"><span class="n">181</span>  have hp2 : (2 : ℝ) ≤ p := by exact_mod_cast hp.out.two_le</span>
+<span class="l" id="L182"><span class="n">182</span>  split_ifs with ha</span>
+<span class="l" id="L183"><span class="n">183</span>  · have := norm_K_le_card p a b</span>
+<span class="l" id="L184"><span class="n">184</span>    calc ‖K p a b‖ ^ 4 ≤ (p : ℝ) ^ 4 := by gcongr</span>
+<span class="l" id="L185"><span class="n">185</span>      _ ≤ 3 * (p : ℝ) ^ 3 * p := by nlinarith [pow_pos (show (0:ℝ) &lt; p by linarith) 3]</span>
+<span class="l" id="L186"><span class="n">186</span>  · rw [K_prime_eq_kl]</span>
+<span class="l" id="L187"><span class="n">187</span>    have hscale := GoldC.QuillonKloosterman.kl_scale ZMod.stdAddChar a (a * b) ha</span>
+<span class="l" id="L188"><span class="n">188</span>    rw [show a * b * a⁻¹ = b by field_simp] at hscale</span>
+<span class="l" id="L189"><span class="n">189</span>    rw [hscale]</span>
+<span class="l" id="L190"><span class="n">190</span>    have hb := GoldC.QuillonKloosterman.kloosterman_bound (F := ZMod p) ZMod.stdAddChar</span>
+<span class="l" id="L191"><span class="n">191</span>      (ZMod.isPrimitive_stdAddChar p) (a * b)</span>
+<span class="l" id="L192"><span class="n">192</span>    rw [ZMod.card] at hb</span>
+<span class="l" id="L193"><span class="n">193</span>    calc _ ≤ 3 * (p : ℝ) ^ 2 * ((p : ℝ) - 1) := hb</span>
+<span class="l" id="L194"><span class="n">194</span>      _ ≤ 3 * (p : ℝ) ^ 3 * 1 := by nlinarith [sq_nonneg (p : ℝ)]</span>
+<span class="l" id="L195"><span class="n">195</span></span>
+<span class="l" id="L196"><span class="n">196</span>/-- Casting through an intermediate modulus. -/</span>
+<span class="l" id="L197"><span class="n">197</span>lemma cast_cast_dvd {q m n : ℕ} [NeZero n] [NeZero m] (hqm : q ∣ m) (hmn : m ∣ n) (a : ZMod n) :</span>
+<span class="l" id="L198"><span class="n">198</span>    (ZMod.cast (ZMod.cast a : ZMod m) : ZMod q) = (ZMod.cast a : ZMod q) := by</span>
+<span class="l" id="L199"><span class="n">199</span>  have := ZMod.castHom_comp hqm hmn</span>
+<span class="l" id="L200"><span class="n">200</span>  have h2 := congrArg (fun f =&gt; f a) this</span>
+<span class="l" id="L201"><span class="n">201</span>  simpa only [RingHom.comp_apply, ZMod.castHom_apply] using h2</span>
+<span class="l" id="L202"><span class="n">202</span></span>
+<span class="l" id="L203"><span class="n">203</span>/-- **Squarefree bound** (by CRT induction): for `s = ∏_{p∈P} p` with distinct primes,</span>
+<span class="l" id="L204"><span class="n">204</span>`‖K_s(a,b)‖⁴ ≤ ∏_{p∈P} 3p³·(p if p ∣ a else 1)`. -/</span>
+<span class="l" id="L205"><span class="n">205</span>theorem K_squarefree_bound (P : Finset ℕ) (hP : ∀ p ∈ P, p.Prime) :</span>
+<span class="l" id="L206"><span class="n">206</span>    ∀ (s : ℕ) (hs : s = ∏ p ∈ P, p) [NeZero s] (a b : ZMod s),</span>
+<span class="l" id="L207"><span class="n">207</span>      ‖K s a b‖ ^ 4 ≤ ∏ p ∈ P,</span>
+<span class="l" id="L208"><span class="n">208</span>        (3 * (p : ℝ) ^ 3 * (if (ZMod.cast a : ZMod p) = 0 then (p : ℝ) else 1)) := by</span>
+<span class="l" id="L209"><span class="n">209</span>  induction P using Finset.induction_on with</span>
+<span class="l" id="L210"><span class="n">210</span>  | empty =&gt;</span>
+<span class="l" id="L211"><span class="n">211</span>    intro s hs _ a b</span>
+<span class="l" id="L212"><span class="n">212</span>    simp only [Finset.prod_empty] at hs ⊢</span>
+<span class="l" id="L213"><span class="n">213</span>    subst hs</span>
+<span class="l" id="L214"><span class="n">214</span>    have := norm_K_le_card 1 a b</span>
+<span class="l" id="L215"><span class="n">215</span>    have h0 : (0 : ℝ) ≤ ‖K 1 a b‖ := norm_nonneg _</span>
+<span class="l" id="L216"><span class="n">216</span>    push_cast at this</span>
+<span class="l" id="L217"><span class="n">217</span>    calc ‖K 1 a b‖ ^ 4 ≤ 1 ^ 4 := by gcongr</span>
+<span class="l" id="L218"><span class="n">218</span>      _ = 1 := by norm_num</span>
+<span class="l" id="L219"><span class="n">219</span>  | insert p P&#x27; hpP&#x27; ih =&gt;</span>
+<span class="l" id="L220"><span class="n">220</span>    intro s hs _ a b</span>
+<span class="l" id="L221"><span class="n">221</span>    have hp : p.Prime := hP p (Finset.mem_insert_self _ _)</span>
+<span class="l" id="L222"><span class="n">222</span>    have hP&#x27; : ∀ q ∈ P&#x27;, q.Prime := fun q hq =&gt; hP q (Finset.mem_insert_of_mem hq)</span>
+<span class="l" id="L223"><span class="n">223</span>    rw [Finset.prod_insert hpP&#x27;] at hs</span>
+<span class="l" id="L224"><span class="n">224</span>    set s&#x27; := ∏ q ∈ P&#x27;, q with hs&#x27;</span>
+<span class="l" id="L225"><span class="n">225</span>    have hs&#x27;0 : s&#x27; ≠ 0 := Finset.prod_ne_zero_iff.2 fun q hq =&gt; (hP&#x27; q hq).ne_zero</span>
+<span class="l" id="L226"><span class="n">226</span>    haveI : NeZero s&#x27; := ⟨hs&#x27;0⟩</span>
+<span class="l" id="L227"><span class="n">227</span>    haveI : NeZero p := ⟨hp.ne_zero⟩</span>
+<span class="l" id="L228"><span class="n">228</span>    haveI : Fact p.Prime := ⟨hp⟩</span>
+<span class="l" id="L229"><span class="n">229</span>    have hcop : p.Coprime s&#x27; := by</span>
+<span class="l" id="L230"><span class="n">230</span>      rw [hs&#x27;]</span>
+<span class="l" id="L231"><span class="n">231</span>      refine Nat.Coprime.prod_right fun q hq =&gt; ?_</span>
+<span class="l" id="L232"><span class="n">232</span>      rw [Nat.coprime_primes hp (hP&#x27; q hq)]</span>
+<span class="l" id="L233"><span class="n">233</span>      exact fun h =&gt; hpP&#x27; (h ▸ hq)</span>
+<span class="l" id="L234"><span class="n">234</span>    subst hs</span>
+<span class="l" id="L235"><span class="n">235</span>    rw [K_mul hcop, norm_mul, mul_pow, Finset.prod_insert hpP&#x27;]</span>
+<span class="l" id="L236"><span class="n">236</span>    have h0 : 0 ≤ ‖K p (ZMod.castHom (dvd_mul_right p s&#x27;) (ZMod p) a * (s&#x27; : ZMod p)⁻¹)</span>
+<span class="l" id="L237"><span class="n">237</span>        (ZMod.castHom (dvd_mul_right p s&#x27;) (ZMod p) b * (s&#x27; : ZMod p)⁻¹)‖ ^ 4 := by positivity</span>
+<span class="l" id="L238"><span class="n">238</span>    gcongr</span>
+<span class="l" id="L239"><span class="n">239</span>    · -- prime factor</span>
+<span class="l" id="L240"><span class="n">240</span>      refine (K_prime_bound p _ _).trans (le_of_eq ?_)</span>
+<span class="l" id="L241"><span class="n">241</span>      congr 2</span>
+<span class="l" id="L242"><span class="n">242</span>      have hu : (s&#x27; : ZMod p) * (s&#x27; : ZMod p)⁻¹ = 1 := ZMod.coe_mul_inv_eq_one s&#x27; hcop.symm</span>
+<span class="l" id="L243"><span class="n">243</span>      apply propext</span>
+<span class="l" id="L244"><span class="n">244</span>      rw [ZMod.castHom_apply]</span>
+<span class="l" id="L245"><span class="n">245</span>      constructor</span>
+<span class="l" id="L246"><span class="n">246</span>      · intro h</span>
+<span class="l" id="L247"><span class="n">247</span>        have := congrArg (· * (s&#x27; : ZMod p)) h</span>
+<span class="l" id="L248"><span class="n">248</span>        simp only [zero_mul] at this</span>
+<span class="l" id="L249"><span class="n">249</span>        rwa [mul_assoc, mul_comm _ (s&#x27; : ZMod p), hu, mul_one] at this</span>
+<span class="l" id="L250"><span class="n">250</span>      · intro h; rw [h, zero_mul]</span>
+<span class="l" id="L251"><span class="n">251</span>    · -- the cofactor, by induction</span>
+<span class="l" id="L252"><span class="n">252</span>      refine (ih hP&#x27; s&#x27; hs&#x27; _ _).trans (le_of_eq ?_)</span>
+<span class="l" id="L253"><span class="n">253</span>      refine Finset.prod_congr rfl fun q hq =&gt; ?_</span>
+<span class="l" id="L254"><span class="n">254</span>      have hq : q.Prime := hP&#x27; q hq</span>
+<span class="l" id="L255"><span class="n">255</span>      haveI : NeZero q := ⟨hq.ne_zero⟩</span>
+<span class="l" id="L256"><span class="n">256</span>      have hqs&#x27; : q ∣ s&#x27; := Finset.dvd_prod_of_mem _ (by assumption)</span>
+<span class="l" id="L257"><span class="n">257</span>      have hqp : q.Coprime p := by</span>
+<span class="l" id="L258"><span class="n">258</span>        rw [Nat.coprime_primes hq hp]; intro h; exact hpP&#x27; (h ▸ by assumption)</span>
+<span class="l" id="L259"><span class="n">259</span>      congr 2</span>
+<span class="l" id="L260"><span class="n">260</span>      apply propext</span>
+<span class="l" id="L261"><span class="n">261</span>      rw [ZMod.castHom_apply, ZMod.cast_mul hqs&#x27;, cast_cast_dvd hqs&#x27; (dvd_mul_left s&#x27; p)]</span>
+<span class="l" id="L262"><span class="n">262</span>      have hu : (p : ZMod s&#x27;) * (p : ZMod s&#x27;)⁻¹ = 1 := ZMod.coe_mul_inv_eq_one p hcop</span>
+<span class="l" id="L263"><span class="n">263</span>      have hu&#x27; : (p : ZMod q) * (ZMod.cast ((p : ZMod s&#x27;)⁻¹) : ZMod q) = 1 := by</span>
+<span class="l" id="L264"><span class="n">264</span>        have := congrArg (fun x : ZMod s&#x27; =&gt; (ZMod.cast x : ZMod q)) hu</span>
+<span class="l" id="L265"><span class="n">265</span>        simp only [ZMod.cast_mul hqs&#x27;, ZMod.cast_natCast hqs&#x27;] at this</span>
+<span class="l" id="L266"><span class="n">266</span>        rw [this, ZMod.cast_one hqs&#x27;]</span>
+<span class="l" id="L267"><span class="n">267</span>      constructor</span>
+<span class="l" id="L268"><span class="n">268</span>      · intro h</span>
+<span class="l" id="L269"><span class="n">269</span>        have := congrArg ((p : ZMod q) * ·) h</span>
+<span class="l" id="L270"><span class="n">270</span>        simp only [mul_zero] at this</span>
+<span class="l" id="L271"><span class="n">271</span>        rwa [mul_comm, mul_assoc, mul_comm _ (p : ZMod q), hu&#x27;, mul_one] at this</span>
+<span class="l" id="L272"><span class="n">272</span>      · intro h; rw [h, zero_mul]</span>
+<span class="l" id="L273"><span class="n">273</span></span>
+<span class="l" id="L274"><span class="n">274</span>end GoldC.QuillonKl</span>
+<span class="l" id="L275"><span class="n">275</span></span>
+<span class="l" id="L276"><span class="n">276</span>#print axioms GoldC.QuillonKl.stdAddChar_crt</span>
+<span class="l" id="L277"><span class="n">277</span>#print axioms GoldC.QuillonKl.K_mul</span>
+<span class="l" id="L278"><span class="n">278</span>#print axioms GoldC.QuillonKl.K_prime_bound</span>
+<span class="l" id="L279"><span class="n">279</span>#print axioms GoldC.QuillonKl.K_squarefree_bound</span></pre></div></body></html>

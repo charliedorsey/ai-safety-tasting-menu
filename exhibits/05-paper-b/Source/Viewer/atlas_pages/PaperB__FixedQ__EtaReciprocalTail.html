@@ -1,0 +1,750 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · PaperB/FixedQ/EtaReciprocalTail.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>PaperB/FixedQ/EtaReciprocalTail.lean</h1><p class="meta">LEAN/PaperB/FixedQ/EtaReciprocalTail.lean · 749 lines · SHA-256 ac5b922820dda59d633d5e6d551168574779ad4845e3ccf81276d3c240622056</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import PaperB.FixedQ.EtaLinearMean</span>
+<span class="l" id="L2"><span class="n">2</span>import PaperB.FixedQ.OneDimensionalFamilyPartition</span>
+<span class="l" id="L3"><span class="n">3</span>import Mathlib.Algebra.BigOperators.Module</span>
+<span class="l" id="L4"><span class="n">4</span></span>
+<span class="l" id="L5"><span class="n">5</span>open scoped BigOperators</span>
+<span class="l" id="L6"><span class="n">6</span></span>
+<span class="l" id="L7"><span class="n">7</span>namespace PaperB.FixedQ</span>
+<span class="l" id="L8"><span class="n">8</span></span>
+<span class="l" id="L9"><span class="n">9</span>noncomputable def etaReciprocalTerm (q n : ℕ) : ℝ :=</span>
+<span class="l" id="L10"><span class="n">10</span>  etaArithmetic q n / (n : ℝ)</span>
+<span class="l" id="L11"><span class="n">11</span></span>
+<span class="l" id="L12"><span class="n">12</span>@[simp] theorem etaReciprocalTerm_zero (q : ℕ) :</span>
+<span class="l" id="L13"><span class="n">13</span>    etaReciprocalTerm q 0 = 0 := by</span>
+<span class="l" id="L14"><span class="n">14</span>  simp [etaReciprocalTerm, etaArithmetic]</span>
+<span class="l" id="L15"><span class="n">15</span></span>
+<span class="l" id="L16"><span class="n">16</span>@[simp] theorem etaReciprocalTerm_one (q : ℕ) :</span>
+<span class="l" id="L17"><span class="n">17</span>    etaReciprocalTerm q 1 = 1 := by</span>
+<span class="l" id="L18"><span class="n">18</span>  simp [etaReciprocalTerm, etaArithmetic,</span>
+<span class="l" id="L19"><span class="n">19</span>    petermannSupportedArithmetic, petermannSupportedCoeff]</span>
+<span class="l" id="L20"><span class="n">20</span></span>
+<span class="l" id="L21"><span class="n">21</span>theorem etaReciprocalTerm_eq_etaCoeff_div</span>
+<span class="l" id="L22"><span class="n">22</span>    (q n : ℕ) :</span>
+<span class="l" id="L23"><span class="n">23</span>    etaReciprocalTerm q n = etaCoeff q n / (n : ℝ) := by</span>
+<span class="l" id="L24"><span class="n">24</span>  simp [etaReciprocalTerm, etaArithmetic_apply]</span>
+<span class="l" id="L25"><span class="n">25</span></span>
+<span class="l" id="L26"><span class="n">26</span>theorem etaReciprocalTerm_mul_of_coprime</span>
+<span class="l" id="L27"><span class="n">27</span>    (q : ℕ) {m n : ℕ} (hcop : m.Coprime n) :</span>
+<span class="l" id="L28"><span class="n">28</span>    etaReciprocalTerm q (m * n) =</span>
+<span class="l" id="L29"><span class="n">29</span>      etaReciprocalTerm q m * etaReciprocalTerm q n := by</span>
+<span class="l" id="L30"><span class="n">30</span>  by_cases hm0 : m = 0</span>
+<span class="l" id="L31"><span class="n">31</span>  · subst m</span>
+<span class="l" id="L32"><span class="n">32</span>    have hn1 : n = 1 := by simpa using hcop</span>
+<span class="l" id="L33"><span class="n">33</span>    subst n</span>
+<span class="l" id="L34"><span class="n">34</span>    simp</span>
+<span class="l" id="L35"><span class="n">35</span>  · by_cases hn0 : n = 0</span>
+<span class="l" id="L36"><span class="n">36</span>    · subst n</span>
+<span class="l" id="L37"><span class="n">37</span>      have hm1 : m = 1 := by simpa using hcop</span>
+<span class="l" id="L38"><span class="n">38</span>      subst m</span>
+<span class="l" id="L39"><span class="n">39</span>      simp</span>
+<span class="l" id="L40"><span class="n">40</span>    · unfold etaReciprocalTerm</span>
+<span class="l" id="L41"><span class="n">41</span>      rw [(etaArithmetic_multiplicative q).map_mul_of_coprime hcop]</span>
+<span class="l" id="L42"><span class="n">42</span>      push_cast</span>
+<span class="l" id="L43"><span class="n">43</span>      have hmR : (m : ℝ) ≠ 0 := by exact_mod_cast hm0</span>
+<span class="l" id="L44"><span class="n">44</span>      have hnR : (n : ℝ) ≠ 0 := by exact_mod_cast hn0</span>
+<span class="l" id="L45"><span class="n">45</span>      field_simp [hmR, hnR]</span>
+<span class="l" id="L46"><span class="n">46</span></span>
+<span class="l" id="L47"><span class="n">47</span>end PaperB.FixedQ</span>
+<span class="l" id="L48"><span class="n">48</span></span>
+<span class="l" id="L49"><span class="n">49</span></span>
+<span class="l" id="L50"><span class="n">50</span>namespace PaperB.FixedQ</span>
+<span class="l" id="L51"><span class="n">51</span></span>
+<span class="l" id="L52"><span class="n">52</span>theorem etaReciprocalTerm_prime_active</span>
+<span class="l" id="L53"><span class="n">53</span>    (q : ℕ) {p : ℕ} (hp : p.Prime) (hcop : p.Coprime (6 * q)) :</span>
+<span class="l" id="L54"><span class="n">54</span>    etaReciprocalTerm q p =</span>
+<span class="l" id="L55"><span class="n">55</span>      1 / ((p : ℝ) * ((p : ℝ) - 2)) := by</span>
+<span class="l" id="L56"><span class="n">56</span>  unfold etaReciprocalTerm</span>
+<span class="l" id="L57"><span class="n">57</span>  have hlocal :=</span>
+<span class="l" id="L58"><span class="n">58</span>    petermannSupportedArithmetic_prime_pow q petermannB</span>
+<span class="l" id="L59"><span class="n">59</span>      (p := p) (i := 1) hp</span>
+<span class="l" id="L60"><span class="n">60</span>  have hcoeff : etaArithmetic q p = petermannB p := by</span>
+<span class="l" id="L61"><span class="n">61</span>    change petermannSupportedArithmetic q petermannB p = petermannB p</span>
+<span class="l" id="L62"><span class="n">62</span>    have h := hlocal</span>
+<span class="l" id="L63"><span class="n">63</span>    simp at h</span>
+<span class="l" id="L64"><span class="n">64</span>    rw [if_pos hcop] at h</span>
+<span class="l" id="L65"><span class="n">65</span>    exact h</span>
+<span class="l" id="L66"><span class="n">66</span>  rw [hcoeff]</span>
+<span class="l" id="L67"><span class="n">67</span>  unfold petermannB</span>
+<span class="l" id="L68"><span class="n">68</span>  have hpR : (p : ℝ) ≠ 0 := by exact_mod_cast hp.ne_zero</span>
+<span class="l" id="L69"><span class="n">69</span>  field_simp [hpR]</span>
+<span class="l" id="L70"><span class="n">70</span></span>
+<span class="l" id="L71"><span class="n">71</span>theorem etaReciprocalTerm_prime_inactive</span>
+<span class="l" id="L72"><span class="n">72</span>    (q : ℕ) {p : ℕ} (hp : p.Prime) (hcop : ¬ p.Coprime (6 * q)) :</span>
+<span class="l" id="L73"><span class="n">73</span>    etaReciprocalTerm q p = 0 := by</span>
+<span class="l" id="L74"><span class="n">74</span>  unfold etaReciprocalTerm</span>
+<span class="l" id="L75"><span class="n">75</span>  have hlocal :=</span>
+<span class="l" id="L76"><span class="n">76</span>    petermannSupportedArithmetic_prime_pow q petermannB</span>
+<span class="l" id="L77"><span class="n">77</span>      (p := p) (i := 1) hp</span>
+<span class="l" id="L78"><span class="n">78</span>  have hcoeff : etaArithmetic q p = 0 := by</span>
+<span class="l" id="L79"><span class="n">79</span>    change petermannSupportedArithmetic q petermannB p = 0</span>
+<span class="l" id="L80"><span class="n">80</span>    have h := hlocal</span>
+<span class="l" id="L81"><span class="n">81</span>    simp at h</span>
+<span class="l" id="L82"><span class="n">82</span>    rw [if_neg hcop] at h</span>
+<span class="l" id="L83"><span class="n">83</span>    exact h</span>
+<span class="l" id="L84"><span class="n">84</span>  rw [hcoeff]</span>
+<span class="l" id="L85"><span class="n">85</span>  simp</span>
+<span class="l" id="L86"><span class="n">86</span></span>
+<span class="l" id="L87"><span class="n">87</span>theorem etaReciprocalTerm_prime_pow_zero_of_two_le</span>
+<span class="l" id="L88"><span class="n">88</span>    (q : ℕ) {p nu : ℕ} (hp : p.Prime) (hnu : 2 ≤ nu) :</span>
+<span class="l" id="L89"><span class="n">89</span>    etaReciprocalTerm q (p ^ nu) = 0 := by</span>
+<span class="l" id="L90"><span class="n">90</span>  unfold etaReciprocalTerm</span>
+<span class="l" id="L91"><span class="n">91</span>  have hlocal :=</span>
+<span class="l" id="L92"><span class="n">92</span>    petermannSupportedArithmetic_prime_pow q petermannB</span>
+<span class="l" id="L93"><span class="n">93</span>      (p := p) (i := nu) hp</span>
+<span class="l" id="L94"><span class="n">94</span>  have h0 : nu ≠ 0 := by omega</span>
+<span class="l" id="L95"><span class="n">95</span>  have h1 : nu ≠ 1 := by omega</span>
+<span class="l" id="L96"><span class="n">96</span>  have hcoeff : etaArithmetic q (p ^ nu) = 0 := by</span>
+<span class="l" id="L97"><span class="n">97</span>    change petermannSupportedArithmetic q petermannB (p ^ nu) = 0</span>
+<span class="l" id="L98"><span class="n">98</span>    rw [hlocal]</span>
+<span class="l" id="L99"><span class="n">99</span>    simp [h0, h1]</span>
+<span class="l" id="L100"><span class="n">100</span>  rw [hcoeff]</span>
+<span class="l" id="L101"><span class="n">101</span>  simp</span>
+<span class="l" id="L102"><span class="n">102</span></span>
+<span class="l" id="L103"><span class="n">103</span>theorem tsum_etaReciprocalTerm_prime_pow</span>
+<span class="l" id="L104"><span class="n">104</span>    (q : ℕ) {p : ℕ} (hp : p.Prime) :</span>
+<span class="l" id="L105"><span class="n">105</span>    (∑&#x27; nu : ℕ, etaReciprocalTerm q (p ^ nu)) =</span>
+<span class="l" id="L106"><span class="n">106</span>      1 + normalizationCorrection q 0 p := by</span>
+<span class="l" id="L107"><span class="n">107</span>  rw [tsum_eq_sum (s := ({0, 1} : Finset ℕ))]</span>
+<span class="l" id="L108"><span class="n">108</span>  · by_cases hactive : p.Prime ∧ 5 ≤ p ∧ ¬ p ∣ q</span>
+<span class="l" id="L109"><span class="n">109</span>    · have hcop : p.Coprime (6 * q) := by</span>
+<span class="l" id="L110"><span class="n">110</span>        apply hp.coprime_iff_not_dvd.mpr</span>
+<span class="l" id="L111"><span class="n">111</span>        intro hd</span>
+<span class="l" id="L112"><span class="n">112</span>        rcases hp.dvd_mul.mp hd with h6 | hq</span>
+<span class="l" id="L113"><span class="n">113</span>        · have hp6 : p ∣ 2 * 3 := by simpa using h6</span>
+<span class="l" id="L114"><span class="n">114</span>          rcases hp.dvd_mul.mp hp6 with h2 | h3</span>
+<span class="l" id="L115"><span class="n">115</span>          · have : p ≤ 2 := Nat.le_of_dvd (by norm_num) h2</span>
+<span class="l" id="L116"><span class="n">116</span>            omega</span>
+<span class="l" id="L117"><span class="n">117</span>          · have : p ≤ 3 := Nat.le_of_dvd (by norm_num) h3</span>
+<span class="l" id="L118"><span class="n">118</span>            omega</span>
+<span class="l" id="L119"><span class="n">119</span>        · exact hactive.2.2 hq</span>
+<span class="l" id="L120"><span class="n">120</span>      rw [show normalizationCorrection q 0 p =</span>
+<span class="l" id="L121"><span class="n">121</span>          1 / ((p : ℝ) * ((p : ℝ) - 2)) by</span>
+<span class="l" id="L122"><span class="n">122</span>        simp [normalizationCorrection, hactive]]</span>
+<span class="l" id="L123"><span class="n">123</span>      simp [etaReciprocalTerm_one,</span>
+<span class="l" id="L124"><span class="n">124</span>        etaReciprocalTerm_prime_active q hp hcop]</span>
+<span class="l" id="L125"><span class="n">125</span>    · have hnotcop : ¬ p.Coprime (6 * q) := by</span>
+<span class="l" id="L126"><span class="n">126</span>        intro hcop</span>
+<span class="l" id="L127"><span class="n">127</span>        have hp5 : 5 ≤ p := eta_rankin_five_le_of_prime_coprime_six hp hcop</span>
+<span class="l" id="L128"><span class="n">128</span>        have hpq : ¬ p ∣ q := by</span>
+<span class="l" id="L129"><span class="n">129</span>          intro hd</span>
+<span class="l" id="L130"><span class="n">130</span>          exact (hp.coprime_iff_not_dvd.mp hcop)</span>
+<span class="l" id="L131"><span class="n">131</span>            (dvd_mul_of_dvd_right hd 6)</span>
+<span class="l" id="L132"><span class="n">132</span>        exact hactive ⟨hp, hp5, hpq⟩</span>
+<span class="l" id="L133"><span class="n">133</span>      rw [show normalizationCorrection q 0 p = 0 by</span>
+<span class="l" id="L134"><span class="n">134</span>        simp [normalizationCorrection, hactive]]</span>
+<span class="l" id="L135"><span class="n">135</span>      simp [etaReciprocalTerm_one,</span>
+<span class="l" id="L136"><span class="n">136</span>        etaReciprocalTerm_prime_inactive q hp hnotcop]</span>
+<span class="l" id="L137"><span class="n">137</span>  · intro nu hnu</span>
+<span class="l" id="L138"><span class="n">138</span>    have hnot : nu ∉ ({0, 1} : Finset ℕ) := hnu</span>
+<span class="l" id="L139"><span class="n">139</span>    have hge : 2 ≤ nu := by</span>
+<span class="l" id="L140"><span class="n">140</span>      simp at hnot</span>
+<span class="l" id="L141"><span class="n">141</span>      omega</span>
+<span class="l" id="L142"><span class="n">142</span>    exact etaReciprocalTerm_prime_pow_zero_of_two_le q hp hge</span>
+<span class="l" id="L143"><span class="n">143</span></span>
+<span class="l" id="L144"><span class="n">144</span>end PaperB.FixedQ</span>
+<span class="l" id="L145"><span class="n">145</span></span>
+<span class="l" id="L146"><span class="n">146</span></span>
+<span class="l" id="L147"><span class="n">147</span>namespace PaperB.FixedQ</span>
+<span class="l" id="L148"><span class="n">148</span></span>
+<span class="l" id="L149"><span class="n">149</span>theorem coprimePrefixCount_le</span>
+<span class="l" id="L150"><span class="n">150</span>    (L Y : ℕ) :</span>
+<span class="l" id="L151"><span class="n">151</span>    coprimePrefixCount L Y ≤ Y := by</span>
+<span class="l" id="L152"><span class="n">152</span>  unfold coprimePrefixCount</span>
+<span class="l" id="L153"><span class="n">153</span>  calc</span>
+<span class="l" id="L154"><span class="n">154</span>    ((Finset.Icc 1 Y).filter fun n =&gt; L.Coprime n).card</span>
+<span class="l" id="L155"><span class="n">155</span>        ≤ (Finset.Icc 1 Y).card := Finset.card_filter_le _ _</span>
+<span class="l" id="L156"><span class="n">156</span>    _ = Y := by simp</span>
+<span class="l" id="L157"><span class="n">157</span></span>
+<span class="l" id="L158"><span class="n">158</span>theorem abs_etaLinearPartialSum_le</span>
+<span class="l" id="L159"><span class="n">159</span>    (q X : ℕ) :</span>
+<span class="l" id="L160"><span class="n">160</span>    |etaLinearPartialSum q X| ≤</span>
+<span class="l" id="L161"><span class="n">161</span>      (X : ℝ) * etaRankinBound := by</span>
+<span class="l" id="L162"><span class="n">162</span>  rw [etaLinearPartialSum_eq_correction_coprime]</span>
+<span class="l" id="L163"><span class="n">163</span>  have hR0 : 0 ≤ etaRankinBound := by</span>
+<span class="l" id="L164"><span class="n">164</span>    unfold etaRankinBound</span>
+<span class="l" id="L165"><span class="n">165</span>    positivity</span>
+<span class="l" id="L166"><span class="n">166</span>  calc</span>
+<span class="l" id="L167"><span class="n">167</span>    |∑ d ∈ Finset.Icc 1 X,</span>
+<span class="l" id="L168"><span class="n">168</span>        etaLinearCorrectionArithmetic q d *</span>
+<span class="l" id="L169"><span class="n">169</span>          (coprimePrefixCount (6 * q) (X / d) : ℝ)|</span>
+<span class="l" id="L170"><span class="n">170</span>      ≤ ∑ d ∈ Finset.Icc 1 X,</span>
+<span class="l" id="L171"><span class="n">171</span>          |etaLinearCorrectionArithmetic q d *</span>
+<span class="l" id="L172"><span class="n">172</span>            (coprimePrefixCount (6 * q) (X / d) : ℝ)| :=</span>
+<span class="l" id="L173"><span class="n">173</span>        Finset.abs_sum_le_sum_abs _ _</span>
+<span class="l" id="L174"><span class="n">174</span>    _ ≤ ∑ d ∈ Finset.Icc 1 X,</span>
+<span class="l" id="L175"><span class="n">175</span>          (X : ℝ) * |etaCorrectionInvTerm q d| := by</span>
+<span class="l" id="L176"><span class="n">176</span>        apply Finset.sum_le_sum</span>
+<span class="l" id="L177"><span class="n">177</span>        intro d hd</span>
+<span class="l" id="L178"><span class="n">178</span>        have hdI := Finset.mem_Icc.mp hd</span>
+<span class="l" id="L179"><span class="n">179</span>        have hd0 : d ≠ 0 := by omega</span>
+<span class="l" id="L180"><span class="n">180</span>        have hcountN :</span>
+<span class="l" id="L181"><span class="n">181</span>            coprimePrefixCount (6 * q) (X / d) ≤ X / d :=</span>
+<span class="l" id="L182"><span class="n">182</span>          coprimePrefixCount_le (6 * q) (X / d)</span>
+<span class="l" id="L183"><span class="n">183</span>        have hcountR :</span>
+<span class="l" id="L184"><span class="n">184</span>            (coprimePrefixCount (6 * q) (X / d) : ℝ) ≤</span>
+<span class="l" id="L185"><span class="n">185</span>              (X : ℝ) / (d : ℝ) := by</span>
+<span class="l" id="L186"><span class="n">186</span>          calc</span>
+<span class="l" id="L187"><span class="n">187</span>            (coprimePrefixCount (6 * q) (X / d) : ℝ)</span>
+<span class="l" id="L188"><span class="n">188</span>                ≤ ((X / d : ℕ) : ℝ) := by exact_mod_cast hcountN</span>
+<span class="l" id="L189"><span class="n">189</span>            _ ≤ (X : ℝ) / (d : ℝ) := Nat.cast_div_le</span>
+<span class="l" id="L190"><span class="n">190</span>        have hcount0 :</span>
+<span class="l" id="L191"><span class="n">191</span>            0 ≤ (coprimePrefixCount (6 * q) (X / d) : ℝ) := by positivity</span>
+<span class="l" id="L192"><span class="n">192</span>        rw [abs_mul, abs_of_nonneg hcount0]</span>
+<span class="l" id="L193"><span class="n">193</span>        have hc0 : 0 ≤ |etaLinearCorrectionArithmetic q d| := abs_nonneg _</span>
+<span class="l" id="L194"><span class="n">194</span>        calc</span>
+<span class="l" id="L195"><span class="n">195</span>          |etaLinearCorrectionArithmetic q d| *</span>
+<span class="l" id="L196"><span class="n">196</span>              (coprimePrefixCount (6 * q) (X / d) : ℝ)</span>
+<span class="l" id="L197"><span class="n">197</span>            ≤ |etaLinearCorrectionArithmetic q d| *</span>
+<span class="l" id="L198"><span class="n">198</span>                ((X : ℝ) / (d : ℝ)) :=</span>
+<span class="l" id="L199"><span class="n">199</span>              mul_le_mul_of_nonneg_left hcountR hc0</span>
+<span class="l" id="L200"><span class="n">200</span>          _ = (X : ℝ) * |etaCorrectionInvTerm q d| := by</span>
+<span class="l" id="L201"><span class="n">201</span>              unfold etaCorrectionInvTerm</span>
+<span class="l" id="L202"><span class="n">202</span>              rw [abs_div, abs_of_pos (by positivity : (0 : ℝ) &lt; d)]</span>
+<span class="l" id="L203"><span class="n">203</span>              ring</span>
+<span class="l" id="L204"><span class="n">204</span>    _ = (X : ℝ) *</span>
+<span class="l" id="L205"><span class="n">205</span>          ∑ d ∈ Finset.Icc 1 X, |etaCorrectionInvTerm q d| := by</span>
+<span class="l" id="L206"><span class="n">206</span>        rw [Finset.mul_sum]</span>
+<span class="l" id="L207"><span class="n">207</span>    _ ≤ (X : ℝ) * etaRankinBound := by</span>
+<span class="l" id="L208"><span class="n">208</span>        apply mul_le_mul_of_nonneg_left _ (by positivity)</span>
+<span class="l" id="L209"><span class="n">209</span>        calc</span>
+<span class="l" id="L210"><span class="n">210</span>          (∑ d ∈ Finset.Icc 1 X, |etaCorrectionInvTerm q d|)</span>
+<span class="l" id="L211"><span class="n">211</span>              ≤ ∑&#x27; d : ℕ, |etaCorrectionInvTerm q d| := by</span>
+<span class="l" id="L212"><span class="n">212</span>                exact (summable_etaCorrectionInvTerm q).abs.sum_le_tsum</span>
+<span class="l" id="L213"><span class="n">213</span>                  (Finset.Icc 1 X) (fun d hd =&gt; abs_nonneg _)</span>
+<span class="l" id="L214"><span class="n">214</span>          _ ≤ etaRankinBound :=</span>
+<span class="l" id="L215"><span class="n">215</span>            tsum_abs_etaCorrectionInvTerm_le_bound q</span>
+<span class="l" id="L216"><span class="n">216</span></span>
+<span class="l" id="L217"><span class="n">217</span>#print axioms abs_etaLinearPartialSum_le</span>
+<span class="l" id="L218"><span class="n">218</span></span>
+<span class="l" id="L219"><span class="n">219</span>end PaperB.FixedQ</span>
+<span class="l" id="L220"><span class="n">220</span></span>
+<span class="l" id="L221"><span class="n">221</span></span>
+<span class="l" id="L222"><span class="n">222</span>namespace PaperB.FixedQ</span>
+<span class="l" id="L223"><span class="n">223</span></span>
+<span class="l" id="L224"><span class="n">224</span>theorem etaLinearPartialSum_eq_shifted_range</span>
+<span class="l" id="L225"><span class="n">225</span>    (q X : ℕ) :</span>
+<span class="l" id="L226"><span class="n">226</span>    etaLinearPartialSum q X =</span>
+<span class="l" id="L227"><span class="n">227</span>      ∑ j ∈ Finset.range X, etaLinearArithmetic q (j + 1) := by</span>
+<span class="l" id="L228"><span class="n">228</span>  unfold etaLinearPartialSum</span>
+<span class="l" id="L229"><span class="n">229</span>  refine Finset.sum_bij</span>
+<span class="l" id="L230"><span class="n">230</span>    (fun n hn =&gt; n - 1)</span>
+<span class="l" id="L231"><span class="n">231</span>    ?_ ?_ ?_ ?_</span>
+<span class="l" id="L232"><span class="n">232</span>  · intro n hn</span>
+<span class="l" id="L233"><span class="n">233</span>    rw [Finset.mem_Icc] at hn</span>
+<span class="l" id="L234"><span class="n">234</span>    rw [Finset.mem_range]</span>
+<span class="l" id="L235"><span class="n">235</span>    omega</span>
+<span class="l" id="L236"><span class="n">236</span>  · intro n1 hn1 n2 hn2 h</span>
+<span class="l" id="L237"><span class="n">237</span>    rw [Finset.mem_Icc] at hn1 hn2</span>
+<span class="l" id="L238"><span class="n">238</span>    omega</span>
+<span class="l" id="L239"><span class="n">239</span>  · intro j hj</span>
+<span class="l" id="L240"><span class="n">240</span>    rw [Finset.mem_range] at hj</span>
+<span class="l" id="L241"><span class="n">241</span>    refine ⟨j + 1, ?_, ?_⟩</span>
+<span class="l" id="L242"><span class="n">242</span>    · rw [Finset.mem_Icc]</span>
+<span class="l" id="L243"><span class="n">243</span>      omega</span>
+<span class="l" id="L244"><span class="n">244</span>    · omega</span>
+<span class="l" id="L245"><span class="n">245</span>  · intro n hn</span>
+<span class="l" id="L246"><span class="n">246</span>    rw [Finset.mem_Icc] at hn</span>
+<span class="l" id="L247"><span class="n">247</span>    have hpos : 1 ≤ n := hn.1</span>
+<span class="l" id="L248"><span class="n">248</span>    rw [Nat.sub_add_cancel hpos]</span>
+<span class="l" id="L249"><span class="n">249</span></span>
+<span class="l" id="L250"><span class="n">250</span>theorem etaReciprocalTerm_succ_eq_linear_sq</span>
+<span class="l" id="L251"><span class="n">251</span>    (q j : ℕ) :</span>
+<span class="l" id="L252"><span class="n">252</span>    etaReciprocalTerm q (j + 1) =</span>
+<span class="l" id="L253"><span class="n">253</span>      (((j + 1 : ℕ) : ℝ)⁻¹ ^ 2) *</span>
+<span class="l" id="L254"><span class="n">254</span>        etaLinearArithmetic q (j + 1) := by</span>
+<span class="l" id="L255"><span class="n">255</span>  rw [etaReciprocalTerm_eq_etaCoeff_div]</span>
+<span class="l" id="L256"><span class="n">256</span>  change etaCoeff q (j + 1) / (((j + 1 : ℕ) : ℝ)) =</span>
+<span class="l" id="L257"><span class="n">257</span>    (((j + 1 : ℕ) : ℝ)⁻¹ ^ 2) *</span>
+<span class="l" id="L258"><span class="n">258</span>      ((((j + 1 : ℕ) : ℝ) * etaCoeff q (j + 1)))</span>
+<span class="l" id="L259"><span class="n">259</span>  have hj : (0 : ℝ) &lt; j + 1 := by positivity</span>
+<span class="l" id="L260"><span class="n">260</span>  field_simp [ne_of_gt hj]</span>
+<span class="l" id="L261"><span class="n">261</span></span>
+<span class="l" id="L262"><span class="n">262</span></span>
+<span class="l" id="L263"><span class="n">263</span>#print axioms etaLinearPartialSum_eq_shifted_range</span>
+<span class="l" id="L264"><span class="n">264</span>#print axioms etaReciprocalTerm_succ_eq_linear_sq</span>
+<span class="l" id="L265"><span class="n">265</span></span>
+<span class="l" id="L266"><span class="n">266</span>end PaperB.FixedQ</span>
+<span class="l" id="L267"><span class="n">267</span></span>
+<span class="l" id="L268"><span class="n">268</span></span>
+<span class="l" id="L269"><span class="n">269</span>namespace PaperB.FixedQ</span>
+<span class="l" id="L270"><span class="n">270</span></span>
+<span class="l" id="L271"><span class="n">271</span>theorem etaReciprocalFiniteTail_by_parts</span>
+<span class="l" id="L272"><span class="n">272</span>    (q X M : ℕ) (hXM : X &lt; M) :</span>
+<span class="l" id="L273"><span class="n">273</span>    (∑ j ∈ Finset.Ico X M, etaReciprocalTerm q (j + 1)) =</span>
+<span class="l" id="L274"><span class="n">274</span>      ((M : ℝ)⁻¹ ^ 2) * etaLinearPartialSum q M -</span>
+<span class="l" id="L275"><span class="n">275</span>      (((X + 1 : ℕ) : ℝ)⁻¹ ^ 2) * etaLinearPartialSum q X -</span>
+<span class="l" id="L276"><span class="n">276</span>      ∑ i ∈ Finset.Ico X (M - 1),</span>
+<span class="l" id="L277"><span class="n">277</span>        (((((i + 2 : ℕ) : ℝ)⁻¹ ^ 2) -</span>
+<span class="l" id="L278"><span class="n">278</span>          (((i + 1 : ℕ) : ℝ)⁻¹ ^ 2)) *</span>
+<span class="l" id="L279"><span class="n">279</span>          etaLinearPartialSum q (i + 1)) := by</span>
+<span class="l" id="L280"><span class="n">280</span>  have h := Finset.sum_Ico_by_parts</span>
+<span class="l" id="L281"><span class="n">281</span>    (f := fun j : ℕ =&gt; (((j + 1 : ℕ) : ℝ)⁻¹ ^ 2))</span>
+<span class="l" id="L282"><span class="n">282</span>    (g := fun j : ℕ =&gt; etaLinearArithmetic q (j + 1))</span>
+<span class="l" id="L283"><span class="n">283</span>    hXM</span>
+<span class="l" id="L284"><span class="n">284</span>  simp only [smul_eq_mul] at h</span>
+<span class="l" id="L285"><span class="n">285</span>  have hL :</span>
+<span class="l" id="L286"><span class="n">286</span>      (∑ i ∈ Finset.Ico X M,</span>
+<span class="l" id="L287"><span class="n">287</span>        (((i + 1 : ℕ) : ℝ)⁻¹ ^ 2) *</span>
+<span class="l" id="L288"><span class="n">288</span>          etaLinearArithmetic q (i + 1)) =</span>
+<span class="l" id="L289"><span class="n">289</span>      ∑ i ∈ Finset.Ico X M, etaReciprocalTerm q (i + 1) := by</span>
+<span class="l" id="L290"><span class="n">290</span>    apply Finset.sum_congr rfl</span>
+<span class="l" id="L291"><span class="n">291</span>    intro i hi</span>
+<span class="l" id="L292"><span class="n">292</span>    rw [etaReciprocalTerm_succ_eq_linear_sq]</span>
+<span class="l" id="L293"><span class="n">293</span>  rw [hL] at h</span>
+<span class="l" id="L294"><span class="n">294</span>  simp_rw [← etaLinearPartialSum_eq_shifted_range] at h</span>
+<span class="l" id="L295"><span class="n">295</span>  have hM : M - 1 + 1 = M := Nat.sub_add_cancel (Nat.one_le_of_lt hXM)</span>
+<span class="l" id="L296"><span class="n">296</span>  simpa [hM, Nat.add_assoc] using h</span>
+<span class="l" id="L297"><span class="n">297</span></span>
+<span class="l" id="L298"><span class="n">298</span>#print axioms etaReciprocalFiniteTail_by_parts</span>
+<span class="l" id="L299"><span class="n">299</span></span>
+<span class="l" id="L300"><span class="n">300</span>end PaperB.FixedQ</span>
+<span class="l" id="L301"><span class="n">301</span></span>
+<span class="l" id="L302"><span class="n">302</span></span>
+<span class="l" id="L303"><span class="n">303</span>namespace PaperB.FixedQ</span>
+<span class="l" id="L304"><span class="n">304</span></span>
+<span class="l" id="L305"><span class="n">305</span>lemma reciprocal_sq_succ_le</span>
+<span class="l" id="L306"><span class="n">306</span>    {m : ℕ} (hm : 0 &lt; m) :</span>
+<span class="l" id="L307"><span class="n">307</span>    (((m + 1 : ℕ) : ℝ)⁻¹ ^ 2) ≤ ((m : ℝ)⁻¹ ^ 2) := by</span>
+<span class="l" id="L308"><span class="n">308</span>  have hmR : (0 : ℝ) &lt; m := by exact_mod_cast hm</span>
+<span class="l" id="L309"><span class="n">309</span>  have hmsR : (0 : ℝ) &lt; m + 1 := by positivity</span>
+<span class="l" id="L310"><span class="n">310</span>  have hinv :</span>
+<span class="l" id="L311"><span class="n">311</span>      (((m + 1 : ℕ) : ℝ)⁻¹) ≤ (m : ℝ)⁻¹ := by</span>
+<span class="l" id="L312"><span class="n">312</span>    simpa [Nat.cast_add, Nat.cast_one] using</span>
+<span class="l" id="L313"><span class="n">313</span>      (inv_le_inv₀ hmsR hmR).2 (by exact_mod_cast Nat.le_succ m)</span>
+<span class="l" id="L314"><span class="n">314</span>  exact (sq_le_sq₀ (by positivity) (by positivity)).2 hinv</span>
+<span class="l" id="L315"><span class="n">315</span></span>
+<span class="l" id="L316"><span class="n">316</span>lemma nat_mul_reciprocal_sq_diff_le</span>
+<span class="l" id="L317"><span class="n">317</span>    {m : ℕ} (hm : 0 &lt; m) :</span>
+<span class="l" id="L318"><span class="n">318</span>    (m : ℝ) *</span>
+<span class="l" id="L319"><span class="n">319</span>        (((m : ℝ)⁻¹ ^ 2) - (((m + 1 : ℕ) : ℝ)⁻¹ ^ 2))</span>
+<span class="l" id="L320"><span class="n">320</span>      ≤ 2 * ((m : ℝ)⁻¹ ^ 2) := by</span>
+<span class="l" id="L321"><span class="n">321</span>  have hmR : (0 : ℝ) &lt; m := by exact_mod_cast hm</span>
+<span class="l" id="L322"><span class="n">322</span>  have hmsR : (0 : ℝ) &lt; m + 1 := by positivity</span>
+<span class="l" id="L323"><span class="n">323</span>  field_simp [hmR.ne&#x27;, hmsR.ne&#x27;]</span>
+<span class="l" id="L324"><span class="n">324</span>  norm_num [Nat.cast_add, Nat.cast_one] at *</span>
+<span class="l" id="L325"><span class="n">325</span>  ring_nf at *</span>
+<span class="l" id="L326"><span class="n">326</span>  nlinarith</span>
+<span class="l" id="L327"><span class="n">327</span></span>
+<span class="l" id="L328"><span class="n">328</span>theorem abs_inv_sq_mul_etaLinearPartialSum_le</span>
+<span class="l" id="L329"><span class="n">329</span>    (q N : ℕ) (hN : 0 &lt; N) :</span>
+<span class="l" id="L330"><span class="n">330</span>    |((N : ℝ)⁻¹ ^ 2) * etaLinearPartialSum q N| ≤</span>
+<span class="l" id="L331"><span class="n">331</span>      etaRankinBound / (N : ℝ) := by</span>
+<span class="l" id="L332"><span class="n">332</span>  have hA := abs_etaLinearPartialSum_le q N</span>
+<span class="l" id="L333"><span class="n">333</span>  have hsq0 : 0 ≤ ((N : ℝ)⁻¹ ^ 2) := sq_nonneg _</span>
+<span class="l" id="L334"><span class="n">334</span>  rw [abs_mul, abs_of_nonneg hsq0]</span>
+<span class="l" id="L335"><span class="n">335</span>  calc</span>
+<span class="l" id="L336"><span class="n">336</span>    ((N : ℝ)⁻¹ ^ 2) * |etaLinearPartialSum q N|</span>
+<span class="l" id="L337"><span class="n">337</span>      ≤ ((N : ℝ)⁻¹ ^ 2) * ((N : ℝ) * etaRankinBound) :=</span>
+<span class="l" id="L338"><span class="n">338</span>        mul_le_mul_of_nonneg_left hA hsq0</span>
+<span class="l" id="L339"><span class="n">339</span>    _ = etaRankinBound / (N : ℝ) := by</span>
+<span class="l" id="L340"><span class="n">340</span>      have hNR : (N : ℝ) ≠ 0 := by exact_mod_cast (Nat.ne_of_gt hN)</span>
+<span class="l" id="L341"><span class="n">341</span>      field_simp [hNR]</span>
+<span class="l" id="L342"><span class="n">342</span></span>
+<span class="l" id="L343"><span class="n">343</span>theorem abs_etaAbelDifferenceTerm_le</span>
+<span class="l" id="L344"><span class="n">344</span>    (q i : ℕ) (hi : 0 &lt; i + 1) :</span>
+<span class="l" id="L345"><span class="n">345</span>    |(((((i + 2 : ℕ) : ℝ)⁻¹ ^ 2) -</span>
+<span class="l" id="L346"><span class="n">346</span>        (((i + 1 : ℕ) : ℝ)⁻¹ ^ 2)) *</span>
+<span class="l" id="L347"><span class="n">347</span>        etaLinearPartialSum q (i + 1))| ≤</span>
+<span class="l" id="L348"><span class="n">348</span>      2 * etaRankinBound * (((i + 1 : ℕ) : ℝ)⁻¹ ^ 2) := by</span>
+<span class="l" id="L349"><span class="n">349</span>  let m := i + 1</span>
+<span class="l" id="L350"><span class="n">350</span>  have hm : 0 &lt; m := by</span>
+<span class="l" id="L351"><span class="n">351</span>    dsimp [m]</span>
+<span class="l" id="L352"><span class="n">352</span>    omega</span>
+<span class="l" id="L353"><span class="n">353</span>  have hdec :</span>
+<span class="l" id="L354"><span class="n">354</span>      (((m + 1 : ℕ) : ℝ)⁻¹ ^ 2) ≤ ((m : ℝ)⁻¹ ^ 2) :=</span>
+<span class="l" id="L355"><span class="n">355</span>    reciprocal_sq_succ_le hm</span>
+<span class="l" id="L356"><span class="n">356</span>  have hA := abs_etaLinearPartialSum_le q m</span>
+<span class="l" id="L357"><span class="n">357</span>  have hdiff0 :</span>
+<span class="l" id="L358"><span class="n">358</span>      0 ≤ ((m : ℝ)⁻¹ ^ 2) - (((m + 1 : ℕ) : ℝ)⁻¹ ^ 2) :=</span>
+<span class="l" id="L359"><span class="n">359</span>    sub_nonneg.mpr hdec</span>
+<span class="l" id="L360"><span class="n">360</span>  have hR0 : 0 ≤ etaRankinBound := by</span>
+<span class="l" id="L361"><span class="n">361</span>    unfold etaRankinBound</span>
+<span class="l" id="L362"><span class="n">362</span>    positivity</span>
+<span class="l" id="L363"><span class="n">363</span>  change</span>
+<span class="l" id="L364"><span class="n">364</span>    |(((((m + 1 : ℕ) : ℝ)⁻¹ ^ 2) - ((m : ℝ)⁻¹ ^ 2)) *</span>
+<span class="l" id="L365"><span class="n">365</span>        etaLinearPartialSum q m)| ≤</span>
+<span class="l" id="L366"><span class="n">366</span>      2 * etaRankinBound * ((m : ℝ)⁻¹ ^ 2)</span>
+<span class="l" id="L367"><span class="n">367</span>  rw [abs_mul, abs_of_nonpos (sub_nonpos.mpr hdec), neg_sub]</span>
+<span class="l" id="L368"><span class="n">368</span>  calc</span>
+<span class="l" id="L369"><span class="n">369</span>    (((m : ℝ)⁻¹ ^ 2) - (((m + 1 : ℕ) : ℝ)⁻¹ ^ 2)) *</span>
+<span class="l" id="L370"><span class="n">370</span>        |etaLinearPartialSum q m|</span>
+<span class="l" id="L371"><span class="n">371</span>      ≤ (((m : ℝ)⁻¹ ^ 2) - (((m + 1 : ℕ) : ℝ)⁻¹ ^ 2)) *</span>
+<span class="l" id="L372"><span class="n">372</span>          ((m : ℝ) * etaRankinBound) :=</span>
+<span class="l" id="L373"><span class="n">373</span>        mul_le_mul_of_nonneg_left hA hdiff0</span>
+<span class="l" id="L374"><span class="n">374</span>    _ = etaRankinBound *</span>
+<span class="l" id="L375"><span class="n">375</span>        ((m : ℝ) *</span>
+<span class="l" id="L376"><span class="n">376</span>          (((m : ℝ)⁻¹ ^ 2) - (((m + 1 : ℕ) : ℝ)⁻¹ ^ 2))) := by ring</span>
+<span class="l" id="L377"><span class="n">377</span>    _ ≤ etaRankinBound * (2 * ((m : ℝ)⁻¹ ^ 2)) :=</span>
+<span class="l" id="L378"><span class="n">378</span>      mul_le_mul_of_nonneg_left</span>
+<span class="l" id="L379"><span class="n">379</span>        (nat_mul_reciprocal_sq_diff_le hm) hR0</span>
+<span class="l" id="L380"><span class="n">380</span>    _ = 2 * etaRankinBound * ((m : ℝ)⁻¹ ^ 2) := by ring</span>
+<span class="l" id="L381"><span class="n">381</span></span>
+<span class="l" id="L382"><span class="n">382</span>end PaperB.FixedQ</span>
+<span class="l" id="L383"><span class="n">383</span></span>
+<span class="l" id="L384"><span class="n">384</span></span>
+<span class="l" id="L385"><span class="n">385</span>namespace PaperB.FixedQ</span>
+<span class="l" id="L386"><span class="n">386</span></span>
+<span class="l" id="L387"><span class="n">387</span>theorem abs_etaAbelInteriorSum_le</span>
+<span class="l" id="L388"><span class="n">388</span>    (q X M : ℕ) (hX : 0 &lt; X) :</span>
+<span class="l" id="L389"><span class="n">389</span>    |∑ i ∈ Finset.Ico X (M - 1),</span>
+<span class="l" id="L390"><span class="n">390</span>        (((((i + 2 : ℕ) : ℝ)⁻¹ ^ 2) -</span>
+<span class="l" id="L391"><span class="n">391</span>          (((i + 1 : ℕ) : ℝ)⁻¹ ^ 2)) *</span>
+<span class="l" id="L392"><span class="n">392</span>          etaLinearPartialSum q (i + 1))| ≤</span>
+<span class="l" id="L393"><span class="n">393</span>      2 * etaRankinBound * (X : ℝ)⁻¹ := by</span>
+<span class="l" id="L394"><span class="n">394</span>  have hR0 : 0 ≤ etaRankinBound := by</span>
+<span class="l" id="L395"><span class="n">395</span>    unfold etaRankinBound</span>
+<span class="l" id="L396"><span class="n">396</span>    positivity</span>
+<span class="l" id="L397"><span class="n">397</span>  have hshift :</span>
+<span class="l" id="L398"><span class="n">398</span>      (∑ i ∈ Finset.Ico X (M - 1),</span>
+<span class="l" id="L399"><span class="n">399</span>        (((i + 1 : ℕ) : ℝ)⁻¹ ^ 2)) =</span>
+<span class="l" id="L400"><span class="n">400</span>      ∑ m ∈ Finset.Icc (X + 1) (M - 1),</span>
+<span class="l" id="L401"><span class="n">401</span>        ((m : ℝ)⁻¹ ^ 2) := by</span>
+<span class="l" id="L402"><span class="n">402</span>    refine Finset.sum_bij</span>
+<span class="l" id="L403"><span class="n">403</span>      (fun i hi =&gt; i + 1)</span>
+<span class="l" id="L404"><span class="n">404</span>      ?_ ?_ ?_ ?_</span>
+<span class="l" id="L405"><span class="n">405</span>    · intro i hi</span>
+<span class="l" id="L406"><span class="n">406</span>      rw [Finset.mem_Ico] at hi</span>
+<span class="l" id="L407"><span class="n">407</span>      rw [Finset.mem_Icc]</span>
+<span class="l" id="L408"><span class="n">408</span>      omega</span>
+<span class="l" id="L409"><span class="n">409</span>    · intro i1 hi1 i2 hi2 heq</span>
+<span class="l" id="L410"><span class="n">410</span>      omega</span>
+<span class="l" id="L411"><span class="n">411</span>    · intro m hm</span>
+<span class="l" id="L412"><span class="n">412</span>      rw [Finset.mem_Icc] at hm</span>
+<span class="l" id="L413"><span class="n">413</span>      refine ⟨m - 1, ?_, ?_⟩</span>
+<span class="l" id="L414"><span class="n">414</span>      · rw [Finset.mem_Ico]</span>
+<span class="l" id="L415"><span class="n">415</span>        omega</span>
+<span class="l" id="L416"><span class="n">416</span>      · omega</span>
+<span class="l" id="L417"><span class="n">417</span>    · intro i hi</span>
+<span class="l" id="L418"><span class="n">418</span>      rfl</span>
+<span class="l" id="L419"><span class="n">419</span>  calc</span>
+<span class="l" id="L420"><span class="n">420</span>    |∑ i ∈ Finset.Ico X (M - 1),</span>
+<span class="l" id="L421"><span class="n">421</span>        (((((i + 2 : ℕ) : ℝ)⁻¹ ^ 2) -</span>
+<span class="l" id="L422"><span class="n">422</span>          (((i + 1 : ℕ) : ℝ)⁻¹ ^ 2)) *</span>
+<span class="l" id="L423"><span class="n">423</span>          etaLinearPartialSum q (i + 1))|</span>
+<span class="l" id="L424"><span class="n">424</span>      ≤ ∑ i ∈ Finset.Ico X (M - 1),</span>
+<span class="l" id="L425"><span class="n">425</span>          |(((((i + 2 : ℕ) : ℝ)⁻¹ ^ 2) -</span>
+<span class="l" id="L426"><span class="n">426</span>            (((i + 1 : ℕ) : ℝ)⁻¹ ^ 2)) *</span>
+<span class="l" id="L427"><span class="n">427</span>            etaLinearPartialSum q (i + 1))| :=</span>
+<span class="l" id="L428"><span class="n">428</span>        Finset.abs_sum_le_sum_abs _ _</span>
+<span class="l" id="L429"><span class="n">429</span>    _ ≤ ∑ i ∈ Finset.Ico X (M - 1),</span>
+<span class="l" id="L430"><span class="n">430</span>          2 * etaRankinBound *</span>
+<span class="l" id="L431"><span class="n">431</span>            (((i + 1 : ℕ) : ℝ)⁻¹ ^ 2) := by</span>
+<span class="l" id="L432"><span class="n">432</span>        apply Finset.sum_le_sum</span>
+<span class="l" id="L433"><span class="n">433</span>        intro i hi</span>
+<span class="l" id="L434"><span class="n">434</span>        exact abs_etaAbelDifferenceTerm_le q i (by omega)</span>
+<span class="l" id="L435"><span class="n">435</span>    _ = 2 * etaRankinBound *</span>
+<span class="l" id="L436"><span class="n">436</span>          (∑ i ∈ Finset.Ico X (M - 1),</span>
+<span class="l" id="L437"><span class="n">437</span>            (((i + 1 : ℕ) : ℝ)⁻¹ ^ 2)) := by</span>
+<span class="l" id="L438"><span class="n">438</span>        rw [Finset.mul_sum]</span>
+<span class="l" id="L439"><span class="n">439</span>    _ = 2 * etaRankinBound *</span>
+<span class="l" id="L440"><span class="n">440</span>          (∑ m ∈ Finset.Icc (X + 1) (M - 1),</span>
+<span class="l" id="L441"><span class="n">441</span>            ((m : ℝ)⁻¹ ^ 2)) := by rw [hshift]</span>
+<span class="l" id="L442"><span class="n">442</span>    _ ≤ 2 * etaRankinBound * (X : ℝ)⁻¹ := by</span>
+<span class="l" id="L443"><span class="n">443</span>        apply mul_le_mul_of_nonneg_left</span>
+<span class="l" id="L444"><span class="n">444</span>          (finite_square_tail_le_inv (F := X) (M := M - 1) hX)</span>
+<span class="l" id="L445"><span class="n">445</span>        positivity</span>
+<span class="l" id="L446"><span class="n">446</span></span>
+<span class="l" id="L447"><span class="n">447</span>theorem abs_etaReciprocalFiniteTail_le</span>
+<span class="l" id="L448"><span class="n">448</span>    (q X M : ℕ) (hX : 0 &lt; X) (hXM : X &lt; M) :</span>
+<span class="l" id="L449"><span class="n">449</span>    |∑ j ∈ Finset.Ico X M, etaReciprocalTerm q (j + 1)| ≤</span>
+<span class="l" id="L450"><span class="n">450</span>      4 * etaRankinBound * (X : ℝ)⁻¹ := by</span>
+<span class="l" id="L451"><span class="n">451</span>  rw [etaReciprocalFiniteTail_by_parts q X M hXM]</span>
+<span class="l" id="L452"><span class="n">452</span>  have hU :=</span>
+<span class="l" id="L453"><span class="n">453</span>    abs_inv_sq_mul_etaLinearPartialSum_le q M</span>
+<span class="l" id="L454"><span class="n">454</span>      (lt_of_lt_of_le hX (Nat.le_of_lt hXM))</span>
+<span class="l" id="L455"><span class="n">455</span>  have hL :=</span>
+<span class="l" id="L456"><span class="n">456</span>    abs_inv_sq_mul_etaLinearPartialSum_le q X hX</span>
+<span class="l" id="L457"><span class="n">457</span>  have hI := abs_etaAbelInteriorSum_le q X M hX</span>
+<span class="l" id="L458"><span class="n">458</span>  have hR0 : 0 ≤ etaRankinBound := by</span>
+<span class="l" id="L459"><span class="n">459</span>    unfold etaRankinBound</span>
+<span class="l" id="L460"><span class="n">460</span>    positivity</span>
+<span class="l" id="L461"><span class="n">461</span>  have hXR : (0 : ℝ) &lt; X := by exact_mod_cast hX</span>
+<span class="l" id="L462"><span class="n">462</span>  have hM : 0 &lt; M := lt_trans hX hXM</span>
+<span class="l" id="L463"><span class="n">463</span>  have hMR : (0 : ℝ) &lt; M := by exact_mod_cast hM</span>
+<span class="l" id="L464"><span class="n">464</span>  have hXMreal : (X : ℝ) ≤ (M : ℝ) := by</span>
+<span class="l" id="L465"><span class="n">465</span>    exact_mod_cast (Nat.le_of_lt hXM)</span>
+<span class="l" id="L466"><span class="n">466</span>  have hInvM :</span>
+<span class="l" id="L467"><span class="n">467</span>      (M : ℝ)⁻¹ ≤ (X : ℝ)⁻¹ :=</span>
+<span class="l" id="L468"><span class="n">468</span>    (inv_le_inv₀ hMR hXR).2 hXMreal</span>
+<span class="l" id="L469"><span class="n">469</span>  have hInvSucc :</span>
+<span class="l" id="L470"><span class="n">470</span>      (((X + 1 : ℕ) : ℝ)⁻¹) ≤ (X : ℝ)⁻¹ := by</span>
+<span class="l" id="L471"><span class="n">471</span>    have hXsR : (0 : ℝ) &lt; ((X + 1 : ℕ) : ℝ) := by</span>
+<span class="l" id="L472"><span class="n">472</span>      exact_mod_cast Nat.zero_lt_succ X</span>
+<span class="l" id="L473"><span class="n">473</span>    exact (inv_le_inv₀ hXsR hXR).2 (by exact_mod_cast Nat.le_succ X)</span>
+<span class="l" id="L474"><span class="n">474</span>  have hUb :</span>
+<span class="l" id="L475"><span class="n">475</span>      |((M : ℝ)⁻¹ ^ 2) * etaLinearPartialSum q M| ≤</span>
+<span class="l" id="L476"><span class="n">476</span>        etaRankinBound * (X : ℝ)⁻¹ := by</span>
+<span class="l" id="L477"><span class="n">477</span>    calc</span>
+<span class="l" id="L478"><span class="n">478</span>      |((M : ℝ)⁻¹ ^ 2) * etaLinearPartialSum q M|</span>
+<span class="l" id="L479"><span class="n">479</span>          ≤ etaRankinBound / (M : ℝ) := hU</span>
+<span class="l" id="L480"><span class="n">480</span>      _ = etaRankinBound * (M : ℝ)⁻¹ := by rw [div_eq_mul_inv]</span>
+<span class="l" id="L481"><span class="n">481</span>      _ ≤ etaRankinBound * (X : ℝ)⁻¹ :=</span>
+<span class="l" id="L482"><span class="n">482</span>        mul_le_mul_of_nonneg_left hInvM hR0</span>
+<span class="l" id="L483"><span class="n">483</span>  have hLb :</span>
+<span class="l" id="L484"><span class="n">484</span>      |(((X + 1 : ℕ) : ℝ)⁻¹ ^ 2) *</span>
+<span class="l" id="L485"><span class="n">485</span>          etaLinearPartialSum q X| ≤</span>
+<span class="l" id="L486"><span class="n">486</span>        etaRankinBound * (X : ℝ)⁻¹ := by</span>
+<span class="l" id="L487"><span class="n">487</span>    have hA := abs_etaLinearPartialSum_le q X</span>
+<span class="l" id="L488"><span class="n">488</span>    have hsq0 : 0 ≤ (((X + 1 : ℕ) : ℝ)⁻¹ ^ 2) := sq_nonneg _</span>
+<span class="l" id="L489"><span class="n">489</span>    rw [abs_mul, abs_of_nonneg hsq0]</span>
+<span class="l" id="L490"><span class="n">490</span>    calc</span>
+<span class="l" id="L491"><span class="n">491</span>      (((X + 1 : ℕ) : ℝ)⁻¹ ^ 2) *</span>
+<span class="l" id="L492"><span class="n">492</span>          |etaLinearPartialSum q X|</span>
+<span class="l" id="L493"><span class="n">493</span>        ≤ (((X + 1 : ℕ) : ℝ)⁻¹ ^ 2) *</span>
+<span class="l" id="L494"><span class="n">494</span>            ((X : ℝ) * etaRankinBound) :=</span>
+<span class="l" id="L495"><span class="n">495</span>          mul_le_mul_of_nonneg_left hA hsq0</span>
+<span class="l" id="L496"><span class="n">496</span>      _ ≤ etaRankinBound * (X : ℝ)⁻¹ := by</span>
+<span class="l" id="L497"><span class="n">497</span>        have hsqInv :</span>
+<span class="l" id="L498"><span class="n">498</span>            (((X + 1 : ℕ) : ℝ)⁻¹ ^ 2) ≤ ((X : ℝ)⁻¹ ^ 2) :=</span>
+<span class="l" id="L499"><span class="n">499</span>          (sq_le_sq₀ (by positivity) (by positivity)).2 hInvSucc</span>
+<span class="l" id="L500"><span class="n">500</span>        calc</span>
+<span class="l" id="L501"><span class="n">501</span>          (((X + 1 : ℕ) : ℝ)⁻¹ ^ 2) *</span>
+<span class="l" id="L502"><span class="n">502</span>              ((X : ℝ) * etaRankinBound)</span>
+<span class="l" id="L503"><span class="n">503</span>            ≤ ((X : ℝ)⁻¹ ^ 2) *</span>
+<span class="l" id="L504"><span class="n">504</span>                ((X : ℝ) * etaRankinBound) :=</span>
+<span class="l" id="L505"><span class="n">505</span>              mul_le_mul_of_nonneg_right hsqInv</span>
+<span class="l" id="L506"><span class="n">506</span>                (mul_nonneg (le_of_lt hXR) hR0)</span>
+<span class="l" id="L507"><span class="n">507</span>          _ = etaRankinBound * (X : ℝ)⁻¹ := by</span>
+<span class="l" id="L508"><span class="n">508</span>              have hXne : (X : ℝ) ≠ 0 := ne_of_gt hXR</span>
+<span class="l" id="L509"><span class="n">509</span>              field_simp [hXne]</span>
+<span class="l" id="L510"><span class="n">510</span>  calc</span>
+<span class="l" id="L511"><span class="n">511</span>    |((M : ℝ)⁻¹ ^ 2) * etaLinearPartialSum q M -</span>
+<span class="l" id="L512"><span class="n">512</span>      (((X + 1 : ℕ) : ℝ)⁻¹ ^ 2) * etaLinearPartialSum q X -</span>
+<span class="l" id="L513"><span class="n">513</span>      ∑ i ∈ Finset.Ico X (M - 1),</span>
+<span class="l" id="L514"><span class="n">514</span>        (((((i + 2 : ℕ) : ℝ)⁻¹ ^ 2) -</span>
+<span class="l" id="L515"><span class="n">515</span>          (((i + 1 : ℕ) : ℝ)⁻¹ ^ 2)) *</span>
+<span class="l" id="L516"><span class="n">516</span>          etaLinearPartialSum q (i + 1))|</span>
+<span class="l" id="L517"><span class="n">517</span>      ≤ |((M : ℝ)⁻¹ ^ 2) * etaLinearPartialSum q M| +</span>
+<span class="l" id="L518"><span class="n">518</span>        |(((X + 1 : ℕ) : ℝ)⁻¹ ^ 2) * etaLinearPartialSum q X| +</span>
+<span class="l" id="L519"><span class="n">519</span>        |∑ i ∈ Finset.Ico X (M - 1),</span>
+<span class="l" id="L520"><span class="n">520</span>          (((((i + 2 : ℕ) : ℝ)⁻¹ ^ 2) -</span>
+<span class="l" id="L521"><span class="n">521</span>            (((i + 1 : ℕ) : ℝ)⁻¹ ^ 2)) *</span>
+<span class="l" id="L522"><span class="n">522</span>            etaLinearPartialSum q (i + 1))| := by</span>
+<span class="l" id="L523"><span class="n">523</span>          have h1 := abs_sub</span>
+<span class="l" id="L524"><span class="n">524</span>            (((M : ℝ)⁻¹ ^ 2) * etaLinearPartialSum q M -</span>
+<span class="l" id="L525"><span class="n">525</span>              (((X + 1 : ℕ) : ℝ)⁻¹ ^ 2) * etaLinearPartialSum q X)</span>
+<span class="l" id="L526"><span class="n">526</span>            (∑ i ∈ Finset.Ico X (M - 1),</span>
+<span class="l" id="L527"><span class="n">527</span>              (((((i + 2 : ℕ) : ℝ)⁻¹ ^ 2) -</span>
+<span class="l" id="L528"><span class="n">528</span>                (((i + 1 : ℕ) : ℝ)⁻¹ ^ 2)) *</span>
+<span class="l" id="L529"><span class="n">529</span>                etaLinearPartialSum q (i + 1)))</span>
+<span class="l" id="L530"><span class="n">530</span>          have h2 := abs_sub</span>
+<span class="l" id="L531"><span class="n">531</span>            (((M : ℝ)⁻¹ ^ 2) * etaLinearPartialSum q M)</span>
+<span class="l" id="L532"><span class="n">532</span>            ((((X + 1 : ℕ) : ℝ)⁻¹ ^ 2) * etaLinearPartialSum q X)</span>
+<span class="l" id="L533"><span class="n">533</span>          linarith</span>
+<span class="l" id="L534"><span class="n">534</span>    _ ≤ 4 * etaRankinBound * (X : ℝ)⁻¹ := by</span>
+<span class="l" id="L535"><span class="n">535</span>      have hInvX0 : 0 ≤ (X : ℝ)⁻¹ := le_of_lt (inv_pos.mpr hXR)</span>
+<span class="l" id="L536"><span class="n">536</span>      nlinarith [hUb, hLb, hI, mul_nonneg hR0 hInvX0]</span>
+<span class="l" id="L537"><span class="n">537</span></span>
+<span class="l" id="L538"><span class="n">538</span>#print axioms abs_etaReciprocalFiniteTail_le</span>
+<span class="l" id="L539"><span class="n">539</span></span>
+<span class="l" id="L540"><span class="n">540</span>end PaperB.FixedQ</span>
+<span class="l" id="L541"><span class="n">541</span></span>
+<span class="l" id="L542"><span class="n">542</span></span>
+<span class="l" id="L543"><span class="n">543</span>namespace PaperB.FixedQ</span>
+<span class="l" id="L544"><span class="n">544</span></span>
+<span class="l" id="L545"><span class="n">545</span>theorem etaCoeff_nonneg</span>
+<span class="l" id="L546"><span class="n">546</span>    (q n : ℕ) :</span>
+<span class="l" id="L547"><span class="n">547</span>    0 ≤ etaCoeff q n := by</span>
+<span class="l" id="L548"><span class="n">548</span>  unfold etaCoeff</span>
+<span class="l" id="L549"><span class="n">549</span>  by_cases hn0 : n = 0</span>
+<span class="l" id="L550"><span class="n">550</span>  · simp [hn0]</span>
+<span class="l" id="L551"><span class="n">551</span>  · rw [if_neg hn0]</span>
+<span class="l" id="L552"><span class="n">552</span>    by_cases hs : Squarefree n ∧ n.Coprime (6 * q)</span>
+<span class="l" id="L553"><span class="n">553</span>    · rw [if_pos hs]</span>
+<span class="l" id="L554"><span class="n">554</span>      apply Finset.prod_nonneg</span>
+<span class="l" id="L555"><span class="n">555</span>      intro p hp</span>
+<span class="l" id="L556"><span class="n">556</span>      have hpPrime := (Nat.mem_primeFactors.mp hp).1</span>
+<span class="l" id="L557"><span class="n">557</span>      have hpDvd := (Nat.mem_primeFactors.mp hp).2.1</span>
+<span class="l" id="L558"><span class="n">558</span>      have hpcop : p.Coprime (6 * q) :=</span>
+<span class="l" id="L559"><span class="n">559</span>        hs.2.coprime_dvd_left hpDvd</span>
+<span class="l" id="L560"><span class="n">560</span>      have hp5 : 5 ≤ p :=</span>
+<span class="l" id="L561"><span class="n">561</span>        eta_rankin_five_le_of_prime_coprime_six hpPrime hpcop</span>
+<span class="l" id="L562"><span class="n">562</span>      have hpR : (5 : ℝ) ≤ (p : ℝ) := by exact_mod_cast hp5</span>
+<span class="l" id="L563"><span class="n">563</span>      have hden : 0 &lt; (p : ℝ) - 2 := by linarith</span>
+<span class="l" id="L564"><span class="n">564</span>      positivity</span>
+<span class="l" id="L565"><span class="n">565</span>    · rw [if_neg hs]</span>
+<span class="l" id="L566"><span class="n">566</span></span>
+<span class="l" id="L567"><span class="n">567</span>theorem etaReciprocalTerm_nonneg</span>
+<span class="l" id="L568"><span class="n">568</span>    (q n : ℕ) :</span>
+<span class="l" id="L569"><span class="n">569</span>    0 ≤ etaReciprocalTerm q n := by</span>
+<span class="l" id="L570"><span class="n">570</span>  rw [etaReciprocalTerm_eq_etaCoeff_div]</span>
+<span class="l" id="L571"><span class="n">571</span>  exact div_nonneg (etaCoeff_nonneg q n) (by positivity)</span>
+<span class="l" id="L572"><span class="n">572</span></span>
+<span class="l" id="L573"><span class="n">573</span>theorem shifted_etaReciprocal_sum_range_le</span>
+<span class="l" id="L574"><span class="n">574</span>    (q M : ℕ) :</span>
+<span class="l" id="L575"><span class="n">575</span>    (∑ j ∈ Finset.range M, etaReciprocalTerm q (j + 1)) ≤</span>
+<span class="l" id="L576"><span class="n">576</span>      1 + 4 * etaRankinBound := by</span>
+<span class="l" id="L577"><span class="n">577</span>  have hR0 : 0 ≤ etaRankinBound := by</span>
+<span class="l" id="L578"><span class="n">578</span>    unfold etaRankinBound</span>
+<span class="l" id="L579"><span class="n">579</span>    positivity</span>
+<span class="l" id="L580"><span class="n">580</span>  cases M with</span>
+<span class="l" id="L581"><span class="n">581</span>  | zero =&gt;</span>
+<span class="l" id="L582"><span class="n">582</span>      simp</span>
+<span class="l" id="L583"><span class="n">583</span>      nlinarith</span>
+<span class="l" id="L584"><span class="n">584</span>  | succ k =&gt;</span>
+<span class="l" id="L585"><span class="n">585</span>      by_cases hk0 : k = 0</span>
+<span class="l" id="L586"><span class="n">586</span>      · subst k</span>
+<span class="l" id="L587"><span class="n">587</span>        have h4 : 0 ≤ 4 * etaRankinBound :=</span>
+<span class="l" id="L588"><span class="n">588</span>          mul_nonneg (by norm_num) hR0</span>
+<span class="l" id="L589"><span class="n">589</span>        simpa [etaReciprocalTerm_one] using h4</span>
+<span class="l" id="L590"><span class="n">590</span>      · have hk : 0 &lt; k := Nat.pos_of_ne_zero hk0</span>
+<span class="l" id="L591"><span class="n">591</span>        have htail :=</span>
+<span class="l" id="L592"><span class="n">592</span>          abs_etaReciprocalFiniteTail_le q 1 (k + 1)</span>
+<span class="l" id="L593"><span class="n">593</span>            (by norm_num) (by omega)</span>
+<span class="l" id="L594"><span class="n">594</span>        have htail0 :</span>
+<span class="l" id="L595"><span class="n">595</span>            0 ≤ ∑ j ∈ Finset.Ico 1 (k + 1),</span>
+<span class="l" id="L596"><span class="n">596</span>              etaReciprocalTerm q (j + 1) := by</span>
+<span class="l" id="L597"><span class="n">597</span>          exact Finset.sum_nonneg fun j hj =&gt;</span>
+<span class="l" id="L598"><span class="n">598</span>            etaReciprocalTerm_nonneg q (j + 1)</span>
+<span class="l" id="L599"><span class="n">599</span>        have htailLe :</span>
+<span class="l" id="L600"><span class="n">600</span>            (∑ j ∈ Finset.Ico 1 (k + 1),</span>
+<span class="l" id="L601"><span class="n">601</span>              etaReciprocalTerm q (j + 1)) ≤</span>
+<span class="l" id="L602"><span class="n">602</span>              4 * etaRankinBound := by</span>
+<span class="l" id="L603"><span class="n">603</span>          simpa [abs_of_nonneg htail0] using htail</span>
+<span class="l" id="L604"><span class="n">604</span>        rw [show Finset.range (k + 1) =</span>
+<span class="l" id="L605"><span class="n">605</span>            insert 0 (Finset.Ico 1 (k + 1)) by</span>
+<span class="l" id="L606"><span class="n">606</span>          ext j</span>
+<span class="l" id="L607"><span class="n">607</span>          simp</span>
+<span class="l" id="L608"><span class="n">608</span>          omega]</span>
+<span class="l" id="L609"><span class="n">609</span>        simp [etaReciprocalTerm_one, htailLe]</span>
+<span class="l" id="L610"><span class="n">610</span></span>
+<span class="l" id="L611"><span class="n">611</span>theorem summable_shifted_etaReciprocalTerm</span>
+<span class="l" id="L612"><span class="n">612</span>    (q : ℕ) :</span>
+<span class="l" id="L613"><span class="n">613</span>    Summable (fun j : ℕ =&gt; etaReciprocalTerm q (j + 1)) := by</span>
+<span class="l" id="L614"><span class="n">614</span>  exact summable_of_sum_range_le</span>
+<span class="l" id="L615"><span class="n">615</span>    (fun j =&gt; etaReciprocalTerm_nonneg q (j + 1))</span>
+<span class="l" id="L616"><span class="n">616</span>    (shifted_etaReciprocal_sum_range_le q)</span>
+<span class="l" id="L617"><span class="n">617</span></span>
+<span class="l" id="L618"><span class="n">618</span>theorem summable_etaReciprocalTerm</span>
+<span class="l" id="L619"><span class="n">619</span>    (q : ℕ) :</span>
+<span class="l" id="L620"><span class="n">620</span>    Summable (etaReciprocalTerm q) := by</span>
+<span class="l" id="L621"><span class="n">621</span>  exact (summable_nat_add_iff (f := etaReciprocalTerm q) 1).1</span>
+<span class="l" id="L622"><span class="n">622</span>    (by simpa using summable_shifted_etaReciprocalTerm q)</span>
+<span class="l" id="L623"><span class="n">623</span></span>
+<span class="l" id="L624"><span class="n">624</span>#print axioms summable_etaReciprocalTerm</span>
+<span class="l" id="L625"><span class="n">625</span></span>
+<span class="l" id="L626"><span class="n">626</span>end PaperB.FixedQ</span>
+<span class="l" id="L627"><span class="n">627</span></span>
+<span class="l" id="L628"><span class="n">628</span></span>
+<span class="l" id="L629"><span class="n">629</span>namespace PaperB.FixedQ</span>
+<span class="l" id="L630"><span class="n">630</span></span>
+<span class="l" id="L631"><span class="n">631</span>noncomputable def etaReciprocalTail</span>
+<span class="l" id="L632"><span class="n">632</span>    (q X : ℕ) : ℝ :=</span>
+<span class="l" id="L633"><span class="n">633</span>  ∑&#x27; j : ℕ, etaReciprocalTerm q (X + 1 + j)</span>
+<span class="l" id="L634"><span class="n">634</span></span>
+<span class="l" id="L635"><span class="n">635</span>theorem summable_etaReciprocalTail</span>
+<span class="l" id="L636"><span class="n">636</span>    (q X : ℕ) :</span>
+<span class="l" id="L637"><span class="n">637</span>    Summable (fun j : ℕ =&gt; etaReciprocalTerm q (X + 1 + j)) := by</span>
+<span class="l" id="L638"><span class="n">638</span>  have hs :</span>
+<span class="l" id="L639"><span class="n">639</span>      Summable (fun j : ℕ =&gt; etaReciprocalTerm q (j + (X + 1))) :=</span>
+<span class="l" id="L640"><span class="n">640</span>    (summable_nat_add_iff (f := etaReciprocalTerm q) (X + 1)).2</span>
+<span class="l" id="L641"><span class="n">641</span>      (summable_etaReciprocalTerm q)</span>
+<span class="l" id="L642"><span class="n">642</span>  simpa [Nat.add_comm, Nat.add_left_comm, Nat.add_assoc] using hs</span>
+<span class="l" id="L643"><span class="n">643</span></span>
+<span class="l" id="L644"><span class="n">644</span>theorem etaReciprocalTail_nonneg</span>
+<span class="l" id="L645"><span class="n">645</span>    (q X : ℕ) :</span>
+<span class="l" id="L646"><span class="n">646</span>    0 ≤ etaReciprocalTail q X := by</span>
+<span class="l" id="L647"><span class="n">647</span>  unfold etaReciprocalTail</span>
+<span class="l" id="L648"><span class="n">648</span>  exact tsum_nonneg fun j =&gt; etaReciprocalTerm_nonneg q (X + 1 + j)</span>
+<span class="l" id="L649"><span class="n">649</span></span>
+<span class="l" id="L650"><span class="n">650</span>theorem etaReciprocalTail_eq_etaCoeff_div</span>
+<span class="l" id="L651"><span class="n">651</span>    (q X : ℕ) :</span>
+<span class="l" id="L652"><span class="n">652</span>    etaReciprocalTail q X =</span>
+<span class="l" id="L653"><span class="n">653</span>      ∑&#x27; j : ℕ, etaCoeff q (X + 1 + j) / ((X + 1 + j : ℕ) : ℝ) := by</span>
+<span class="l" id="L654"><span class="n">654</span>  unfold etaReciprocalTail</span>
+<span class="l" id="L655"><span class="n">655</span>  apply tsum_congr</span>
+<span class="l" id="L656"><span class="n">656</span>  intro j</span>
+<span class="l" id="L657"><span class="n">657</span>  exact etaReciprocalTerm_eq_etaCoeff_div q (X + 1 + j)</span>
+<span class="l" id="L658"><span class="n">658</span></span>
+<span class="l" id="L659"><span class="n">659</span>theorem etaReciprocalTail_le</span>
+<span class="l" id="L660"><span class="n">660</span>    (q X : ℕ) (hX : 0 &lt; X) :</span>
+<span class="l" id="L661"><span class="n">661</span>    etaReciprocalTail q X ≤</span>
+<span class="l" id="L662"><span class="n">662</span>      4 * etaRankinBound * (X : ℝ)⁻¹ := by</span>
+<span class="l" id="L663"><span class="n">663</span>  have hR0 : 0 ≤ etaRankinBound := by</span>
+<span class="l" id="L664"><span class="n">664</span>    unfold etaRankinBound</span>
+<span class="l" id="L665"><span class="n">665</span>    positivity</span>
+<span class="l" id="L666"><span class="n">666</span>  have hXR : (0 : ℝ) &lt; X := by exact_mod_cast hX</span>
+<span class="l" id="L667"><span class="n">667</span>  have hInvX0 : 0 ≤ (X : ℝ)⁻¹ := le_of_lt (inv_pos.mpr hXR)</span>
+<span class="l" id="L668"><span class="n">668</span>  unfold etaReciprocalTail</span>
+<span class="l" id="L669"><span class="n">669</span>  apply Real.tsum_le_of_sum_range_le</span>
+<span class="l" id="L670"><span class="n">670</span>    (fun j =&gt; etaReciprocalTerm_nonneg q (X + 1 + j))</span>
+<span class="l" id="L671"><span class="n">671</span>  intro K</span>
+<span class="l" id="L672"><span class="n">672</span>  cases K with</span>
+<span class="l" id="L673"><span class="n">673</span>  | zero =&gt;</span>
+<span class="l" id="L674"><span class="n">674</span>      simp</span>
+<span class="l" id="L675"><span class="n">675</span>      exact mul_nonneg (mul_nonneg (by norm_num) hR0) hInvX0</span>
+<span class="l" id="L676"><span class="n">676</span>  | succ k =&gt;</span>
+<span class="l" id="L677"><span class="n">677</span>      have hXM : X &lt; X + (k + 1) := by omega</span>
+<span class="l" id="L678"><span class="n">678</span>      have hfinite :=</span>
+<span class="l" id="L679"><span class="n">679</span>        abs_etaReciprocalFiniteTail_le q X (X + (k + 1)) hX hXM</span>
+<span class="l" id="L680"><span class="n">680</span>      have hEq :</span>
+<span class="l" id="L681"><span class="n">681</span>          (∑ j ∈ Finset.range (k + 1),</span>
+<span class="l" id="L682"><span class="n">682</span>            etaReciprocalTerm q (X + 1 + j)) =</span>
+<span class="l" id="L683"><span class="n">683</span>          ∑ j ∈ Finset.Ico X (X + (k + 1)),</span>
+<span class="l" id="L684"><span class="n">684</span>            etaReciprocalTerm q (j + 1) := by</span>
+<span class="l" id="L685"><span class="n">685</span>        refine Finset.sum_bij</span>
+<span class="l" id="L686"><span class="n">686</span>          (fun j hj =&gt; X + j)</span>
+<span class="l" id="L687"><span class="n">687</span>          ?_ ?_ ?_ ?_</span>
+<span class="l" id="L688"><span class="n">688</span>        · intro j hj</span>
+<span class="l" id="L689"><span class="n">689</span>          rw [Finset.mem_range] at hj</span>
+<span class="l" id="L690"><span class="n">690</span>          rw [Finset.mem_Ico]</span>
+<span class="l" id="L691"><span class="n">691</span>          omega</span>
+<span class="l" id="L692"><span class="n">692</span>        · intro j1 hj1 j2 hj2 h</span>
+<span class="l" id="L693"><span class="n">693</span>          omega</span>
+<span class="l" id="L694"><span class="n">694</span>        · intro i hi</span>
+<span class="l" id="L695"><span class="n">695</span>          rw [Finset.mem_Ico] at hi</span>
+<span class="l" id="L696"><span class="n">696</span>          refine ⟨i - X, ?_, ?_⟩</span>
+<span class="l" id="L697"><span class="n">697</span>          · rw [Finset.mem_range]</span>
+<span class="l" id="L698"><span class="n">698</span>            omega</span>
+<span class="l" id="L699"><span class="n">699</span>          · omega</span>
+<span class="l" id="L700"><span class="n">700</span>        · intro j hj</span>
+<span class="l" id="L701"><span class="n">701</span>          congr 1</span>
+<span class="l" id="L702"><span class="n">702</span>          omega</span>
+<span class="l" id="L703"><span class="n">703</span>      rw [hEq]</span>
+<span class="l" id="L704"><span class="n">704</span>      have hnonneg :</span>
+<span class="l" id="L705"><span class="n">705</span>          0 ≤ ∑ j ∈ Finset.Ico X (X + (k + 1)),</span>
+<span class="l" id="L706"><span class="n">706</span>            etaReciprocalTerm q (j + 1) := by</span>
+<span class="l" id="L707"><span class="n">707</span>        exact Finset.sum_nonneg fun j hj =&gt;</span>
+<span class="l" id="L708"><span class="n">708</span>          etaReciprocalTerm_nonneg q (j + 1)</span>
+<span class="l" id="L709"><span class="n">709</span>      simpa [abs_of_nonneg hnonneg] using hfinite</span>
+<span class="l" id="L710"><span class="n">710</span></span>
+<span class="l" id="L711"><span class="n">711</span>theorem abs_etaReciprocalTail_le</span>
+<span class="l" id="L712"><span class="n">712</span>    (q X : ℕ) (hX : 0 &lt; X) :</span>
+<span class="l" id="L713"><span class="n">713</span>    |etaReciprocalTail q X| ≤</span>
+<span class="l" id="L714"><span class="n">714</span>      4 * etaRankinBound * (X : ℝ)⁻¹ := by</span>
+<span class="l" id="L715"><span class="n">715</span>  rw [abs_of_nonneg (etaReciprocalTail_nonneg q X)]</span>
+<span class="l" id="L716"><span class="n">716</span>  exact etaReciprocalTail_le q X hX</span>
+<span class="l" id="L717"><span class="n">717</span></span>
+<span class="l" id="L718"><span class="n">718</span>#print axioms etaReciprocalTail_le</span>
+<span class="l" id="L719"><span class="n">719</span>#print axioms abs_etaReciprocalTail_le</span>
+<span class="l" id="L720"><span class="n">720</span></span>
+<span class="l" id="L721"><span class="n">721</span>end PaperB.FixedQ</span>
+<span class="l" id="L722"><span class="n">722</span></span>
+<span class="l" id="L723"><span class="n">723</span></span>
+<span class="l" id="L724"><span class="n">724</span>namespace PaperB.FixedQ</span>
+<span class="l" id="L725"><span class="n">725</span></span>
+<span class="l" id="L726"><span class="n">726</span>theorem etaReciprocalTail_manuscript</span>
+<span class="l" id="L727"><span class="n">727</span>    (q H : ℕ) (hH : 2 ≤ H) :</span>
+<span class="l" id="L728"><span class="n">728</span>    |((H - 1 : ℕ) : ℝ) * etaReciprocalTail q (H - 1)| ≤</span>
+<span class="l" id="L729"><span class="n">729</span>      4 * etaRankinBound := by</span>
+<span class="l" id="L730"><span class="n">730</span>  have hX : 0 &lt; H - 1 := by omega</span>
+<span class="l" id="L731"><span class="n">731</span>  have hXR : (0 : ℝ) &lt; (H - 1 : ℕ) := by exact_mod_cast hX</span>
+<span class="l" id="L732"><span class="n">732</span>  have htail := etaReciprocalTail_le q (H - 1) hX</span>
+<span class="l" id="L733"><span class="n">733</span>  have htail0 := etaReciprocalTail_nonneg q (H - 1)</span>
+<span class="l" id="L734"><span class="n">734</span>  have hR0 : 0 ≤ etaRankinBound := by</span>
+<span class="l" id="L735"><span class="n">735</span>    unfold etaRankinBound</span>
+<span class="l" id="L736"><span class="n">736</span>    positivity</span>
+<span class="l" id="L737"><span class="n">737</span>  rw [abs_mul, abs_of_nonneg (le_of_lt hXR), abs_of_nonneg htail0]</span>
+<span class="l" id="L738"><span class="n">738</span>  calc</span>
+<span class="l" id="L739"><span class="n">739</span>    ((H - 1 : ℕ) : ℝ) * etaReciprocalTail q (H - 1)</span>
+<span class="l" id="L740"><span class="n">740</span>      ≤ ((H - 1 : ℕ) : ℝ) *</span>
+<span class="l" id="L741"><span class="n">741</span>          (4 * etaRankinBound * (((H - 1 : ℕ) : ℝ)⁻¹)) :=</span>
+<span class="l" id="L742"><span class="n">742</span>        mul_le_mul_of_nonneg_left htail (le_of_lt hXR)</span>
+<span class="l" id="L743"><span class="n">743</span>    _ = 4 * etaRankinBound := by</span>
+<span class="l" id="L744"><span class="n">744</span>      have hXne : (((H - 1 : ℕ) : ℝ)) ≠ 0 := ne_of_gt hXR</span>
+<span class="l" id="L745"><span class="n">745</span>      field_simp [hXne]</span>
+<span class="l" id="L746"><span class="n">746</span></span>
+<span class="l" id="L747"><span class="n">747</span>#print axioms etaReciprocalTail_manuscript</span>
+<span class="l" id="L748"><span class="n">748</span></span>
+<span class="l" id="L749"><span class="n">749</span>end PaperB.FixedQ</span></pre></div></body></html>

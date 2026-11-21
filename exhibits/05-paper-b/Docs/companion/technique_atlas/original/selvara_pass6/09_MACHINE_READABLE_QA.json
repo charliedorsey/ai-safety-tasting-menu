@@ -1,0 +1,29 @@
+{
+  "schema": "raccoon.paperb.technique_atlas.pass6.qa.v1",
+  "source_snapshot": "PAPERB_PRINTED_TERMINAL_RC_R0003_TRIMMED_20261023.zip",
+  "source_sha256": "e8bccaf4c607a3b2458a47833bdd98f598a59229f7af0175927b994318d7b2a1",
+  "cases": {
+    "mechanism_cards": 62,
+    "cell_traces": 12,
+    "terminal_nodes": 16,
+    "typed_edges": 26,
+    "equation_transitions": 25,
+    "parameter_registry": 21,
+    "source_files": 70,
+    "previous_pass_references": 136,
+    "source_hashes_checked_against_R0003": true,
+    "source_excerpt_line_verifications": true,
+    "budget_graph_nodes": 41,
+    "budget_graph_edges": 41,
+    "browser_tests_desktop_mobile": 66
+  },
+  "rates": {
+    "CORE_max_public": "499/500",
+    "LONG_max_public": "19/20",
+    "CORE_with_decorations": "999/1000",
+    "LONG_with_decorations": "951/1000"
+  },
+  "issues": [],
+  "lean_replay_this_pass": false,
+  "external_referee_approved_here": false
+}

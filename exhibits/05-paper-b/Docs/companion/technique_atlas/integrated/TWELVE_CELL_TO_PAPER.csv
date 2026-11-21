@@ -1,0 +1,13 @@
+id,cell,sector,article_location,paper_pdf_page,source_anchor,literature_keys,failure_boundary
+CELL-W,W,CORE,Appendix F · Other physical cells | p. 28,28,GoldC/QuillonWPhysical.lean:48,Ramare2010,"If no B prime packet, Ramaré decomposition cannot be invoked; classified into other cells."
+CELL-C,C,CORE,Appendix F · Other physical cells | p. 28,28,GoldC/QuillonCPhysical.lean:514,Vaughan1980,"Without the lower edge r>=s^(1+epsilon), the C dyadic lower range is invalid."
+CELL-R,R,CORE,Appendix D · R/RL reciprocal sum | p. 24,24,GoldC/QuillonRPhysical.lean:385,Karatsuba1971,"Without C meeting J_R(B), the progression prime extraction that powers the R method is absent."
+CELL-ResA,ResA,CORE,Appendix F · Other physical cells | p. 28,28,GoldC/QuillonResPhysical.lean:208,,"Without the missing-packet conditions, both sides need not be rough and bound is unavailable."
+CELL-Band,Band,CORE,Appendix B · CORE Band | p. 18,18,GoldC/QuillonResPhysical.lean:220,,"Without the near-diagonal double inequality, log(b/a) is not O(epsilon log h)."
+CELL-WL,WL,LONG,Appendix F · Other physical cells | p. 28,28,GoldC/QuillonLW.lean:412,Ramare2010,No B packet -> CL; no need for Weil on this orientation.
+CELL-CL,CL,LONG,Appendix F · Other physical cells | p. 28,28,GoldC/QuillonLC.lean:570,Vaughan1980,Incorrect to port CORE constant-5 lower bound unchanged into LONG.
+CELL-RL,RL,LONG,Appendix D · R/RL reciprocal sum | p. 24,24,GoldC/QuillonLR.lean:528,Karatsuba1971,Requires C prime packet and 3epsilon<=delta; does not assume r upper cap from CORE.
+CELL-ManyL,ManyL,LONG,Appendix C · LONG edge / Weil | p. 20,20,GoldC/QuillonLRP.lean:35,,Without card C>=K0 the 3^-K0 factor vanishes; need separate low-card cells.
+CELL-EdgeL,EdgeL,LONG,Appendix C · LONG edge / Weil | p. 20,20,GoldC/QuillonLRP.lean:45,,Weil-Cauchy cofactor range at s^(1/2) gives no fixed saving; this cell avoids that demand.
+CELL-ResL,ResL,LONG,Appendix C · LONG edge / Weil | p. 20,20,GoldC/QuillonLRP.lean:56,,B-prime packet makes rough-B assumption false; its complement is WRL.
+CELL-WRL,WRL,LONG,Appendix C · LONG edge / Weil | p. 20,20,GoldC/QuillonLRP.lean:28,Weil1948;Estermann1961;IwaniecKowalski2004,At r close to s^(1/2) the cofactor is too short; large gcd and zero modes cannot be silently dropped.

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Mathematical source waypoints</title>
+  
+<link rel="stylesheet" href="documentary.css" />
+</head>
+<body><main class="wrap"><header><nav aria-label="Documentary navigation"><a href="index.html">Documentary home</a><a href="When_Zero_Was_Enough.html">Short feature</a><a href="The_Proof_That_Could_Still_Change.html">Long history</a><a href="waypoints.html">Source waypoints</a><a href="timeline.html">Timeline</a></nav></header>
+<header id="title-block-header">
+<h1 class="title">Mathematical source waypoints</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#source-to-theorem-waypoints-r0005-literary-edition"
+id="toc-source-to-theorem-waypoints-r0005-literary-edition">Source-to-theorem
+waypoints — R0005, literary edition</a>
+<ul>
+<li><a
+href="#second-pass-technical-waypoints-what-the-middle-of-the-story-costs"
+id="toc-second-pass-technical-waypoints-what-the-middle-of-the-story-costs">Second-pass
+technical waypoints: what the middle of the story costs</a></li>
+<li><a
+href="#logical-dependency-is-not-an-argument-for-organizational-causation"
+id="toc-logical-dependency-is-not-an-argument-for-organizational-causation">Logical
+dependency is not an argument for organizational causation</a></li>
+<li><a href="#historical-waypoints-that-are-not-formal-dependency-edges"
+id="toc-historical-waypoints-that-are-not-formal-dependency-edges">Historical
+waypoints that are <em>not</em> formal dependency edges</a></li>
+<li><a href="#identity-anchors-from-source-inspected-october-23-archive"
+id="toc-identity-anchors-from-source-inspected-october-23-archive">Identity
+anchors from source-inspected October 23 archive</a></li>
+<li><a href="#r0005-supplementary-source-and-editorial-standing"
+id="toc-r0005-supplementary-source-and-editorial-standing">R0005
+supplementary source and editorial standing</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1
+id="source-to-theorem-waypoints-r0005-literary-edition">Source-to-theorem
+waypoints — R0005, literary edition</h1>
+<p><strong>Companion to the R0005 literary edition of <em>The Proof That
+Could Still Change</em>.</strong> R0004 remains the unchanged source
+edition. R0005 did not add a new mathematical source audit, kernel
+replay or release verification. This map is checked against the
+<strong>archived October 23 R0003 source</strong> and Selvara’s Pass 6
+mathematical atlas. Source anchors denote <code>LEAN/</code> paths
+inside
+<code>PAPERB_PRINTED_TERMINAL_RC_R0003_TRIMMED_20261023.zip</code>. File
+excerpts, hash matches, and source-inspection claims are not a fresh
+Lean replay. A <code>direct</code> edge means the visible proof body
+calls or rewrites with the named supplier; <code>via</code> means at
+least one intermediate declaration; <code>method</code> means a
+proof-method relationship rather than an immediate call.</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Code</th>
+<th>Scene / proof obligation</th>
+<th>Archived Lean waypoint</th>
+<th>Verified scope</th>
+<th>Evidence edge</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>W1</strong></td>
+<td>Native cardinality conservation</td>
+<td><code>PaperB/Gate3/CentralTransfer/ThreeSectorConsumer.lean:84–92</code>,
+<code>Merivelle.Central.regionSum_three_sectors</code></td>
+<td>Fixed ordered numerical cutoffs, exact LOW+MIDDLE+HIGH source
+identity</td>
+<td>source-inspected / via terminal</td>
+</tr>
+<tr class="even">
+<td><strong>W2</strong></td>
+<td>Middle source geometry</td>
+<td><code>PaperB/Gate3/CentralTransfer/MiddleLongCoreConsumer.lean:20–26</code>,
+<code>foldedMiddle_long_core</code></td>
+<td>Middle equals longEither and its complement, with same folded row
+and physical supports</td>
+<td>source-inspected / via</td>
+</tr>
+<tr class="odd">
+<td><strong>W3</strong></td>
+<td>Five CORE physical cells</td>
+<td><code>GoldC/QuillonCoreFinal.lean:58–62</code>,
+<code>pair_decomp</code></td>
+<td>Exact signed pair-sum split W+C+R+ResA+Band, not a termwise
+bound</td>
+<td>source-inspected / method</td>
+</tr>
+<tr class="even">
+<td><strong>W4</strong></td>
+<td>CORE analytic rate</td>
+<td><code>GoldC/QuillonCoreFinal.lean:118–123</code>,
+<code>core_sublog</code></td>
+<td>Arbitrary <code>Jlow,Jhigh : ℕ → ℕ</code>; sector
+<code>SourceUniformSublog</code></td>
+<td>source-inspected / via</td>
+</tr>
+<tr class="odd">
+<td><strong>W5a</strong></td>
+<td>Seven LONG physical cells</td>
+<td><code>GoldC/QuillonLongFinal.lean:74–79</code>,
+<code>long_pair_decomp</code></td>
+<td>Exact WL+CL+RL+ManyL+EdgeL+ResL+WRL</td>
+<td>source-inspected / method</td>
+</tr>
+<tr class="even">
+<td><strong>W5b</strong></td>
+<td>LONG analytic rate</td>
+<td><code>GoldC/QuillonLongFinal.lean:148–153</code>,
+<code>long_sublog (hW : WeilHyp)</code></td>
+<td>Arbitrary cutoff functions, with a named Weil premise in the
+isolated theorem</td>
+<td>source-inspected / via</td>
+</tr>
+<tr class="odd">
+<td><strong>W5c</strong></td>
+<td>Weil bound used by LONG</td>
+<td><code>Orienne/CSC3/WeilQuillonBridgeR0002.lean:16–21</code>,
+<code>norm_quillon_K_weil</code></td>
+<td>Retains divisor-cardinality and conductor gcd in Kloosterman
+estimate; uses <code>GenKloosterman.norm_kSum_le</code></td>
+<td>source-inspected / via bridge</td>
+</tr>
+<tr class="even">
+<td><strong>W5d</strong></td>
+<td>Exact native bridge</td>
+<td><code>Orienne/CSC3/PhysicalLongBridgeQ0001.lean</code>,
+<code>quillon_weilHyp</code>, <code>signed_long_copy_eq_native</code>,
+<code>long_source_native_sublog</code></td>
+<td>Discharges named Weil hypothesis and identifies copied source with
+native source; does not replace source-proof audit</td>
+<td>source-inspected / via</td>
+</tr>
+<tr class="odd">
+<td><strong>N1</strong></td>
+<td>Numerical survival</td>
+<td><code>GoldC/QuillonCoreFinal.lean</code>,
+<code>GoldC/QuillonLongFinal.lean</code>; Atlas Pass 6
+<code>05_TWELVE_CELL_COMPLETE_TRACE.csv</code></td>
+<td>max CORE 499/500, max LONG 19/20, +1/1000 per decoration -&gt;
+999/1000 and 951/1000</td>
+<td>source-inspected / arithmetic audit</td>
+</tr>
+<tr class="even">
+<td><strong>W6a</strong></td>
+<td>LOW exact empty</td>
+<td><code>Orienne/CSC3/LowZeroTerminalR0001.lean:8–11</code>,
+<code>lowSector_zero_exact</code></td>
+<td>Native cardinality <code>&lt; 0</code> impossible</td>
+<td>source-inspected / direct from zero proof</td>
+</tr>
+<tr class="odd">
+<td><strong>W6b</strong></td>
+<td>LOW rate</td>
+<td>same file lines 15–21, <code>lowSector_zero_sublog</code></td>
+<td>Packages zero as the uniform rate with actual anchor
+quantifiers</td>
+<td>source-inspected / direct</td>
+</tr>
+<tr class="even">
+<td><strong>W6c</strong></td>
+<td>Native terminal</td>
+<td>same file lines 33–38,
+<code>paperB_terminal_via_empty_low</code></td>
+<td>Supplies cutoff zero and delta 1/4 to
+<code>paperB_terminal_of_native_low</code></td>
+<td>source-inspected / direct</td>
+</tr>
+<tr class="odd">
+<td><strong>W7a</strong></td>
+<td>Printed A/B equality</td>
+<td><code>Orienne/Publication/F01PrintedLiteralBridgeR0001.lean:1470–1481</code>,
+<code>printedA_sub_printedB_eq_manuscriptKernels</code></td>
+<td>Printed difference equals named kernels under exact compatibility
+and parity conditions</td>
+<td>source-inspected / direct to printed theorem</td>
+</tr>
+<tr class="even">
+<td><strong>W7b</strong></td>
+<td>Printed public theorem</td>
+<td><code>Orienne/Publication/PaperBPrintedTerminalR0001.lean:10–28</code>,
+<code>paperB_printed_terminal</code></td>
+<td>Direct calls: Thistle’s native theorem and F-01 difference
+rewrite</td>
+<td>source-inspected / direct</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Locator convention:</strong> W1-W4 are individual source
+edges. <strong>W5</strong> denotes the cluster W5a-W5d (the LONG
+partition, conditional source rate, named Weil discharge, and
+copied-to-native transport). <strong>W6</strong> denotes W6a-W6c (LOW
+emptiness, uniform rate, native terminal). <strong>W7</strong> denotes
+W7a-W7b (printed equality and the printed theorem). Codes
+<strong>W8-W16</strong> identify the second-pass technical questions
+below. Unlike the R0003 companion, every bracketed W-locator in the
+manuscript now resolves here.</p>
+<h2
+id="second-pass-technical-waypoints-what-the-middle-of-the-story-costs">Second-pass
+technical waypoints: what the middle of the story costs</h2>
+<p>These anchors were checked in Selvara’s sealed R0003
+source-inspection and quantitative ledger; they were <strong>not
+independently elaborated or built again for this literary pass</strong>.
+Line numbers refer to the source archive where provided and are
+approximate when marked <code>~</code>. Use these waypoints to assess
+the exact source claim made in the narrative, not to infer authorship or
+general publication priority.</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Code</th>
+<th>Historical question</th>
+<th>Source anchor</th>
+<th>Mathematical answer / limit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>W8</strong></td>
+<td>Does the formal <code>o(log h)</code> rate have the right
+uniformity?</td>
+<td><code>GoldC/QuillonSetup.lean:64–69</code>,
+<code>SourceUniformSublog</code>;
+<code>GoldC/QuillonCoreFinal.lean:118–214</code>;
+<code>GoldC/QuillonLongFinal.lean:148–241</code></td>
+<td>Fixes positive squarefree <code>q</code>, then positive
+<code>ε</code>, produces <code>H₀</code> uniform in admissible anchor;
+does <strong>not</strong> establish a single threshold uniform in
+increasing q. The physical supplier bounds are independent of arbitrary
+cutoff functions.</td>
+</tr>
+<tr class="even">
+<td><strong>W9</strong></td>
+<td>What actually governs CORE’s exponent?</td>
+<td><code>GoldC/QuillonResPhysical.lean:404–590</code>,
+<code>Band_physical</code>;
+<code>GoldC/QuillonCoreFinal.lean:72–116</code>,
+<code>core_pair_le</code></td>
+<td>The Band physical mass calculation gives raw exponent
+<code>1991/2000</code>; fixed constants are absorbed to
+<code>499/500</code>. It is not the W/Kloosterman cell that sets the
+published maximum.</td>
+</tr>
+<tr class="odd">
+<td><strong>W10</strong></td>
+<td>Why does Weil not dominate LONG’s total estimate?</td>
+<td><code>GoldC/QuillonLRP.lean:385–~560</code>,
+<code>EdgeL_physical</code>;
+<code>GoldC/QuillonLongFinal.lean:88–146</code>,
+<code>long_pair_le</code></td>
+<td>EdgeL’s thin logarithmic window has pre-absorption exponent
+<code>3741/4000</code>, rounded to <code>19/20</code>. WRL’s power is
+negative. The final seven-cell bound takes the <strong>largest</strong>
+exponent among additive disjoint cells, not their sum.</td>
+</tr>
+<tr class="even">
+<td><strong>W11</strong></td>
+<td>How much did decoration aggregation cost?</td>
+<td><code>GoldC/QuillonDecorationGronwall.lean:260</code>,
+<code>decoration_mass_le_loglog_pow</code>;
+<code>GoldC/QuillonCoreFinal.lean:176–214</code>;
+<code>GoldC/QuillonLongFinal.lean:204–241</code></td>
+<td>Positive decoration weights are summed <strong>after</strong> each
+signed cell sum is estimated, with one <code>+1/1000</code> exponent
+charge per sector. Result: <code>999/1000</code> for CORE,
+<code>951/1000</code> for LONG; this is an eventual source bound.</td>
+</tr>
+<tr class="odd">
+<td><strong>W12</strong></td>
+<td>Why did a numerical change from 5 to 4 matter?</td>
+<td><code>GoldC.QuillonREv.R_exp_ev</code>;
+<code>GoldC.QuillonLR.R_exp_ev4</code>; Selvara Atlas Pass 5 §5, Pass 4
+§6</td>
+<td>The source height/cofactor geometry weakens the admissible constant.
+Re-proving the bound at 4 preserves <code>3σ₀−3/200−2=3/200&gt;0</code>
+with <code>σ₀=2/3+1/100</code>; not a mechanical symbol rename.</td>
+</tr>
+<tr class="even">
+<td><strong>W13</strong></td>
+<td>How is the exact three-sector result assembled at epsilon?</td>
+<td><code>PaperB/Gate3/CentralTransfer/MiddleLongCoreConsumer.lean:~20–65</code>;
+<code>ThreeSectorConsumer.lean:130–194</code>;
+<code>ThreeSectorTerminalAssembly.lean:66–142</code>;
+<code>GoldC/QuarterFold.lean:838,894</code></td>
+<td>Middle requests CORE/LONG at <code>ε/2</code> each; folded Central
+requests LOW/MIDDLE/HIGH at <code>ε/3</code>; folded-to-active transport
+spends another <code>ε/2</code> on inverse+density error. Thus CORE/LONG
+may be requested at <code>ε/12</code> of the outer Central target. These
+are choices of tolerance, not extra exponent losses.</td>
+</tr>
+<tr class="odd">
+<td><strong>W14</strong></td>
+<td>Does HIGH borrow the same CORE/LONG decoration budget?</td>
+<td><code>Orienne/Central/HighCardGrowingR0001.lean:18–~70</code>;
+<code>HighCardRateR0002.lean:20–46</code></td>
+<td>No. HIGH is a separate physical, positive bound at
+<code>orienneCentralHighCut</code>, then made sublog by eventual
+<code>log h</code> growth. The final zero-LOW choice retains this
+already-paid HIGH cutoff.</td>
+</tr>
+<tr class="even">
+<td><strong>W15</strong></td>
+<td>Was the zero-mode objection a refutation of finite Fourier
+algebra?</td>
+<td>Orvian milestone-2
+<code>PaperB.FourierRebuild.dft_masked_product</code>; milestone-3
+<code>anchored_cutoff_source_fourier</code>; Quillon/Brannoc
+Fourier-first source critique in Selvara Phase 5</td>
+<td>No. Finite masked reconstruction and source-entry identities could
+be Lean-green while the source’s signed zero mode stayed unpaid. The
+obstacle is an <strong>analytic implication</strong>, not the validity
+of the DFT identity. These milestone receipts are contemporaneous
+reported builds, not included in the sealed R0003 terminal’s checked
+edge map.</td>
+</tr>
+<tr class="odd">
+<td><strong>W16</strong></td>
+<td>What was MirrorDance’s real scope?</td>
+<td><code>PaperB.MirrorDance.paperBTerminal_of_mirrorDance</code>;
+Brannoc Hunt A source/referee; Mirelle source-leaf receipts
+R0001–R0005</td>
+<td>Conditional theorem has <strong>three explicit hypotheses</strong>
+O1/S1/S2. Thirteen early reported source-side identities did not
+discharge S1/S2 and did not finish O1’s infinite-to-finite source
+composition. It is a verified route <em>conditioned on</em> mathematics,
+not an alternative unconditional terminal.</td>
+</tr>
+</tbody>
+</table>
+<p>For a representative requested rate <code>ε = 0.1</code>, Selvara’s
+Pass 5 computes illustrative final constant-absorption
+<em>sufficient</em> conditions on <code>log10(log h)</code> of
+approximately <code>8450.15</code> for CORE and <code>175.43</code> for
+LONG. These figures omit earlier thresholds and are <strong>not</strong>
+minimal heights or a practical finite-height error estimate. The
+manuscript retains the qualitative consequence; the numerical microscope
+belongs here rather than being used to sensationalize the story.</p>
+<h2
+id="logical-dependency-is-not-an-argument-for-organizational-causation">Logical
+dependency is not an argument for organizational causation</h2>
+<p>The surviving Lean sources establish the need for the exact physical
+partitions, the source-matched analytic suppliers, and the
+cutoff-uniform bounds within the present proof. They do
+<strong>not</strong> establish that a particular tool, routing doctrine,
+personality, or alternative research lane was causally indispensable to
+the discovery of that proof. That requires dated process evidence and,
+for counterfactual claims, evidence we may never have.</p>
+<p>The appropriate historical statement is narrower: Charlie describes a
+deliberate investment in optionality; a contemporaneous research estate
+contains independent competing routes and reusable interfaces; the
+winning physical CORE/LONG mathematics later possessed the cutoff
+flexibility required by the terminal. The record supports the
+coexistence and sequencing of those facts, and the <em>logical use</em>
+of the mathematical flexibility. It does not prove that no narrower
+laboratory could have discovered the same theorem.</p>
+<h2
+id="historical-waypoints-that-are-not-formal-dependency-edges">Historical
+waypoints that are <em>not</em> formal dependency edges</h2>
+<ul>
+<li><strong>October 4 reuse moment:</strong> signed reindex one logical
+level earlier than an established absolute-value reindex; supports
+engineering reuse and Charlie’s remembered reaction,
+<strong>not</strong> an assertion that the named lemma was imported into
+the final terminal.</li>
+<li><strong>Fourier-first / Orvian:</strong>
+<code>PaperB.FourierRebuild.dft_masked_product</code> and
+<code>anchored_cutoff_source_fourier</code> in the exploratory research
+tree; finite masked Fourier and source entry <strong>do not</strong>
+prove the full signed decorated source bound.</li>
+<li><strong>MirrorDance / Mirelle:</strong>
+<code>PaperB.MirrorDance.paperBTerminal_of_mirrorDance</code> has
+S1/S2/O1 as <strong>premises</strong>. Verified source identity leaves
+do not supply either signed saving.</li>
+<li><strong>Quillon / Thistle attribution:</strong> Quillon’s earlier
+zero-cutoff proposal and Thistle’s later checked proof are separate
+dated acts; the reviewed Brannoc-to-Thistle handoff did not mention zero
+LOW. Do not infer an unrecorded transmission or definitive cognitive
+independence.</li>
+<li><strong>Q0002:</strong> additional explicit no-packet
+theorem/referee response came after the initial zero-terminal proof; not
+an antecedent necessary for the original 9,633-job receipt.</li>
+</ul>
+<h2
+id="identity-anchors-from-source-inspected-october-23-archive">Identity
+anchors from source-inspected October 23 archive</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>SHA-256 prefix</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Orienne/Publication/PaperBPrintedTerminalR0001.lean</code></td>
+<td><code>5a4da763d9accf33</code></td>
+</tr>
+<tr class="even">
+<td><code>Orienne/Publication/F01PrintedLiteralBridgeR0001.lean</code></td>
+<td><code>5e7e4a353867fd41</code></td>
+</tr>
+<tr class="odd">
+<td><code>Orienne/CSC3/LowZeroTerminalR0001.lean</code></td>
+<td><code>8827c16fed0ecde1</code></td>
+</tr>
+<tr class="even">
+<td><code>PaperB/Gate3/CentralTransfer/ThreeSectorConsumer.lean</code></td>
+<td><code>e8502d4a400b3ef3</code></td>
+</tr>
+<tr class="odd">
+<td><code>PaperB/Gate3/CentralTransfer/MiddleLongCoreConsumer.lean</code></td>
+<td><code>7955a44eedf21619</code></td>
+</tr>
+<tr class="even">
+<td><code>GoldC/QuillonCoreFinal.lean</code></td>
+<td><code>12166b732e44da05</code></td>
+</tr>
+<tr class="odd">
+<td><code>GoldC/QuillonLongFinal.lean</code></td>
+<td><code>105dbc896b2269f9</code></td>
+</tr>
+<tr class="even">
+<td><code>Orienne/CSC3/PhysicalLongBridgeQ0001.lean</code></td>
+<td><code>90ba2136be23631b</code></td>
+</tr>
+<tr class="odd">
+<td><code>Orienne/CSC3/WeilQuillonBridgeR0002.lean</code></td>
+<td><code>6e99e4243bfc1cf0</code></td>
+</tr>
+</tbody>
+</table>
+<p>The complete SHA-256 seal and full line-anchored technical accounts
+are in Selvara’s Pass 6 Atlas, especially
+<code>02_INTEGRATED_ATLAS_DATA.json</code>,
+<code>04_PROOF_EDGE_COURT.csv</code> and
+<code>08_SOURCE_VERIFICATION_AND_LIMITS.md</code>. The atlas counted 136
+matched source anchors across 70 files, but did not extract the full
+elaborated proof-constant graph or perform an independent full Lean
+replay.</p>
+<h2 id="r0005-supplementary-source-and-editorial-standing">R0005
+supplementary source and editorial standing</h2>
+<p><strong>Observatory correction (institutional, not a Lean
+theorem):</strong> In the 25 October semantic correction, Charlie
+describes a functioning dispatch office, its subsequent redesign for his
+own comprehensibility, and its retirement at lifecycle end after
+specialist-to-specialist communication through Pulse became operational.
+The earlier September 26 candidate and October 5 overwatch doctrine are
+<strong>distinct</strong> historical surfaces; neither is the exact
+later commission. The source court has not located that commission. This
+distinction corrects the preceding manuscript’s institutional narrative
+without altering the formal proof chain.</p>
+<p><strong>Technical arithmetic moved from main narrative to this
+companion:</strong> The LONG-left 5-to-4 adaptation preserves the
+positive margin</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3</mn><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mn>2</mn><mn>3</mn></mfrac><mo>+</mo><mfrac><mn>1</mn><mn>100</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mfrac><mn>3</mn><mn>200</mn></mfrac><mo>−</mo><mn>2</mn><mo>=</mo><mfrac><mn>3</mn><mn>200</mn></mfrac><mo>&gt;</mo><mn>0</mn><mi>.</mi></mrow><annotation encoding="application/x-tex">
+3\left(\frac23+\frac1{100}\right)-\frac3{200}-2=\frac3{200}&gt;0.
+</annotation></semantics></math></p>
+<p>For
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Λ</mi><mo>=</mo><mo>log</mo><mi>h</mi></mrow><annotation encoding="application/x-tex">\Lambda=\log h</annotation></semantics></math>,
+Selvara’s source-inspected quantitative ledger records eventual sector
+bounds (with
+fixed-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>q</mi><annotation encoding="application/x-tex">q</annotation></semantics></math>
+and source admissibility restrictions):</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">|</mo><msub><mi>S</mi><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">O</mi><mi mathvariant="normal">R</mi><mi mathvariant="normal">E</mi></mrow></msub><mo stretchy="true" form="postfix">|</mo></mrow><mo>≤</mo><mn>1280</mn><msup><mi>e</mi><mn>10</mn></msup><msup><mi>Λ</mi><mrow><mn>999</mn><mi>/</mi><mn>1000</mn></mrow></msup><mo>,</mo><mspace width="2.0em"></mspace><mrow><mo stretchy="true" form="prefix">|</mo><msub><mi>S</mi><mrow><mi mathvariant="normal">L</mi><mi mathvariant="normal">O</mi><mi mathvariant="normal">N</mi><mi mathvariant="normal">G</mi></mrow></msub><mo stretchy="true" form="postfix">|</mo></mrow><mo>≤</mo><mn>1792</mn><msup><mi>e</mi><mn>10</mn></msup><msup><mi>Λ</mi><mrow><mn>951</mn><mi>/</mi><mn>1000</mn></mrow></msup><mi>.</mi></mrow><annotation encoding="application/x-tex">
+|S_{\mathrm{CORE}}|\le1280e^{10}\Lambda^{999/1000},\qquad
+|S_{\mathrm{LONG}}|\le1792e^{10}\Lambda^{951/1000}.
+</annotation></semantics></math></p>
+<p>The final exponent gaps are
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi>/</mi><mn>1000</mn></mrow><annotation encoding="application/x-tex">1/1000</annotation></semantics></math>
+for CORE and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>49</mn><mi>/</mi><mn>1000</mn></mrow><annotation encoding="application/x-tex">49/1000</annotation></semantics></math>
+for LONG. These are <strong>not</strong> uniform finite-height numerical
+error bars, nor a new independent rerun. Any source status subsequent to
+the October 23 cut must be supported separately.</p>
+<footer>Source-narrative waypoints are not a compiler-extracted dependency DAG.</footer></main></body>
+</html>

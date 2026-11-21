@@ -1,0 +1,174 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · PaperB/Boolean/EndpointContraction.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>PaperB/Boolean/EndpointContraction.lean</h1><p class="meta">LEAN/PaperB/Boolean/EndpointContraction.lean · 173 lines · SHA-256 24712ba5b4eef8ef68af8652c67e9cd80cc0642ebf62e61e38ef75c9a34d311b</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import Mathlib.Algebra.BigOperators.Group.Finset.Powerset</span>
+<span class="l" id="L2"><span class="n">2</span>import Mathlib.Algebra.BigOperators.Pi</span>
+<span class="l" id="L3"><span class="n">3</span>import Mathlib.Algebra.BigOperators.Ring.Finset</span>
+<span class="l" id="L4"><span class="n">4</span>import Mathlib.Data.Finset.SDiff</span>
+<span class="l" id="L5"><span class="n">5</span>import Mathlib.Tactic.Abel</span>
+<span class="l" id="L6"><span class="n">6</span></span>
+<span class="l" id="L7"><span class="n">7</span>/-!</span>
+<span class="l" id="L8"><span class="n">8</span># Paper B: endpoint Boolean contraction</span>
+<span class="l" id="L9"><span class="n">9</span></span>
+<span class="l" id="L10"><span class="n">10</span>Frozen paper source:</span>
+<span class="l" id="L11"><span class="n">11</span>* `manuscript/paper_b_frozen.tex`</span>
+<span class="l" id="L12"><span class="n">12</span>* SHA-256: `9004c20d63218b529ea392d13914c17a347c485fd43814eb88bf8612a8512070`</span>
+<span class="l" id="L13"><span class="n">13</span>* labels: `prop:endpoint-contraction`, `eq:commuting-identity`</span>
+<span class="l" id="L14"><span class="n">14</span></span>
+<span class="l" id="L15"><span class="n">15</span>Mathematical role: exact finite Boolean incidence algebra only.</span>
+<span class="l" id="L16"><span class="n">16</span>This file intentionally contains no singular-series, CRT, arithmetic, or asymptotic definitions.</span>
+<span class="l" id="L17"><span class="n">17</span>-/</span>
+<span class="l" id="L18"><span class="n">18</span></span>
+<span class="l" id="L19"><span class="n">19</span>open scoped BigOperators</span>
+<span class="l" id="L20"><span class="n">20</span></span>
+<span class="l" id="L21"><span class="n">21</span>namespace PaperB</span>
+<span class="l" id="L22"><span class="n">22</span>namespace Boolean</span>
+<span class="l" id="L23"><span class="n">23</span></span>
+<span class="l" id="L24"><span class="n">24</span>variable {ι A : Type*}</span>
+<span class="l" id="L25"><span class="n">25</span></span>
+<span class="l" id="L26"><span class="n">26</span>/-- Boolean Möbius transform on the interval below `s`.</span>
+<span class="l" id="L27"><span class="n">27</span></span>
+<span class="l" id="L28"><span class="n">28</span>The exponent is written as `card (s \ t)` because this is convenient for the</span>
+<span class="l" id="L29"><span class="n">29</span>finite-set recursion. `mobius_eq_paper_formula` below proves that on the</span>
+<span class="l" id="L30"><span class="n">30</span>powerset summation range this is exactly the frozen paper exponent</span>
+<span class="l" id="L31"><span class="n">31</span>`|s| - |t|`.</span>
+<span class="l" id="L32"><span class="n">32</span>-/</span>
+<span class="l" id="L33"><span class="n">33</span>def mobius [DecidableEq ι] [AddCommGroup A]</span>
+<span class="l" id="L34"><span class="n">34</span>    (f : Finset ι → A) (s : Finset ι) : A :=</span>
+<span class="l" id="L35"><span class="n">35</span>  ∑ t ∈ s.powerset, ((-1 : ℤ) ^ (s \ t).card) • f t</span>
+<span class="l" id="L36"><span class="n">36</span></span>
+<span class="l" id="L37"><span class="n">37</span>/-- The implementation of `mobius` is literally the frozen paper formula</span>
+<span class="l" id="L38"><span class="n">38</span>`∑_{t ⊆ s} (-1)^(|s|-|t|) f(t)` after the finite-cardinality identity</span>
+<span class="l" id="L39"><span class="n">39</span>`|s \ t| = |s| - |t|` on `t ⊆ s`.</span>
+<span class="l" id="L40"><span class="n">40</span>-/</span>
+<span class="l" id="L41"><span class="n">41</span>theorem mobius_eq_paper_formula [DecidableEq ι] [AddCommGroup A]</span>
+<span class="l" id="L42"><span class="n">42</span>    (f : Finset ι → A) (s : Finset ι) :</span>
+<span class="l" id="L43"><span class="n">43</span>    mobius f s =</span>
+<span class="l" id="L44"><span class="n">44</span>      ∑ t ∈ s.powerset, ((-1 : ℤ) ^ (s.card - t.card)) • f t := by</span>
+<span class="l" id="L45"><span class="n">45</span>  apply Finset.sum_congr rfl</span>
+<span class="l" id="L46"><span class="n">46</span>  intro t ht</span>
+<span class="l" id="L47"><span class="n">47</span>  have hts : t ⊆ s := Finset.mem_powerset.mp ht</span>
+<span class="l" id="L48"><span class="n">48</span>  rw [Finset.card_sdiff_of_subset hts]</span>
+<span class="l" id="L49"><span class="n">49</span></span>
+<span class="l" id="L50"><span class="n">50</span>/-- Möbius transform as an operator on Boolean-fiber functions. -/</span>
+<span class="l" id="L51"><span class="n">51</span>def mobiusOp [DecidableEq ι] [AddCommGroup A]</span>
+<span class="l" id="L52"><span class="n">52</span>    (f : Finset ι → A) : Finset ι → A :=</span>
+<span class="l" id="L53"><span class="n">53</span>  fun s =&gt; mobius f s</span>
+<span class="l" id="L54"><span class="n">54</span></span>
+<span class="l" id="L55"><span class="n">55</span>/-- Evaluation of a function-valued Boolean Möbius transform is pointwise. -/</span>
+<span class="l" id="L56"><span class="n">56</span>theorem mobius_apply [DecidableEq ι] [AddCommGroup A]</span>
+<span class="l" id="L57"><span class="n">57</span>    {X : Type*} (f : Finset ι → X → A) (s : Finset ι) (x : X) :</span>
+<span class="l" id="L58"><span class="n">58</span>    mobius f s x = mobius (fun t =&gt; f t x) s := by</span>
+<span class="l" id="L59"><span class="n">59</span>  simp [mobius, Finset.sum_apply]</span>
+<span class="l" id="L60"><span class="n">60</span></span>
+<span class="l" id="L61"><span class="n">61</span>/-- Zeta contraction to the top of a finite Boolean fiber. -/</span>
+<span class="l" id="L62"><span class="n">62</span>def zetaTop [Fintype ι] [DecidableEq ι] [AddCommMonoid A]</span>
+<span class="l" id="L63"><span class="n">63</span>    (f : Finset ι → A) : A :=</span>
+<span class="l" id="L64"><span class="n">64</span>  ∑ s ∈ (Finset.univ : Finset ι).powerset, f s</span>
+<span class="l" id="L65"><span class="n">65</span></span>
+<span class="l" id="L66"><span class="n">66</span>private theorem mobius_insert [DecidableEq ι] [AddCommGroup A]</span>
+<span class="l" id="L67"><span class="n">67</span>    (f : Finset ι → A) (a : ι) (s : Finset ι) (ha : a ∉ s) :</span>
+<span class="l" id="L68"><span class="n">68</span>    mobius f (insert a s) =</span>
+<span class="l" id="L69"><span class="n">69</span>      mobius (fun t =&gt; f (insert a t) - f t) s := by</span>
+<span class="l" id="L70"><span class="n">70</span>  rw [mobius, Finset.sum_powerset_insert ha, mobius]</span>
+<span class="l" id="L71"><span class="n">71</span>  rw [← Finset.sum_add_distrib]</span>
+<span class="l" id="L72"><span class="n">72</span>  apply Finset.sum_congr rfl</span>
+<span class="l" id="L73"><span class="n">73</span>  intro t ht</span>
+<span class="l" id="L74"><span class="n">74</span>  have ht_sub : t ⊆ s := Finset.mem_powerset.mp ht</span>
+<span class="l" id="L75"><span class="n">75</span>  have hat : a ∉ t := fun h =&gt; ha (ht_sub h)</span>
+<span class="l" id="L76"><span class="n">76</span>  have ha_diff : a ∉ s \ t := fun h =&gt; ha (Finset.sdiff_subset h)</span>
+<span class="l" id="L77"><span class="n">77</span>  have hleft : insert a s \ t = insert a (s \ t) :=</span>
+<span class="l" id="L78"><span class="n">78</span>    Finset.insert_sdiff_of_notMem s hat</span>
+<span class="l" id="L79"><span class="n">79</span>  have hright : insert a s \ insert a t = s \ t := by</span>
+<span class="l" id="L80"><span class="n">80</span>    rw [Finset.insert_sdiff_insert, Finset.sdiff_insert_of_notMem ha]</span>
+<span class="l" id="L81"><span class="n">81</span>  rw [hleft, Finset.card_insert_of_notMem ha_diff, hright, pow_succ]</span>
+<span class="l" id="L82"><span class="n">82</span>  simp only [mul_neg, mul_one, neg_zsmul, zsmul_sub]</span>
+<span class="l" id="L83"><span class="n">83</span>  abel</span>
+<span class="l" id="L84"><span class="n">84</span></span>
+<span class="l" id="L85"><span class="n">85</span>/-- Finite Boolean zeta followed by Möbius, evaluated at an arbitrary top `s`. -/</span>
+<span class="l" id="L86"><span class="n">86</span>theorem zeta_mobius_on [DecidableEq ι] [AddCommGroup A]</span>
+<span class="l" id="L87"><span class="n">87</span>    (f : Finset ι → A) (s : Finset ι) :</span>
+<span class="l" id="L88"><span class="n">88</span>    ∑ t ∈ s.powerset, mobius f t = f s := by</span>
+<span class="l" id="L89"><span class="n">89</span>  induction s using Finset.induction_on generalizing f with</span>
+<span class="l" id="L90"><span class="n">90</span>  | empty =&gt; simp [mobius]</span>
+<span class="l" id="L91"><span class="n">91</span>  | @insert a s ha ih =&gt;</span>
+<span class="l" id="L92"><span class="n">92</span>      rw [Finset.sum_powerset_insert ha]</span>
+<span class="l" id="L93"><span class="n">93</span>      rw [ih f]</span>
+<span class="l" id="L94"><span class="n">94</span>      have hsecond :</span>
+<span class="l" id="L95"><span class="n">95</span>          (∑ t ∈ s.powerset, mobius f (insert a t)) = f (insert a s) - f s := by</span>
+<span class="l" id="L96"><span class="n">96</span>        calc</span>
+<span class="l" id="L97"><span class="n">97</span>          (∑ t ∈ s.powerset, mobius f (insert a t)) =</span>
+<span class="l" id="L98"><span class="n">98</span>              ∑ t ∈ s.powerset, mobius (fun u =&gt; f (insert a u) - f u) t := by</span>
+<span class="l" id="L99"><span class="n">99</span>                apply Finset.sum_congr rfl</span>
+<span class="l" id="L100"><span class="n">100</span>                intro t ht</span>
+<span class="l" id="L101"><span class="n">101</span>                have ht_sub : t ⊆ s := Finset.mem_powerset.mp ht</span>
+<span class="l" id="L102"><span class="n">102</span>                exact mobius_insert f a t (fun hat =&gt; ha (ht_sub hat))</span>
+<span class="l" id="L103"><span class="n">103</span>          _ = f (insert a s) - f s := ih (fun u =&gt; f (insert a u) - f u)</span>
+<span class="l" id="L104"><span class="n">104</span>      rw [hsecond]</span>
+<span class="l" id="L105"><span class="n">105</span>      abel</span>
+<span class="l" id="L106"><span class="n">106</span></span>
+<span class="l" id="L107"><span class="n">107</span>/-- Global Boolean zeta–Möbius identity at the full finite endpoint fiber. -/</span>
+<span class="l" id="L108"><span class="n">108</span>theorem zeta_mobius [Fintype ι] [DecidableEq ι] [AddCommGroup A]</span>
+<span class="l" id="L109"><span class="n">109</span>    (f : Finset ι → A) :</span>
+<span class="l" id="L110"><span class="n">110</span>    zetaTop (mobiusOp f) = f Finset.univ := by</span>
+<span class="l" id="L111"><span class="n">111</span>  simpa [zetaTop, mobiusOp] using zeta_mobius_on f (Finset.univ : Finset ι)</span>
+<span class="l" id="L112"><span class="n">112</span></span>
+<span class="l" id="L113"><span class="n">113</span>end Boolean</span>
+<span class="l" id="L114"><span class="n">114</span></span>
+<span class="l" id="L115"><span class="n">115</span>section EndpointContraction</span>
+<span class="l" id="L116"><span class="n">116</span></span>
+<span class="l" id="L117"><span class="n">117</span>variable {E T A : Type*}</span>
+<span class="l" id="L118"><span class="n">118</span>variable [Fintype E] [DecidableEq E]</span>
+<span class="l" id="L119"><span class="n">119</span>variable [Fintype T] [DecidableEq T]</span>
+<span class="l" id="L120"><span class="n">120</span>variable [AddCommGroup A]</span>
+<span class="l" id="L121"><span class="n">121</span></span>
+<span class="l" id="L122"><span class="n">122</span>/-- Free-fiber Möbius transform `M_T`.</span>
+<span class="l" id="L123"><span class="n">123</span></span>
+<span class="l" id="L124"><span class="n">124</span>It is polymorphic in its codomain. In the left side of the paper identity the</span>
+<span class="l" id="L125"><span class="n">125</span>codomain is the endpoint-fiber function space `Finset E → A`; after `ev_E` it</span>
+<span class="l" id="L126"><span class="n">126</span>is simply `A`. This makes the same Lean operator represent both typed uses of</span>
+<span class="l" id="L127"><span class="n">127</span>paper notation `M_T`.</span>
+<span class="l" id="L128"><span class="n">128</span>-/</span>
+<span class="l" id="L129"><span class="n">129</span>def mobiusT {X : Type*} [AddCommGroup X]</span>
+<span class="l" id="L130"><span class="n">130</span>    (f : Finset T → X) : Finset T → X :=</span>
+<span class="l" id="L131"><span class="n">131</span>  Boolean.mobiusOp f</span>
+<span class="l" id="L132"><span class="n">132</span></span>
+<span class="l" id="L133"><span class="n">133</span>/-- Endpoint-fiber Möbius transform `M_E`, acting pointwise in the free fiber. -/</span>
+<span class="l" id="L134"><span class="n">134</span>def mobiusE (f : Finset T → Finset E → A) : Finset T → Finset E → A :=</span>
+<span class="l" id="L135"><span class="n">135</span>  fun t =&gt; Boolean.mobiusOp (f t)</span>
+<span class="l" id="L136"><span class="n">136</span></span>
+<span class="l" id="L137"><span class="n">137</span>/-- Endpoint zeta/contraction `Z_E`, acting pointwise in the free fiber. -/</span>
+<span class="l" id="L138"><span class="n">138</span>def zetaE (g : Finset T → Finset E → A) : Finset T → A :=</span>
+<span class="l" id="L139"><span class="n">139</span>  fun t =&gt; Boolean.zetaTop (g t)</span>
+<span class="l" id="L140"><span class="n">140</span></span>
+<span class="l" id="L141"><span class="n">141</span>/-- Evaluation at the full endpoint set, `ev_E`. -/</span>
+<span class="l" id="L142"><span class="n">142</span>def evE (f : Finset T → Finset E → A) : Finset T → A :=</span>
+<span class="l" id="L143"><span class="n">143</span>  fun t =&gt; f t Finset.univ</span>
+<span class="l" id="L144"><span class="n">144</span></span>
+<span class="l" id="L145"><span class="n">145</span>/-- Pointwise form of the frozen endpoint-contraction identity.</span>
+<span class="l" id="L146"><span class="n">146</span></span>
+<span class="l" id="L147"><span class="n">147</span>For every free Boolean choice `t`, this states</span>
+<span class="l" id="L148"><span class="n">148</span>`(Z_E M_E M_T f)(t) = (M_T ev_E f)(t)`.</span>
+<span class="l" id="L149"><span class="n">149</span>-/</span>
+<span class="l" id="L150"><span class="n">150</span>theorem endpointContractionPointwise</span>
+<span class="l" id="L151"><span class="n">151</span>    (f : Finset T → Finset E → A) (t : Finset T) :</span>
+<span class="l" id="L152"><span class="n">152</span>    zetaE (mobiusE (mobiusT f)) t = mobiusT (evE f) t := by</span>
+<span class="l" id="L153"><span class="n">153</span>  calc</span>
+<span class="l" id="L154"><span class="n">154</span>    zetaE (mobiusE (mobiusT f)) t = (mobiusT f t) Finset.univ := by</span>
+<span class="l" id="L155"><span class="n">155</span>      exact Boolean.zeta_mobius (mobiusT f t)</span>
+<span class="l" id="L156"><span class="n">156</span>    _ = mobiusT (evE f) t := by</span>
+<span class="l" id="L157"><span class="n">157</span>      change Boolean.mobius f t (Finset.univ : Finset E) =</span>
+<span class="l" id="L158"><span class="n">158</span>        Boolean.mobius (fun u =&gt; f u (Finset.univ : Finset E)) t</span>
+<span class="l" id="L159"><span class="n">159</span>      exact Boolean.mobius_apply f t (Finset.univ : Finset E)</span>
+<span class="l" id="L160"><span class="n">160</span></span>
+<span class="l" id="L161"><span class="n">161</span>/-- Operator-form correspondence with the frozen paper display</span>
+<span class="l" id="L162"><span class="n">162</span>`Z_E M_E M_T = M_T ev_E`.</span>
+<span class="l" id="L163"><span class="n">163</span></span>
+<span class="l" id="L164"><span class="n">164</span>This is an equality of the resulting functions on the free Boolean fiber.</span>
+<span class="l" id="L165"><span class="n">165</span>-/</span>
+<span class="l" id="L166"><span class="n">166</span>theorem endpointContraction</span>
+<span class="l" id="L167"><span class="n">167</span>    (f : Finset T → Finset E → A) :</span>
+<span class="l" id="L168"><span class="n">168</span>    zetaE (mobiusE (mobiusT f)) = mobiusT (evE f) := by</span>
+<span class="l" id="L169"><span class="n">169</span>  funext t</span>
+<span class="l" id="L170"><span class="n">170</span>  exact endpointContractionPointwise f t</span>
+<span class="l" id="L171"><span class="n">171</span></span>
+<span class="l" id="L172"><span class="n">172</span>end EndpointContraction</span>
+<span class="l" id="L173"><span class="n">173</span>end PaperB</span></pre></div></body></html>

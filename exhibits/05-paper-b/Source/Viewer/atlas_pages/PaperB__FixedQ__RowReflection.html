@@ -1,0 +1,85 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · PaperB/FixedQ/RowReflection.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>PaperB/FixedQ/RowReflection.lean</h1><p class="meta">LEAN/PaperB/FixedQ/RowReflection.lean · 84 lines · SHA-256 a89647a63a221eba80ee6ba9ac2194e9a1a0b188017373a6e2a3304f0e163a57</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import PaperB.FixedQ.RowReduction</span>
+<span class="l" id="L2"><span class="n">2</span></span>
+<span class="l" id="L3"><span class="n">3</span>open scoped BigOperators</span>
+<span class="l" id="L4"><span class="n">4</span></span>
+<span class="l" id="L5"><span class="n">5</span>namespace PaperB.FixedQ</span>
+<span class="l" id="L6"><span class="n">6</span></span>
+<span class="l" id="L7"><span class="n">7</span>/-- Reflection of an interior row.  The involution y ↦ H-y swaps the two</span>
+<span class="l" id="L8"><span class="n">8</span>divisibility moduli exactly. -/</span>
+<span class="l" id="L9"><span class="n">9</span>theorem rowConstrainedMass_reflect</span>
+<span class="l" id="L10"><span class="n">10</span>    (lambda : ℕ → ℝ) (H e1 e2 : ℕ) :</span>
+<span class="l" id="L11"><span class="n">11</span>    rowConstrainedMass lambda H e1 e2 =</span>
+<span class="l" id="L12"><span class="n">12</span>      rowConstrainedMass (fun z =&gt; lambda (H - z)) H e2 e1 := by</span>
+<span class="l" id="L13"><span class="n">13</span>  rw [rowConstrainedMass_eq_sum_set, rowConstrainedMass_eq_sum_set]</span>
+<span class="l" id="L14"><span class="n">14</span>  classical</span>
+<span class="l" id="L15"><span class="n">15</span>  apply Finset.sum_bij&#x27;</span>
+<span class="l" id="L16"><span class="n">16</span>    (fun y _ =&gt; H - y)</span>
+<span class="l" id="L17"><span class="n">17</span>    (fun z _ =&gt; H - z)</span>
+<span class="l" id="L18"><span class="n">18</span>  · intro y hy</span>
+<span class="l" id="L19"><span class="n">19</span>    have hy&#x27; := Finset.mem_filter.mp hy</span>
+<span class="l" id="L20"><span class="n">20</span>    have hyI := Finset.mem_Ioo.mp hy&#x27;.1</span>
+<span class="l" id="L21"><span class="n">21</span>    apply Finset.mem_filter.mpr</span>
+<span class="l" id="L22"><span class="n">22</span>    constructor</span>
+<span class="l" id="L23"><span class="n">23</span>    · apply Finset.mem_Ioo.mpr</span>
+<span class="l" id="L24"><span class="n">24</span>      omega</span>
+<span class="l" id="L25"><span class="n">25</span>    · constructor</span>
+<span class="l" id="L26"><span class="n">26</span>      · simpa [Nat.sub_sub_self hyI.2.le] using hy&#x27;.2.2</span>
+<span class="l" id="L27"><span class="n">27</span>      · simpa [Nat.sub_sub_self hyI.2.le] using hy&#x27;.2.1</span>
+<span class="l" id="L28"><span class="n">28</span>  · intro z hz</span>
+<span class="l" id="L29"><span class="n">29</span>    have hz&#x27; := Finset.mem_filter.mp hz</span>
+<span class="l" id="L30"><span class="n">30</span>    have hzI := Finset.mem_Ioo.mp hz&#x27;.1</span>
+<span class="l" id="L31"><span class="n">31</span>    apply Finset.mem_filter.mpr</span>
+<span class="l" id="L32"><span class="n">32</span>    constructor</span>
+<span class="l" id="L33"><span class="n">33</span>    · apply Finset.mem_Ioo.mpr</span>
+<span class="l" id="L34"><span class="n">34</span>      omega</span>
+<span class="l" id="L35"><span class="n">35</span>    · constructor</span>
+<span class="l" id="L36"><span class="n">36</span>      · simpa [Nat.sub_sub_self hzI.2.le] using hz&#x27;.2.2</span>
+<span class="l" id="L37"><span class="n">37</span>      · simpa [Nat.sub_sub_self hzI.2.le] using hz&#x27;.2.1</span>
+<span class="l" id="L38"><span class="n">38</span>  · intro y hy</span>
+<span class="l" id="L39"><span class="n">39</span>    have hyI := Finset.mem_Ioo.mp (Finset.mem_filter.mp hy).1</span>
+<span class="l" id="L40"><span class="n">40</span>    omega</span>
+<span class="l" id="L41"><span class="n">41</span>  · intro z hz</span>
+<span class="l" id="L42"><span class="n">42</span>    have hzI := Finset.mem_Ioo.mp (Finset.mem_filter.mp hz).1</span>
+<span class="l" id="L43"><span class="n">43</span>    omega</span>
+<span class="l" id="L44"><span class="n">44</span>  · intro y hy</span>
+<span class="l" id="L45"><span class="n">45</span>    have hyI := Finset.mem_Ioo.mp (Finset.mem_filter.mp hy).1</span>
+<span class="l" id="L46"><span class="n">46</span>    simp [Nat.sub_sub_self hyI.2.le]</span>
+<span class="l" id="L47"><span class="n">47</span></span>
+<span class="l" id="L48"><span class="n">48</span>/-- Reflection for row discrepancy when the reflected weight agrees pointwise. -/</span>
+<span class="l" id="L49"><span class="n">49</span>theorem rowDiscrepancy_reflect</span>
+<span class="l" id="L50"><span class="n">50</span>    (lambda lambdaR : ℕ → ℝ) (H e1 e2 : ℕ)</span>
+<span class="l" id="L51"><span class="n">51</span>    (hreflect : ∀ z ∈ Finset.Ioo 0 H, lambda (H - z) = lambdaR z) :</span>
+<span class="l" id="L52"><span class="n">52</span>    rowDiscrepancy lambda H e1 e2 =</span>
+<span class="l" id="L53"><span class="n">53</span>      rowDiscrepancy lambdaR H e2 e1 := by</span>
+<span class="l" id="L54"><span class="n">54</span>  unfold rowDiscrepancy</span>
+<span class="l" id="L55"><span class="n">55</span>  have hmass :</span>
+<span class="l" id="L56"><span class="n">56</span>      rowConstrainedMass lambda H e1 e2 =</span>
+<span class="l" id="L57"><span class="n">57</span>        rowConstrainedMass lambdaR H e2 e1 := by</span>
+<span class="l" id="L58"><span class="n">58</span>    rw [rowConstrainedMass_reflect]</span>
+<span class="l" id="L59"><span class="n">59</span>    unfold rowConstrainedMass</span>
+<span class="l" id="L60"><span class="n">60</span>    apply Finset.sum_congr rfl</span>
+<span class="l" id="L61"><span class="n">61</span>    intro z hz</span>
+<span class="l" id="L62"><span class="n">62</span>    by_cases hcond : e2 ∣ z ∧ e1 ∣ H - z</span>
+<span class="l" id="L63"><span class="n">63</span>    · simp only [hcond, if_true]</span>
+<span class="l" id="L64"><span class="n">64</span>      exact hreflect z hz</span>
+<span class="l" id="L65"><span class="n">65</span>    · simp only [hcond, if_false]</span>
+<span class="l" id="L66"><span class="n">66</span>  have hweightReflect :</span>
+<span class="l" id="L67"><span class="n">67</span>      rowWeightMass lambda H =</span>
+<span class="l" id="L68"><span class="n">68</span>        rowWeightMass (fun z =&gt; lambda (H - z)) H := by</span>
+<span class="l" id="L69"><span class="n">69</span>    have htmp := rowConstrainedMass_reflect lambda H 1 1</span>
+<span class="l" id="L70"><span class="n">70</span>    simpa [rowConstrainedMass, rowWeightMass] using htmp</span>
+<span class="l" id="L71"><span class="n">71</span>  have hweightPointwise :</span>
+<span class="l" id="L72"><span class="n">72</span>      rowWeightMass (fun z =&gt; lambda (H - z)) H =</span>
+<span class="l" id="L73"><span class="n">73</span>        rowWeightMass lambdaR H := by</span>
+<span class="l" id="L74"><span class="n">74</span>    unfold rowWeightMass</span>
+<span class="l" id="L75"><span class="n">75</span>    apply Finset.sum_congr rfl</span>
+<span class="l" id="L76"><span class="n">76</span>    intro z hz</span>
+<span class="l" id="L77"><span class="n">77</span>    exact hreflect z hz</span>
+<span class="l" id="L78"><span class="n">78</span>  rw [hmass, hweightReflect, hweightPointwise]</span>
+<span class="l" id="L79"><span class="n">79</span>  ring</span>
+<span class="l" id="L80"><span class="n">80</span></span>
+<span class="l" id="L81"><span class="n">81</span>#print axioms rowConstrainedMass_reflect</span>
+<span class="l" id="L82"><span class="n">82</span>#print axioms rowDiscrepancy_reflect</span>
+<span class="l" id="L83"><span class="n">83</span></span>
+<span class="l" id="L84"><span class="n">84</span>end PaperB.FixedQ</span></pre></div></body></html>

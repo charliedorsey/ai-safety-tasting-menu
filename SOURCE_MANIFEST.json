@@ -1,0 +1,3070 @@
+{
+  "schema_version": 1,
+  "edition_status": "PRIVATE_RESTORED_COMPLETE_PAPERB",
+  "entries": [
+    {
+      "path": "exhibits/01-weil/.github/workflows/lean.yml",
+      "sha256": "fa33c2bc84b194b42df12f10e7a3f22fdde4186e4b90a162be82e10e32d8c7f8",
+      "size_bytes": 856
+    },
+    {
+      "path": "exhibits/01-weil/.gitignore",
+      "sha256": "1ab04dcd7ae8210e9a75d3cfe74a1feb537a8ff2e5e231d61f3cbe8db88ceba3",
+      "size_bytes": 54
+    },
+    {
+      "path": "exhibits/01-weil/CITATION.cff",
+      "sha256": "94383d82ad690ff48303d1d9df7a9936c4be630365c5e52182e318b083bbef58",
+      "size_bytes": 625
+    },
+    {
+      "path": "exhibits/01-weil/LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "size_bytes": 11358
+    },
+    {
+      "path": "exhibits/01-weil/README.md",
+      "sha256": "957301880063ee66061182e84a1df8f3d7118fdf87adc6d20c2aa39940ee069f",
+      "size_bytes": 5913
+    },
+    {
+      "path": "exhibits/01-weil/SHA256SUMS",
+      "sha256": "e67ef11750e9c6e6327c2d6c783280696a818a3e0b06abf4c09a8968d6f9064e",
+      "size_bytes": 5886
+    },
+    {
+      "path": "exhibits/01-weil/docs/attribution.md",
+      "sha256": "76300aadb24ac2f99cdbe088ed1a191fc21431f24caa94fcd327220be75acb98",
+      "size_bytes": 2765
+    },
+    {
+      "path": "exhibits/01-weil/docs/check_axioms.py",
+      "sha256": "59d315a4b6359beb586e7017e019c947ed1fd315d7c00bf599127ca982ce749d",
+      "size_bytes": 1473
+    },
+    {
+      "path": "exhibits/01-weil/docs/module_provenance.csv",
+      "sha256": "ace4075d0ecbdcc906acb83fe51384df4b1b2d6a1ef8658f21bf61c854b6bf78",
+      "size_bytes": 11598
+    },
+    {
+      "path": "exhibits/01-weil/docs/proof_guide.md",
+      "sha256": "8c3f4cc78f892773208c0656a998649f7e903a4eab77a30f7ad1e6acd132cfb7",
+      "size_bytes": 4456
+    },
+    {
+      "path": "exhibits/01-weil/docs/provenance_review.md",
+      "sha256": "5ded263ecc15245c124a1d6ab38184d1ff973eb9deb720eb1c497982c85c2663",
+      "size_bytes": 2971
+    },
+    {
+      "path": "exhibits/01-weil/docs/references.bib",
+      "sha256": "ff0b4df4d78851719ba9bce3c2a53c06f5026edd20d372f894cefd6fe9bf41aa",
+      "size_bytes": 3030
+    },
+    {
+      "path": "exhibits/01-weil/docs/references.md",
+      "sha256": "3b28911698ed592bf2f7c8d071e02e15924cdb124075c328d3d9109b14c0a0c9",
+      "size_bytes": 3336
+    },
+    {
+      "path": "exhibits/01-weil/docs/release_verification.json",
+      "sha256": "c923a4308e8d6c5d083a64e64e6cb57d8e7a9cbc3854d8c682d93587634741c9",
+      "size_bytes": 2969
+    },
+    {
+      "path": "exhibits/01-weil/docs/scope.md",
+      "sha256": "4e11a7ddebe913ccd8fdbef547502944d9f6dc2ec3100c26071e61cab991c134",
+      "size_bytes": 2114
+    },
+    {
+      "path": "exhibits/01-weil/docs/theorems.md",
+      "sha256": "ef389625bd315cc29bcc2ba32d84427e36f248e0f799d379f12a1693325f0119",
+      "size_bytes": 2268
+    },
+    {
+      "path": "exhibits/01-weil/docs/verification.md",
+      "sha256": "bc560a92b363914d67544165b7c080fc148e595cd3aab6f23727ec1fc7ead36b",
+      "size_bytes": 2724
+    },
+    {
+      "path": "exhibits/01-weil/docs/verify.py",
+      "sha256": "9e180bfdd351c01af206fcefc925f6626cce0cc4f68fc44a1bd77061861b1a3f",
+      "size_bytes": 3726
+    },
+    {
+      "path": "exhibits/01-weil/examples/Use.lean",
+      "sha256": "053f54751062c13cedfba55898207fe82b3cbb58472777d8ec9d840016d88bb6",
+      "size_bytes": 1523
+    },
+    {
+      "path": "exhibits/01-weil/lake-manifest.json",
+      "sha256": "ca371fd7d63404d3b9b9dd49ca6a013f96b2adbab5b144775102ab3c698e0636",
+      "size_bytes": 3520
+    },
+    {
+      "path": "exhibits/01-weil/lakefile.toml",
+      "sha256": "0eaa81cd9c77633481b80f3f7f1c5d1a92dac90e3061926f7f28a8f7cd3a6f30",
+      "size_bytes": 242
+    },
+    {
+      "path": "exhibits/01-weil/lean-toolchain",
+      "sha256": "8733782dc070a99b312039cda424f601b80f3be6f6f512627da5ba25adc27632",
+      "size_bytes": 25
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/carlitz/class_ghost.lean",
+      "sha256": "ad42a0c82b1b6c8e9e69a66f7f87ebf2618f6a1776f0557714a7bd87106ebb0e",
+      "size_bytes": 5440
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/carlitz/class_value.lean",
+      "sha256": "834001643f044b7d935b43719a1cac38f29eed1fd68f96ff29db4cfc30bb798c",
+      "size_bytes": 2504
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/carlitz/coeff_equiv.lean",
+      "sha256": "5550065006b556e06b644859591522cf0192e0879b0ea0fbcfde27f372f8bdb4",
+      "size_bytes": 2661
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/carlitz/conj_decomp.lean",
+      "sha256": "f9c0b8a30ffd16218d255f72165dfa484fb27cb0297e6742ca9179c081a47598",
+      "size_bytes": 1170
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/carlitz/dickson_finite_algebra.lean",
+      "sha256": "1c3d6b5cfaeb46a5bdbf5c19ba54531169a4b7290d1a0ff8d8d2f97dd807ac80",
+      "size_bytes": 17661
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/carlitz/extension_defs.lean",
+      "sha256": "e38fedfc0e2017d59bb0a0d16dee84df58039bd37fb367c8afd196da82658a28",
+      "size_bytes": 3129
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/carlitz/factor_data.lean",
+      "sha256": "45eec478b8a1d6254dce6e299db52d3313bf8cb6607d54526f048cc5d4a4f2be",
+      "size_bytes": 3062
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/carlitz/factor_weight.lean",
+      "sha256": "06cdd4501ee7c735ed3713bccd3c94ed1838c3c8e67b153077ae26b04cbc74f5",
+      "size_bytes": 3237
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/carlitz/formal_algebra.lean",
+      "sha256": "5aa702b41df70095db9b96a334522e22773b5bb3c737b2309f931e9c80068664",
+      "size_bytes": 8255
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/carlitz/generating_identity.lean",
+      "sha256": "8647843aec8071c7c544a8eeda0fb91484397ed485c9bc3f717b7d07a6a16e2c",
+      "size_bytes": 4745
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/carlitz/irred_ghost.lean",
+      "sha256": "1e91cb2bd4adb48bb4254898cf6872261826fa20cd5a64f48bf26d5ad1570cda",
+      "size_bytes": 2623
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/carlitz/minpoly_inverse.lean",
+      "sha256": "e89985fd71436459a7808db9a7fd5547ae2e23cd559e1a12a1d3d5425ae48788",
+      "size_bytes": 6642
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/carlitz/newton_index.lean",
+      "sha256": "684996cbb1c37b9d32fa1a0f4eaf2b391e9473b96ba8bd646eaafbe2268cab15",
+      "size_bytes": 11818
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/carlitz/newton_sum.lean",
+      "sha256": "dbf519d3915c8fc786b0aefd5ed886cda4b224a5d6835de4fc31c7aa1739e62f",
+      "size_bytes": 10304
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/carlitz/recurrence_package.lean",
+      "sha256": "1a01a7839c9b880f079329a262d4b5824f32afaf6b17ec36b53522ba6823b737",
+      "size_bytes": 2563
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/carlitz/relevant_irred.lean",
+      "sha256": "8dacc16953a23ea19c5e501c4239eb3dd00077495be4692dd2803321ad0bd8a6",
+      "size_bytes": 2884
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/stepanov/algebra.lean",
+      "sha256": "e169f1bc2071bb46bb4e43b7a0c70bd02b96307f0e64910ac6190a82762aa2da",
+      "size_bytes": 10477
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/stepanov/artin_schreier.lean",
+      "sha256": "8a4bae41820e250e1cb768a918597aa4088e3d291149ffaf92effa81e582be44",
+      "size_bytes": 6351
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/stepanov/auxiliary.lean",
+      "sha256": "a8107fbdcac4e98f8ad3e75f8eadf7866f9bc089212a8bd3b547f434bbd9e1ea",
+      "size_bytes": 33083
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/stepanov/carlitz_roots.lean",
+      "sha256": "e9c85042e182f07cb3804c8e8a835b48783baf757b6758096f8543b16127cd1a",
+      "size_bytes": 2117
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/stepanov/curve_count.lean",
+      "sha256": "4f1a37d635da51bde4da34bfc02baa533830288d5685f4eae15f50fc662dea99",
+      "size_bytes": 9640
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/stepanov/curve_trace.lean",
+      "sha256": "b483e1490f4b8f50d5921228a9e3c3b69b2a9af9f74ecdb83ed26a53dae7fc2e",
+      "size_bytes": 7161
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/stepanov/defect.lean",
+      "sha256": "bdfadde82c7fbf46ebc1b357f27766676a18204a4e123d1ea362428eb9f25d3c",
+      "size_bytes": 8235
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/stepanov/finite_sum.lean",
+      "sha256": "bc0fb1c98a6e325fa780e1df9d3f73c320d22cca22c6730a00e11f291f54d6be",
+      "size_bytes": 652
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/stepanov/parameters.lean",
+      "sha256": "36a09a2386377f59b33d2ed65787e90a2a55a81978befc116efc36101c187cbe",
+      "size_bytes": 10420
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/stepanov/point_count_bridge.lean",
+      "sha256": "cb55cf190c221a3ba430cdd8787bf8d98162c02f5185d363a343cabd13471375",
+      "size_bytes": 3854
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/stepanov/power_sum_spectral.lean",
+      "sha256": "28abebb561940caac63dfcb181965cb21ba32691cca29730f99abdd5b2aa0450",
+      "size_bytes": 10721
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/stepanov/prime_weil.lean",
+      "sha256": "882ea794e7d3cf8c9a21b54baa9557ef54cb47d600cc2cb072a1000e817b6399",
+      "size_bytes": 5306
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/stepanov/prime_weil_bridge.lean",
+      "sha256": "a3c1072714573ed6d723b36f2e83128044e204c9aeb45cf6dea1fddf837aac47",
+      "size_bytes": 879
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/stepanov/scalar_kext.lean",
+      "sha256": "b90cc218f8e3d25cfe9a4401dbdcff06a839e281414a32d39aaa347848e7717e",
+      "size_bytes": 7563
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/stepanov/specialized_curve.lean",
+      "sha256": "e007bdc81600c5f985f59f8e61835987755ac65d9c77594140275e08877a61dd",
+      "size_bytes": 5987
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/stepanov/spectral_bound.lean",
+      "sha256": "b9d803ed15ce357935d3ad397ef922c847bd256905ece61772b710ba788f1e52",
+      "size_bytes": 8121
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/weil/axioms.lean",
+      "sha256": "ffce9bbb4470c5096e45e5b89d62b5c7adcaa3ddf2eb965ab7463f8d1473b7e3",
+      "size_bytes": 740
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/weil/contracts.lean",
+      "sha256": "621fe768bcd6eb073ca4cd4c9ae2fcb09143b835b1e3581aa9e5d7126235317a",
+      "size_bytes": 2571
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/weil/crt_and_completion.lean",
+      "sha256": "4edaf7a13f46f787eee6d0dd9154c16eb32fcdde4de1b2afe9ff9b998e24a02c",
+      "size_bytes": 48804
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/weil/edge_cases.lean",
+      "sha256": "8ee2f83ee1223890e278aa0c0af9bea507d1b627505ce8c5e5034b5e4064fc3c",
+      "size_bytes": 422
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/weil/prime_foundation.lean",
+      "sha256": "52c9a89b07be8e08d787240e204751c95769391926145fa40ed0eed76d8edc8c",
+      "size_bytes": 6243
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/weil/prime_kloosterman.lean",
+      "sha256": "02aa4f011adb51741af46ae2c1a295b53047a150be260e5dd79cbcb2ff39ce27",
+      "size_bytes": 673
+    },
+    {
+      "path": "exhibits/01-weil/source/rml/weil.lean",
+      "sha256": "27f9df536c3ced5e12f5564c1660e4b443cffcf0f8d0aa1fe90d468705de5eed",
+      "size_bytes": 69
+    },
+    {
+      "path": "exhibits/01-weil/source/rml.lean",
+      "sha256": "4186f71f6d1b03d0ed9bfdad52e3dfec9aeeef016d39e50431b607dd76b6e448",
+      "size_bytes": 42
+    },
+    {
+      "path": "exhibits/02-kms/.gitignore",
+      "sha256": "321221f0f89c73d9029a1862fe64e840a8c50efd2bd1eaa23978f9ced961fb1f",
+      "size_bytes": 159
+    },
+    {
+      "path": "exhibits/02-kms/CITATION.cff",
+      "sha256": "3303daa4e99197d9f9c750fd43e0ca404f2d8dbaa21d552fb625423a7cedb24a",
+      "size_bytes": 1150
+    },
+    {
+      "path": "exhibits/02-kms/COPYRIGHT.txt",
+      "sha256": "e69fcf2bc1be26efaa695bc400ada258645842c065d5496555e5f50096b9b7e7",
+      "size_bytes": 968
+    },
+    {
+      "path": "exhibits/02-kms/LICENSE.md",
+      "sha256": "b055a721582ee28a2dcfb9ce41cd2bc408a7514a8269918fbe68e5e3bd629b8b",
+      "size_bytes": 1891
+    },
+    {
+      "path": "exhibits/02-kms/LICENSES/Apache-2.0.txt",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "size_bytes": 11358
+    },
+    {
+      "path": "exhibits/02-kms/LICENSES/CC-BY-4.0.txt",
+      "sha256": "8e9d5a9704d58fe61032dd85496663575a0737da715088d3d2f05c92da00460d",
+      "size_bytes": 379
+    },
+    {
+      "path": "exhibits/02-kms/OPEN_ME.html",
+      "sha256": "003b9dd0834cb4cd14b2fc227cb5146034a2cf4bb893636fcd1bcd0446969852",
+      "size_bytes": 318
+    },
+    {
+      "path": "exhibits/02-kms/README.md",
+      "sha256": "3b1f998a8ddf99919f94b4a882cb37f92074c50e158ef82dc14d7b4c324967f1",
+      "size_bytes": 4068
+    },
+    {
+      "path": "exhibits/02-kms/REPRODUCE.md",
+      "sha256": "c466d4f3f1aa05571e66de7243b1e89a6ba5fd416a9ae8d975b73d142602b06e",
+      "size_bytes": 1072
+    },
+    {
+      "path": "exhibits/02-kms/SHA256SUMS",
+      "sha256": "0ec47e489f584a72d754723542525c82f81edc726e70617509d99e2004edc179",
+      "size_bytes": 7730
+    },
+    {
+      "path": "exhibits/02-kms/VERIFICATION.md",
+      "sha256": "54fffa7f690d233a2f3031785766d2ba9ef91d5cff011602f201423bd99f2bc1",
+      "size_bytes": 2178
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS/Arith.lean",
+      "sha256": "7f200e6c241631d525792d42218d8b737376a4b69b9c1bd0a6e7d309237d786a",
+      "size_bytes": 17722
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS/Basic.lean",
+      "sha256": "df6ee0af73b87e0bcdedbc9230335f41b119ee255ef64497e3eaf787e62bdf33",
+      "size_bytes": 1119
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS/Cassels.lean",
+      "sha256": "11b5766a6f3a27ed5992df3fec4c5ff2ead8fa8495a0baf2b2ea889d989cdbe0",
+      "size_bytes": 16659
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS/ChebShift.lean",
+      "sha256": "9e67e2944b33ac56467c4cd2a834f758c49c22d323420dfe3722234205ffa05d",
+      "size_bytes": 13766
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS/Cond.lean",
+      "sha256": "93aa2056d1ad2f90efbdfb79c7381a2345de5b886357db457dc8979824a0d394",
+      "size_bytes": 36586
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS/Examples.lean",
+      "sha256": "062dec47f1e08cd4cd80a0fd357748e21f5dd8aaed5a74a0423f956b467c3d9c",
+      "size_bytes": 16366
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS/GoldenSetup.lean",
+      "sha256": "f88e31958114c9580019b3ad21126d76048514f8c47fe9232a53bd32f263ffc6",
+      "size_bytes": 1272
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS/Hurwitz.lean",
+      "sha256": "ce3bf11c4d0005966c83ff47fa42e7d2bd9b76fe9001a294ff892587e5825cc7",
+      "size_bytes": 32902
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS/IrrLaws.lean",
+      "sha256": "e21487db781e95197251c3860ac6b977d1a49042ac0a119b38f832a0be6ba234",
+      "size_bytes": 40553
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS/Laws.lean",
+      "sha256": "512beda2e55c85bc01993599ae4f86941d48461ef66598655eeba7479d436ed8",
+      "size_bytes": 22212
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS/MatrixBridge.lean",
+      "sha256": "8602fcd9e63b917d2a1f4053f57cf25e8a2afb3a58b799b55cdebd6b3fee06ed",
+      "size_bytes": 23585
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS/Paper.lean",
+      "sha256": "4eb1de0730cd328ce61a3f828fb14dd1bd212517f604ad13feb366068bd6f7ca",
+      "size_bytes": 5758
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS/PaperStatements.lean",
+      "sha256": "503ff175b918b934f96d4b32e819d808f9304d33c729c4590bfafb6ef6793d77",
+      "size_bytes": 88453
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS/Phase.lean",
+      "sha256": "051504c7c02a781bc65cd043fe579b47d13d323dd9878aa3209c962268fffb85",
+      "size_bytes": 30486
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS/Regimes.lean",
+      "sha256": "aa0c0b91a0e03ff503fd9e1e0a12a7cfcd3587f1cf2e774e5f683ddd01a1c1a3",
+      "size_bytes": 52812
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS/Secular.lean",
+      "sha256": "733c1ccfd00b4fec9908728439f2cb27ee71eb9147edc7a0dc56409c61fa7736",
+      "size_bytes": 3345
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS/Sharpen.lean",
+      "sha256": "a78b39660506a3d56a4f6d9420cc719d938691b123828459dd46a169f777c6ba",
+      "size_bytes": 13959
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS/Singular.lean",
+      "sha256": "5d5f028cbe49ce6e9267bf5f64f67e20ae765f9ec50fdff79b6f012d3096f253",
+      "size_bytes": 19644
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS/Spikes.lean",
+      "sha256": "5d3500a722ff57d7315050a6be589f3b2f011db1e5e403225e641559160a000a",
+      "size_bytes": 24900
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS/Strata.lean",
+      "sha256": "be4ee4b5f39e576669420333bbae82510f8d089330cc0f6175c8e1f8f8e69270",
+      "size_bytes": 19224
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS/Suppliers.lean",
+      "sha256": "a37ac57cdf5e8c83eda894893159fb226931d83518deb58dfbb1cae46e8948eb",
+      "size_bytes": 13405
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS/Triangle.lean",
+      "sha256": "aea007a62c495d40089f40d952aa78f490faf429947d7f56b31ed669084a4885",
+      "size_bytes": 12430
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS/Tridiag.lean",
+      "sha256": "1bcfaaf416a3e3e9ff489005d1627461cec77dfaf206c5e119f65bc3122979c5",
+      "size_bytes": 10398
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS/VirtualOne.lean",
+      "sha256": "327d32d10c4f7577f1da083ac6717b14d484527fc45e616e9e6568eb026ee3b8",
+      "size_bytes": 2117
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/KMS.lean",
+      "sha256": "b38bdc2a1d03ac9351efcfc905e8c9b9137c448d47da0304fac32449cddb6fa3",
+      "size_bytes": 469
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/ShiftedKMS/Core/Definitions.lean",
+      "sha256": "7c375272bdcc9e8fc0cb357e84808ac32cc172fdb3ec6cc63c9337f3362152dc",
+      "size_bytes": 862
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/ShiftedKMS.lean",
+      "sha256": "fb3eb8611d498b4a30624c19734fcb45f116016db8005c79327f7061f52cab82",
+      "size_bytes": 46
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/lake-manifest.json",
+      "sha256": "758684457ceb99c17bad7c351f0b6841e716ac9abdd681766b84fc53e26094c4",
+      "size_bytes": 3197
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/lakefile.toml",
+      "sha256": "68ccfdefba543549132b42501b09f95546c6a3a02424f18ead4d51f8597ef760",
+      "size_bytes": 238
+    },
+    {
+      "path": "exhibits/02-kms/lean_project/lean-toolchain",
+      "sha256": "8733782dc070a99b312039cda424f601b80f3be6f6f512627da5ba25adc27632",
+      "size_bytes": 25
+    },
+    {
+      "path": "exhibits/02-kms/manuscript/shifted_kms.pdf",
+      "sha256": "02c89ac294f2454742c9a16eaad4c4c9fcb8725ab7d63414dbeabd59b87818c5",
+      "size_bytes": 382751
+    },
+    {
+      "path": "exhibits/02-kms/manuscript/shifted_kms.tex",
+      "sha256": "0118d37dd54cad42cda2186b74897c0de11680b0901567f7174e8b734224af00",
+      "size_bytes": 65035
+    },
+    {
+      "path": "exhibits/02-kms/site/assets/diophantine_triangle.svg",
+      "sha256": "eaac563eda8aafec3ce7cb32ef69f438755404a41af7eaf489ba7a1554ea7765",
+      "size_bytes": 3168
+    },
+    {
+      "path": "exhibits/02-kms/site/assets/diophantine_triangle_mobile.svg",
+      "sha256": "08405a0b22b6cf7632360bcad8712b43dd3479772c38620998110a1da4661baa",
+      "size_bytes": 2477
+    },
+    {
+      "path": "exhibits/02-kms/site/assets/five_regimes.svg",
+      "sha256": "6aef607662a2ad103bdb967845ddde95dd55245b5fa3a76227551ee7b35befb0",
+      "size_bytes": 2824
+    },
+    {
+      "path": "exhibits/02-kms/site/assets/five_regimes_mobile.svg",
+      "sha256": "d34671ce56fe1a11ea1a4f33f3d6e63df5a23583d59ddd443f1e48b0eaaceb65",
+      "size_bytes": 3109
+    },
+    {
+      "path": "exhibits/02-kms/site/assets/style.css",
+      "sha256": "6311e6f9b2604de502badba3e9ed339583ba4c030822b79126eb319e759f99e3",
+      "size_bytes": 11900
+    },
+    {
+      "path": "exhibits/02-kms/site/for_curious_readers.html",
+      "sha256": "cc91dd3f191409f829de4886bbf2f22a275fedf96cf5948ff50500fd73f184a5",
+      "size_bytes": 36742
+    },
+    {
+      "path": "exhibits/02-kms/site/index.html",
+      "sha256": "ac9b1341fcdca53dc9b427fbbf271913c1c2a44689f9c8272456d88d3aeb0bfd",
+      "size_bytes": 9483
+    },
+    {
+      "path": "exhibits/02-kms/site/interactive/index.html",
+      "sha256": "b95583e3fa0f9c788bb568fe300bea777e070e227ec401fa3e2f4d7c0210dcff",
+      "size_bytes": 66998
+    },
+    {
+      "path": "exhibits/02-kms/site/proof_guide.html",
+      "sha256": "1f41c5c9a0b3df6e0f0782f5dc5873a7fda369a69f83a0d6698c7d0b2c36ca66",
+      "size_bytes": 27966
+    },
+    {
+      "path": "exhibits/02-kms/site/reproduce.html",
+      "sha256": "5ef80d7ff1a52358471ac5b9c7c4a98882e1e7a17c4dbf5263d7cb47b525dc0a",
+      "size_bytes": 4884
+    },
+    {
+      "path": "exhibits/02-kms/site/scope.html",
+      "sha256": "882bc3c7bbb2e307b5c0d41add45cdf5099aabda1f0b11cb8b9e717c973b4e8f",
+      "size_bytes": 6236
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS/Arith.lean.html",
+      "sha256": "434db045051fd9ae585bf4e2d2eb7a6c43ab6a2de947fc6cfe05d4bdaae4f879",
+      "size_bytes": 72749
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS/Basic.lean.html",
+      "sha256": "9c0bb6f81d8524a5f248d35f6d2b3ae22d471b93851ae576a50d58bcc7e92dfc",
+      "size_bytes": 5006
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS/Cassels.lean.html",
+      "sha256": "e4fff31b560c850c0668082db323ce5eff1fd77c33401d0de1d9bfe16b72d8e1",
+      "size_bytes": 65165
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS/ChebShift.lean.html",
+      "sha256": "d0b4caf8bc77e0ff2d5b60ef6f1d24809afd959aecd25171104aa6d68987eddf",
+      "size_bytes": 52126
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS/Cond.lean.html",
+      "sha256": "83bf48b00634577cc5801f81a9e594b7a681700c1302b331844da53670103a33",
+      "size_bytes": 138434
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS/Examples.lean.html",
+      "sha256": "5ef6aeceefc7932aac92c7f19ae0b4fa85a418704741ee5da5345411ad371b71",
+      "size_bytes": 64420
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS/GoldenSetup.lean.html",
+      "sha256": "c034c10e8d72fd15d318602a0140db6eaedec4d4b64c044d831d109e904775ad",
+      "size_bytes": 6938
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS/Hurwitz.lean.html",
+      "sha256": "45bf5be878dbc143db03a753e5bbf6c9899d86013af909fda52903bdc9e4ef7b",
+      "size_bytes": 125182
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS/IrrLaws.lean.html",
+      "sha256": "8b52f23d151f9b330b0e8868483f9572fd32275784a6f57eb4902140d1d3a0dd",
+      "size_bytes": 151628
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS/Laws.lean.html",
+      "sha256": "8c236a704c27c38fd46607a88ff908e22c6c88cc02c5d90486653497b02ab981",
+      "size_bytes": 84140
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS/MatrixBridge.lean.html",
+      "sha256": "9a1b73c3814c4ca3b3f7487c09c15589f36eee3239f8f58c0c1538e2427334f8",
+      "size_bytes": 84314
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS/Paper.lean.html",
+      "sha256": "591025620fd75ae87308589a3390c37db93467a37101211ec04b17ea861515e6",
+      "size_bytes": 21737
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS/PaperStatements.lean.html",
+      "sha256": "b3815c1fdf70e03bddc3c7f8f6a77fc6a6cdeb78fe3e3121f55fb07adb63a77e",
+      "size_bytes": 308065
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS/Phase.lean.html",
+      "sha256": "0f0dd844c4353ad647d03e76ca135b07f079d75fc7c092360383155051f6866e",
+      "size_bytes": 118855
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS/Regimes.lean.html",
+      "sha256": "f54438ba28cc746388ba1b6ca293a52402f6f766dbff97dbfac64489e71cf7fd",
+      "size_bytes": 198269
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS/Secular.lean.html",
+      "sha256": "221c897bee4cccf665287b003ea2707a4930d79646f7e73acb051779b96455f8",
+      "size_bytes": 13577
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS/Sharpen.lean.html",
+      "sha256": "8e5783e38b927eb8f19825156df677a943727d56523762fbce3657bfd529c95e",
+      "size_bytes": 53923
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS/Singular.lean.html",
+      "sha256": "e234e8bfe4870b2a01788fbec666924d50d7a7c7878e2a3ca38f241cfe9bf216",
+      "size_bytes": 82208
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS/Spikes.lean.html",
+      "sha256": "7b557fc60986e441fd2eb144524cd2f83c877fbcd6e8f5ac6e6902ea9e17a7c7",
+      "size_bytes": 92654
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS/Strata.lean.html",
+      "sha256": "4555e07b20caf8cbddd3c0a95abc3f24da56ee8f0d07f411a56e9d739c63b999",
+      "size_bytes": 79010
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS/Suppliers.lean.html",
+      "sha256": "9361a48bc91e8df5e9ba2c2ce6c7e7e37e3b1dbaa09bf23f04d454d7d4a8b484",
+      "size_bytes": 50790
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS/Triangle.lean.html",
+      "sha256": "13e1491859aefe6fddcbb03bb28c466cf2f52aad3be812cd7555d268003a76f1",
+      "size_bytes": 49203
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS/Tridiag.lean.html",
+      "sha256": "274f74bc69701d35828034734c4e31fd57522de78c0512eaf218ce719dc92c2b",
+      "size_bytes": 37842
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS/VirtualOne.lean.html",
+      "sha256": "d59adf495d8a6c60401c66da12cc88ae01c777833f7db7847d3288541c8277df",
+      "size_bytes": 11300
+    },
+    {
+      "path": "exhibits/02-kms/site/source/KMS.lean.html",
+      "sha256": "4b3e5789f2af8f2adfa798af2954c301e70c00e282445c89fbdbc27f26fb97ff",
+      "size_bytes": 4590
+    },
+    {
+      "path": "exhibits/02-kms/site/source/ShiftedKMS/Core/Definitions.lean.html",
+      "sha256": "118cc2a8f00d90e16c1314aea433b95e5b0c8d35480986c2b8e6a1b32994a4fb",
+      "size_bytes": 6045
+    },
+    {
+      "path": "exhibits/02-kms/site/source/ShiftedKMS.lean.html",
+      "sha256": "0f683d006e854db151546e89bac4806088e3b2377b9f2849ceefc22c294e7e79",
+      "size_bytes": 976
+    },
+    {
+      "path": "exhibits/02-kms/site/source/index.html",
+      "sha256": "8f0d9d4cd88eb820761638f0206ac0e3922e541628eb0ebbf49ad6120dc58eda",
+      "size_bytes": 2679
+    },
+    {
+      "path": "exhibits/02-kms/site/theorems.html",
+      "sha256": "51d47a5f2d78343f4e8fc6639924d25a790dbe44865e61c70ea4e00f24fa6c5f",
+      "size_bytes": 14192
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterAccuracyCheckR0001.lean",
+      "sha256": "342d8f3b44b588ca5b2d675693e2ff27a92613103e2b7950a56884dd2bb7442d",
+      "size_bytes": 2562
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterActualSpectralRootExclusion.lean",
+      "sha256": "112596843fa04455e8158959a6c35030eb235ea2920dceb2f1fa826c554aaa9f",
+      "size_bytes": 2376
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterBracketStep.lean",
+      "sha256": "5c1d00096a00f3fdc2c5c6e8905ce95270a56bd1a98275d6db7fe0f0a4818a50",
+      "size_bytes": 2586
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterCertificate.lean",
+      "sha256": "a07e28989341eb40a9560495c84190ebf7f93c615702e886e5fcccb3c5328db4",
+      "size_bytes": 4185
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterContinuantEnvelope.lean",
+      "sha256": "a6298697867db4c9cdcd83dc4b057047cdbed88d2430a758552676ff03f8eaef",
+      "size_bytes": 2056
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterEmitted3x3R0001.lean",
+      "sha256": "e868e65169296e6a512664705fe18deae5614a6c9310714dee1dc7de5e9e14eb",
+      "size_bytes": 1278
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterFastProducerR0001.lean",
+      "sha256": "0d51cf164c1bd3cc1e4336f0038b0ff1fe11ff47cec92ee4d5d5c4be0c58ab41",
+      "size_bytes": 2782
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterFiniteEndpointEscape.lean",
+      "sha256": "07b1e605a0147bf6cc2438657fc0b224155bb68c1fc08874f5ac75a16d5e22ef",
+      "size_bytes": 2077
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterFiniteSelector.lean",
+      "sha256": "3d4a4e4fa7235855eaf20b23042f634bb22f9f725107ad7990f398d9011e8ea6",
+      "size_bytes": 3291
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterInnerSturmEquality.lean",
+      "sha256": "ec4477575132ea72bb51b9eab19765b6d1b4089c5b6b4390732dd4ec108afe09",
+      "size_bytes": 3767
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterKestrelleAccuracyAssembly.lean",
+      "sha256": "e2310b915ef8d7b5488442d01c00390e31cde7f0a5d43f0b1b43b5250a590b24",
+      "size_bytes": 2333
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterKestrelleInnerRadialAssembly.lean",
+      "sha256": "391b928197e8eef6703b8fe4db9b36286945887f5ba4fb6099e3afa74337b504",
+      "size_bytes": 1977
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterLiteralIndependentCheckR0001.lean",
+      "sha256": "dcf5ca7039bfcfae455319b61a7055356b61b2f80173e500844cbb1d5d072abe",
+      "size_bytes": 2975
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterLogFuelR0001.lean",
+      "sha256": "4114ebab2054beb8acd12d54818a241bc218105cf84c296b7087ef380b56b79a",
+      "size_bytes": 1701
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterNearest.lean",
+      "sha256": "5e85b5a4fa0b8a1fda4f1cc66326cadf9f8ceaf2ab41404ea382709c58625d71",
+      "size_bytes": 5644
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterOuterDominanceStep.lean",
+      "sha256": "a8bf0d9d5d18300f9bc64b82954478a1d0fe1de0a3f116aea1a4cf84cb43831e",
+      "size_bytes": 1203
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterOuterSearch.lean",
+      "sha256": "ea58b503db619dfa2d28c2622a8d13b85a8728a15a78ef3769f6d26c7eaf5e86",
+      "size_bytes": 4756
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterPublicProducer.lean",
+      "sha256": "9a7ecd3a087ddc6c1b1daa73faaf92fbda5663369056f0d13e0f62afd85ff38a",
+      "size_bytes": 2519
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterRadialBracket.lean",
+      "sha256": "b8b1b84a690b7f049a7b4b46fc5e6ff6b2fe763ca4a4db2381ec75f93c086bc5",
+      "size_bytes": 3010
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterRadialBracketSource.lean",
+      "sha256": "b8b1b84a690b7f049a7b4b46fc5e6ff6b2fe763ca4a4db2381ec75f93c086bc5",
+      "size_bytes": 3010
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterRadialConsumer.lean",
+      "sha256": "b1ce6efd01cc96f3e127b53e15255b07762d519fb709121de283b882333f1e1a",
+      "size_bytes": 1223
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterRadialFuel.lean",
+      "sha256": "7728bc17e1987269262dd0a574d9087491d2786cf7700e3fbd2996350b8c1fd3",
+      "size_bytes": 1915
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterRadialReady.lean",
+      "sha256": "c13ff9736396de38aa7ff169fb908a0f1748d9df423bd9bbc2952abdbfdacd66",
+      "size_bytes": 1866
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterRealContinuantInduction.lean",
+      "sha256": "ad64c39b8c8b28d80ebeeaf7b85059b0e04392331f1d7e85dc9fdd26279dd447",
+      "size_bytes": 3645
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterRealPerturbationStep.lean",
+      "sha256": "557abba646eafb2b91d81f97e099e799e1ea55b20e636fe21fd78b8bee24724a",
+      "size_bytes": 2670
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterRealRootExclusion.lean",
+      "sha256": "af9d0b126f49ffdf44786a22652602a7e5d5c10b3aac5dde073618d2858dc252",
+      "size_bytes": 2098
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterSingularMatrix.lean",
+      "sha256": "67138b0f394c4c6b59a88ec0741d14e1715592456d864e228490b4d4660f16f9",
+      "size_bytes": 788
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterSingularity.lean",
+      "sha256": "602f82f9fd7d3df873e05e85713b3df2cc7cbe26855a2e5a790b473824daaa19",
+      "size_bytes": 989
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterSturmAntitone.lean",
+      "sha256": "452b5717da2e3f1fba770f179710c1548404aad8bbeaf07b718234a009697145",
+      "size_bytes": 1294
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterTotalEntrypointR0001.lean",
+      "sha256": "dff5ea6a366b0bce02435e825617b3f48e944b76505536552ca9fdeaac4a058a",
+      "size_bytes": 1245
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterTotalRadialProducer.lean",
+      "sha256": "c3c7091bfcec5ac58228c553b5506514d19f1d4e019a9316fe038898452f040d",
+      "size_bytes": 5307
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/AsterToyKernel.lean",
+      "sha256": "5c2072b53e2347956cd0b949a56ffdaa6b671a33cb1f19e7b01990436e77c6c3",
+      "size_bytes": 2321
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/DiscreteSturm/Count.lean",
+      "sha256": "c827a49f9574ec4433b85cfbf0710829c0544a93a687c049ea4a0add1f30ad18",
+      "size_bytes": 4523
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/DiscreteSturm/Examples.lean",
+      "sha256": "1122e4db801e785f0a15251916f95da6945a6e585b6ed93d2588651b16f307c2",
+      "size_bytes": 10561
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/DiscreteSturm/MinMax.lean",
+      "sha256": "559ca50de5bb1777950e7ef66819b3b478a27a4ffa43982c2a9075c811b26af6",
+      "size_bytes": 10363
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/DiscreteSturm/Oscillation.lean",
+      "sha256": "0fb96466e3647197bb7e78b2e88fd299b1f76dd464b7de56bde37c1e298b86c6",
+      "size_bytes": 24545
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/DiscreteSturm/Perturbation.lean",
+      "sha256": "5fd440227950a421b324461d7f77041a423f5939e6e6cc96622e9c9e2e835c95",
+      "size_bytes": 7304
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/DiscreteSturm/SignVar.lean",
+      "sha256": "1dbfeb8215e59dfa1b5ef5bd6af1ddf299de443773168e1aca087e6f0ba1e435",
+      "size_bytes": 2297
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/DiscreteSturm.lean",
+      "sha256": "304f7fe8735831ab3c8030617ce7b0cbe1724c8175161bb867ea416654fbc4be",
+      "size_bytes": 181
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/IlystrenCheckedNonsingularConsumerR0001.lean",
+      "sha256": "2e688d198d19480ab38d7b357e08d4cf401225584824460501bcebd814a3147c",
+      "size_bytes": 1397
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/IlystrenFullNonsingularProducerR0001.lean",
+      "sha256": "229790cdc69c5cd79d97b7f1ab1ef3f1e90f011614636aab6d4f257bfb0ff002",
+      "size_bytes": 3256
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/IlystrenOuterBasic.lean",
+      "sha256": "4ef745c82a8ddffba13847d17594f3208848086c275eccb9a777a2a03e1fd5ad",
+      "size_bytes": 6307
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/JacobiBridge.lean",
+      "sha256": "2310cb8f0c6ecc25b0d74ecf4ab67716a2f8b8761a5f002b7ac19357edf8ecce",
+      "size_bytes": 1453
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/JacobiDioph/Audit.lean",
+      "sha256": "3d725652c69127489f30b01af335783b515bc59af16e9b0660b96f20dc31a47c",
+      "size_bytes": 524
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/JacobiDioph/Transfer.lean",
+      "sha256": "bdbb2eba3d85ca4751136398210d93bf4c9a179bfc245eef930be5515c47b99a",
+      "size_bytes": 18803
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/JacobiDioph.lean",
+      "sha256": "84dafcb036af4d822d1e31340936fbe86c244934406b8f3f824c3c0cdb012f58",
+      "size_bytes": 28
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/JacobiMatrixFinal.lean",
+      "sha256": "3fa0fb07af17ce997275db18118c3737519ff1a4667cf2e052ce9c1c248a5c7f",
+      "size_bytes": 3804
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/JacobiPhysical.lean",
+      "sha256": "cb40e8310c3acc3444674b0424419374517d6021007e0a5033d13ff5a1452d18",
+      "size_bytes": 1875
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/JacobiSpectral/Audit.lean",
+      "sha256": "fbcda6a86339d2db1b31698fd02f4b26cff9900d565d2521b54bcae161a43b17",
+      "size_bytes": 1745
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/JacobiSpectral/Basic.lean",
+      "sha256": "d6fca41de95505aa613a0d01339ab6303898c57ddff02115fff647128deeb718",
+      "size_bytes": 8224
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/JacobiSpectral/Chebyshev.lean",
+      "sha256": "1d3266f87788eeb582ce8caa7e85c7f5315da844a40d6e07d4632f45d7e2860b",
+      "size_bytes": 6337
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/JacobiSpectral/Continuant.lean",
+      "sha256": "351f9c8f074cbb3ff36f8960513b90357a38a3800027cf7d8d399d4b73667324",
+      "size_bytes": 5740
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/JacobiSpectral/Examples.lean",
+      "sha256": "55ceed07679a5501f7c17e80171caab4f8f58ac9c4843ef5671caaeb622f627f",
+      "size_bytes": 7079
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/JacobiSpectral/KMSAdapter.lean",
+      "sha256": "ed0e000ac15bb514cd414355ae1d0545ccf2c33f437235459a0bfd5dff4bff6f",
+      "size_bytes": 5434
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/JacobiSpectral/Norms.lean",
+      "sha256": "a8d993de343b41218c74c4458c0fe6109d78771f4d39e767819ec0104596b70b",
+      "size_bytes": 12513
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/JacobiSpectral/Spectrum.lean",
+      "sha256": "c3a39a1b716d31826114b5f9bc713673e328748f4e14619afb68a280ee1c42f7",
+      "size_bytes": 9875
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/JacobiSpectral/Sturm.lean",
+      "sha256": "9db47b5e04f771a44fdfb14c912c22e78f284e463cd2e2d7fb7af110efdb1208",
+      "size_bytes": 13259
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/JacobiSpectral.lean",
+      "sha256": "2c5d2f8428a0adfa36baea528e6b85be47d9f9c1692e79f65ce008f500ffc62d",
+      "size_bytes": 244
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/JacobiUnconditional.lean",
+      "sha256": "98170db11e080045eae5c8e2e11ef96f9aeeab8510912e458c915166d7f92ee6",
+      "size_bytes": 2558
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/PeriodicJacobi/Arith.lean",
+      "sha256": "3fe0d654265975bb8a2e0a1b8a598df5fe7b4b80be7717931af667816a87d4cf",
+      "size_bytes": 8671
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/PeriodicJacobi/Audit.lean",
+      "sha256": "d1ffba9dc370063c6560818101f8da6aa4d294b8d15ae890c72550b40f36b1b5",
+      "size_bytes": 963
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/PeriodicJacobi/Examples.lean",
+      "sha256": "da4d8a04037131fd000b69cc4547ccbbb190163e066e74c7c04febdb526be36d",
+      "size_bytes": 3684
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/PeriodicJacobi/PhaseLaw.lean",
+      "sha256": "8fad1c5c2025f2eb95816fe658f57a28f93e8ae3e218ffb16ce3f1b008a8e428",
+      "size_bytes": 12989
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/PeriodicJacobi.lean",
+      "sha256": "949c4e58bf1ea3468f0f94c7e5f43b61a4c2ebb7970a1d9d6611fea1c64e84ae",
+      "size_bytes": 90
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/STAGED_PROOFS/ASTER_ABS_MICROBRIDGE_R0001.lean",
+      "sha256": "6c2333913d4413d2f34768001ee030cd4f7e22378e940302fab1e089a8bc6e50",
+      "size_bytes": 2123
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/STAGED_PROOFS/AsterAccuracyCheckR0001.lean",
+      "sha256": "342d8f3b44b588ca5b2d675693e2ff27a92613103e2b7950a56884dd2bb7442d",
+      "size_bytes": 2562
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/STAGED_PROOFS/AsterEmitted3x3R0001.lean",
+      "sha256": "e868e65169296e6a512664705fe18deae5614a6c9310714dee1dc7de5e9e14eb",
+      "size_bytes": 1278
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/STAGED_PROOFS/AsterFastProducerR0001.lean",
+      "sha256": "0d51cf164c1bd3cc1e4336f0038b0ff1fe11ff47cec92ee4d5d5c4be0c58ab41",
+      "size_bytes": 2782
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/STAGED_PROOFS/AsterLiteralIndependentCheckR0001.lean",
+      "sha256": "dcf5ca7039bfcfae455319b61a7055356b61b2f80173e500844cbb1d5d072abe",
+      "size_bytes": 2975
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/STAGED_PROOFS/AsterLogFuelR0001.lean",
+      "sha256": "4114ebab2054beb8acd12d54818a241bc218105cf84c296b7087ef380b56b79a",
+      "size_bytes": 1701
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/STAGED_PROOFS/AsterTotalEntrypointR0001.lean",
+      "sha256": "dff5ea6a366b0bce02435e825617b3f48e944b76505536552ca9fdeaac4a058a",
+      "size_bytes": 1245
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/lake-manifest.json",
+      "sha256": "bcdf902012e4d706a0dc2120b9b9ace28393948fde7935f4a79e04e2b0dcae80",
+      "size_bytes": 3200
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/lakefile.toml",
+      "sha256": "b1ab3e5a9cdafaadcdbecd2e39d399b45c93aff99a15c55a451a9d7ddcc70012",
+      "size_bytes": 970
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/lean-toolchain",
+      "sha256": "8733782dc070a99b312039cda424f601b80f3be6f6f512627da5ba25adc27632",
+      "size_bytes": 25
+    },
+    {
+      "path": "exhibits/03-jacobi/LEAN_PROJECT/scripts/PrintAxioms.lean",
+      "sha256": "713bad4caf7d94bad42b164abb2b216bc43e8869a4e2512f05062e1fc7357cb0",
+      "size_bytes": 1421
+    },
+    {
+      "path": "exhibits/03-jacobi/MANUSCRIPT_AND_REFERENCE/ASTER_JACOBI_WORKING_MANUSCRIPT_R0005.pdf",
+      "sha256": "480bf9a1ff2d651411a651bcbdd9b555443b5c2ae4da2e1978bb83c136c20fba",
+      "size_bytes": 424755
+    },
+    {
+      "path": "exhibits/03-jacobi/MANUSCRIPT_AND_REFERENCE/ASTER_JACOBI_WORKING_MANUSCRIPT_R0005.tex",
+      "sha256": "461523a637998d629adc79cf2296dfc1bbd3673871af8ef639d2eb9927d09407",
+      "size_bytes": 62848
+    },
+    {
+      "path": "exhibits/03-jacobi/MANUSCRIPT_AND_REFERENCE/ASTER_JACOBI_WORKING_MANUSCRIPT_R0005_2026-10-21.md",
+      "sha256": "37519547c6c3656cf39e1481e623bccacc68f54cd8eec3d0e62ed4a5eb7ba115",
+      "size_bytes": 58649
+    },
+    {
+      "path": "exhibits/03-jacobi/MANUSCRIPT_AND_REFERENCE/bench_reference.py",
+      "sha256": "9d58d327ffe772cd389abcd0bef28db315bb958e10bcf37a09c1085022aec601",
+      "size_bytes": 1121
+    },
+    {
+      "path": "exhibits/03-jacobi/MANUSCRIPT_AND_REFERENCE/exact_certificate_reference.py",
+      "sha256": "40666ff01815f0f74dfda9f9b887c96efd893bf621a4abf0251ec304bbd3f9bc",
+      "size_bytes": 6230
+    },
+    {
+      "path": "exhibits/03-jacobi/MANUSCRIPT_AND_REFERENCE/python_reference_benchmark.json",
+      "sha256": "3a3cea8862c1b03aeda855017ddf7fd760aeace1e85573743332b8301af1f8f5",
+      "size_bytes": 2401
+    },
+    {
+      "path": "exhibits/03-jacobi/MANUSCRIPT_AND_REFERENCE/python_reference_certificate_3x3.json",
+      "sha256": "076d4454f4227442e9fae0422f068a901a506d8d4a1ab0700e74cb0318fa0f66",
+      "size_bytes": 1890
+    },
+    {
+      "path": "exhibits/03-jacobi/PRODUCER_CHECKER_TOUR.md",
+      "sha256": "21ae730cbf7ce20a284fcc3ddbd71d1e31275a4f9add0b1a5e3f6f3456205c9d",
+      "size_bytes": 2906
+    },
+    {
+      "path": "exhibits/03-jacobi/README.md",
+      "sha256": "01761db13f1c174349e6f7aeb5c6a0854383c2e790d9d9d36b8bd8c0929f337e",
+      "size_bytes": 2523
+    },
+    {
+      "path": "exhibits/03-jacobi/SHA256SUMS.txt",
+      "sha256": "24a32927c4022c158d43e98bc9a9738ab3221b314be2cf19b6f7cccaf0084b9e",
+      "size_bytes": 9006
+    },
+    {
+      "path": "exhibits/04-tool-field-guide/README.md",
+      "sha256": "d2e89f40fd0d61b83e994d5a56c6915bdd7a33044449bfdaf109f02f2645a399",
+      "size_bytes": 6748
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/K1/Boolean_CRT_Fibers_K1_PREVIEW.pdf",
+      "sha256": "c7eca025ed9a9a1bb3c2625625a6811769969cbe11fdfceafa157ba69eee3556",
+      "size_bytes": 459258
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/K1/READ_ME_K1.md",
+      "sha256": "39685514c282bbd62a1b24d071523b96f45be2f81413e3dc33623b6b3e0ecfaa",
+      "size_bytes": 2122
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/K1/pointwise_k1_submission.companion.bbl",
+      "sha256": "a60ee3417d864a8207155a5dab9be485dc15fb545ed4bdf930ad97326698a647",
+      "size_bytes": 975
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/K1/pointwise_k1_submission.companion.tex",
+      "sha256": "844cf5553097a2fc0a79857ab62813b745d33fb37b27c130848bf18e79296a60",
+      "size_bytes": 72173
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/K1/references.bib",
+      "sha256": "803ae97293e56a32c5183c7e983302875f171be44fa18ad2c94491cec31948da",
+      "size_bytes": 1702
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/LICENSE_AND_RIGHTS.md",
+      "sha256": "4be9b06b1ce2b1c09cd994be498e568d5a82d1d036bfb3a97b64d5ccf53bb5b7",
+      "size_bytes": 1830
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/OPEN_READING_ROOM.html",
+      "sha256": "685373009e29a41751749d62096469066c6439a02a6a87da18f4b0f5d19a1aca",
+      "size_bytes": 4415
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/Verification/ALEX_BREAKELL_INDEPENDENT_LEAN_REPLAY.md",
+      "sha256": "812fa2e01e3f54c91864d6acf0852c5678ebc25ba9759089a9c711b97c947e3f",
+      "size_bytes": 1389
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/Reading_the_Proof.pdf",
+      "sha256": "d4b0853883e43b43b4f386fac46625d4c4e228a2196518739e49e0fa007f6666",
+      "size_bytes": 309290
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/Reading_the_Proof.tex",
+      "sha256": "a3dd194163f8efb409c104ed0fd29dbb547fd4b7846183e1002c286b02c9d65c",
+      "size_bytes": 18026
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/reading_room/README.txt",
+      "sha256": "de56278d11bf8c39f171f00abdc87f0106eb4d5f3cdb2a44134977b886b1b5cb",
+      "size_bytes": 801
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/reading_room/index.html",
+      "sha256": "6c6f1556e2b9319f0b84665e9699fa51ce37d94ed3db9b145fa0c3d40783f0af",
+      "size_bytes": 40961
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/index.html",
+      "sha256": "7e172b539091a6bf6b183f02ff9eb1dad208ddc879e1b3f3782ceac3fd4fca6e",
+      "size_bytes": 437982
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/integrated/CLASSICAL_CITATION_AUDIT_R0007R1.md",
+      "sha256": "f96827c119000bf3893146dd744c8244b169a4387c90322ebc9550d2003ed815",
+      "size_bytes": 4044
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/integrated/DEEP_LINK_ADAPTER.js",
+      "sha256": "65fd0673f8c4e11f4b0e3417a3a634ce04a45a0044dd262a002d8694a9afb364",
+      "size_bytes": 9697
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/integrated/EULER_25_TO_PAPER.json",
+      "sha256": "9c4fcb9707c06a1113b350067fe0de3fd86bd3296bdcee774e48e20e9b7dbeb9",
+      "size_bytes": 12478
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/integrated/PARCHMENT_OVERRIDE.css",
+      "sha256": "910d3e2698536d168fc8ab630345bf61e6af01685e49e9d98f350ab6eec6d686",
+      "size_bytes": 9198
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/integrated/POWER_GRAPH_41_SOURCE_RECORD.json",
+      "sha256": "ca60ed88ed4e905270a179d03b4b2be7247ac5f7457b96a379580deafbe7fcfc",
+      "size_bytes": 16783
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/integrated/PRIVATE_SOURCE_INDEX_70.json",
+      "sha256": "3a4f5b902c1bbf5e4b3115de237bbc1254792642ee12bb25c81e10ffc3d301c1",
+      "size_bytes": 14281
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/integrated/PROOF_EDGES_26_TO_SOURCE.json",
+      "sha256": "5bea3616556735ff06b79de3b62b21a4663f62080e28d8c6944ce0c8cbd09578",
+      "size_bytes": 3897
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/integrated/SCHOLARLY_AND_HISTORICAL_CREDIT_POLICY.md",
+      "sha256": "0c4d004b7d4ca3e58b784e273ca4acdceacbd0bd98c3b18b2ac5123f2ae067c1",
+      "size_bytes": 2173
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/integrated/SOURCE_RANGE_CORRECTION_R0007.json",
+      "sha256": "fd9589c119efaca2740dc39642ea547099f2208e95a4cdb2ca926da71590e608",
+      "size_bytes": 250
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/integrated/TECHNIQUE_TO_PAPER_AND_CREDITS.csv",
+      "sha256": "06b622e3640f2dab695ce8ef0bd05d72b12dfdd8cae1d105cf9b8a80fcd39503",
+      "size_bytes": 74899
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/integrated/TECHNIQUE_TO_PAPER_AND_CREDITS.json",
+      "sha256": "7b7f2bc275a0b181d29300ac31a31e4cbc3900bfe1fa6a14739b39c7db2a7b1d",
+      "size_bytes": 145206
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/integrated/TWELVE_CELL_TO_PAPER.csv",
+      "sha256": "6481b7b03341ea18303170601b42e735e3c7a60a0f06d09e0abce4277efecc9a",
+      "size_bytes": 2297
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/integrated/VERIFIED_BIBLIOGRAPHY_R0007R1.json",
+      "sha256": "eae67939b892e517e971468a90c130ad523dc75ca62edf10d3d7efded5f05e27",
+      "size_bytes": 4071
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/original/ORIGINAL_SELVARA_PASS6_UNMODIFIED.zip",
+      "sha256": "3553ea3ab552998e63342cdbd3331433e625859443fc59dea4b44ee940175d2f",
+      "size_bytes": 1356046
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/original/selvara_pass6/00_START_HERE.md",
+      "sha256": "e9ea1c9acb15e558eedd06539057a88fb2da5f0f8a84a8b9312f52ccb9c4322d",
+      "size_bytes": 3588
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/original/selvara_pass6/01_MATHEMATICAL_TECHNIQUE_ATLAS.md",
+      "sha256": "4cea7c8ccc1fdc7bf175dc176f0523ce43d1d80a413a0350dfeda73480d74d87",
+      "size_bytes": 44337
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/original/selvara_pass6/02_INTEGRATED_ATLAS_DATA.json",
+      "sha256": "3f117ae47dcb1c525a7c82f7462233c08d6adfa9947849d978f54122d5ca3848",
+      "size_bytes": 289860
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/original/selvara_pass6/03_ALL_MECHANISMS.csv",
+      "sha256": "2624a3de8559b7dc539e0bddbaee06249931f3b02e451030050afce68e5637ca",
+      "size_bytes": 32143
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/original/selvara_pass6/04_PROOF_EDGE_COURT.csv",
+      "sha256": "343d8423299ff4bc87a1cb07489c5d94ac9ccd8f62cb6a30e6f1d3c4b6eb0432",
+      "size_bytes": 1698
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/original/selvara_pass6/05_TWELVE_CELL_COMPLETE_TRACE.csv",
+      "sha256": "76eeb994487f348394aea12f32118d6451bb7600e7c6b494f19c5b3067bdf8ee",
+      "size_bytes": 5715
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/original/selvara_pass6/06_INTERACTIVE_MATHEMATICAL_ATLAS.html",
+      "sha256": "86db24662619456c01878618c15d4da6189fc5d3ceb6df401c5a03c3ea339f63",
+      "size_bytes": 293109
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/original/selvara_pass6/07_PROOF_GRAPH_AND_EVIDENCE_LEGEND.md",
+      "sha256": "1bf51e53749ddd706ead7cb3e970d4e041c5e57d44287d7f09f4018edc5b778d",
+      "size_bytes": 5467
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/original/selvara_pass6/08_SOURCE_VERIFICATION_AND_LIMITS.md",
+      "sha256": "fec669083688e1e31894594b5ca74104446af83a7b60f78685e5a8e4ab68c6bf",
+      "size_bytes": 5953
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/original/selvara_pass6/09_MACHINE_READABLE_QA.json",
+      "sha256": "94ddb38740fd043899cc72c59c95eb7e84271acb95b6e4a336669df83cbc1396",
+      "size_bytes": 919
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/original/selvara_pass6/10_PREVIEW_OVERVIEW.png",
+      "sha256": "0b5f3f07694713ce3c8b0c75fe4a266465c591af4a6ba25398e7241af8dcdf2b",
+      "size_bytes": 476787
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/original/selvara_pass6/11_PREVIEW_CELL_TRACE.png",
+      "sha256": "c6d67891ca5ff483355503f58f7617ccf94350e72d3c15bd1114b23ab017e742",
+      "size_bytes": 699482
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/original/selvara_pass6/APPENDIX_PRIOR_PASSES/PASS_1_TERMINAL_TRACE.md",
+      "sha256": "5c6d20e452f9f0f21304ede730417cf581e374252c7425d3b2679d2a0268b689",
+      "size_bytes": 8887
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/original/selvara_pass6/APPENDIX_PRIOR_PASSES/PASS_2_EULER_DICTIONARY.md",
+      "sha256": "24c13f2747109c9de9444870310f2b150c7df4a8c565fa7b9a75804665e6929a",
+      "size_bytes": 23934
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/original/selvara_pass6/APPENDIX_PRIOR_PASSES/PASS_3_ANALYTIC_ENGINES.md",
+      "sha256": "97fe9c5cdfd7dadfc957e62bf74cfda1e3c760b9bd9331740a198d6950522d98",
+      "size_bytes": 29783
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/original/selvara_pass6/APPENDIX_PRIOR_PASSES/PASS_4_TWELVE_CELLS.md",
+      "sha256": "475bac6d9bcfe6f905265b5af05cada536fc168ab7348e25439789d8efeb4ee1",
+      "size_bytes": 19568
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/original/selvara_pass6/APPENDIX_PRIOR_PASSES/PASS_5_QUANTITATIVE_LEDGER.md",
+      "sha256": "91e91d20b96bf870f4b3e510561344f4631fd366098e3faf156eaa3c809cbb0c",
+      "size_bytes": 19488
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/original/selvara_pass6/PACKAGE_RECEIPT.json",
+      "sha256": "dc0c64e0e42d991b255fff06e6e511ee3739a3a7794ac606a2a6b1c8d9d2a0e1",
+      "size_bytes": 580
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/original/selvara_pass6/SHA256SUMS.txt",
+      "sha256": "221a071ccb7fc7da1ee862cb556bbd36072617b644bc370e790887d4328e1507",
+      "size_bytes": 1805
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/companion/technique_atlas/references.html",
+      "sha256": "635ddd82a9bf20745182c04b33e411ea1ce43561f731d95bb1c7e70065a9e0e7",
+      "size_bytes": 79103
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/documentary/The_Proof_That_Could_Still_Change.html",
+      "sha256": "ea8a9d0b27ebdfd56302e3d8f02f85f19ae679818d67a690834a32c5fc3f8d14",
+      "size_bytes": 117481
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/documentary/The_Proof_That_Could_Still_Change.md",
+      "sha256": "d6f08cb1092bc24abd8bff67a7a3a739e3950ac895fc9b654dc02bf19fcbea40",
+      "size_bytes": 67652
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/documentary/The_Proof_That_Could_Still_Change.pdf",
+      "sha256": "2c946bd2952ba5fc3565b80a6467e92480ab1a1c871da888af75bf8b8c5dbb98",
+      "size_bytes": 224239
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/documentary/When_Zero_Was_Enough.html",
+      "sha256": "0029f8c2b8c22af9bca8b520c658ac75cca79daeffe28cc8d6486217a4ad028d",
+      "size_bytes": 16417
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/documentary/When_Zero_Was_Enough.md",
+      "sha256": "4a6a5c1a9c38cfdfe79e9633cac488d7a9707ae03e4e24ecdfe00ea32da60bb7",
+      "size_bytes": 13988
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/documentary/When_Zero_Was_Enough.pdf",
+      "sha256": "b7961690b0e668a6c9b0577be92b3f39cad5cca17f9aa1f11012da14e223b3eb",
+      "size_bytes": 82234
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/documentary/documentary.css",
+      "sha256": "f278a8deb9a1b54a0f9a2be86c9ecbf5a5287be7cafbcf5f611983258d74deea",
+      "size_bytes": 3730
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/documentary/edition_notes.html",
+      "sha256": "49bd189ccf0cc536532ab0eab183d00f4817196865ce673b2abeba6a8caaa58c",
+      "size_bytes": 1529
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/documentary/index.html",
+      "sha256": "5d7bc2a10351f53c979651a3f5fff3a426db0a7d56e4fdf687cd30399f3a7c95",
+      "size_bytes": 2191
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/documentary/timeline.html",
+      "sha256": "12c369dd2d9f8da1279d2285c83a72be06a10ce606bd4f4d619ee9de5af177b5",
+      "size_bytes": 7233
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/documentary/waypoints.html",
+      "sha256": "f2f04b638343b5b4a10740a77588683303fad1d95ff9bf5ba5ad1d0e999696b0",
+      "size_bytes": 23445
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/history/README.md",
+      "sha256": "873a7b937bbd4c0d7c7c3b00da3364504a80b78f779afd441653a8d70cfade37",
+      "size_bytes": 317
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/history/paper_b_frozen.canonical.tex",
+      "sha256": "9004c20d63218b529ea392d13914c17a347c485fd43814eb88bf8612a8512070",
+      "size_bytes": 64595
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/paper/paper.pdf",
+      "sha256": "7900d5fdd14828c3bd70b77da07de4872b93eb8048df94eb6d3d78eb45c3f908",
+      "size_bytes": 471293
+    },
+    {
+      "path": "exhibits/05-paper-b/Docs/paper/paper.tex",
+      "sha256": "c9d2a4eb35dba8fca7327913457c41f8d69ad15656c0949d4321bf14ba1446d3",
+      "size_bytes": 100944
+    },
+    {
+      "path": "exhibits/05-paper-b/EDITION_IDENTITY_R0007R3.json",
+      "sha256": "f85b96fbc67bfa06f93eb4877a67fac9e3a5aa6054698e5dde2c454045bbb7d7",
+      "size_bytes": 905
+    },
+    {
+      "path": "exhibits/05-paper-b/FINAL_RELEASE_AUDIT.md",
+      "sha256": "6a5fdd07e4e2150dfcba2dcfacd37c9ecd3a09d173e8ab75372074e1f592b1fb",
+      "size_bytes": 6758
+    },
+    {
+      "path": "exhibits/05-paper-b/OPEN_ME.html",
+      "sha256": "c84bb94b00d9d84bfb236f61dfb9071a439bd4ae6d03d13ea4eddfc313ebfe81",
+      "size_bytes": 1908
+    },
+    {
+      "path": "exhibits/05-paper-b/OPEN_ME_READING_ROOM_HERE.html",
+      "sha256": "d844b750a83309174119234597f26ef1ba8daf2569d484ca7094f4849586656d",
+      "size_bytes": 1707
+    },
+    {
+      "path": "exhibits/05-paper-b/PUBLICATION_ROUTE_NOTE.md",
+      "sha256": "93e16f1685221efd3ec593fa7ecda0319ec7d5cf97950744e965771bc594d662",
+      "size_bytes": 3145
+    },
+    {
+      "path": "exhibits/05-paper-b/README.md",
+      "sha256": "c36660d8f0ab9cf1f45e7fe0b2a0b6d7485145f76d07025af33dbd1c3df9b06e",
+      "size_bytes": 1787
+    },
+    {
+      "path": "exhibits/05-paper-b/RELEASE_AUDIT_AND_STRATEGY.md",
+      "sha256": "63081abe5c25835dde0234e439ac9107309b921a207172488697cb42a89c78c6",
+      "size_bytes": 3678
+    },
+    {
+      "path": "exhibits/05-paper-b/SHA256SUMS.txt",
+      "sha256": "c668ce726f9cada68abff16c41bdfa2cd60a6b7a31918fb542be5c3508f8adfa",
+      "size_bytes": 15602
+    },
+    {
+      "path": "exhibits/05-paper-b/SHA256SUMS_R0007R3.txt",
+      "sha256": "a74210f22e7fbcbd1afa956df979be35b835c50ad32b47f3fc106071e75fce5f",
+      "size_bytes": 21028
+    },
+    {
+      "path": "exhibits/05-paper-b/START_HERE.md",
+      "sha256": "7f02c8fff99de164423cb09b24fa025baac3e2671022009db839fd93237af92f",
+      "size_bytes": 1944
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Lean/PAPERB_PRINTED_TERMINAL_RC_R0003_TRIMMED_20261023.zip",
+      "sha256": "e8bccaf4c607a3b2458a47833bdd98f598a59229f7af0175927b994318d7b2a1",
+      "size_bytes": 1985806
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/README_SOURCE_AND_PROVENANCE.md",
+      "sha256": "6a0eb9c9b3ad0db5a71db8c478758b9cc0339c7e9c5557f3c39efa55e3b67e7b",
+      "size_bytes": 905
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GeneralKloosterman__General.html",
+      "sha256": "a695a37843a244da6932d71e1ce99b20622d12fcf4a2f9ce2c3d75cbc31881ee",
+      "size_bytes": 17355
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GeneralKloosterman__PrimePower.html",
+      "sha256": "cbe97783bce880b8b60fae3a08aeadfa4f5d0c27eb4bee9397f1e45d73ced7f1",
+      "size_bytes": 22982
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GeneralKloosterman__PrimePowerUnit.html",
+      "sha256": "e7adb793d08d40a5047ffbec2bd07632226cec5ba02f837d0b77a28898d4eea7",
+      "size_bytes": 36185
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldB__DoubleSum.html",
+      "sha256": "c8bd829b5782c151a1c57140e8bfc89c386bd6a5ad62b151ab50a4ee5ecc29f1",
+      "size_bytes": 28726
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldB__Final.html",
+      "sha256": "48e4e977a82d60e0a66d73e4306f8fd2459aedcb002670bce645b79839e94f7d",
+      "size_bytes": 22271
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldB__Params.html",
+      "sha256": "5347de3fe591c92785509f05fdbcec355412ccb304bf6734bc123923d7c7c49c",
+      "size_bytes": 20095
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldB__QuillonDerivativeWindow.html",
+      "sha256": "ee630347bc0edde65396f6eeba661c20f0faa999037e6d985bddc766d72716bd",
+      "size_bytes": 10895
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldB__QuillonLowY.html",
+      "sha256": "5667f163e6d132bbb25e507ee6ff71a6e5db3ce26b000481fb575f25062da209",
+      "size_bytes": 11852
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldB__QuillonSelectedOrders.html",
+      "sha256": "b31cfa9c875a07e52cfeeeb96422a75061b17cd2c90b93c17951cf16fd5ce962",
+      "size_bytes": 18381
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldB__StepThm.html",
+      "sha256": "71746b98563c9783ee64c0d2d9d951529702c06d1dba7b62cfca8de2583b7f16",
+      "size_bytes": 26900
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldB__Suzuki.html",
+      "sha256": "09a9246519d46238dc1903e68fc8bb58d0fe74f4f9cd3fff0d63b825be0104fe",
+      "size_bytes": 35048
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldB__VinoMain.html",
+      "sha256": "dce77d98a6c722a7123d7d3359749dadc7473537127fffe670bad5dd1dd7b504",
+      "size_bytes": 38234
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuarterFold.html",
+      "sha256": "e9f41d38041cf14b21fadb1934e0dc8706bcd5614c0dc0286a497ea845962bd5",
+      "size_bytes": 126387
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonAsymp.html",
+      "sha256": "3820e2c5c6071201b37bdd72bd141059e8d5a29db06c1a0b38d56703820e5ba9",
+      "size_bytes": 33678
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonCEv.html",
+      "sha256": "14e38cce5af7b711e8cfa1d356b7842e118f7f0d89da832a1756e87c12f46c68",
+      "size_bytes": 85224
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonCPhysical.html",
+      "sha256": "2f3e78bbd3584e903de479800b2b096bccbb085169a29f89b919d38e766200ba",
+      "size_bytes": 82196
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonCoef.html",
+      "sha256": "3cd707c74194e7196c8115faec690b35c55e3e661b4bd1ffd9b3bc00d645e37b",
+      "size_bytes": 14667
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonCopyF.html",
+      "sha256": "2379fa8225a67dcb7adbce17639d32de8459efe4251c225902e3abe47508ebcb",
+      "size_bytes": 39087
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonCoreFinal.html",
+      "sha256": "19b1d742a0317ab03c7a8327bb4bc7666ef81dbe96412405165d9814733db2e2",
+      "size_bytes": 25611
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonDecorationGronwall.html",
+      "sha256": "023bbaefc3fd1a677e8947605c10961e0379793bbd6967e9bf6bae52772fd9ce",
+      "size_bytes": 43276
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonEv.html",
+      "sha256": "b8806a059a90211d64e28456f8b4d226dba4cde047265211c78ac6c9644b9dbb",
+      "size_bytes": 18390
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonKlComposite.html",
+      "sha256": "41575e57d8cb9a4fb48757a578d08877fa3f1fbf5b23f81794bfcda1e802f1c2",
+      "size_bytes": 32666
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonLC.html",
+      "sha256": "b1e640061a8d4be6974325c65c8cb5921b1f92701574bc2c93cc8132a24ee46b",
+      "size_bytes": 85684
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonLR.html",
+      "sha256": "40f8271e949286509cd04b1e0a93280a1e8acf4e22a0e69bb1e7d69820c60f80",
+      "size_bytes": 76240
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonLRP.html",
+      "sha256": "beac14d9d38284fb63a850b81aacff3573c09457ce22f78db40d34cf4f2a85ab",
+      "size_bytes": 70911
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonLW.html",
+      "sha256": "25ff0c84f4d1bb860d1923da20730407b947229ba6c683cb3e42de35d935cab0",
+      "size_bytes": 62767
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonLWR.html",
+      "sha256": "315dc765ecde5a346479a20a5e25011e385633d0b91a1763dcd624b46bf1f3aa",
+      "size_bytes": 69556
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonLWeil.html",
+      "sha256": "72bed3f714d568341ffdc5da62764e81163f621cb35c9f081a388fd0d1778112",
+      "size_bytes": 45006
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonLWeilB.html",
+      "sha256": "175042556c6937c149016c178a22bd224e3517560b959995190cd9a11ad6593f",
+      "size_bytes": 110054
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonLam.html",
+      "sha256": "172a07bf94e0e14a5960ed21caa36b95e418bc28876ed25c684af78d8d32b4f3",
+      "size_bytes": 18547
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonLongFinal.html",
+      "sha256": "c54c33985a41bed8ccebe49cf1da38ac598d0e4f26263c446aad2b3ff6381976",
+      "size_bytes": 28978
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonREv.html",
+      "sha256": "adb3b7f45a413e793ea127495acfe4f73da2f23953908163e1da2db84bfb4541",
+      "size_bytes": 57887
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonRLemma.html",
+      "sha256": "65cfdeac961859501dea6aebff9d100a9c980fca88271b6b7c75829b343cedca",
+      "size_bytes": 25461
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonRPhysical.html",
+      "sha256": "13023fde41bf285d84d19db05f10b8460f4dd3d057af98ac8245df19b70ed179",
+      "size_bytes": 61620
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonResPhysical.html",
+      "sha256": "1f56abe3d3d56b807593faa2c7805c6984c89c7d9def6cfe5dc82af4cdf7d91c",
+      "size_bytes": 71083
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonRowNF.html",
+      "sha256": "735d3567af33a4c33c3291bd3b9feafa65a1a551109f1f317e5098ff24875abc",
+      "size_bytes": 52119
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonSetup.html",
+      "sha256": "3a72be2fe41548559eab7e0d81fb45205cd94fa381c610a4074629c6378b6ae3",
+      "size_bytes": 22643
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonWCell.html",
+      "sha256": "ccc3bea50d220f35ce9a1ce41f0c82b4fe57af3e8685ac7daf4a660d350e0239",
+      "size_bytes": 53481
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__QuillonWPhysical.html",
+      "sha256": "354b4df427af863fc552484d69187c99e99335c3a221281ff62cff7a527414cb",
+      "size_bytes": 20733
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__VKCore.html",
+      "sha256": "44b4837c6883b17a044912386d240484457889e8c6e764a49572726121d2b4fe",
+      "size_bytes": 55369
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/GoldC__VKRegimes.html",
+      "sha256": "0882f95857524edc0c9459569fa911b0b914681c3ee2251644934f29de48424e",
+      "size_bytes": 51913
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/Orienne__CSC3__CoreHighPaidConsumerR0002.html",
+      "sha256": "0ac028f510220452bb1ce3b17c8a8a2c335335894521746f487d733801d0ecad",
+      "size_bytes": 4282
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/Orienne__CSC3__CorePaidTerminalConsumerR0001.html",
+      "sha256": "2909e891f5b77bc1d0e1912b05eb19bef6337d19a1a932e5403d945df7782ac9",
+      "size_bytes": 6334
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/Orienne__CSC3__LowZeroTerminalR0001.html",
+      "sha256": "7f16d49086e2b26cec40541857187ec9c69162c75e9e5685d8370d344a233cd0",
+      "size_bytes": 6215
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/Orienne__CSC3__PhysicalCoreBridgeR0001.html",
+      "sha256": "054ae702d4a2527a47d77ae130a47a3991e51a4312a1ab6b54896c04f7104230",
+      "size_bytes": 6464
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/Orienne__CSC3__PhysicalLongBridgeQ0001.html",
+      "sha256": "cd88367ac04c8e7f308686c2404743d44e56592076d61fd1173f11490d4f49b5",
+      "size_bytes": 7719
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/Orienne__CSC3__WeilQuillonBridgeR0002.html",
+      "sha256": "2af9f6c2df3e28724427acc1325a9fa937856c5909cfa180359aba3b92bb5c0c",
+      "size_bytes": 4324
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/Orienne__Central__HighCardGrowingR0001.html",
+      "sha256": "72f0668d7932d7b960572a42a4d3369f8aa8ebae8d5f67629b11cfef58ea8d5c",
+      "size_bytes": 8654
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/Orienne__Central__HighCardRateR0002.html",
+      "sha256": "35cab67f5e1a5cf12894c98cb509f3b58cc97df6ba82c4e55adedbc701df8994",
+      "size_bytes": 6360
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/Orienne__Publication__F01PrintedLiteralBridgeR0001.html",
+      "sha256": "2b886635b7ae055176bd4e14ca9a84fee338b641d4e9811a7d9510af8c75f52c",
+      "size_bytes": 150710
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/Orienne__Publication__PaperBPrintedTerminalR0001.html",
+      "sha256": "50e8864b45bf4d24aacfec9f7e29c1a275af2361e720b65112bf830cd3b50125",
+      "size_bytes": 5003
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/PaperB__Boolean__EndpointContraction.html",
+      "sha256": "e3db3cba53080b31ae74f77a44b66c4572aa53268292f8b19c28d87b89f6d243",
+      "size_bytes": 18579
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/PaperB__Closure.html",
+      "sha256": "240d51e4c5880f87d1a934dee4685e5f25e9c901644609244d91a19936603a5c",
+      "size_bytes": 54844
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/PaperB__FixedQ__DivisorExpansion.html",
+      "sha256": "4e2bf541f1c1fb7573e28efb6f40201e35d36573efe2779743ed8a92e351bf69",
+      "size_bytes": 186715
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/PaperB__FixedQ__EtaReciprocalTail.html",
+      "sha256": "b6e6be9aeb52670c535c884f1e11fc0384f0652e775110f8458ded0b85dbfc23",
+      "size_bytes": 71802
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/PaperB__FixedQ__PeriodicCount.html",
+      "sha256": "056f23eef8394e1b6dd517bde61847efcfe4d7624a90e861c2550cce3421e161",
+      "size_bytes": 15099
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/PaperB__FixedQ__PetermannInterface.html",
+      "sha256": "b136c10dbbeaafca8c73b3982ec06a5660128a1eb059eb66f789f6801910923b",
+      "size_bytes": 8745
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/PaperB__FixedQ__RowReflection.html",
+      "sha256": "25258ceea057d84d66241cd39ed1e518d5ace314b92a4a642fd24c0f626873c5",
+      "size_bytes": 9504
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/PaperB__FixedQ__SourceBridge.html",
+      "sha256": "f9eba9a175e1418cb2a77e0b53a322647f12532ea6b86f5430897e2fd257213d",
+      "size_bytes": 9404
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/PaperB__Gate3__CentralTransfer__MiddleLongCoreConsumer.html",
+      "sha256": "a9d8397e6ca73c8828f3d07ae1417fd724b5d949e88538d5978f57be0ce10580",
+      "size_bytes": 8879
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/PaperB__Gate3__CentralTransfer__ThreeSectorConsumer.html",
+      "sha256": "d7f9260fd3c22d26e1545a5eb3b80a16d90e8241afe95497dbc0b4c71b8fa058",
+      "size_bytes": 21410
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/PaperB__Gate3__CentralTransfer__ThreeSectorTerminalAssembly.html",
+      "sha256": "b63c964dda6bd3554d4711eb61b8c673ade5babe4c4a57aba5e689535ce82a22",
+      "size_bytes": 16339
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/PaperB__Gate3__ClassicalVaalerPaidTerminal.html",
+      "sha256": "51a25e2fe519c106e7a168cb3020a7547ec645f90128612d7d37be075e2c6544",
+      "size_bytes": 4634
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/PaperB__Gate3__SuzukiCentralOnly.html",
+      "sha256": "3b98cff7e51b321975a11a1e6a88f2cb1d77b750c32be22f6697d9172522388b",
+      "size_bytes": 4014
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/PaperB__Gate3__VaalerCoefficients.html",
+      "sha256": "8d8b6ba0a9218728c87d9d34e4dd05b75ee0975aa30deccd22b4d753bb8a4bc8",
+      "size_bytes": 11912
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/PaperB__Gate3__VaalerErrorPolynomial.html",
+      "sha256": "0c2f946391f38b9e10acc27e0ee90c54466c91359f1044bbdfb5a183a24fef7a",
+      "size_bytes": 7653
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/PaperB__Gate3__VaalerFullPointwise.html",
+      "sha256": "47253839622b76409fbd43f17a07f31641f9269ed566f4ec7602ee0336bcb0f5",
+      "size_bytes": 11674
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/VPWStepanov__StepanovPrimeWeil.html",
+      "sha256": "27b065336398c22af0fc19a8585698d77b98a5cb7202055d2eb601a4db5fb9e7",
+      "size_bytes": 15034
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/paper_b_frozen.canonical.tex",
+      "sha256": "bb34666b995bd5f522d4c1d72d50dc600450ab7b2a21105f400afe737b2ffccd",
+      "size_bytes": 159119
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/atlas_pages/rml__weil__prime_kloosterman.html",
+      "sha256": "cb5d60d2fd2074754588da8be3c161fe0c2aa61df236f42c4e656e094505d7a0",
+      "size_bytes": 3833
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/GeneralKloosterman__General.html",
+      "sha256": "53592f5e6f8e2ff11463b61141022a89ec164eca9589d18e6745e2bf0219ec2b",
+      "size_bytes": 18298
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/GoldB__Suzuki.html",
+      "sha256": "5b1b8fc10ee470709f7bb0d6e79ce6f33ee2111ab0de802236f29fb6fc8127d6",
+      "size_bytes": 36941
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/GoldC__QuillonAsymp.html",
+      "sha256": "34d09be2ac0e894803190aa5e8483101783c2ebe73575763b6f6613f9d4dab9d",
+      "size_bytes": 35463
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/GoldC__QuillonCPhysical.html",
+      "sha256": "5697a306238c2e2693893c50e912e2008fe1aca25076a61893ce306ac1f53e81",
+      "size_bytes": 86431
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/GoldC__QuillonCoreFinal.html",
+      "sha256": "2495bab5bd2e48278373c796bb79557badb1f1de0d5a56eb39e6201b1f87f136",
+      "size_bytes": 26924
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/GoldC__QuillonCot.html",
+      "sha256": "ba25c156d53cb91ff64a796b51f6ed391bdc9e164b60d00c9c7d5672523b5d6f",
+      "size_bytes": 50698
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/GoldC__QuillonDecorationGronwall.html",
+      "sha256": "be0154155a6b2e88bf39de94bfa0146acf43790de245972d188d4abee0154516",
+      "size_bytes": 45606
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/GoldC__QuillonLC.html",
+      "sha256": "14fa4175cfb0b6168513fd2cb14974d900455bd630feea567a7c4c2ea72d4499",
+      "size_bytes": 90082
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/GoldC__QuillonLR.html",
+      "sha256": "709188dc6fe9a623394828842b42977270ef8e78fc5eba8080940fd9807a7ca6",
+      "size_bytes": 80140
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/GoldC__QuillonLRP.html",
+      "sha256": "c87c59290d22ef66c91b51f331785b10f355105334cfde382fd8703625e08445",
+      "size_bytes": 74432
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/GoldC__QuillonLRes.html",
+      "sha256": "fabbae5a5b7e9be9815efcde6bddae096c63ccd808e0409cc3fac0a3f5f3cbb8",
+      "size_bytes": 33936
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/GoldC__QuillonLW.html",
+      "sha256": "c78dccdd496355b080d4aa3f4f78f72224ccc952a2982c9aeb5f30234d145403",
+      "size_bytes": 65959
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/GoldC__QuillonLWR.html",
+      "sha256": "60c70ecf046041df0bbe6e92f7a4f01402efa613f87d2b06e132de75ad13d221",
+      "size_bytes": 73107
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/GoldC__QuillonLWeil.html",
+      "sha256": "195e3942dbe4fd6d93740cc350cb2b1353ae38af0861ec32f104c0d45eeb315b",
+      "size_bytes": 47271
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/GoldC__QuillonLongFinal.html",
+      "sha256": "0fb85aed4578e03a4062f34c18b574dead654165b86ff87a9feb8384f023eb11",
+      "size_bytes": 30471
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/GoldC__QuillonREv.html",
+      "sha256": "8c2d0fff3452330672c679144a5ab7bf2617e4bdbd2327db9f7a453b40515ee9",
+      "size_bytes": 60898
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/GoldC__QuillonRLemma.html",
+      "sha256": "2573c5e759b6d04ae3109233ca1a6efd97465dec015c23a92f44c60672330e36",
+      "size_bytes": 26837
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/GoldC__QuillonRMode.html",
+      "sha256": "c0357fc3303f1b406ee1b88baf63598ec92b704d8917bed9268ad6b2a797ab68",
+      "size_bytes": 14218
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/GoldC__QuillonRPhysical.html",
+      "sha256": "a06c3cbeb34dc8fe7840738c4344ee54cca247b0d24a8583f30510673f3e43c9",
+      "size_bytes": 64811
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/GoldC__QuillonRPiece.html",
+      "sha256": "0b8b99b950540499e29ffd04de7f07a2ab8b6fd7751505a77f82de8fa007fbfe",
+      "size_bytes": 65545
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/GoldC__QuillonResPhysical.html",
+      "sha256": "650e15bd09cd26929071df9ba5f4a20be84b9dba91ae5e734e144ab769642541",
+      "size_bytes": 74716
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/GoldC__QuillonResidue.html",
+      "sha256": "3e3083d856b664e8dc47025432613637ceef9ae3103ba538d7fab6e74dc61b6c",
+      "size_bytes": 68092
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/GoldC__QuillonWPhysical.html",
+      "sha256": "8e4b97740102d77d91a645eef4b5280aea602b4c559a8c2252c6f34611a4d630",
+      "size_bytes": 21824
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/Orienne__CSC3__LowZeroTerminalR0001.html",
+      "sha256": "53c690f42fa0a4f89175b8f435ff6d9678d73d24af952bb71dedfefbf42ff433",
+      "size_bytes": 6491
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/Orienne__CSC3__PhysicalLongBridgeQ0001.html",
+      "sha256": "5777a6553747fa61b94653063e2b1ad7b86513459b123797c5208fd102fa9834",
+      "size_bytes": 8069
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/Orienne__CSC3__WeilQuillonBridgeR0002.html",
+      "sha256": "b24f227b0796536e0905e49f4c3b01e5770b65e4900285958fc020f549d6b8a2",
+      "size_bytes": 4465
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/Orienne__Publication__F01PrintedLiteralBridgeR0001.html",
+      "sha256": "840b273b2e368406cb550ec02f430ee73db6d72adebdbb9b764d0737ffe38fdb",
+      "size_bytes": 159164
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/Orienne__Publication__PaperBPrintedTerminalR0001.html",
+      "sha256": "778441efc58a06e6a6679a4319474602a6ecec0eff12bb983c549a8960f1fc1e",
+      "size_bytes": 5175
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/PaperB__Gate3__CentralTransfer__MiddleLongCoreConsumer.html",
+      "sha256": "ae044176affa046cbb02fa9f4c21756bb99c76956ae365f06efa0066a9103cb1",
+      "size_bytes": 9305
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/pages/PaperB__Gate3__CentralTransfer__ThreeSectorConsumer.html",
+      "sha256": "34437f9581b31e0889d0ad75f1a2d0b0dfa39cf20d90bcd9a80ce6a2e5095961",
+      "size_bytes": 22625
+    },
+    {
+      "path": "exhibits/05-paper-b/Source/Viewer/source_index.html",
+      "sha256": "e856c811b742f571b34cf2b82da46c5b701fd95ba5035f70b16f6db82d9773c0",
+      "size_bytes": 16219
+    },
+    {
+      "path": "exhibits/06-shiu/.github/workflows/palomar-manual-preflight.yml",
+      "sha256": "1b9ff4511df86c75403ac2c8b079fd5fb81c0e9c43927b4ee958127a08866b85",
+      "size_bytes": 779
+    },
+    {
+      "path": "exhibits/06-shiu/.gitignore",
+      "sha256": "0d1d5f4c2ba15b0ea5a4766ca96c8d39529aeb8d17bcf6abd1f66ec0ce4a4f90",
+      "size_bytes": 63
+    },
+    {
+      "path": "exhibits/06-shiu/CITATION.cff",
+      "sha256": "149019efe8c045d1ae77378a00416a2cfd6a666cb4ef7e7a226e4f0dcf190ed6",
+      "size_bytes": 1587
+    },
+    {
+      "path": "exhibits/06-shiu/Challenge.lean",
+      "sha256": "b118911a5be103eb17467e22bd3c6784a047aba2dc0b840190a615d8adc0190d",
+      "size_bytes": 4950
+    },
+    {
+      "path": "exhibits/06-shiu/ChallengeDefs/ClassI.lean",
+      "sha256": "b2cde90c6b4b2df5bee5c7db48e8183fb9e1a49f1d08974ac938ed97fce9f352",
+      "size_bytes": 431
+    },
+    {
+      "path": "exhibits/06-shiu/ChallengeDefs/ClassIV.lean",
+      "sha256": "7bbd8b2e980f3ea77fd0d06ca566851d7e2f6e471f8bfdc2b925634a0e2040db",
+      "size_bytes": 458
+    },
+    {
+      "path": "exhibits/06-shiu/ChallengeDefs/Constant.lean",
+      "sha256": "72b369d972721ce381bc11018bbfe315fe0615a7bc54609c7211e8d8585e2fd4",
+      "size_bytes": 343
+    },
+    {
+      "path": "exhibits/06-shiu/ChallengeDefs/Cutoff.lean",
+      "sha256": "5d16138ae022ffa1c6ff20fa2455969f5356c310266ce3f97a661790b9410acd",
+      "size_bytes": 230
+    },
+    {
+      "path": "exhibits/06-shiu/ChallengeDefs/Envelope.lean",
+      "sha256": "19aaa2d5f9625e55008b8da6b7930bba4e4954e39c86c38e7eb18a755b4a3d43",
+      "size_bytes": 496
+    },
+    {
+      "path": "exhibits/06-shiu/ChallengeDefs/Mass.lean",
+      "sha256": "54ddef008ddbf0e5e87043f0e9efe2969f00aee0870223cc952c214eb3ddea9e",
+      "size_bytes": 251
+    },
+    {
+      "path": "exhibits/06-shiu/ChallengeDefs/Progressions.lean",
+      "sha256": "a29dc12f5eb9ef907fb2202749cc6eb6469052ed1de027b08977ace1edd94538",
+      "size_bytes": 381
+    },
+    {
+      "path": "exhibits/06-shiu/ChallengeDefs/Rankin.lean",
+      "sha256": "04ad359dbe5aae4ad4d6262e6dffaff5c557bb9e9979b709e0588b727f72f4e5",
+      "size_bytes": 365
+    },
+    {
+      "path": "exhibits/06-shiu/ChallengeDefs/SmallPrime.lean",
+      "sha256": "8825805366cc1bd8b84ff9205b822a75de95c7bf854350adc383ee4f59a44ddb",
+      "size_bytes": 274
+    },
+    {
+      "path": "exhibits/06-shiu/LICENSE",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "size_bytes": 11357
+    },
+    {
+      "path": "exhibits/06-shiu/NOTICE",
+      "sha256": "271f027ac6a27c9d838e8b6ff632b379fa441fca2d853a37dd8590ee9df725a1",
+      "size_bytes": 2180
+    },
+    {
+      "path": "exhibits/06-shiu/README.md",
+      "sha256": "9345e98b88bfb9771b0d7a763cbd7b0252ee4ce32b6efa4a36ee589ee808bd10",
+      "size_bytes": 9030
+    },
+    {
+      "path": "exhibits/06-shiu/RELEASE_PROVENANCE.md",
+      "sha256": "e38321c5ef2fb5e480707a6824fb1b43063c06f8f72405db9df7084a958202a6",
+      "size_bytes": 3951
+    },
+    {
+      "path": "exhibits/06-shiu/SHA256SUMS",
+      "sha256": "5c4a7e70b77320d2b55acffbf996c3c20d7af0ee8e59190dd588745d3d3a5144",
+      "size_bytes": 19481
+    },
+    {
+      "path": "exhibits/06-shiu/Solution.lean",
+      "sha256": "c1c72b3f7f304b563e520c66df19bc74e6278bebe3279561b6e74aff6ac2a230",
+      "size_bytes": 259
+    },
+    {
+      "path": "exhibits/06-shiu/comparator.json",
+      "sha256": "5c0e77e320c1cd2668f6eca9fd03a88433e425420c4e8c4ca1cc47dc3137f2df",
+      "size_bytes": 507
+    },
+    {
+      "path": "exhibits/06-shiu/examples/Classical.lean",
+      "sha256": "4d923d9042862b87318d1b2c634abdaa51d4fd44114a58f3f70a0b3710236362",
+      "size_bytes": 887
+    },
+    {
+      "path": "exhibits/06-shiu/examples/ClassicalCorollaries.lean",
+      "sha256": "e1cf26199594c3c508bf8c9c392781532c9c63168827114c6a7a1b9f57163698",
+      "size_bytes": 1576
+    },
+    {
+      "path": "exhibits/06-shiu/examples/ConcreteWeights.lean",
+      "sha256": "bf95c62af14d0608d64683239e2a2da944e02ff3bde77a83fcb8d59ff86c62a1",
+      "size_bytes": 2416
+    },
+    {
+      "path": "exhibits/06-shiu/examples/ModulusOneCover.lean",
+      "sha256": "9d60e1896492ee6ad41d7ef36dbd0d9858448250f53ff3a926c16e5b7ae5256d",
+      "size_bytes": 723
+    },
+    {
+      "path": "exhibits/06-shiu/examples/ModulusOneFinal.lean",
+      "sha256": "604ef41069816e74444041acb285f2704d7f35a4497fd734838a73b20790104b",
+      "size_bytes": 792
+    },
+    {
+      "path": "exhibits/06-shiu/examples/PrimePowers.lean",
+      "sha256": "c0e2e41f08789ea69623558995ae6879acda9d0e60d40b4d6b3886f30eb85450",
+      "size_bytes": 801
+    },
+    {
+      "path": "exhibits/06-shiu/examples/Squarefree.lean",
+      "sha256": "c0b6b81fa4c3ce7dcc2a9651d918707bdf390bf3208412aa4b3c74065539328c",
+      "size_bytes": 999
+    },
+    {
+      "path": "exhibits/06-shiu/examples/TwoParameter.lean",
+      "sha256": "7b99448ef8ff04e2b5aa65b4226e5506d5dad34c3d6c67c8ac8f26fcd325551c",
+      "size_bytes": 2343
+    },
+    {
+      "path": "exhibits/06-shiu/formalization.yaml",
+      "sha256": "49f0827c15c0944678857774ae3039fea1bf94dec49fe3b2875e80113b7099c0",
+      "size_bytes": 7454
+    },
+    {
+      "path": "exhibits/06-shiu/lake-manifest.json",
+      "sha256": "8a051f40db39d51cf613528445069ae5eccb4fda9d6e98f543a14da1b5b3acd9",
+      "size_bytes": 3129
+    },
+    {
+      "path": "exhibits/06-shiu/lakefile.toml",
+      "sha256": "6b487bec0179859d6a09a2f54e1a282306074c610fad9252d3c1b4683572344e",
+      "size_bytes": 2705
+    },
+    {
+      "path": "exhibits/06-shiu/lean-toolchain",
+      "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c",
+      "size_bytes": 25
+    },
+    {
+      "path": "exhibits/06-shiu/scripts/check_canonical_challenge.py",
+      "sha256": "7add859453f3f9e0a4a4330f85c0ccfe6ed2023cefa0f115b0d907d1ee18c2b2",
+      "size_bytes": 1607
+    },
+    {
+      "path": "exhibits/06-shiu/scripts/check_release_sources.py",
+      "sha256": "48b930af3dc8c51825cbdc1295036dca14fda2aed6bf4660b8b6a9148e21aa0b",
+      "size_bytes": 1533
+    },
+    {
+      "path": "exhibits/06-shiu/scripts/verify-comparator.sh",
+      "sha256": "fed9106e44d8fb9e2212badd8ac0e7e7b044f54005c3e969fe16d6f935f2812b",
+      "size_bytes": 938
+    },
+    {
+      "path": "exhibits/06-shiu/scripts/verify-release.sh",
+      "sha256": "c4d01a1a1503079576d23e63ea366ed9f69047432b9357053942baddcb1ce5b5",
+      "size_bytes": 559
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelActualFirstLargeBase.lean",
+      "sha256": "8daaaaa503aaadb9daef2ec34d9a8637b811dd1242491608e7b99f2f6b353f03",
+      "size_bytes": 2489
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelBaseProductTransport.lean",
+      "sha256": "ce402427a7daf841ce63119d333a038310c589ff34579aaeb6cd5ebe0e7b6c73",
+      "size_bytes": 832
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelBaseShellEndpoints.lean",
+      "sha256": "d40eebcbde0ca5d8322c52ba268a58b6c9a67137d16261558bac99b4ada1838f",
+      "size_bytes": 1191
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelClassIBranches.lean",
+      "sha256": "d8e17982591ce70c61b6270103c051569b58c186efbf6dd58dc88d4005fc8226",
+      "size_bytes": 1344
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelClassIIISmoothPhysical.lean",
+      "sha256": "d381d4b2d07c8eaaee13dc7f01515a397d6eefbb1ef2e08d634cfe42530f8503",
+      "size_bytes": 1007
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelClassIIISubsum.lean",
+      "sha256": "5b6f3a9338050e21e1989188140bb0ac34a6a79b4846fe42ade2f4590acefb25",
+      "size_bytes": 2705
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelClassISubsum.lean",
+      "sha256": "796744b8a39ac8edd489f21c6818eaae1b4712878f124c1db7a3a4b0cfdab183",
+      "size_bytes": 2773
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelClassIVInnerScaled.lean",
+      "sha256": "0aa8f5756c949dfb9afb9d51411bbb3b05cb4f3a2c5dd1f8905e270ef36f6797",
+      "size_bytes": 1617
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelClassIVPrefixMembership.lean",
+      "sha256": "97b7a572ba1cda8ac79e52413413b1b2d8fbf0216b923431f7b02b67b2f0fb67",
+      "size_bytes": 1580
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelClassIVSubsum.lean",
+      "sha256": "fd9e9205974eb1647398d54febe7fedcd189493bd115173d6ed0742860590393",
+      "size_bytes": 3740
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelCrossingModulus.lean",
+      "sha256": "ed09dfb4a88e4202c79989954552a2fa9e0bd9184695309c4c59355bf82d05a3",
+      "size_bytes": 2408
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelDivisorOrder.lean",
+      "sha256": "c2da7d9b0de48825131868db0f7def329fcd11f84459f9084de680e8c796f8d1",
+      "size_bytes": 1598
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelExceptionSubsum.lean",
+      "sha256": "f5638c7ef6b24d7d3b14df5960a34df785e8a49c4004ff3eab71a6020e1cc371",
+      "size_bytes": 2809
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelFixedConstantException.lean",
+      "sha256": "7bb5dced8db5ccad04e157e031ae96298a924ad4d8b49c4038436659e5fcc843",
+      "size_bytes": 3474
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelFourOvercounts.lean",
+      "sha256": "0b750b53b3a3020f56a70e774406c6868e1097c5cb4b297ce574def62b1a9342",
+      "size_bytes": 2635
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelFullPhysicalShell.lean",
+      "sha256": "5a04591c27caada5d5c71179ec030710ed691f66cdbe199041b731fe53cad1e3",
+      "size_bytes": 2560
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelGeneralPowerAP.lean",
+      "sha256": "541069d8836538bba11305b466df97f52cf86ecdcc3a2b460a21303ee63e4ab5",
+      "size_bytes": 8457
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelGrowthLog.lean",
+      "sha256": "4efd3d0ca7b066233526c5ffd3673a4ed19836a31c52c3546e2b383a5b08f932",
+      "size_bytes": 1790
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelLargeBaseLeast.lean",
+      "sha256": "6765af733ad36243f85c92aae1f48fa48fd847858d637f07b051c6a35a098929",
+      "size_bytes": 1383
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelLowBaseReciprocal.lean",
+      "sha256": "add713e0d945d98e33cd92fa6f25d8c2ebca3ec3fe49f4d0770b8748d3a24aeb",
+      "size_bytes": 6422
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelNonsmoothClassIVWitness.lean",
+      "sha256": "b5fe1e3b39c17b288cd7dfa8b025745f3d006932b17d179470a07e82639e58e4",
+      "size_bytes": 2685
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelPhysicalSuffixShellRough.lean",
+      "sha256": "479d5a0510ddc8b9f1417bd4cbdddddf77e2d969989331d3357b66c971612e4c",
+      "size_bytes": 923
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelScalarCombination.lean",
+      "sha256": "430eefb69a9f506c17b3c430b651d8a8e3675524f36d55a11b26c8a951b51e34",
+      "size_bytes": 1514
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelScalarGeometry.lean",
+      "sha256": "f12f2929938ab43fdfc4a4040fcd77472f6fd4c840cf1c1c913e300507ca850b",
+      "size_bytes": 4610
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelShellCeilingTransport.lean",
+      "sha256": "1b5dbcefeaa5395f8f3d959aac4b568a26f1160faad5b478f8bf129b4564ede3",
+      "size_bytes": 954
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelShellLower.lean",
+      "sha256": "f81ad5ba4f179c16bfc056bbe35423f7ac50c4a24f369cd2822ff294863d6c29",
+      "size_bytes": 546
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelShiuTargetException.lean",
+      "sha256": "b96d8772eec314a56009e5fd853163f4a353ca6dc63807770c391ec371db2217",
+      "size_bytes": 2926
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelShortEligibleException.lean",
+      "sha256": "c90163fbbfe21d6d75d209d6dea77f2e6ab75d6dc62f59b348b13851e8a5ec6d",
+      "size_bytes": 1488
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelSourceWeightedAssembly.lean",
+      "sha256": "975babeaad8dd499ad5b9ef196cec075c186f75dfbda1f882aebc545282202bc",
+      "size_bytes": 3920
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelSquareRootBridge.lean",
+      "sha256": "eb6ae4fd5a0bdda87cfed256fe01b291ca2ccb4db31add3b8ccd5785f2d601ee",
+      "size_bytes": 763
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelSuffixRough.lean",
+      "sha256": "780042031b77791d291ee7fed368cad66c7ce36d4a833f11ed7ceaec5b45bdea",
+      "size_bytes": 791
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelUnrestrictedConditionalFinal.lean",
+      "sha256": "118db65b1f370f646361664c481e252f69b373b236c4cef5df9eeef95f2fd6d6",
+      "size_bytes": 11243
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelUnrestrictedFourWay.lean",
+      "sha256": "a361a430685f0a85ca4a25b3a9952371e8e28a90238983fc4f8c2ab8418f30cc",
+      "size_bytes": 5143
+    },
+    {
+      "path": "exhibits/06-shiu/src/EiravelWeightedFourWayFinite.lean",
+      "sha256": "7148cc05fde790f8b458769b757ea3c37e76614a79d0085965ad54ceb30d4f99",
+      "size_bytes": 1860
+    },
+    {
+      "path": "exhibits/06-shiu/src/Orienne/ClassicalThreshold.lean",
+      "sha256": "8ba2927e3901cc88b913a2c9114ac531d579098ee0c804ee0afaa80bed8ae7a0",
+      "size_bytes": 1838
+    },
+    {
+      "path": "exhibits/06-shiu/src/Orienne/QuarterCutoffLarge.lean",
+      "sha256": "4145e498529a0d0f79a2a14683781497b093c00d9ac25bcd506e10d6b5e3d9af",
+      "size_bytes": 1637
+    },
+    {
+      "path": "exhibits/06-shiu/src/Orienne/UnrestrictedFixedQuarter.lean",
+      "sha256": "79c22484582d988ad7b9ab9ea258daf849ac64a0bcfc63e9dbafbcb5b8e6a9bb",
+      "size_bytes": 3397
+    },
+    {
+      "path": "exhibits/06-shiu/src/PaperB/M4A/APDivCount.lean",
+      "sha256": "cdb505881352ac629fac5adf7bfd016e0b61edefbb63fbe50118706c2cc1a599",
+      "size_bytes": 6873
+    },
+    {
+      "path": "exhibits/06-shiu/src/PaperB/M4A/CoprimeHarmonic.lean",
+      "sha256": "e5bcdf62f707ff99c57a7faed0dd42aedaa60937dbbcaacc31709bd92eccaa17",
+      "size_bytes": 7187
+    },
+    {
+      "path": "exhibits/06-shiu/src/PaperB/M4A/CoprimeHarmonicLog.lean",
+      "sha256": "55e5fe783dca4e73915f2d0607cf8e8fafd214bd6218a4988be6eebe98a243be",
+      "size_bytes": 1154
+    },
+    {
+      "path": "exhibits/06-shiu/src/PaperB/M4A/OptimalSelberg.lean",
+      "sha256": "722e32928cce1cbdc65ba221bd13db6d4e568409a9667016d1c2d8ee8c99b3d1",
+      "size_bytes": 19986
+    },
+    {
+      "path": "exhibits/06-shiu/src/PaperB/M4A/OptimalSelbergAux.lean",
+      "sha256": "f4123f9d6e62c1946c7213f76ed7e9a84eeca1f8699e9af32b9b07ac15f87abb",
+      "size_bytes": 3263
+    },
+    {
+      "path": "exhibits/06-shiu/src/PaperB/M4A/SelectedPrimeBoundSum.lean",
+      "sha256": "bc6488e0c06cc72e134dfba74ae0c229cf50f8fb11a877f8644a1584a5d8ac20",
+      "size_bytes": 18481
+    },
+    {
+      "path": "exhibits/06-shiu/src/PaperB/M4A/SelectivePrimeProduct.lean",
+      "sha256": "29c06615f59ace5ff2c4787e928ea864403dcb60da0f86d51f380957e6f790e1",
+      "size_bytes": 4263
+    },
+    {
+      "path": "exhibits/06-shiu/src/PaperB/M4A/SelectivePrimeSieve.lean",
+      "sha256": "c5cb0304bdabce736bc0a3d814fcabd6f3b6fa1575b92fe5fe25117855486da2",
+      "size_bytes": 12461
+    },
+    {
+      "path": "exhibits/06-shiu/src/PaperB/M4A/ShiuLemma2.lean",
+      "sha256": "2a3a29b77428d627d25f262dee8098be5c1ae758aac1eb68f14898dc1f02b7fc",
+      "size_bytes": 4127
+    },
+    {
+      "path": "exhibits/06-shiu/src/PaperB/M4B/ShiuAssemble.lean",
+      "sha256": "ce96760b79366552dc28d331aad019f67f2f768d08f3c33c2f8fbe84a6a061a3",
+      "size_bytes": 45366
+    },
+    {
+      "path": "exhibits/06-shiu/src/PaperB/M4B/ShiuClassI.lean",
+      "sha256": "f74b92c6b2b6aa64f19fe0b87386717b9c192e3e1f9b350858eadde01daf6fde",
+      "size_bytes": 16129
+    },
+    {
+      "path": "exhibits/06-shiu/src/PaperB/M4B/ShiuClassII.lean",
+      "sha256": "57724c3f3ec1584c061ae6cc6cb36158754a339ea78dc7ad75571ed0837f73e5",
+      "size_bytes": 2590
+    },
+    {
+      "path": "exhibits/06-shiu/src/PaperB/M4B/ShiuClassIII.lean",
+      "sha256": "f9512e7eaa3ee73121ddf8b8fe53a1bf9b111b72f8a7ea3fd49251dcb42e38bb",
+      "size_bytes": 9779
+    },
+    {
+      "path": "exhibits/06-shiu/src/PaperB/M4B/ShiuClassIV.lean",
+      "sha256": "bc35b99e057b6037ff4e82c781ee2b23f118b30c177570f1a1651d2527484af3",
+      "size_bytes": 54091
+    },
+    {
+      "path": "exhibits/06-shiu/src/PaperB/M4B/ShiuClassIVShell.lean",
+      "sha256": "e5b8cae511061f9b7de776dd4b0d04246ef42247ad2fda9c54ec3ac52e5f8a5e",
+      "size_bytes": 5000
+    },
+    {
+      "path": "exhibits/06-shiu/src/PaperB/M4B/ShiuCore.lean",
+      "sha256": "c055e5750aa62764a5e4317defb4d15bd71fb5590846598be45e99a1098e9ded",
+      "size_bytes": 16302
+    },
+    {
+      "path": "exhibits/06-shiu/src/PaperB/M4B/ShiuProgression.lean",
+      "sha256": "b16dabad895285084c211008422b9d17afb2db4a9c51276ae3f5cb700b8e1f7c",
+      "size_bytes": 29460
+    },
+    {
+      "path": "exhibits/06-shiu/src/PaperB/M4B/ShiuScaledAP.lean",
+      "sha256": "4478d718f6dd00c7811ea2410fc61697f4258de6dd8f196e5d6488fac623e7e2",
+      "size_bytes": 6713
+    },
+    {
+      "path": "exhibits/06-shiu/src/PaperB/M4B/ShiuSmallException.lean",
+      "sha256": "38be12e2fb80658f0e1ea48c4d70ee42bec577003a26aaeac2de5deadfdc3142",
+      "size_bytes": 11268
+    },
+    {
+      "path": "exhibits/06-shiu/src/PaperB/M4B/ShiuSmoothCount.lean",
+      "sha256": "582fd1e6c986715956cc51cbf60221bc0cd0e8e9ac4945c9dc36791c0693ffe8",
+      "size_bytes": 15458
+    },
+    {
+      "path": "exhibits/06-shiu/src/PaperB/M4B/ShiuSmoothTail.lean",
+      "sha256": "dbf7c93c667e85858c8b94692639597e1b39199160eae1d22ee56066fceaa307",
+      "size_bytes": 15420
+    },
+    {
+      "path": "exhibits/06-shiu/src/PaperB/M4B/ShiuSplit.lean",
+      "sha256": "c17cd715ea4ae9fbeeff431c993fbce3323df81b077ded3c17be152f18658b56",
+      "size_bytes": 5891
+    },
+    {
+      "path": "exhibits/06-shiu/src/Shiu/Classical.lean",
+      "sha256": "74c2613bfa38ab141b10e4dacbefe6aacb645054528788d7c790fd934094bcad",
+      "size_bytes": 1338
+    },
+    {
+      "path": "exhibits/06-shiu/src/Shiu/ClassicalCorollaries.lean",
+      "sha256": "df5d802739024493abe5302e05f870e293b870f3549339325fefb3c7a6556ad5",
+      "size_bytes": 2662
+    },
+    {
+      "path": "exhibits/06-shiu/src/Shiu/ModulusOne.lean",
+      "sha256": "34bd8e4b276fc1a5572ef50d27c0dc90f244b0e1ef0ed774ab2338d78f0c538b",
+      "size_bytes": 3161
+    },
+    {
+      "path": "exhibits/06-shiu/src/Shiu/ModulusOneAP.lean",
+      "sha256": "ebeb59060164176edcc30771f53b9ea68b4079aaadb26d738604dd27621bedb5",
+      "size_bytes": 2304
+    },
+    {
+      "path": "exhibits/06-shiu/src/Shiu/ModulusOneFinal.lean",
+      "sha256": "89f5ecb450895d16bbe91ac6eca22c13e992d6347a945928c9ee4e9c16bacc4b",
+      "size_bytes": 3305
+    },
+    {
+      "path": "exhibits/06-shiu/src/Shiu/ModulusOneGeometry.lean",
+      "sha256": "00ad50b13a992eafe999d82589a05e14e4dd13ca223fd2f473d03d8f24784533",
+      "size_bytes": 1658
+    },
+    {
+      "path": "exhibits/06-shiu/src/Shiu/ModulusOneMass.lean",
+      "sha256": "4de99c7cfe97730757c2e1b8d8a6c81df99d00114ef4a74be7864b502c6393cf",
+      "size_bytes": 1977
+    },
+    {
+      "path": "exhibits/06-shiu/src/Shiu/ModulusOneNineCover.lean",
+      "sha256": "49fb1c22db9d0206a0f3a65ca31fd69dd78a1e3933cf0a91bdc11a85d5e6aa00",
+      "size_bytes": 3296
+    },
+    {
+      "path": "exhibits/06-shiu/src/Shiu/ModulusOnePrimeNormalized.lean",
+      "sha256": "efc6d246fd4d26dd052e520be365faaee496f20147fde7bcd3d0b10a2747aa79",
+      "size_bytes": 2715
+    },
+    {
+      "path": "exhibits/06-shiu/src/Shiu/ModulusOnePrimes.lean",
+      "sha256": "e2a16fc410fd4934e09dcccd2c8d8739eec7fab8ba6be26f08fabd0db8f30bee",
+      "size_bytes": 2982
+    },
+    {
+      "path": "exhibits/06-shiu/src/Shiu/ModulusOneRealGeometry.lean",
+      "sha256": "131d2be5954aa5b4e87f76c93b4f0a2e28701d8b94325a1ae7d368145f12be2c",
+      "size_bytes": 2983
+    },
+    {
+      "path": "exhibits/06-shiu/src/Shiu/ModulusOneResidues.lean",
+      "sha256": "71a2180d0c8f2e992898c7efa48f60366166d1feda075ff855293f81ececac7c",
+      "size_bytes": 1891
+    },
+    {
+      "path": "exhibits/06-shiu/src/Shiu/PrimePowers.lean",
+      "sha256": "790fc6a82ff3605a8a03c243cbe200b25d5bf41b6f7a681f888318f1c7a9f022",
+      "size_bytes": 1752
+    },
+    {
+      "path": "exhibits/06-shiu/src/Shiu/Progressions.lean",
+      "sha256": "68892aa9d6e7503af8dc5ea0ac4b97a4a52c65c367ddeeee51f99c31f9eb41a8",
+      "size_bytes": 1714
+    },
+    {
+      "path": "exhibits/06-shiu/src/Shiu/Squarefree.lean",
+      "sha256": "0f7aa4fb594aa4c090f0e2381180fcf7106fba01b4428f67d38c607ac1c911a0",
+      "size_bytes": 3388
+    },
+    {
+      "path": "exhibits/06-shiu/src/Shiu/TwoParameter.lean",
+      "sha256": "172052c75947305bd85752266ae599031a2f439a5205c72431a5ced1abad9309",
+      "size_bytes": 2268
+    },
+    {
+      "path": "exhibits/06-shiu/src/Shiu.lean",
+      "sha256": "88e7e219e0b99eae9da4d524b43a7bc92183013380c0dbe180b5b92de5e08699",
+      "size_bytes": 809
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuBaseOrderR0006.lean",
+      "sha256": "8d6a3202c5754909b19be793f5bf6e56a80a01e15e8e04cc8038a950de19c2b8",
+      "size_bytes": 2244
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/ClassIVRoughPower.lean",
+      "sha256": "91efdbf9431fa5fd26f56fbbc56e4c744d099a4d17ba9c8a452d427022080ac8",
+      "size_bytes": 2994
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/ClassicalRankinCorrection.lean",
+      "sha256": "9977c3c60fece092009194ed3d3b2ba31ffcfd2489243848f51e6389607e0ace",
+      "size_bytes": 4486
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/CorvethClassicalClassI.lean",
+      "sha256": "04b48e70fc248a9e711209363215fb53e9ed005a68527c22400f9f037417cb61",
+      "size_bytes": 12027
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/CorvethClassicalClassICorrection.lean",
+      "sha256": "c7b8b53da94dd4ab7ce5cd88dba5c6763c77db8a78bd57476502f874ee67ff09",
+      "size_bytes": 1464
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/CorvethClassicalClassIFinal.lean",
+      "sha256": "719dd464f66cc4b22166107c875d0a3ac635b6679c072c390738b0bd4ee0baa0",
+      "size_bytes": 3281
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/CorvethClassicalClassIFull.lean",
+      "sha256": "44f4662d4787b957c10f38b91aa957905df843d8610637129b57a5e51bfb5d16",
+      "size_bytes": 2287
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/CorvethClassicalClassIII.lean",
+      "sha256": "4722c617bdb5daf52682e46dd8450a4b1ea5303086826860d4f6dce1d6f34671",
+      "size_bytes": 4981
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/CorvethClassicalClassIIIWeighted.lean",
+      "sha256": "407c47c119a7548f3891a17c1c5de79d31f24df006d8d1ebe853e8e6acc9854d",
+      "size_bytes": 6677
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/CorvethClassicalClassISource.lean",
+      "sha256": "2c492e54bfedc9813ea92163d37bd66863821d67751fc206bb969cb3db4fcd65",
+      "size_bytes": 2496
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/CorvethClassicalHarmonicEuler.lean",
+      "sha256": "a6408f6e67779550beb272ad7448c040cc7e326ad86987db4dfee301ff20eaa7",
+      "size_bytes": 3207
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/CorvethClassicalHeavyBlock.lean",
+      "sha256": "68b2af049ae190268bc9183edb62a649a025743fe922299d5d10df028653c47f",
+      "size_bytes": 1295
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/CorvethClassicalPrefixCore.lean",
+      "sha256": "4de9440d0730a5827de7580c05da83489d603a7a21c97b5b9a53e84891d3e368",
+      "size_bytes": 1312
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/CorvethHeavyPhysicalSquare.lean",
+      "sha256": "2302b8513e29f97a18df694d958663ec0a6f82db3635490667d45436479042ae",
+      "size_bytes": 1658
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/CorvethHeavyPowerSquare.lean",
+      "sha256": "a7fbd6c304fca72e0f63f5442cdb02077f6dce753e4cf04f0dcf9cb11a23140d",
+      "size_bytes": 1110
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/CorvethNonSquarefreeClassIIIObstruction.lean",
+      "sha256": "56ac403c5025f1cb6fe8de26ff33333705174b6f44410bcdd62f13eab0e832b8",
+      "size_bytes": 613
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/CorvethSquareExceptionAP.lean",
+      "sha256": "9e4793f8c0f592877365e4bd4b07f62c019b6df820b5359d2d90d75001c0e8f4",
+      "size_bytes": 3680
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/CutoffCertificate.lean",
+      "sha256": "686e4ca5e5f731e156562f782ecb813b1552fb158dd5f23cfec8781188939bac",
+      "size_bytes": 3177
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/EiravelClassIIIEulerMass.lean",
+      "sha256": "f094b2c5458fcce37fc35d202b379b7ec07d09d303a398c3a09e932a3f885824",
+      "size_bytes": 6149
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/EiravelClassIIIEventualMass.lean",
+      "sha256": "5ad0af8a17fb7698690e6c2b1b422bf87c84df518a70c2024dd161b953d4ea92",
+      "size_bytes": 3875
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/EiravelClassIIIFinalOnset.lean",
+      "sha256": "163883eff549e753b184cbbc7237d1e4d1c485fe6ba057728c0096d5633c4c14",
+      "size_bytes": 882
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/EiravelClassIIIPrimeMass.lean",
+      "sha256": "578aa9ead414a9e1a3686076201b070906829b24255fcde518dacabc39c46fcf",
+      "size_bytes": 6694
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/EiravelClassIIIRankin.lean",
+      "sha256": "1858865f8f222f8ce5f8fc67da9630c6cce98fe453ac975788750b30412c1418",
+      "size_bytes": 3727
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/EiravelClassIIIUnconditional.lean",
+      "sha256": "e0b929e0984adf6032fdbeb2033f15e8e4c405ffdacde4459c062c774b27c856",
+      "size_bytes": 4699
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/ExponentBudget.lean",
+      "sha256": "39d98678bffa4291a059c107cef7e7bf125b0125c5b0466de17e921cccb8fb83",
+      "size_bytes": 1924
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/FiniteEulerDivisors.lean",
+      "sha256": "802c00ccdfbc7cbb87c8595b1b81c018f4cab262f30d94950e567937f9d213b2",
+      "size_bytes": 2977
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/FiniteEulerVectors.lean",
+      "sha256": "1201506043bcb4668f7dae0c5f79c67332c45fb17ca984a5e0b69a417ebb6fbf",
+      "size_bytes": 1461
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/FixedQuarter.lean",
+      "sha256": "22c7b4273139570a6cb2f46fd7f1e1b80aec00ef3c94fcad9819d7312dffd3ed",
+      "size_bytes": 2378
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/LargePrimeEulerFactor.lean",
+      "sha256": "31549fafe6ebf5112b4eaab5f500299b58f432b2c2435afb43eb16c8e8f2c7c1",
+      "size_bytes": 2429
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/LargePrimeMassCorrection.lean",
+      "sha256": "5d8814f5a89a24779f3cd4dd54ea08f47eee10f5de9ee6e2631ecb692dc79ff0",
+      "size_bytes": 2462
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/LargePrimeRelativeProduct.lean",
+      "sha256": "befa40529ff01add6a411c32c08241391f60a574715d6fee42f944821c92d8e8",
+      "size_bytes": 1806
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/OneFifth.lean",
+      "sha256": "c0d6c6ae6f6bb4883285f824481347698e692df99c5ec5ec0749a99ef49df70e",
+      "size_bytes": 2699
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/OneFifthExperiment.lean",
+      "sha256": "2369df4b0fc9e16f033f57253a2dd7ed715b4b3ab0b8e6fe3f2874801d713998",
+      "size_bytes": 29330
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/OneTenth.lean",
+      "sha256": "5600f4ed66143337b6d86b4f554f3b223af8e4195d907d0f2a9a8a41201ad32d",
+      "size_bytes": 2714
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/OneTenthExperiment.lean",
+      "sha256": "6010b952de7c97a9921e4ca651246e0ea3e6494bc1f3fc3be43b1cad8135a9e8",
+      "size_bytes": 29374
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/PrimePowerEnvelope.lean",
+      "sha256": "744119dce600d60b11d3144c49eb7b6b27c797a08f571c74ca0d986604978ab3",
+      "size_bytes": 2798
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/PrimePowerLocal.lean",
+      "sha256": "984a1fcacc970cfd6f19df1a4e3316ae259b60d6fd08286a8eb16c6e81a01227",
+      "size_bytes": 2607
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/QuadraticEulerBudget.lean",
+      "sha256": "d8a56e30f3921ebdb60f2dafb8f23d3a27977d54466795a1166c5b3705570df2",
+      "size_bytes": 1774
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/RankinPowerGate.lean",
+      "sha256": "0b1f6f84128a9670e279ae243e23eccabf707b585308865bbee0bdff64f6b6cf",
+      "size_bytes": 1443
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/RelativeEulerCombined.lean",
+      "sha256": "c05514c0398791be09d3dd8eea1b2947ad6ad4c1dd0f1c4ae8069239f1858f3e",
+      "size_bytes": 3178
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/RelativeEulerFinite.lean",
+      "sha256": "03345be82a5b050880dac7deaa1e3d624c067caff5c2cb468669929434ad0089",
+      "size_bytes": 1101
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/RelativeEulerOriginalMass.lean",
+      "sha256": "81f4f214a90d78e9522b0336f03f7d2033a6d94a4a9b9ffc88a67935ca9db916",
+      "size_bytes": 1539
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/RelativeEulerSourcePrimes.lean",
+      "sha256": "b2f0bd4de35a273eadaf66084ebbd860cc45852a76a8e57ca70a54aa4d9c5cb9",
+      "size_bytes": 5652
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/Release.lean",
+      "sha256": "140849cb82fe97c9d591ddc5d0468dc9a908aeb2f2757ab5a240d6676c6abfee",
+      "size_bytes": 309
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/ShiftedPrimePowerTail.lean",
+      "sha256": "9ed51cfb15b96531d26398b929884c4071aa88812991808c98907eb8fffb2774",
+      "size_bytes": 2065
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/SmallPrimeEuler.lean",
+      "sha256": "9022356ca8b06a880a450775d087cab9b895bc021ce810334b691d9f9e0a9727",
+      "size_bytes": 3018
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/SmallPrimeFactorBridge.lean",
+      "sha256": "953456d070241458bf98699f16724c667973532a8613d6b1ead76a5975b065a1",
+      "size_bytes": 1164
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/SmallPrimeLocalComplete.lean",
+      "sha256": "36f0f7b358c649d5b7f1ed060bf4ff14628909fe2c0e0c0ebe934934613b32dc",
+      "size_bytes": 1631
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/SmallPrimeProduct.lean",
+      "sha256": "4b089aa639aa3f3e3f2228ddd515c924e54ba8a84c903cfe9649133e7d3051c5",
+      "size_bytes": 2262
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/StrongShellThreshold.lean",
+      "sha256": "3785cef48ff615c41abbf09429cf817d388ab96338449efe284b378a6ec4c76e",
+      "size_bytes": 3049
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/UniformQuadraticCorrection.lean",
+      "sha256": "584f75d1e325e917fedc70c1f6f2141fd220281c06cc0540c659f723ebac043f",
+      "size_bytes": 1601
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisClassIVAllShell.lean",
+      "sha256": "83a27f46144d9fc62f00ed8bfa61f9366eb6a9255b2f764ff905abae1d56b7a6",
+      "size_bytes": 8411
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisClassIVEndpointCorrection.lean",
+      "sha256": "e7fbcac155905c74e1faac6d67b9f7151997e3e03af18129aac194dbf10ff0ba",
+      "size_bytes": 9146
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisClassIVFixedDelta.lean",
+      "sha256": "a8cf63d68bdc211a27c77ea4ba2eff340924933fff5177ba8b33bd186cfb3b69",
+      "size_bytes": 4350
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisClassIVMassMonotone.lean",
+      "sha256": "fcfad9be59e61b78c1ee76bdedc776cea563372b022edc6aa756b8d69932e393",
+      "size_bytes": 1061
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisClassIVPrefixNonSquarefree.lean",
+      "sha256": "b50f0c846cd37ae7341b02eb7fbd26dd0f549af08f4f8e319c273c5edd868e73",
+      "size_bytes": 3539
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisClassIVRankinExpBudget.lean",
+      "sha256": "441e0d2d6bcb9c0a9993debfed93f5f10fb2a077a4ff3277ebdf510672cb506a",
+      "size_bytes": 770
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisClassIVShellFinal.lean",
+      "sha256": "f55581fd1889ff14f33833827d88ca658521af7de5c6a7d29b25e5ca00f340fe",
+      "size_bytes": 10729
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisClassIVShellRankin.lean",
+      "sha256": "c8466a851a377c7512837d935d5947a60521e245bacce913e5d31626d4353449",
+      "size_bytes": 2274
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisClassIVShellRaw.lean",
+      "sha256": "72652634ce71595b2d9463571ef5f97b4c343c2a3399bd23c417c3150620b18f",
+      "size_bytes": 9626
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisClassIVShellScalarBudget.lean",
+      "sha256": "9814b053c0a4e46f74491bed32a31f3e24129390bcf0f5df4e034d17c3149472",
+      "size_bytes": 4147
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisClassIVStrongEndpoints.lean",
+      "sha256": "d3683b77ea117da24a0ce72e79e75970e7bd51113b0db9c39aba3b3e89b90c30",
+      "size_bytes": 2897
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisClassicalSmoothTailOriginal.lean",
+      "sha256": "0cbc122d9a41b6bb700f0290297cd75877793f790fa12b6ecba1812aa7a387df",
+      "size_bytes": 1472
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisCompleteSmoothTailRankin.lean",
+      "sha256": "354eb77330ea44940a4296a179be86992330707338076e1ba311e4ea8e55a084",
+      "size_bytes": 3439
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisCompleteSmoothTsum.lean",
+      "sha256": "9749698c893fc889d9a6aeb442f0cb8172c61ef4312c16aba254daa13ebddce3",
+      "size_bytes": 3309
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisEulerUniformCutoff.lean",
+      "sha256": "d48ef09d4fc86054f483a8bf4ebc27e1e05891adef0e4c94cfd2d5a964a31500",
+      "size_bytes": 1107
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisGeneralPrefixSplit.lean",
+      "sha256": "6dc679873ca8d1cf52f7f0b56ab2edbfaba15dfca9bd13454a61fd0fcc8a4dce",
+      "size_bytes": 1432
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisOriginalSmoothEuler.lean",
+      "sha256": "67abbd8a3c940d13212651d3ca88f8497810ae3453afeb9b21afddfa472045ad",
+      "size_bytes": 1517
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisPrimePowerBlocks.lean",
+      "sha256": "b077a41a61352cda4085e917afee210e9a76217c60b6a96a83cd34216a425174",
+      "size_bytes": 962
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisPrimePowerCoprimeList.lean",
+      "sha256": "6194e582469d786b46ffe78fedb846a78fea5693fc2ef413831ac850deab96f6",
+      "size_bytes": 1652
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisPrimePowerDistinctCoprime.lean",
+      "sha256": "9bc3eafaa6d3fe982188ffae5ce3776c3bbb3e7b63b745cdca48bf73e1ca1670",
+      "size_bytes": 669
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisPrimePowerPrefix.lean",
+      "sha256": "eeab0cbf3a2e2d1d0d1be6432c221a7991373bb25a65216fd89347cd4c290b00",
+      "size_bytes": 1756
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisPrimePowerSplitCoprime.lean",
+      "sha256": "bbeef73dc1f9186a680b66aeb866f281ce417c0599c478d4d1ddc766d17817b7",
+      "size_bytes": 1052
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisPrimePowerWeightedSplit.lean",
+      "sha256": "7c5196d771342cedd346c22d364a9314156eb58c0e0297f394122647f658d777",
+      "size_bytes": 842
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisSmoothDivisor.lean",
+      "sha256": "b3b4ad0c0cc8c82df12dd3cfd0d386d62e958c2e181976364524e080c042735b",
+      "size_bytes": 1952
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisSmoothEulerTransport.lean",
+      "sha256": "e8d9637863466c89ea97f92f92c21e3e8550cad683eecff94adc7da202167173",
+      "size_bytes": 1310
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisSmoothTailRankin.lean",
+      "sha256": "f05b62e50168b3494fc89bd4d2d63b7101b305999ca24dcc3d41ffc96c22ff9e",
+      "size_bytes": 2926
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisSmoothUniformFinite.lean",
+      "sha256": "0eee5cfa99574ad3edab0935e295eea73800dc060ed343f5eae86f8b01e5f02f",
+      "size_bytes": 2081
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic/VaelisSortedPrimePowerBlocks.lean",
+      "sha256": "7d3e719729b76278c5a1e541cc7184226723a27df52821cbab50cdf7b388d5b9",
+      "size_bytes": 813
+    },
+    {
+      "path": "exhibits/06-shiu/src/ShiuPublic.lean",
+      "sha256": "57da7c440a39751a532e8a7d22245e487d5255bafffb717a5dcc1d1f151ea10f",
+      "size_bytes": 121
+    },
+    {
+      "path": "exhibits/07-the-catch/EDITORIAL_FIDELITY.md",
+      "sha256": "f20f15bc13725a63542f64ec3712beded487fe4e13a10d260f2feb8db5c2f980",
+      "size_bytes": 1708
+    },
+    {
+      "path": "exhibits/07-the-catch/README.md",
+      "sha256": "96d1559d8f0487d392d4ed3080310b7becb09982f70e5df15a8c1527b8181466",
+      "size_bytes": 2168
+    },
+    {
+      "path": "exhibits/07-the-catch/index.html",
+      "sha256": "58fae7bc6d22d8f85b4e9f4dfb9c236d00183607f4c4d0229933b14f689d78d0",
+      "size_bytes": 11872
+    }
+  ],
+  "courses": [
+    {
+      "course": "01-weil",
+      "origin": "charliedorsey/weil-bounds-toolkit",
+      "source_snapshot": "7adcd23667b063ae54cc0e8707c89ce259e8fd31",
+      "scope": "full public git tree",
+      "files": 62,
+      "total_bytes": 352261
+    },
+    {
+      "course": "02-kms",
+      "origin": "charliedorsey/Diophantine-singularity-and-conditioning-of-shifted-Kac-Murdock-Szeg-matrices",
+      "source_snapshot": "db536c2026e703400de3749bee0259b3e1ab7a07",
+      "scope": "full public git tree",
+      "files": 83,
+      "total_bytes": 3175371
+    },
+    {
+      "course": "03-jacobi",
+      "origin": "archive:2026-10-24",
+      "source_snapshot": "dbba5ca20390d8dff27f9fc2ebb4b81a64140246bb7073f44284204582cc3070",
+      "scope": "selected complete flagship Lean project and matching manuscript",
+      "files": 85,
+      "total_bytes": 870686
+    },
+    {
+      "course": "04-tool-field-guide",
+      "origin": "new editorial synthesis",
+      "source_snapshot": "none",
+      "scope": "new generalized text",
+      "files": 1,
+      "total_bytes": 6748
+    },
+    {
+      "course": "05-paper-b",
+      "origin": "archive:R0007R3",
+      "source_snapshot": "d04546886e62885658beb9aa1266794fb70b2c0d140a1c8aa61f098482dc82d4",
+      "scope": "curated mathematical reader, rights pending",
+      "files": 175,
+      "total_bytes": 12390540
+    },
+    {
+      "course": "06-shiu",
+      "origin": "charliedorsey/shiu-toolkit-palomar-release",
+      "source_snapshot": "e95766703ddf14b6b0d920bc17f6199e5797834c",
+      "scope": "full public git tree",
+      "files": 192,
+      "total_bytes": 821499
+    },
+    {
+      "course": "07-the-catch",
+      "origin": "new synthetic demo",
+      "source_snapshot": "none",
+      "scope": "five original retired public items",
+      "files": 3,
+      "total_bytes": 15748
+    }
+  ],
+  "note": "SHA-256 binds included file bytes; it does not authenticate the release owner or certify mathematical correctness."
+}

@@ -1,0 +1,558 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · PaperB/Closure.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>PaperB/Closure.lean</h1><p class="meta">LEAN/PaperB/Closure.lean · 557 lines · SHA-256 f8ef2423df662e6ed69de3bd9b97aa20b00263129c0d0862e3f4acd678cbc13d</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import PaperB.FixedQ.SourceBridge</span>
+<span class="l" id="L2"><span class="n">2</span>import PaperB.FixedQ.OneDimensionalBracket</span>
+<span class="l" id="L3"><span class="n">3</span>import PaperB.FixedQ.PrincipalOneDimensionalCancellation</span>
+<span class="l" id="L4"><span class="n">4</span>import PaperB.FixedQ.TwoDimensionalClosure</span>
+<span class="l" id="L5"><span class="n">5</span>import PaperB.FixedQ.DecoratedTerminalSpine</span>
+<span class="l" id="L6"><span class="n">6</span></span>
+<span class="l" id="L7"><span class="n">7</span>/-!</span>
+<span class="l" id="L8"><span class="n">8</span># Paper B closure root</span>
+<span class="l" id="L9"><span class="n">9</span></span>
+<span class="l" id="L10"><span class="n">10</span>Source binding:</span>
+<span class="l" id="L11"><span class="n">11</span>* canonical manuscript:</span>
+<span class="l" id="L12"><span class="n">12</span>  `paper_b_frozen.canonical.tex`</span>
+<span class="l" id="L13"><span class="n">13</span>* frozen source SHA-256:</span>
+<span class="l" id="L14"><span class="n">14</span>  `9004c20d63218b529ea392d13914c17a347c485fd43814eb88bf8612a8512070`</span>
+<span class="l" id="L15"><span class="n">15</span>* public theorem:</span>
+<span class="l" id="L16"><span class="n">16</span>  `thm:fixed-q` / `eq:main-theorem`</span>
+<span class="l" id="L17"><span class="n">17</span></span>
+<span class="l" id="L18"><span class="n">18</span>This file is intentionally a minimal staging root.  It states the exact</span>
+<span class="l" id="L19"><span class="n">19</span>manuscript-facing terminal proposition but does not claim it proved until the</span>
+<span class="l" id="L20"><span class="n">20</span>final assembly is actually wired.</span>
+<span class="l" id="L21"><span class="n">21</span></span>
+<span class="l" id="L22"><span class="n">22</span>Manuscript theorem:</span>
+<span class="l" id="L23"><span class="n">23</span>for every fixed squarefree q, uniformly over compatible admissible reduced</span>
+<span class="l" id="L24"><span class="n">24</span>endpoint pairs (a,b),</span>
+<span class="l" id="L25"><span class="n">25</span></span>
+<span class="l" id="L26"><span class="n">26</span>  A_{1,q}(a,b;h) - B_{1,q}(a,b;h) = o_q(log h)</span>
+<span class="l" id="L27"><span class="n">27</span></span>
+<span class="l" id="L28"><span class="n">28</span>as h tends to infinity through positive compatible heights.</span>
+<span class="l" id="L29"><span class="n">29</span></span>
+<span class="l" id="L30"><span class="n">30</span>The epsilon form below gives the threshold to fixed q and epsilon only; it is</span>
+<span class="l" id="L31"><span class="n">31</span>uniform in the finitely many endpoint residue pairs.</span>
+<span class="l" id="L32"><span class="n">32</span>-/</span>
+<span class="l" id="L33"><span class="n">33</span></span>
+<span class="l" id="L34"><span class="n">34</span>open scoped BigOperators</span>
+<span class="l" id="L35"><span class="n">35</span></span>
+<span class="l" id="L36"><span class="n">36</span>namespace PaperB.Closure</span>
+<span class="l" id="L37"><span class="n">37</span></span>
+<span class="l" id="L38"><span class="n">38</span>open PaperB.FixedQ</span>
+<span class="l" id="L39"><span class="n">39</span></span>
+<span class="l" id="L40"><span class="n">40</span>/-- Canonical natural representative of the residue class `-b (mod q)`. -/</span>
+<span class="l" id="L41"><span class="n">41</span>def reflectedResidue (q b : ℕ) : ℕ :=</span>
+<span class="l" id="L42"><span class="n">42</span>  (q - b % q) % q</span>
+<span class="l" id="L43"><span class="n">43</span></span>
+<span class="l" id="L44"><span class="n">44</span>lemma reflectedResidue_lt</span>
+<span class="l" id="L45"><span class="n">45</span>    {q b : ℕ} (hq : 0 &lt; q) :</span>
+<span class="l" id="L46"><span class="n">46</span>    reflectedResidue q b &lt; q := by</span>
+<span class="l" id="L47"><span class="n">47</span>  unfold reflectedResidue</span>
+<span class="l" id="L48"><span class="n">48</span>  exact Nat.mod_lt _ hq</span>
+<span class="l" id="L49"><span class="n">49</span></span>
+<span class="l" id="L50"><span class="n">50</span>lemma coprime_reflectedResidue</span>
+<span class="l" id="L51"><span class="n">51</span>    {q b : ℕ} (hq : 0 &lt; q) (hb : q.Coprime b) :</span>
+<span class="l" id="L52"><span class="n">52</span>    q.Coprime (reflectedResidue q b) := by</span>
+<span class="l" id="L53"><span class="n">53</span>  have hrlt : b % q &lt; q := Nat.mod_lt b hq</span>
+<span class="l" id="L54"><span class="n">54</span>  have hrle : b % q ≤ q := Nat.le_of_lt hrlt</span>
+<span class="l" id="L55"><span class="n">55</span>  have hr : (b % q).Coprime q :=</span>
+<span class="l" id="L56"><span class="n">56</span>    (ZMod.coprime_mod_iff_coprime b q).2 hb.symm</span>
+<span class="l" id="L57"><span class="n">57</span>  have hsub : (q - b % q).Coprime q :=</span>
+<span class="l" id="L58"><span class="n">58</span>    (Nat.coprime_self_sub_left hrle).2 hr</span>
+<span class="l" id="L59"><span class="n">59</span>  have hmod : ((q - b % q) % q).Coprime q :=</span>
+<span class="l" id="L60"><span class="n">60</span>    (ZMod.coprime_mod_iff_coprime (q - b % q) q).2 hsub</span>
+<span class="l" id="L61"><span class="n">61</span>  exact hmod.symm</span>
+<span class="l" id="L62"><span class="n">62</span></span>
+<span class="l" id="L63"><span class="n">63</span>private lemma dvd_add_reflectedResidue</span>
+<span class="l" id="L64"><span class="n">64</span>    {q b : ℕ} (hq : 0 &lt; q) :</span>
+<span class="l" id="L65"><span class="n">65</span>    q ∣ b + reflectedResidue q b := by</span>
+<span class="l" id="L66"><span class="n">66</span>  rw [Nat.dvd_iff_mod_eq_zero]</span>
+<span class="l" id="L67"><span class="n">67</span>  unfold reflectedResidue</span>
+<span class="l" id="L68"><span class="n">68</span>  rw [Nat.add_mod]</span>
+<span class="l" id="L69"><span class="n">69</span>  by_cases hs : b % q = 0</span>
+<span class="l" id="L70"><span class="n">70</span>  · simp [hs]</span>
+<span class="l" id="L71"><span class="n">71</span>  · have hslt : b % q &lt; q := Nat.mod_lt b hq</span>
+<span class="l" id="L72"><span class="n">72</span>    have hsub_lt : q - b % q &lt; q := by omega</span>
+<span class="l" id="L73"><span class="n">73</span>    simp only [Nat.mod_eq_of_lt hsub_lt]</span>
+<span class="l" id="L74"><span class="n">74</span>    have hsum : b % q + (q - b % q) = q := by omega</span>
+<span class="l" id="L75"><span class="n">75</span>    rw [hsum, Nat.mod_self]</span>
+<span class="l" id="L76"><span class="n">76</span></span>
+<span class="l" id="L77"><span class="n">77</span>private lemma coprime_right_of_add_dvd</span>
+<span class="l" id="L78"><span class="n">78</span>    {q x y : ℕ} (h : q ∣ x + y) (hx : q.Coprime x) :</span>
+<span class="l" id="L79"><span class="n">79</span>    q.Coprime y := by</span>
+<span class="l" id="L80"><span class="n">80</span>  rw [Nat.coprime_iff_gcd_eq_one]</span>
+<span class="l" id="L81"><span class="n">81</span>  have hdq : q.gcd y ∣ q := Nat.gcd_dvd_left q y</span>
+<span class="l" id="L82"><span class="n">82</span>  have hdy : q.gcd y ∣ y := Nat.gcd_dvd_right q y</span>
+<span class="l" id="L83"><span class="n">83</span>  have hdsum : q.gcd y ∣ x + y := hdq.trans h</span>
+<span class="l" id="L84"><span class="n">84</span>  have hdx : q.gcd y ∣ x := (Nat.dvd_add_iff_left hdy).2 hdsum</span>
+<span class="l" id="L85"><span class="n">85</span>  have hdg : q.gcd y ∣ q.gcd x := Nat.dvd_gcd hdq hdx</span>
+<span class="l" id="L86"><span class="n">86</span>  rw [hx.gcd_eq_one] at hdg</span>
+<span class="l" id="L87"><span class="n">87</span>  exact Nat.dvd_one.mp hdg</span>
+<span class="l" id="L88"><span class="n">88</span></span>
+<span class="l" id="L89"><span class="n">89</span>private lemma coprime_right_iff_of_add_dvd</span>
+<span class="l" id="L90"><span class="n">90</span>    {q x y : ℕ} (h : q ∣ x + y) :</span>
+<span class="l" id="L91"><span class="n">91</span>    q.Coprime x ↔ q.Coprime y := by</span>
+<span class="l" id="L92"><span class="n">92</span>  constructor</span>
+<span class="l" id="L93"><span class="n">93</span>  · exact coprime_right_of_add_dvd h</span>
+<span class="l" id="L94"><span class="n">94</span>  · intro hy</span>
+<span class="l" id="L95"><span class="n">95</span>    have h&#x27; : q ∣ y + x := by simpa [Nat.add_comm] using h</span>
+<span class="l" id="L96"><span class="n">96</span>    exact coprime_right_of_add_dvd h&#x27; hy</span>
+<span class="l" id="L97"><span class="n">97</span></span>
+<span class="l" id="L98"><span class="n">98</span>lemma reflected_coprime_equiv</span>
+<span class="l" id="L99"><span class="n">99</span>    {q a b h : ℕ} (hq : 0 &lt; q)</span>
+<span class="l" id="L100"><span class="n">100</span>    (hcompat : Nat.ModEq q (a + h) b) :</span>
+<span class="l" id="L101"><span class="n">101</span>    ∀ z ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L102"><span class="n">102</span>      q.Coprime (a + (h - z)) ↔</span>
+<span class="l" id="L103"><span class="n">103</span>        q.Coprime (reflectedResidue q b + z) := by</span>
+<span class="l" id="L104"><span class="n">104</span>  intro z hz</span>
+<span class="l" id="L105"><span class="n">105</span>  have hzI := Finset.mem_Ioo.mp hz</span>
+<span class="l" id="L106"><span class="n">106</span>  have hdbr : q ∣ b + reflectedResidue q b :=</span>
+<span class="l" id="L107"><span class="n">107</span>    dvd_add_reflectedResidue hq</span>
+<span class="l" id="L108"><span class="n">108</span>  have hbr0 : Nat.ModEq q (b + reflectedResidue q b) 0 :=</span>
+<span class="l" id="L109"><span class="n">109</span>    Nat.modEq_zero_iff_dvd.mpr hdbr</span>
+<span class="l" id="L110"><span class="n">110</span>  have har0 : Nat.ModEq q ((a + h) + reflectedResidue q b) 0 :=</span>
+<span class="l" id="L111"><span class="n">111</span>    (hcompat.add_right (reflectedResidue q b)).trans hbr0</span>
+<span class="l" id="L112"><span class="n">112</span>  have hdahr : q ∣ (a + h) + reflectedResidue q b :=</span>
+<span class="l" id="L113"><span class="n">113</span>    Nat.modEq_zero_iff_dvd.mp har0</span>
+<span class="l" id="L114"><span class="n">114</span>  have hsumEq :</span>
+<span class="l" id="L115"><span class="n">115</span>      (a + (h - z)) + (reflectedResidue q b + z) =</span>
+<span class="l" id="L116"><span class="n">116</span>        (a + h) + reflectedResidue q b := by</span>
+<span class="l" id="L117"><span class="n">117</span>    omega</span>
+<span class="l" id="L118"><span class="n">118</span>  have hsumDvd :</span>
+<span class="l" id="L119"><span class="n">119</span>      q ∣ (a + (h - z)) + (reflectedResidue q b + z) := by</span>
+<span class="l" id="L120"><span class="n">120</span>    rw [hsumEq]</span>
+<span class="l" id="L121"><span class="n">121</span>    exact hdahr</span>
+<span class="l" id="L122"><span class="n">122</span>  exact coprime_right_iff_of_add_dvd hsumDvd</span>
+<span class="l" id="L123"><span class="n">123</span></span>
+<span class="l" id="L124"><span class="n">124</span>lemma admissibleInteriorCount_reflected</span>
+<span class="l" id="L125"><span class="n">125</span>    {q a b h : ℕ} (hq : 0 &lt; q)</span>
+<span class="l" id="L126"><span class="n">126</span>    (hcompat : Nat.ModEq q (a + h) b) :</span>
+<span class="l" id="L127"><span class="n">127</span>    admissibleInteriorCount q a h =</span>
+<span class="l" id="L128"><span class="n">128</span>      admissibleInteriorCount q (reflectedResidue q b) h := by</span>
+<span class="l" id="L129"><span class="n">129</span>  exact admissibleInteriorCount_reflect_of_coprime</span>
+<span class="l" id="L130"><span class="n">130</span>    (reflected_coprime_equiv hq hcompat)</span>
+<span class="l" id="L131"><span class="n">131</span></span>
+<span class="l" id="L132"><span class="n">132</span>lemma fixedQRowDelta_reflected</span>
+<span class="l" id="L133"><span class="n">133</span>    {q a b h e1 e2 : ℕ} (hq : 0 &lt; q)</span>
+<span class="l" id="L134"><span class="n">134</span>    (hcompat : Nat.ModEq q (a + h) b) :</span>
+<span class="l" id="L135"><span class="n">135</span>    fixedQRowDelta q a h e1 e2 =</span>
+<span class="l" id="L136"><span class="n">136</span>      fixedQRowDelta q (reflectedResidue q b) h e2 e1 := by</span>
+<span class="l" id="L137"><span class="n">137</span>  exact fixedQRowDelta_reflect_of_coprime</span>
+<span class="l" id="L138"><span class="n">138</span>    (reflected_coprime_equiv hq hcompat)</span>
+<span class="l" id="L139"><span class="n">139</span></span>
+<span class="l" id="L140"><span class="n">140</span>/-- Frozen-paper `Delta^F_{q,r}(h;e)` from `eq:exact-Sq`.</span>
+<span class="l" id="L141"><span class="n">141</span></span>
+<span class="l" id="L142"><span class="n">142</span>This is the exact free one-anchor constrained mass centered by the exact</span>
+<span class="l" id="L143"><span class="n">143</span>admissible interior count, not by an asymptotic density replacement. -/</span>
+<span class="l" id="L144"><span class="n">144</span>noncomputable def manuscriptFreeBoundaryDelta</span>
+<span class="l" id="L145"><span class="n">145</span>    (q r h e : ℕ) : ℝ :=</span>
+<span class="l" id="L146"><span class="n">146</span>  rowConstrainedMass (freeFixedQLowWeight q r) h e 1 -</span>
+<span class="l" id="L147"><span class="n">147</span>    (admissibleInteriorCount q r h : ℝ) / (e : ℝ)</span>
+<span class="l" id="L148"><span class="n">148</span></span>
+<span class="l" id="L149"><span class="n">149</span>/-- Frozen-paper `S_{q,r}(h)` from `eq:Sqa` / `eq:exact-Sq`,</span>
+<span class="l" id="L150"><span class="n">150</span>represented by its exact high-prime Euler expansion. -/</span>
+<span class="l" id="L151"><span class="n">151</span>noncomputable def manuscriptS1Kernel</span>
+<span class="l" id="L152"><span class="n">152</span>    (q r h : ℕ) : ℝ :=</span>
+<span class="l" id="L153"><span class="n">153</span>  freeHighBaseline q *</span>
+<span class="l" id="L154"><span class="n">154</span>    ∑&#x27; e : ℕ,</span>
+<span class="l" id="L155"><span class="n">155</span>      etaCoeff q e * manuscriptFreeBoundaryDelta q r h e</span>
+<span class="l" id="L156"><span class="n">156</span></span>
+<span class="l" id="L157"><span class="n">157</span>/-- Frozen-paper `B_{1,q}(a,b;h)`.</span>
+<span class="l" id="L158"><span class="n">158</span></span>
+<span class="l" id="L159"><span class="n">159</span>By `eq:B1q-simple` and the exact reflection `eq:reflection-q`,</span>
+<span class="l" id="L160"><span class="n">160</span>`B_{1,q} = S_{q,a} + S_{q,-b}`. -/</span>
+<span class="l" id="L161"><span class="n">161</span>noncomputable def manuscriptB1Kernel</span>
+<span class="l" id="L162"><span class="n">162</span>    (q a b h : ℕ) : ℝ :=</span>
+<span class="l" id="L163"><span class="n">163</span>  manuscriptS1Kernel q a h +</span>
+<span class="l" id="L164"><span class="n">164</span>    manuscriptS1Kernel q (reflectedResidue q b) h</span>
+<span class="l" id="L165"><span class="n">165</span></span>
+<span class="l" id="L166"><span class="n">166</span>/-- Exact manuscript-facing terminal proposition, in epsilon form.</span>
+<span class="l" id="L167"><span class="n">167</span></span>
+<span class="l" id="L168"><span class="n">168</span>Source: `thm:fixed-q` / `eq:main-theorem`.</span>
+<span class="l" id="L169"><span class="n">169</span></span>
+<span class="l" id="L170"><span class="n">170</span>* q is fixed, positive, squarefree;</span>
+<span class="l" id="L171"><span class="n">171</span>* a,b are reduced endpoint representatives;</span>
+<span class="l" id="L172"><span class="n">172</span>* `a+h = b (mod q)` is the compatible-height condition;</span>
+<span class="l" id="L173"><span class="n">173</span>* `¬ 2 ∣ q -&gt; 2 ∣ h` is the exact level-one endpoint-admissibility</span>
+<span class="l" id="L174"><span class="n">174</span>  condition used by the source bridge;</span>
+<span class="l" id="L175"><span class="n">175</span>* h is positive;</span>
+<span class="l" id="L176"><span class="n">176</span>* the eventual threshold depends only on q and epsilon, hence is uniform in</span>
+<span class="l" id="L177"><span class="n">177</span>  the compatible admissible endpoint pair.</span>
+<span class="l" id="L178"><span class="n">178</span>-/</span>
+<span class="l" id="L179"><span class="n">179</span>def PaperBTerminalStatement : Prop :=</span>
+<span class="l" id="L180"><span class="n">180</span>  ∀ q : ℕ,</span>
+<span class="l" id="L181"><span class="n">181</span>    0 &lt; q →</span>
+<span class="l" id="L182"><span class="n">182</span>    Squarefree q →</span>
+<span class="l" id="L183"><span class="n">183</span>    ∀ ε : ℝ, 0 &lt; ε →</span>
+<span class="l" id="L184"><span class="n">184</span>      ∃ h0 : ℕ,</span>
+<span class="l" id="L185"><span class="n">185</span>        ∀ a b h : ℕ,</span>
+<span class="l" id="L186"><span class="n">186</span>          q.Coprime a →</span>
+<span class="l" id="L187"><span class="n">187</span>          q.Coprime b →</span>
+<span class="l" id="L188"><span class="n">188</span>          Nat.ModEq q (a + h) b →</span>
+<span class="l" id="L189"><span class="n">189</span>          (¬ 2 ∣ q → 2 ∣ h) →</span>
+<span class="l" id="L190"><span class="n">190</span>          0 &lt; h →</span>
+<span class="l" id="L191"><span class="n">191</span>          h0 ≤ h →</span>
+<span class="l" id="L192"><span class="n">192</span>          |manuscriptA1Kernel q a h -</span>
+<span class="l" id="L193"><span class="n">193</span>              manuscriptB1Kernel q a b h| ≤</span>
+<span class="l" id="L194"><span class="n">194</span>            ε * Real.log (h : ℝ)</span>
+<span class="l" id="L195"><span class="n">195</span></span>
+<span class="l" id="L196"><span class="n">196</span>/-- Exact consumer contract for Quoin&#x27;s completed one-dimensional bracket</span>
+<span class="l" id="L197"><span class="n">197</span>assembly.  Both manuscript boundary families are required under one uniform</span>
+<span class="l" id="L198"><span class="n">198</span>threshold, with the exact fixed-q normalization used by the divisor expansion. -/</span>
+<span class="l" id="L199"><span class="n">199</span>def OneDimensionalBracketsContract : Prop :=</span>
+<span class="l" id="L200"><span class="n">200</span>  ∀ q : ℕ,</span>
+<span class="l" id="L201"><span class="n">201</span>    0 &lt; q →</span>
+<span class="l" id="L202"><span class="n">202</span>    Squarefree q →</span>
+<span class="l" id="L203"><span class="n">203</span>    ∀ ε : ℝ, 0 &lt; ε →</span>
+<span class="l" id="L204"><span class="n">204</span>      ∃ h0 : ℕ,</span>
+<span class="l" id="L205"><span class="n">205</span>        ∀ a b h : ℕ,</span>
+<span class="l" id="L206"><span class="n">206</span>          q.Coprime a →</span>
+<span class="l" id="L207"><span class="n">207</span>          q.Coprime b →</span>
+<span class="l" id="L208"><span class="n">208</span>          Nat.ModEq q (a + h) b →</span>
+<span class="l" id="L209"><span class="n">209</span>          (¬ 2 ∣ q → 2 ∣ h) →</span>
+<span class="l" id="L210"><span class="n">210</span>          0 &lt; h →</span>
+<span class="l" id="L211"><span class="n">211</span>          h0 ≤ h →</span>
+<span class="l" id="L212"><span class="n">212</span>          |cStarReal q h * pureLeftFamily q a h -</span>
+<span class="l" id="L213"><span class="n">213</span>              manuscriptS1Kernel q a h| ≤</span>
+<span class="l" id="L214"><span class="n">214</span>            ε * Real.log (h : ℝ) ∧</span>
+<span class="l" id="L215"><span class="n">215</span>          |cStarReal q h * heightBoundaryFamily q a h -</span>
+<span class="l" id="L216"><span class="n">216</span>              manuscriptS1Kernel q (reflectedResidue q b) h| ≤</span>
+<span class="l" id="L217"><span class="n">217</span>            ε * Real.log (h : ℝ)</span>
+<span class="l" id="L218"><span class="n">218</span></span>
+<span class="l" id="L219"><span class="n">219</span>lemma exists_nat_threshold_const_le_eps_log</span>
+<span class="l" id="L220"><span class="n">220</span>    {B ε : ℝ} (_hB : 0 ≤ B) (hε : 0 &lt; ε) :</span>
+<span class="l" id="L221"><span class="n">221</span>    ∃ h0 : ℕ, ∀ h : ℕ, h0 ≤ h → B ≤ ε * Real.log (h : ℝ) := by</span>
+<span class="l" id="L222"><span class="n">222</span>  obtain ⟨h0, hh0⟩ := exists_nat_gt (Real.exp (B / ε))</span>
+<span class="l" id="L223"><span class="n">223</span>  refine ⟨h0, ?_⟩</span>
+<span class="l" id="L224"><span class="n">224</span>  intro h hlarge</span>
+<span class="l" id="L225"><span class="n">225</span>  have hexp_lt_h0 : Real.exp (B / ε) &lt; (h0 : ℝ) := by</span>
+<span class="l" id="L226"><span class="n">226</span>    exact_mod_cast hh0</span>
+<span class="l" id="L227"><span class="n">227</span>  have hh0_le_h : (h0 : ℝ) ≤ (h : ℝ) := by exact_mod_cast hlarge</span>
+<span class="l" id="L228"><span class="n">228</span>  have hexp_lt_h : Real.exp (B / ε) &lt; (h : ℝ) :=</span>
+<span class="l" id="L229"><span class="n">229</span>    lt_of_lt_of_le hexp_lt_h0 hh0_le_h</span>
+<span class="l" id="L230"><span class="n">230</span>  have hhpos : 0 &lt; (h : ℝ) := lt_trans (Real.exp_pos _) hexp_lt_h</span>
+<span class="l" id="L231"><span class="n">231</span>  have hlog : B / ε &lt; Real.log (h : ℝ) := by</span>
+<span class="l" id="L232"><span class="n">232</span>    have hlogexp : Real.log (Real.exp (B / ε)) = B / ε := Real.log_exp _</span>
+<span class="l" id="L233"><span class="n">233</span>    rw [← hlogexp]</span>
+<span class="l" id="L234"><span class="n">234</span>    exact Real.strictMonoOn_log (Real.exp_pos _) hhpos hexp_lt_h</span>
+<span class="l" id="L235"><span class="n">235</span>  have hmul := mul_lt_mul_of_pos_left hlog hε</span>
+<span class="l" id="L236"><span class="n">236</span>  have hεne : ε ≠ 0 := ne_of_gt hε</span>
+<span class="l" id="L237"><span class="n">237</span>  exact le_of_lt (by</span>
+<span class="l" id="L238"><span class="n">238</span>    calc</span>
+<span class="l" id="L239"><span class="n">239</span>      B = ε * (B / ε) := by field_simp [hεne]</span>
+<span class="l" id="L240"><span class="n">240</span>      _ &lt; ε * Real.log (h : ℝ) := hmul)</span>
+<span class="l" id="L241"><span class="n">241</span></span>
+<span class="l" id="L242"><span class="n">242</span>/-- The genuinely analytic ordinary 2D target after the exact periodic-density</span>
+<span class="l" id="L243"><span class="n">243</span>correction has been removed. -/</span>
+<span class="l" id="L244"><span class="n">244</span>def OrdinaryBooleanCoreContract : Prop :=</span>
+<span class="l" id="L245"><span class="n">245</span>  ∀ q : ℕ,</span>
+<span class="l" id="L246"><span class="n">246</span>    0 &lt; q →</span>
+<span class="l" id="L247"><span class="n">247</span>    Squarefree q →</span>
+<span class="l" id="L248"><span class="n">248</span>    ∀ ε : ℝ, 0 &lt; ε →</span>
+<span class="l" id="L249"><span class="n">249</span>      ∃ h0 : ℕ,</span>
+<span class="l" id="L250"><span class="n">250</span>        ∀ a b h : ℕ,</span>
+<span class="l" id="L251"><span class="n">251</span>          q.Coprime a →</span>
+<span class="l" id="L252"><span class="n">252</span>          q.Coprime b →</span>
+<span class="l" id="L253"><span class="n">253</span>          Nat.ModEq q (a + h) b →</span>
+<span class="l" id="L254"><span class="n">254</span>          (¬ 2 ∣ q → 2 ∣ h) →</span>
+<span class="l" id="L255"><span class="n">255</span>          0 &lt; h →</span>
+<span class="l" id="L256"><span class="n">256</span>          h0 ≤ h →</span>
+<span class="l" id="L257"><span class="n">257</span>          |cStarReal q h * ordinaryBooleanCore q a h| ≤</span>
+<span class="l" id="L258"><span class="n">258</span>            ε * Real.log (h : ℝ)</span>
+<span class="l" id="L259"><span class="n">259</span></span>
+<span class="l" id="L260"><span class="n">260</span>/-- Exact terminal target for the ordinary, undecorated two-dimensional</span>
+<span class="l" id="L261"><span class="n">261</span>family. -/</span>
+<span class="l" id="L262"><span class="n">262</span>def OrdinaryTwoDimensionalContract : Prop :=</span>
+<span class="l" id="L263"><span class="n">263</span>  ∀ q : ℕ,</span>
+<span class="l" id="L264"><span class="n">264</span>    0 &lt; q →</span>
+<span class="l" id="L265"><span class="n">265</span>    Squarefree q →</span>
+<span class="l" id="L266"><span class="n">266</span>    ∀ ε : ℝ, 0 &lt; ε →</span>
+<span class="l" id="L267"><span class="n">267</span>      ∃ h0 : ℕ,</span>
+<span class="l" id="L268"><span class="n">268</span>        ∀ a b h : ℕ,</span>
+<span class="l" id="L269"><span class="n">269</span>          q.Coprime a →</span>
+<span class="l" id="L270"><span class="n">270</span>          q.Coprime b →</span>
+<span class="l" id="L271"><span class="n">271</span>          Nat.ModEq q (a + h) b →</span>
+<span class="l" id="L272"><span class="n">272</span>          (¬ 2 ∣ q → 2 ∣ h) →</span>
+<span class="l" id="L273"><span class="n">273</span>          0 &lt; h →</span>
+<span class="l" id="L274"><span class="n">274</span>          h0 ≤ h →</span>
+<span class="l" id="L275"><span class="n">275</span>          |cStarReal q h * ordinaryTwoDimensionalRemainder q a h| ≤</span>
+<span class="l" id="L276"><span class="n">276</span>            ε * Real.log (h : ℝ)</span>
+<span class="l" id="L277"><span class="n">277</span></span>
+<span class="l" id="L278"><span class="n">278</span>theorem ordinaryTwoDimensionalContract_of_booleanCore</span>
+<span class="l" id="L279"><span class="n">279</span>    (hBoolean : OrdinaryBooleanCoreContract) :</span>
+<span class="l" id="L280"><span class="n">280</span>    OrdinaryTwoDimensionalContract := by</span>
+<span class="l" id="L281"><span class="n">281</span>  intro q hq hsq ε hε</span>
+<span class="l" id="L282"><span class="n">282</span>  let δ : ℝ := ε / 2</span>
+<span class="l" id="L283"><span class="n">283</span>  have hδ : 0 &lt; δ := by</span>
+<span class="l" id="L284"><span class="n">284</span>    dsimp [δ]</span>
+<span class="l" id="L285"><span class="n">285</span>    positivity</span>
+<span class="l" id="L286"><span class="n">286</span>  obtain ⟨hB, hBspec⟩ := hBoolean q hq hsq δ hδ</span>
+<span class="l" id="L287"><span class="n">287</span>  have hC0 : 0 ≤ fixedQDensityDefectUniformBound q := by</span>
+<span class="l" id="L288"><span class="n">288</span>    unfold fixedQDensityDefectUniformBound</span>
+<span class="l" id="L289"><span class="n">289</span>    positivity</span>
+<span class="l" id="L290"><span class="n">290</span>  obtain ⟨hC, hCspec⟩ :=</span>
+<span class="l" id="L291"><span class="n">291</span>    exists_nat_threshold_const_le_eps_log hC0 hδ</span>
+<span class="l" id="L292"><span class="n">292</span>  refine ⟨max hB hC, ?_⟩</span>
+<span class="l" id="L293"><span class="n">293</span>  intro a b h ha hb hcompat h2admissible hh hlarge</span>
+<span class="l" id="L294"><span class="n">294</span>  have hBh : hB ≤ h := (le_max_left hB hC).trans hlarge</span>
+<span class="l" id="L295"><span class="n">295</span>  have hCh : hC ≤ h := (le_max_right hB hC).trans hlarge</span>
+<span class="l" id="L296"><span class="n">296</span>  have hBest := hBspec a b h ha hb hcompat h2admissible hh hBh</span>
+<span class="l" id="L297"><span class="n">297</span>  have hCest := hCspec h hCh</span>
+<span class="l" id="L298"><span class="n">298</span>  have hreflect := reflected_coprime_equiv hq hcompat</span>
+<span class="l" id="L299"><span class="n">299</span>  rw [ordinaryTwoDimensionalRemainder_eq_cores hq hh h2admissible hreflect]</span>
+<span class="l" id="L300"><span class="n">300</span>  rw [mul_add]</span>
+<span class="l" id="L301"><span class="n">301</span>  calc</span>
+<span class="l" id="L302"><span class="n">302</span>    |cStarReal q h * ordinaryBooleanCore q a h +</span>
+<span class="l" id="L303"><span class="n">303</span>        cStarReal q h * ordinaryDensityCore q a h| ≤</span>
+<span class="l" id="L304"><span class="n">304</span>      |cStarReal q h * ordinaryBooleanCore q a h| +</span>
+<span class="l" id="L305"><span class="n">305</span>        |cStarReal q h * ordinaryDensityCore q a h| := abs_add_le _ _</span>
+<span class="l" id="L306"><span class="n">306</span>    _ ≤ δ * Real.log (h : ℝ) + fixedQDensityDefectUniformBound q := by</span>
+<span class="l" id="L307"><span class="n">307</span>      exact add_le_add hBest</span>
+<span class="l" id="L308"><span class="n">308</span>        (abs_cStar_mul_ordinaryDensityCore_le hq hh h2admissible)</span>
+<span class="l" id="L309"><span class="n">309</span>    _ ≤ δ * Real.log (h : ℝ) + δ * Real.log (h : ℝ) := by</span>
+<span class="l" id="L310"><span class="n">310</span>      exact add_le_add (le_refl _) hCest</span>
+<span class="l" id="L311"><span class="n">311</span>    _ = ε * Real.log (h : ℝ) := by</span>
+<span class="l" id="L312"><span class="n">312</span>      dsimp [δ]</span>
+<span class="l" id="L313"><span class="n">313</span>      ring</span>
+<span class="l" id="L314"><span class="n">314</span></span>
+<span class="l" id="L315"><span class="n">315</span>/-- Exact terminal target for the decorated two-dimensional family. -/</span>
+<span class="l" id="L316"><span class="n">316</span>def DecoratedTwoDimensionalContract : Prop :=</span>
+<span class="l" id="L317"><span class="n">317</span>  ∀ q : ℕ,</span>
+<span class="l" id="L318"><span class="n">318</span>    0 &lt; q →</span>
+<span class="l" id="L319"><span class="n">319</span>    Squarefree q →</span>
+<span class="l" id="L320"><span class="n">320</span>    ∀ ε : ℝ, 0 &lt; ε →</span>
+<span class="l" id="L321"><span class="n">321</span>      ∃ h0 : ℕ,</span>
+<span class="l" id="L322"><span class="n">322</span>        ∀ a b h : ℕ,</span>
+<span class="l" id="L323"><span class="n">323</span>          q.Coprime a →</span>
+<span class="l" id="L324"><span class="n">324</span>          q.Coprime b →</span>
+<span class="l" id="L325"><span class="n">325</span>          Nat.ModEq q (a + h) b →</span>
+<span class="l" id="L326"><span class="n">326</span>          (¬ 2 ∣ q → 2 ∣ h) →</span>
+<span class="l" id="L327"><span class="n">327</span>          0 &lt; h →</span>
+<span class="l" id="L328"><span class="n">328</span>          h0 ≤ h →</span>
+<span class="l" id="L329"><span class="n">329</span>          |cStarReal q h * decoratedTwoDimensionalRemainder q a h| ≤</span>
+<span class="l" id="L330"><span class="n">330</span>            ε * Real.log (h : ℝ)</span>
+<span class="l" id="L331"><span class="n">331</span></span>
+<span class="l" id="L332"><span class="n">332</span>/-- Consumer-facing analytic branch of the decorated two-dimensional remainder. -/</span>
+<span class="l" id="L333"><span class="n">333</span>def DecoratedAnalyticContract : Prop :=</span>
+<span class="l" id="L334"><span class="n">334</span>  ∀ q : ℕ,</span>
+<span class="l" id="L335"><span class="n">335</span>    0 &lt; q →</span>
+<span class="l" id="L336"><span class="n">336</span>    Squarefree q →</span>
+<span class="l" id="L337"><span class="n">337</span>    ∀ ε : ℝ, 0 &lt; ε →</span>
+<span class="l" id="L338"><span class="n">338</span>      ∃ h0 : ℕ,</span>
+<span class="l" id="L339"><span class="n">339</span>        ∀ a b h : ℕ,</span>
+<span class="l" id="L340"><span class="n">340</span>          q.Coprime a →</span>
+<span class="l" id="L341"><span class="n">341</span>          q.Coprime b →</span>
+<span class="l" id="L342"><span class="n">342</span>          Nat.ModEq q (a + h) b →</span>
+<span class="l" id="L343"><span class="n">343</span>          (¬ 2 ∣ q → 2 ∣ h) →</span>
+<span class="l" id="L344"><span class="n">344</span>          0 &lt; h →</span>
+<span class="l" id="L345"><span class="n">345</span>          h0 ≤ h →</span>
+<span class="l" id="L346"><span class="n">346</span>          |cStarReal q h * decoratedAnalyticRemainder q a h| ≤</span>
+<span class="l" id="L347"><span class="n">347</span>            ε * Real.log (h : ℝ)</span>
+<span class="l" id="L348"><span class="n">348</span></span>
+<span class="l" id="L349"><span class="n">349</span>/-- Consumer-facing density branch of the decorated two-dimensional remainder. -/</span>
+<span class="l" id="L350"><span class="n">350</span>def DecoratedDensityContract : Prop :=</span>
+<span class="l" id="L351"><span class="n">351</span>  ∀ q : ℕ,</span>
+<span class="l" id="L352"><span class="n">352</span>    0 &lt; q →</span>
+<span class="l" id="L353"><span class="n">353</span>    Squarefree q →</span>
+<span class="l" id="L354"><span class="n">354</span>    ∀ ε : ℝ, 0 &lt; ε →</span>
+<span class="l" id="L355"><span class="n">355</span>      ∃ h0 : ℕ,</span>
+<span class="l" id="L356"><span class="n">356</span>        ∀ a b h : ℕ,</span>
+<span class="l" id="L357"><span class="n">357</span>          q.Coprime a →</span>
+<span class="l" id="L358"><span class="n">358</span>          q.Coprime b →</span>
+<span class="l" id="L359"><span class="n">359</span>          Nat.ModEq q (a + h) b →</span>
+<span class="l" id="L360"><span class="n">360</span>          (¬ 2 ∣ q → 2 ∣ h) →</span>
+<span class="l" id="L361"><span class="n">361</span>          0 &lt; h →</span>
+<span class="l" id="L362"><span class="n">362</span>          h0 ≤ h →</span>
+<span class="l" id="L363"><span class="n">363</span>          |cStarReal q h * decoratedDensityRemainder q a h| ≤</span>
+<span class="l" id="L364"><span class="n">364</span>            ε * Real.log (h : ℝ)</span>
+<span class="l" id="L365"><span class="n">365</span></span>
+<span class="l" id="L366"><span class="n">366</span></span>
+<span class="l" id="L367"><span class="n">367</span>theorem decoratedDensityContract :</span>
+<span class="l" id="L368"><span class="n">368</span>    DecoratedDensityContract := by</span>
+<span class="l" id="L369"><span class="n">369</span>  intro q hq hsq ε hε</span>
+<span class="l" id="L370"><span class="n">370</span>  obtain ⟨h0, hspec⟩ :=</span>
+<span class="l" id="L371"><span class="n">371</span>    decoratedDensityRemainder_sublog q hq ε hε</span>
+<span class="l" id="L372"><span class="n">372</span>  refine ⟨h0, ?_⟩</span>
+<span class="l" id="L373"><span class="n">373</span>  intro a b h ha hb hcompat h2admissible hh hlarge</span>
+<span class="l" id="L374"><span class="n">374</span>  exact hspec a h h2admissible hh hlarge</span>
+<span class="l" id="L375"><span class="n">375</span></span>
+<span class="l" id="L376"><span class="n">376</span></span>
+<span class="l" id="L377"><span class="n">377</span>theorem decoratedTwoDimensionalContract_of_analytic_density</span>
+<span class="l" id="L378"><span class="n">378</span>    (hAnalytic : DecoratedAnalyticContract)</span>
+<span class="l" id="L379"><span class="n">379</span>    (hDensity : DecoratedDensityContract) :</span>
+<span class="l" id="L380"><span class="n">380</span>    DecoratedTwoDimensionalContract := by</span>
+<span class="l" id="L381"><span class="n">381</span>  intro q hq hsq ε hε</span>
+<span class="l" id="L382"><span class="n">382</span>  let δ : ℝ := ε / 2</span>
+<span class="l" id="L383"><span class="n">383</span>  have hδ : 0 &lt; δ := by</span>
+<span class="l" id="L384"><span class="n">384</span>    dsimp [δ]</span>
+<span class="l" id="L385"><span class="n">385</span>    positivity</span>
+<span class="l" id="L386"><span class="n">386</span>  obtain ⟨hA, hAspec⟩ := hAnalytic q hq hsq δ hδ</span>
+<span class="l" id="L387"><span class="n">387</span>  obtain ⟨hD, hDspec⟩ := hDensity q hq hsq δ hδ</span>
+<span class="l" id="L388"><span class="n">388</span>  refine ⟨max hA hD, ?_⟩</span>
+<span class="l" id="L389"><span class="n">389</span>  intro a b h ha hb hcompat h2admissible hh hlarge</span>
+<span class="l" id="L390"><span class="n">390</span>  have hAh : hA ≤ h := (le_max_left hA hD).trans hlarge</span>
+<span class="l" id="L391"><span class="n">391</span>  have hDh : hD ≤ h := (le_max_right hA hD).trans hlarge</span>
+<span class="l" id="L392"><span class="n">392</span>  have hAest := hAspec a b h ha hb hcompat h2admissible hh hAh</span>
+<span class="l" id="L393"><span class="n">393</span>  have hDest := hDspec a b h ha hb hcompat h2admissible hh hDh</span>
+<span class="l" id="L394"><span class="n">394</span>  have hreflect := reflected_coprime_equiv hq hcompat</span>
+<span class="l" id="L395"><span class="n">395</span>  rw [decoratedTwoDimensionalRemainder_eq_analytic_add_density</span>
+<span class="l" id="L396"><span class="n">396</span>    hq hh h2admissible hreflect]</span>
+<span class="l" id="L397"><span class="n">397</span>  rw [mul_add]</span>
+<span class="l" id="L398"><span class="n">398</span>  calc</span>
+<span class="l" id="L399"><span class="n">399</span>    |cStarReal q h * decoratedAnalyticRemainder q a h +</span>
+<span class="l" id="L400"><span class="n">400</span>        cStarReal q h * decoratedDensityRemainder q a h| ≤</span>
+<span class="l" id="L401"><span class="n">401</span>      |cStarReal q h * decoratedAnalyticRemainder q a h| +</span>
+<span class="l" id="L402"><span class="n">402</span>        |cStarReal q h * decoratedDensityRemainder q a h| :=</span>
+<span class="l" id="L403"><span class="n">403</span>          abs_add_le _ _</span>
+<span class="l" id="L404"><span class="n">404</span>    _ ≤ δ * Real.log (h : ℝ) + δ * Real.log (h : ℝ) :=</span>
+<span class="l" id="L405"><span class="n">405</span>          add_le_add hAest hDest</span>
+<span class="l" id="L406"><span class="n">406</span>    _ = ε * Real.log (h : ℝ) := by</span>
+<span class="l" id="L407"><span class="n">407</span>          dsimp [δ]</span>
+<span class="l" id="L408"><span class="n">408</span>          ring</span>
+<span class="l" id="L409"><span class="n">409</span></span>
+<span class="l" id="L410"><span class="n">410</span>/-- Exact terminal target for the ordinary plus decorated two-dimensional</span>
+<span class="l" id="L411"><span class="n">411</span>families after the two one-dimensional boundary families have been removed. -/</span>
+<span class="l" id="L412"><span class="n">412</span>def TwoDimensionalRemainderContract : Prop :=</span>
+<span class="l" id="L413"><span class="n">413</span>  ∀ q : ℕ,</span>
+<span class="l" id="L414"><span class="n">414</span>    0 &lt; q →</span>
+<span class="l" id="L415"><span class="n">415</span>    Squarefree q →</span>
+<span class="l" id="L416"><span class="n">416</span>    ∀ ε : ℝ, 0 &lt; ε →</span>
+<span class="l" id="L417"><span class="n">417</span>      ∃ h0 : ℕ,</span>
+<span class="l" id="L418"><span class="n">418</span>        ∀ a b h : ℕ,</span>
+<span class="l" id="L419"><span class="n">419</span>          q.Coprime a →</span>
+<span class="l" id="L420"><span class="n">420</span>          q.Coprime b →</span>
+<span class="l" id="L421"><span class="n">421</span>          Nat.ModEq q (a + h) b →</span>
+<span class="l" id="L422"><span class="n">422</span>          (¬ 2 ∣ q → 2 ∣ h) →</span>
+<span class="l" id="L423"><span class="n">423</span>          0 &lt; h →</span>
+<span class="l" id="L424"><span class="n">424</span>          h0 ≤ h →</span>
+<span class="l" id="L425"><span class="n">425</span>          |cStarReal q h * twoDimensionalFamilyRemainder q a h| ≤</span>
+<span class="l" id="L426"><span class="n">426</span>            ε * Real.log (h : ℝ)</span>
+<span class="l" id="L427"><span class="n">427</span></span>
+<span class="l" id="L428"><span class="n">428</span>theorem twoDimensionalRemainderContract_of_parts</span>
+<span class="l" id="L429"><span class="n">429</span>    (hOrdinary : OrdinaryTwoDimensionalContract)</span>
+<span class="l" id="L430"><span class="n">430</span>    (hDecorated : DecoratedTwoDimensionalContract) :</span>
+<span class="l" id="L431"><span class="n">431</span>    TwoDimensionalRemainderContract := by</span>
+<span class="l" id="L432"><span class="n">432</span>  intro q hq hsq ε hε</span>
+<span class="l" id="L433"><span class="n">433</span>  let δ : ℝ := ε / 2</span>
+<span class="l" id="L434"><span class="n">434</span>  have hδ : 0 &lt; δ := by</span>
+<span class="l" id="L435"><span class="n">435</span>    dsimp [δ]</span>
+<span class="l" id="L436"><span class="n">436</span>    positivity</span>
+<span class="l" id="L437"><span class="n">437</span>  obtain ⟨hO, hOspec⟩ := hOrdinary q hq hsq δ hδ</span>
+<span class="l" id="L438"><span class="n">438</span>  obtain ⟨hD, hDspec⟩ := hDecorated q hq hsq δ hδ</span>
+<span class="l" id="L439"><span class="n">439</span>  refine ⟨max hO hD, ?_⟩</span>
+<span class="l" id="L440"><span class="n">440</span>  intro a b h ha hb hcompat h2admissible hh hlarge</span>
+<span class="l" id="L441"><span class="n">441</span>  have hOh : hO ≤ h := (le_max_left hO hD).trans hlarge</span>
+<span class="l" id="L442"><span class="n">442</span>  have hDh : hD ≤ h := (le_max_right hO hD).trans hlarge</span>
+<span class="l" id="L443"><span class="n">443</span>  have hOest := hOspec a b h ha hb hcompat h2admissible hh hOh</span>
+<span class="l" id="L444"><span class="n">444</span>  have hDest := hDspec a b h ha hb hcompat h2admissible hh hDh</span>
+<span class="l" id="L445"><span class="n">445</span>  have hreflect := reflected_coprime_equiv hq hcompat</span>
+<span class="l" id="L446"><span class="n">446</span>  rw [twoDimensionalFamilyRemainder_eq_ordinary_add_decorated hreflect]</span>
+<span class="l" id="L447"><span class="n">447</span>  rw [mul_add]</span>
+<span class="l" id="L448"><span class="n">448</span>  calc</span>
+<span class="l" id="L449"><span class="n">449</span>    |cStarReal q h * ordinaryTwoDimensionalRemainder q a h +</span>
+<span class="l" id="L450"><span class="n">450</span>        cStarReal q h * decoratedTwoDimensionalRemainder q a h| ≤</span>
+<span class="l" id="L451"><span class="n">451</span>      |cStarReal q h * ordinaryTwoDimensionalRemainder q a h| +</span>
+<span class="l" id="L452"><span class="n">452</span>        |cStarReal q h * decoratedTwoDimensionalRemainder q a h| :=</span>
+<span class="l" id="L453"><span class="n">453</span>          abs_add_le _ _</span>
+<span class="l" id="L454"><span class="n">454</span>    _ ≤ δ * Real.log (h : ℝ) + δ * Real.log (h : ℝ) :=</span>
+<span class="l" id="L455"><span class="n">455</span>          add_le_add hOest hDest</span>
+<span class="l" id="L456"><span class="n">456</span>    _ = ε * Real.log (h : ℝ) := by</span>
+<span class="l" id="L457"><span class="n">457</span>          dsimp [δ]</span>
+<span class="l" id="L458"><span class="n">458</span>          ring</span>
+<span class="l" id="L459"><span class="n">459</span></span>
+<span class="l" id="L460"><span class="n">460</span>/-- Once the one-dimensional bracket contract and the genuinely</span>
+<span class="l" id="L461"><span class="n">461</span> two-dimensional remainder contract are delivered, the exact manuscript</span>
+<span class="l" id="L462"><span class="n">462</span> theorem is a triangle-inequality assembly with no further mathematics. -/</span>
+<span class="l" id="L463"><span class="n">463</span>theorem paperBTerminal_of_contracts</span>
+<span class="l" id="L464"><span class="n">464</span>    (hBracket : OneDimensionalBracketsContract)</span>
+<span class="l" id="L465"><span class="n">465</span>    (hTwoDim : TwoDimensionalRemainderContract) :</span>
+<span class="l" id="L466"><span class="n">466</span>    PaperBTerminalStatement := by</span>
+<span class="l" id="L467"><span class="n">467</span>  intro q hq hsq ε hε</span>
+<span class="l" id="L468"><span class="n">468</span>  let δ : ℝ := ε / 3</span>
+<span class="l" id="L469"><span class="n">469</span>  have hδ : 0 &lt; δ := by</span>
+<span class="l" id="L470"><span class="n">470</span>    dsimp [δ]</span>
+<span class="l" id="L471"><span class="n">471</span>    positivity</span>
+<span class="l" id="L472"><span class="n">472</span>  obtain ⟨hB, hBspec⟩ := hBracket q hq hsq δ hδ</span>
+<span class="l" id="L473"><span class="n">473</span>  obtain ⟨hD, hDspec⟩ := hTwoDim q hq hsq δ hδ</span>
+<span class="l" id="L474"><span class="n">474</span>  refine ⟨max hB hD, ?_⟩</span>
+<span class="l" id="L475"><span class="n">475</span>  intro a b h ha hb hcompat h2admissible hh hlarge</span>
+<span class="l" id="L476"><span class="n">476</span>  have hBh : hB ≤ h := (le_max_left hB hD).trans hlarge</span>
+<span class="l" id="L477"><span class="n">477</span>  have hDh : hD ≤ h := (le_max_right hB hD).trans hlarge</span>
+<span class="l" id="L478"><span class="n">478</span>  obtain ⟨hleft, hright⟩ :=</span>
+<span class="l" id="L479"><span class="n">479</span>    hBspec a b h ha hb hcompat h2admissible hh hBh</span>
+<span class="l" id="L480"><span class="n">480</span>  have htwo :=</span>
+<span class="l" id="L481"><span class="n">481</span>    hDspec a b h ha hb hcompat h2admissible hh hDh</span>
+<span class="l" id="L482"><span class="n">482</span>  have hA := manuscriptA1Kernel_eq_boundary_families_add_twoDimensional</span>
+<span class="l" id="L483"><span class="n">483</span>    (q := q) (a := a) (h := h) h2admissible</span>
+<span class="l" id="L484"><span class="n">484</span>  unfold manuscriptB1Kernel</span>
+<span class="l" id="L485"><span class="n">485</span>  rw [hA]</span>
+<span class="l" id="L486"><span class="n">486</span>  have hdecomp :</span>
+<span class="l" id="L487"><span class="n">487</span>      cStarReal q h *</span>
+<span class="l" id="L488"><span class="n">488</span>          (pureLeftFamily q a h +</span>
+<span class="l" id="L489"><span class="n">489</span>            heightBoundaryFamily q a h +</span>
+<span class="l" id="L490"><span class="n">490</span>            twoDimensionalFamilyRemainder q a h) -</span>
+<span class="l" id="L491"><span class="n">491</span>          (manuscriptS1Kernel q a h +</span>
+<span class="l" id="L492"><span class="n">492</span>            manuscriptS1Kernel q (reflectedResidue q b) h) =</span>
+<span class="l" id="L493"><span class="n">493</span>        (cStarReal q h * pureLeftFamily q a h -</span>
+<span class="l" id="L494"><span class="n">494</span>          manuscriptS1Kernel q a h) +</span>
+<span class="l" id="L495"><span class="n">495</span>        (cStarReal q h * heightBoundaryFamily q a h -</span>
+<span class="l" id="L496"><span class="n">496</span>          manuscriptS1Kernel q (reflectedResidue q b) h) +</span>
+<span class="l" id="L497"><span class="n">497</span>        cStarReal q h * twoDimensionalFamilyRemainder q a h := by</span>
+<span class="l" id="L498"><span class="n">498</span>    ring</span>
+<span class="l" id="L499"><span class="n">499</span>  rw [hdecomp]</span>
+<span class="l" id="L500"><span class="n">500</span>  calc</span>
+<span class="l" id="L501"><span class="n">501</span>    |(cStarReal q h * pureLeftFamily q a h -</span>
+<span class="l" id="L502"><span class="n">502</span>          manuscriptS1Kernel q a h) +</span>
+<span class="l" id="L503"><span class="n">503</span>        (cStarReal q h * heightBoundaryFamily q a h -</span>
+<span class="l" id="L504"><span class="n">504</span>          manuscriptS1Kernel q (reflectedResidue q b) h) +</span>
+<span class="l" id="L505"><span class="n">505</span>        cStarReal q h * twoDimensionalFamilyRemainder q a h|</span>
+<span class="l" id="L506"><span class="n">506</span>      ≤ |cStarReal q h * pureLeftFamily q a h -</span>
+<span class="l" id="L507"><span class="n">507</span>          manuscriptS1Kernel q a h| +</span>
+<span class="l" id="L508"><span class="n">508</span>        |cStarReal q h * heightBoundaryFamily q a h -</span>
+<span class="l" id="L509"><span class="n">509</span>          manuscriptS1Kernel q (reflectedResidue q b) h| +</span>
+<span class="l" id="L510"><span class="n">510</span>        |cStarReal q h * twoDimensionalFamilyRemainder q a h| := by</span>
+<span class="l" id="L511"><span class="n">511</span>          exact (abs_add_le</span>
+<span class="l" id="L512"><span class="n">512</span>            ((cStarReal q h * pureLeftFamily q a h -</span>
+<span class="l" id="L513"><span class="n">513</span>              manuscriptS1Kernel q a h) +</span>
+<span class="l" id="L514"><span class="n">514</span>              (cStarReal q h * heightBoundaryFamily q a h -</span>
+<span class="l" id="L515"><span class="n">515</span>                manuscriptS1Kernel q (reflectedResidue q b) h))</span>
+<span class="l" id="L516"><span class="n">516</span>            (cStarReal q h * twoDimensionalFamilyRemainder q a h)).trans</span>
+<span class="l" id="L517"><span class="n">517</span>            (add_le_add</span>
+<span class="l" id="L518"><span class="n">518</span>              (abs_add_le</span>
+<span class="l" id="L519"><span class="n">519</span>                (cStarReal q h * pureLeftFamily q a h -</span>
+<span class="l" id="L520"><span class="n">520</span>                  manuscriptS1Kernel q a h)</span>
+<span class="l" id="L521"><span class="n">521</span>                (cStarReal q h * heightBoundaryFamily q a h -</span>
+<span class="l" id="L522"><span class="n">522</span>                  manuscriptS1Kernel q (reflectedResidue q b) h))</span>
+<span class="l" id="L523"><span class="n">523</span>              (le_refl _))</span>
+<span class="l" id="L524"><span class="n">524</span>    _ ≤ δ * Real.log (h : ℝ) +</span>
+<span class="l" id="L525"><span class="n">525</span>          δ * Real.log (h : ℝ) +</span>
+<span class="l" id="L526"><span class="n">526</span>          δ * Real.log (h : ℝ) := by</span>
+<span class="l" id="L527"><span class="n">527</span>          exact add_le_add (add_le_add hleft hright) htwo</span>
+<span class="l" id="L528"><span class="n">528</span>    _ = ε * Real.log (h : ℝ) := by</span>
+<span class="l" id="L529"><span class="n">529</span>          dsimp [δ]</span>
+<span class="l" id="L530"><span class="n">530</span>          ring</span>
+<span class="l" id="L531"><span class="n">531</span></span>
+<span class="l" id="L532"><span class="n">532</span>theorem paperBTerminal_of_split_contracts</span>
+<span class="l" id="L533"><span class="n">533</span>    (hBracket : OneDimensionalBracketsContract)</span>
+<span class="l" id="L534"><span class="n">534</span>    (hOrdinary : OrdinaryTwoDimensionalContract)</span>
+<span class="l" id="L535"><span class="n">535</span>    (hDecorated : DecoratedTwoDimensionalContract) :</span>
+<span class="l" id="L536"><span class="n">536</span>    PaperBTerminalStatement :=</span>
+<span class="l" id="L537"><span class="n">537</span>  paperBTerminal_of_contracts hBracket</span>
+<span class="l" id="L538"><span class="n">538</span>    (twoDimensionalRemainderContract_of_parts hOrdinary hDecorated)</span>
+<span class="l" id="L539"><span class="n">539</span></span>
+<span class="l" id="L540"><span class="n">540</span>theorem paperBTerminal_of_reduced_contracts</span>
+<span class="l" id="L541"><span class="n">541</span>    (hBracket : OneDimensionalBracketsContract)</span>
+<span class="l" id="L542"><span class="n">542</span>    (hBoolean : OrdinaryBooleanCoreContract)</span>
+<span class="l" id="L543"><span class="n">543</span>    (hDecorated : DecoratedTwoDimensionalContract) :</span>
+<span class="l" id="L544"><span class="n">544</span>    PaperBTerminalStatement :=</span>
+<span class="l" id="L545"><span class="n">545</span>  paperBTerminal_of_split_contracts hBracket</span>
+<span class="l" id="L546"><span class="n">546</span>    (ordinaryTwoDimensionalContract_of_booleanCore hBoolean)</span>
+<span class="l" id="L547"><span class="n">547</span>    hDecorated</span>
+<span class="l" id="L548"><span class="n">548</span></span>
+<span class="l" id="L549"><span class="n">549</span>#print axioms decoratedDensityContract</span>
+<span class="l" id="L550"><span class="n">550</span>#print axioms decoratedTwoDimensionalContract_of_analytic_density</span>
+<span class="l" id="L551"><span class="n">551</span>#print axioms ordinaryTwoDimensionalContract_of_booleanCore</span>
+<span class="l" id="L552"><span class="n">552</span>#print axioms twoDimensionalRemainderContract_of_parts</span>
+<span class="l" id="L553"><span class="n">553</span>#print axioms paperBTerminal_of_contracts</span>
+<span class="l" id="L554"><span class="n">554</span>#print axioms paperBTerminal_of_split_contracts</span>
+<span class="l" id="L555"><span class="n">555</span>#print axioms paperBTerminal_of_reduced_contracts</span>
+<span class="l" id="L556"><span class="n">556</span></span>
+<span class="l" id="L557"><span class="n">557</span>end PaperB.Closure</span></pre></div></body></html>

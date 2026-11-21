@@ -1,0 +1,195 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · GeneralKloosterman/PrimePower.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>GeneralKloosterman/PrimePower.lean</h1><p class="meta">LEAN/GeneralKloosterman/PrimePower.lean · 194 lines · SHA-256 a3393de9b9b87b9f732a89e9b1c071a7bc84336d0ef342fb834d0c94cf508a71</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import GeneralKloosterman.PrimePowerUnit</span>
+<span class="l" id="L2"><span class="n">2</span>import rml.weil.contracts</span>
+<span class="l" id="L3"><span class="n">3</span></span>
+<span class="l" id="L4"><span class="n">4</span>/-!</span>
+<span class="l" id="L5"><span class="n">5</span># The prime-power theorem with the exact gcd loss</span>
+<span class="l" id="L6"><span class="n">6</span></span>
+<span class="l" id="L7"><span class="n">7</span>`kgcd N a b = gcd(a, b, N)` (computed from the canonical representatives).</span>
+<span class="l" id="L8"><span class="n">8</span></span>
+<span class="l" id="L9"><span class="n">9</span>* `kSum_eq_kloostermanUnitSum` — `kSum` is the toolkit&#x27;s `kloostermanUnitSum` (`rfl`).</span>
+<span class="l" id="L10"><span class="n">10</span>* `norm_kSum_prime_le` — `k = 1`, all coefficients: from the toolkit&#x27;s Weil bound `prime_bound`</span>
+<span class="l" id="L11"><span class="n">11</span>  (and the trivial bound when `a = b = 0`).</span>
+<span class="l" id="L12"><span class="n">12</span>* `norm_kSum_unit_primePow_le` — unit coefficients, `k ≥ 2`, every prime `p` (including `2`):</span>
+<span class="l" id="L13"><span class="n">13</span>  `‖S(a,b;p^k)‖ ≤ (k+1) √(p^k)`.</span>
+<span class="l" id="L14"><span class="n">14</span>* **`norm_kSum_primePow_le`** — every `k ≥ 1`, all `a, b`:</span>
+<span class="l" id="L15"><span class="n">15</span>  `‖S(a,b;p^k)‖ ≤ τ(p^k) · √(gcd(a,b,p^k) · p^k)` with `τ(p^k) = k + 1`,</span>
+<span class="l" id="L16"><span class="n">16</span>  by induction on `k`: units (cancellation) / exactly one coefficient divisible by `p` (vanishing) /</span>
+<span class="l" id="L17"><span class="n">17</span>  both divisible (`S(pa&#x27;,pb&#x27;;p^k) = p·S(a&#x27;,b&#x27;;p^(k-1))`, the gcd absorbing the factor `p`).</span>
+<span class="l" id="L18"><span class="n">18</span>-/</span>
+<span class="l" id="L19"><span class="n">19</span></span>
+<span class="l" id="L20"><span class="n">20</span>open Finset RML.ExpSum.Weil</span>
+<span class="l" id="L21"><span class="n">21</span></span>
+<span class="l" id="L22"><span class="n">22</span>namespace GenKloosterman</span>
+<span class="l" id="L23"><span class="n">23</span></span>
+<span class="l" id="L24"><span class="n">24</span>theorem kSum_eq_kloostermanUnitSum (N : ℕ) [NeZero N] (a b : ZMod N) :</span>
+<span class="l" id="L25"><span class="n">25</span>    kSum N a b = kloostermanUnitSum N a b := rfl</span>
+<span class="l" id="L26"><span class="n">26</span></span>
+<span class="l" id="L27"><span class="n">27</span>/-- `gcd(a, b, N)`. -/</span>
+<span class="l" id="L28"><span class="n">28</span>def kgcd (N : ℕ) (a b : ZMod N) : ℕ := Nat.gcd (Nat.gcd a.val b.val) N</span>
+<span class="l" id="L29"><span class="n">29</span></span>
+<span class="l" id="L30"><span class="n">30</span>theorem kgcd_pos (N : ℕ) [NeZero N] (a b : ZMod N) : 0 &lt; kgcd N a b :=</span>
+<span class="l" id="L31"><span class="n">31</span>  Nat.gcd_pos_of_pos_right _ (Nat.pos_of_ne_zero (NeZero.ne N))</span>
+<span class="l" id="L32"><span class="n">32</span></span>
+<span class="l" id="L33"><span class="n">33</span>theorem sqrt_le_sqrt_kgcd (N : ℕ) [NeZero N] (a b : ZMod N) :</span>
+<span class="l" id="L34"><span class="n">34</span>    Real.sqrt N ≤ Real.sqrt (kgcd N a b * N) := by</span>
+<span class="l" id="L35"><span class="n">35</span>  apply Real.sqrt_le_sqrt</span>
+<span class="l" id="L36"><span class="n">36</span>  have : (1 : ℝ) ≤ kgcd N a b := by exact_mod_cast kgcd_pos N a b</span>
+<span class="l" id="L37"><span class="n">37</span>  nlinarith [(Nat.cast_nonneg N : (0 : ℝ) ≤ N)]</span>
+<span class="l" id="L38"><span class="n">38</span></span>
+<span class="l" id="L39"><span class="n">39</span>/-- Descent with the modulus given by an equation. -/</span>
+<span class="l" id="L40"><span class="n">40</span>theorem kSum_descent&#x27; {N d M : ℕ} [NeZero N] [NeZero M] (hN : N = d * M) (a&#x27; b&#x27; : ZMod N) :</span>
+<span class="l" id="L41"><span class="n">41</span>    kSum N ((d : ZMod N) * a&#x27;) ((d : ZMod N) * b&#x27;) =</span>
+<span class="l" id="L42"><span class="n">42</span>      ((Nat.totient N / Nat.totient M : ℕ) : ℂ) *</span>
+<span class="l" id="L43"><span class="n">43</span>        kSum M (ZMod.castHom (hN ▸ Dvd.intro_left d rfl : M ∣ N) (ZMod M) a&#x27;)</span>
+<span class="l" id="L44"><span class="n">44</span>          (ZMod.castHom (hN ▸ Dvd.intro_left d rfl : M ∣ N) (ZMod M) b&#x27;) := by</span>
+<span class="l" id="L45"><span class="n">45</span>  subst hN</span>
+<span class="l" id="L46"><span class="n">46</span>  exact kSum_descent a&#x27; b&#x27;</span>
+<span class="l" id="L47"><span class="n">47</span></span>
+<span class="l" id="L48"><span class="n">48</span>variable {p : ℕ} [hp : Fact p.Prime]</span>
+<span class="l" id="L49"><span class="n">49</span></span>
+<span class="l" id="L50"><span class="n">50</span>/-- `k = 1`: Weil&#x27;s bound (toolkit) and the trivial case `a = b = 0`. -/</span>
+<span class="l" id="L51"><span class="n">51</span>theorem norm_kSum_prime_le (a b : ZMod p) :</span>
+<span class="l" id="L52"><span class="n">52</span>    ‖kSum p a b‖ ≤ 2 * Real.sqrt (kgcd p a b * p) := by</span>
+<span class="l" id="L53"><span class="n">53</span>  by_cases h0 : a = 0 ∧ b = 0</span>
+<span class="l" id="L54"><span class="n">54</span>  · obtain ⟨rfl, rfl⟩ := h0</span>
+<span class="l" id="L55"><span class="n">55</span>    have hk : kgcd p 0 0 = p := by simp [kgcd]</span>
+<span class="l" id="L56"><span class="n">56</span>    rw [hk, ← sq, Real.sqrt_sq (Nat.cast_nonneg _)]</span>
+<span class="l" id="L57"><span class="n">57</span>    refine (norm_kSum_le_card _ _).trans ?_</span>
+<span class="l" id="L58"><span class="n">58</span>    have : (Nat.totient p : ℝ) ≤ p := by exact_mod_cast Nat.totient_le p</span>
+<span class="l" id="L59"><span class="n">59</span>    linarith [(Nat.cast_nonneg p : (0 : ℝ) ≤ p)]</span>
+<span class="l" id="L60"><span class="n">60</span>  · have hnot : a ≠ 0 ∨ b ≠ 0 := by tauto</span>
+<span class="l" id="L61"><span class="n">61</span>    rw [kSum_eq_kloostermanUnitSum]</span>
+<span class="l" id="L62"><span class="n">62</span>    refine (kloostermanUnitSum_prime_le_two_sqrt_of_not_both_zero prime_bound p a b hnot).trans ?_</span>
+<span class="l" id="L63"><span class="n">63</span>    exact mul_le_mul_of_nonneg_left (sqrt_le_sqrt_kgcd p a b) (by norm_num)</span>
+<span class="l" id="L64"><span class="n">64</span></span>
+<span class="l" id="L65"><span class="n">65</span>theorem sqrt_two_mul_gt : (8 : ℝ) ≤ 6 * Real.sqrt 2 := by</span>
+<span class="l" id="L66"><span class="n">66</span>  have h := Real.sq_sqrt (show (0 : ℝ) ≤ 2 by norm_num)</span>
+<span class="l" id="L67"><span class="n">67</span>  nlinarith [Real.sqrt_nonneg 2]</span>
+<span class="l" id="L68"><span class="n">68</span></span>
+<span class="l" id="L69"><span class="n">69</span>/-- Unit coefficients, `k ≥ 2`, any prime: `‖S‖ ≤ (k+1) √(p^k)`. -/</span>
+<span class="l" id="L70"><span class="n">70</span>theorem norm_kSum_unit_primePow_le {k : ℕ} (hk : 2 ≤ k) (a b : ZMod (p ^ k))</span>
+<span class="l" id="L71"><span class="n">71</span>    (ha : IsUnit a) (hb : IsUnit b) :</span>
+<span class="l" id="L72"><span class="n">72</span>    ‖kSum (p ^ k) a b‖ ≤ (k + 1) * Real.sqrt ((p : ℝ) ^ k) := by</span>
+<span class="l" id="L73"><span class="n">73</span>  have hp0 : (0 : ℝ) ≤ p := Nat.cast_nonneg p</span>
+<span class="l" id="L74"><span class="n">74</span>  have hs0 : 0 ≤ Real.sqrt ((p : ℝ) ^ k) := Real.sqrt_nonneg _</span>
+<span class="l" id="L75"><span class="n">75</span>  by_cases hp2 : p = 2</span>
+<span class="l" id="L76"><span class="n">76</span>  · subst hp2</span>
+<span class="l" id="L77"><span class="n">77</span>    have h2 : (0 : ℝ) ≤ 2 := by norm_num</span>
+<span class="l" id="L78"><span class="n">78</span>    by_cases hk4 : 4 ≤ k</span>
+<span class="l" id="L79"><span class="n">79</span>    · have h := norm_kSum_unit_le_count hk sep_two a b ha hb</span>
+<span class="l" id="L80"><span class="n">80</span>      obtain ⟨m, hm | hm⟩ := Nat.even_or_odd&#x27; k</span>
+<span class="l" id="L81"><span class="n">81</span>      · subst hm</span>
+<span class="l" id="L82"><span class="n">82</span>        rw [show 2 * m - (2 * m / 2 - 1) = m + 1 by omega] at h</span>
+<span class="l" id="L83"><span class="n">83</span>        push_cast at h ⊢</span>
+<span class="l" id="L84"><span class="n">84</span>        rw [sqrt_pow_two_mul _ h2]</span>
+<span class="l" id="L85"><span class="n">85</span>        have hm2 : (2 : ℝ) ≤ m := by exact_mod_cast (show 2 ≤ m by omega)</span>
+<span class="l" id="L86"><span class="n">86</span>        calc ‖kSum (2 ^ (2 * m)) a b‖ ≤ 2 * 2 ^ (m + 1) := h</span>
+<span class="l" id="L87"><span class="n">87</span>          _ = 4 * 2 ^ m := by ring</span>
+<span class="l" id="L88"><span class="n">88</span>          _ ≤ (2 * m + 1) * 2 ^ m := by gcongr; linarith</span>
+<span class="l" id="L89"><span class="n">89</span>      · subst hm</span>
+<span class="l" id="L90"><span class="n">90</span>        rw [show 2 * m + 1 - ((2 * m + 1) / 2 - 1) = m + 2 by omega] at h</span>
+<span class="l" id="L91"><span class="n">91</span>        push_cast at h ⊢</span>
+<span class="l" id="L92"><span class="n">92</span>        rw [sqrt_pow_two_mul_add_one _ h2]</span>
+<span class="l" id="L93"><span class="n">93</span>        have hm2 : (2 : ℝ) ≤ m := by exact_mod_cast (show 2 ≤ m by omega)</span>
+<span class="l" id="L94"><span class="n">94</span>        have hs := sqrt_two_mul_gt</span>
+<span class="l" id="L95"><span class="n">95</span>        have hpos : (0 : ℝ) &lt; 2 ^ m := by positivity</span>
+<span class="l" id="L96"><span class="n">96</span>        calc ‖kSum (2 ^ (2 * m + 1)) a b‖ ≤ 2 * 2 ^ (m + 2) := h</span>
+<span class="l" id="L97"><span class="n">97</span>          _ = 8 * 2 ^ m := by ring</span>
+<span class="l" id="L98"><span class="n">98</span>          _ ≤ 6 * Real.sqrt 2 * 2 ^ m := by gcongr</span>
+<span class="l" id="L99"><span class="n">99</span>          _ ≤ (2 * m + 1 + 1) * (2 ^ m * Real.sqrt 2) := by</span>
+<span class="l" id="L100"><span class="n">100</span>            nlinarith [mul_nonneg (show (0 : ℝ) ≤ 2 * m + 2 - 6 by linarith)</span>
+<span class="l" id="L101"><span class="n">101</span>              (mul_nonneg hpos.le (Real.sqrt_nonneg 2))]</span>
+<span class="l" id="L102"><span class="n">102</span>    · -- `k ∈ {2, 3}`: the trivial bound</span>
+<span class="l" id="L103"><span class="n">103</span>      refine (norm_kSum_le_card a b).trans ?_</span>
+<span class="l" id="L104"><span class="n">104</span>      rw [Nat.totient_prime_pow Nat.prime_two (by omega)]</span>
+<span class="l" id="L105"><span class="n">105</span>      interval_cases k &lt;;&gt; norm_num</span>
+<span class="l" id="L106"><span class="n">106</span>  · calc ‖kSum (p ^ k) a b‖ ≤ 2 * Real.sqrt ((p : ℝ) ^ k) := norm_kSum_unit_odd_le hp2 hk a b ha hb</span>
+<span class="l" id="L107"><span class="n">107</span>      _ ≤ (k + 1) * Real.sqrt ((p : ℝ) ^ k) := by</span>
+<span class="l" id="L108"><span class="n">108</span>        gcongr</span>
+<span class="l" id="L109"><span class="n">109</span>        have : (2 : ℝ) ≤ k := by exact_mod_cast hk</span>
+<span class="l" id="L110"><span class="n">110</span>        linarith</span>
+<span class="l" id="L111"><span class="n">111</span></span>
+<span class="l" id="L112"><span class="n">112</span>/-- **Prime-power Weil–Estermann bound with the exact gcd loss.** -/</span>
+<span class="l" id="L113"><span class="n">113</span>theorem norm_kSum_primePow_le : ∀ (k N : ℕ) [NeZero N], N = p ^ k → 1 ≤ k →</span>
+<span class="l" id="L114"><span class="n">114</span>    ∀ a b : ZMod N, ‖kSum N a b‖ ≤ (k + 1) * Real.sqrt (kgcd N a b * N) := by</span>
+<span class="l" id="L115"><span class="n">115</span>  intro k</span>
+<span class="l" id="L116"><span class="n">116</span>  induction k with</span>
+<span class="l" id="L117"><span class="n">117</span>  | zero =&gt; intro N _ _ h; omega</span>
+<span class="l" id="L118"><span class="n">118</span>  | succ k ih =&gt;</span>
+<span class="l" id="L119"><span class="n">119</span>    intro N _ hN _ a b</span>
+<span class="l" id="L120"><span class="n">120</span>    rcases Nat.eq_zero_or_pos k with hk0 | hkpos</span>
+<span class="l" id="L121"><span class="n">121</span>    · subst hk0</span>
+<span class="l" id="L122"><span class="n">122</span>      rw [pow_one] at hN</span>
+<span class="l" id="L123"><span class="n">123</span>      subst hN</span>
+<span class="l" id="L124"><span class="n">124</span>      have := norm_kSum_prime_le a b</span>
+<span class="l" id="L125"><span class="n">125</span>      push_cast</span>
+<span class="l" id="L126"><span class="n">126</span>      linarith</span>
+<span class="l" id="L127"><span class="n">127</span>    subst hN</span>
+<span class="l" id="L128"><span class="n">128</span>    have hk2 : 2 ≤ k + 1 := by omega</span>
+<span class="l" id="L129"><span class="n">129</span>    have hpos : (0 : ℝ) ≤ Real.sqrt (kgcd (p ^ (k + 1)) a b * ((p ^ (k + 1) : ℕ) : ℝ)) :=</span>
+<span class="l" id="L130"><span class="n">130</span>      Real.sqrt_nonneg _</span>
+<span class="l" id="L131"><span class="n">131</span>    by_cases hpa : p ∣ a.val</span>
+<span class="l" id="L132"><span class="n">132</span>    · by_cases hpb : p ∣ b.val</span>
+<span class="l" id="L133"><span class="n">133</span>      · -- descent</span>
+<span class="l" id="L134"><span class="n">134</span>        set A := a.val / p with hA</span>
+<span class="l" id="L135"><span class="n">135</span>        set B := b.val / p with hB</span>
+<span class="l" id="L136"><span class="n">136</span>        have haA : a = (p : ZMod (p ^ (k + 1))) * (A : ZMod (p ^ (k + 1))) := by</span>
+<span class="l" id="L137"><span class="n">137</span>          rw [← Nat.cast_mul, Nat.mul_div_cancel&#x27; hpa, ZMod.natCast_zmod_val]</span>
+<span class="l" id="L138"><span class="n">138</span>        have hbB : b = (p : ZMod (p ^ (k + 1))) * (B : ZMod (p ^ (k + 1))) := by</span>
+<span class="l" id="L139"><span class="n">139</span>          rw [← Nat.cast_mul, Nat.mul_div_cancel&#x27; hpb, ZMod.natCast_zmod_val]</span>
+<span class="l" id="L140"><span class="n">140</span>        have hAlt : A &lt; p ^ k := by</span>
+<span class="l" id="L141"><span class="n">141</span>          rw [hA, Nat.div_lt_iff_lt_mul hp.out.pos, ← pow_succ]; exact ZMod.val_lt a</span>
+<span class="l" id="L142"><span class="n">142</span>        have hBlt : B &lt; p ^ k := by</span>
+<span class="l" id="L143"><span class="n">143</span>          rw [hB, Nat.div_lt_iff_lt_mul hp.out.pos, ← pow_succ]; exact ZMod.val_lt b</span>
+<span class="l" id="L144"><span class="n">144</span>        have hdesc := kSum_descent&#x27; (N := p ^ (k + 1)) (d := p) (M := p ^ k) (pow_succ&#x27; p k)</span>
+<span class="l" id="L145"><span class="n">145</span>          (A : ZMod (p ^ (k + 1))) (B : ZMod (p ^ (k + 1)))</span>
+<span class="l" id="L146"><span class="n">146</span>        rw [← haA, ← hbB] at hdesc</span>
+<span class="l" id="L147"><span class="n">147</span>        rw [hdesc, show Nat.totient (p ^ (k + 1)) / Nat.totient (p ^ k) = p by</span>
+<span class="l" id="L148"><span class="n">148</span>          rw [pow_succ&#x27;]; exact totient_pow_succ_div k hkpos]</span>
+<span class="l" id="L149"><span class="n">149</span>        rw [ZMod.castHom_apply, ZMod.castHom_apply, ZMod.cast_natCast (pow_dvd_pow p (by omega)),</span>
+<span class="l" id="L150"><span class="n">150</span>          ZMod.cast_natCast (pow_dvd_pow p (by omega))]</span>
+<span class="l" id="L151"><span class="n">151</span>        have hih := ih (p ^ k) rfl hkpos (A : ZMod (p ^ k)) (B : ZMod (p ^ k))</span>
+<span class="l" id="L152"><span class="n">152</span>        have hg : kgcd (p ^ (k + 1)) a b = p * kgcd (p ^ k) (A : ZMod (p ^ k)) (B : ZMod (p ^ k)) := by</span>
+<span class="l" id="L153"><span class="n">153</span>          unfold kgcd</span>
+<span class="l" id="L154"><span class="n">154</span>          rw [ZMod.val_cast_of_lt hAlt, ZMod.val_cast_of_lt hBlt,</span>
+<span class="l" id="L155"><span class="n">155</span>            ← Nat.mul_div_cancel&#x27; hpa, ← Nat.mul_div_cancel&#x27; hpb, ← hA, ← hB,</span>
+<span class="l" id="L156"><span class="n">156</span>            Nat.gcd_mul_left, pow_succ&#x27;, Nat.gcd_mul_left]</span>
+<span class="l" id="L157"><span class="n">157</span>        rw [norm_mul, Complex.norm_natCast, hg]</span>
+<span class="l" id="L158"><span class="n">158</span>        have hp0 : (0 : ℝ) ≤ p := Nat.cast_nonneg p</span>
+<span class="l" id="L159"><span class="n">159</span>        have hsq : Real.sqrt (((p * kgcd (p ^ k) (A : ZMod (p ^ k)) (B : ZMod (p ^ k)) : ℕ) : ℝ) *</span>
+<span class="l" id="L160"><span class="n">160</span>            ((p ^ (k + 1) : ℕ) : ℝ)) =</span>
+<span class="l" id="L161"><span class="n">161</span>            p * Real.sqrt ((kgcd (p ^ k) (A : ZMod (p ^ k)) (B : ZMod (p ^ k)) : ℝ) *</span>
+<span class="l" id="L162"><span class="n">162</span>              ((p ^ k : ℕ) : ℝ)) := by</span>
+<span class="l" id="L163"><span class="n">163</span>          rw [show (((p * kgcd (p ^ k) (A : ZMod (p ^ k)) (B : ZMod (p ^ k)) : ℕ) : ℝ) *</span>
+<span class="l" id="L164"><span class="n">164</span>              ((p ^ (k + 1) : ℕ) : ℝ)) = (p : ℝ) ^ 2 *</span>
+<span class="l" id="L165"><span class="n">165</span>                ((kgcd (p ^ k) (A : ZMod (p ^ k)) (B : ZMod (p ^ k)) : ℝ) * ((p ^ k : ℕ) : ℝ)) by</span>
+<span class="l" id="L166"><span class="n">166</span>            push_cast; ring]</span>
+<span class="l" id="L167"><span class="n">167</span>          rw [Real.sqrt_mul (sq_nonneg _), Real.sqrt_sq hp0]</span>
+<span class="l" id="L168"><span class="n">168</span>        rw [hsq]</span>
+<span class="l" id="L169"><span class="n">169</span>        push_cast at hih ⊢</span>
+<span class="l" id="L170"><span class="n">170</span>        have hs0 : 0 ≤ Real.sqrt ((kgcd (p ^ k) (A : ZMod (p ^ k)) (B : ZMod (p ^ k)) : ℝ) *</span>
+<span class="l" id="L171"><span class="n">171</span>            (p : ℝ) ^ k) := Real.sqrt_nonneg _</span>
+<span class="l" id="L172"><span class="n">172</span>        calc (p : ℝ) * ‖kSum (p ^ k) (A : ZMod (p ^ k)) (B : ZMod (p ^ k))‖</span>
+<span class="l" id="L173"><span class="n">173</span>            ≤ p * ((k + 1) * Real.sqrt ((kgcd (p ^ k) (A : ZMod (p ^ k)) (B : ZMod (p ^ k)) : ℝ) *</span>
+<span class="l" id="L174"><span class="n">174</span>                (p : ℝ) ^ k)) := by gcongr</span>
+<span class="l" id="L175"><span class="n">175</span>          _ ≤ (k + 1 + 1) * (p * Real.sqrt ((kgcd (p ^ k) (A : ZMod (p ^ k)) (B : ZMod (p ^ k)) : ℝ) *</span>
+<span class="l" id="L176"><span class="n">176</span>                (p : ℝ) ^ k)) := by nlinarith [mul_nonneg hp0 hs0]</span>
+<span class="l" id="L177"><span class="n">177</span>      · -- `p ∣ a`, `b` a unit: vanishing</span>
+<span class="l" id="L178"><span class="n">178</span>        have hb : IsUnit b := (isUnit_iff_not_dvd (by omega) b).2 hpb</span>
+<span class="l" id="L179"><span class="n">179</span>        rw [kSum_eq_zero_of_dvd_left hk2 a b hpa hb, norm_zero]</span>
+<span class="l" id="L180"><span class="n">180</span>        positivity</span>
+<span class="l" id="L181"><span class="n">181</span>    · have ha : IsUnit a := (isUnit_iff_not_dvd (by omega) a).2 hpa</span>
+<span class="l" id="L182"><span class="n">182</span>      by_cases hpb : p ∣ b.val</span>
+<span class="l" id="L183"><span class="n">183</span>      · rw [kSum_eq_zero_of_dvd_right hk2 a b ha hpb, norm_zero]</span>
+<span class="l" id="L184"><span class="n">184</span>        positivity</span>
+<span class="l" id="L185"><span class="n">185</span>      · have hb : IsUnit b := (isUnit_iff_not_dvd (by omega) b).2 hpb</span>
+<span class="l" id="L186"><span class="n">186</span>        have h := norm_kSum_unit_primePow_le hk2 a b ha hb</span>
+<span class="l" id="L187"><span class="n">187</span>        have hmono := sqrt_le_sqrt_kgcd (p ^ (k + 1)) a b</span>
+<span class="l" id="L188"><span class="n">188</span>        push_cast at h hmono ⊢</span>
+<span class="l" id="L189"><span class="n">189</span>        calc ‖kSum (p ^ (k + 1)) a b‖ ≤ (k + 1 + 1) * Real.sqrt ((p : ℝ) ^ (k + 1)) := by</span>
+<span class="l" id="L190"><span class="n">190</span>              exact_mod_cast h</span>
+<span class="l" id="L191"><span class="n">191</span>          _ ≤ (k + 1 + 1) * Real.sqrt (kgcd (p ^ (k + 1)) a b * (p : ℝ) ^ (k + 1)) := by</span>
+<span class="l" id="L192"><span class="n">192</span>              gcongr</span>
+<span class="l" id="L193"><span class="n">193</span></span>
+<span class="l" id="L194"><span class="n">194</span>end GenKloosterman</span></pre></div></body></html>

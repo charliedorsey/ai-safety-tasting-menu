@@ -1,0 +1,720 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · GoldC/QuillonLC.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>GoldC/QuillonLC.lean</h1><p class="meta">LEAN/GoldC/QuillonLC.lean · 719 lines · SHA-256 c3a1495d45ad1f6f3daa8e122ec55477c50fc28a206a1f1e569d930ee24a24c5</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import GoldC.QuillonCPhysical</span>
+<span class="l" id="L2"><span class="n">2</span>import GoldC.QuillonLW</span>
+<span class="l" id="L3"><span class="n">3</span></span>
+<span class="l" id="L4"><span class="n">4</span>/-!</span>
+<span class="l" id="L5"><span class="n">5</span># Quillon LONG L3: the LONG-left region-C cell (Parseval-W + VW + Rankin; r long, s modulus)</span>
+<span class="l" id="L6"><span class="n">6</span></span>
+<span class="l" id="L7"><span class="n">7</span>Constant-4 copies of `CTerm_ev` and `rankin_Lw_ev`, the fixed-`C` cell `C_final_L` on the LONG-left</span>
+<span class="l" id="L8"><span class="n">8</span>mask `GeoLL` (no upper cap on `r` is used: the dyadic `r`-pieces run up to `H²`), and the</span>
+<span class="l" id="L9"><span class="n">9</span>**physical LONG-left C theorem** `CL_physical`. On LONG-left `s^{1+ε} ≤ s^{1+δ} &lt; r` once</span>
+<span class="l" id="L10"><span class="n">10</span>`ε = Λ^{-1/200} ≤ δ`, so the CORE region-C lower edge `LwC &lt; r` holds automatically.</span>
+<span class="l" id="L11"><span class="n">11</span></span>
+<span class="l" id="L12"><span class="n">12</span>No axiom, no `sorry`.</span>
+<span class="l" id="L13"><span class="n">13</span>-/</span>
+<span class="l" id="L14"><span class="n">14</span></span>
+<span class="l" id="L15"><span class="n">15</span>open scoped BigOperators</span>
+<span class="l" id="L16"><span class="n">16</span>open Finset</span>
+<span class="l" id="L17"><span class="n">17</span></span>
+<span class="l" id="L18"><span class="n">18</span>namespace GoldC.QuillonLC</span>
+<span class="l" id="L19"><span class="n">19</span></span>
+<span class="l" id="L20"><span class="n">20</span>open GoldC.QuillonEv GoldC.QuillonSetup GoldC.QuillonLam GoldC.QuillonCEv GoldC.QuillonCFinal</span>
+<span class="l" id="L21"><span class="n">21</span>  GoldC.QuillonCEst GoldC.QuillonLSetup GoldC.QuillonCPhysical GoldC.QuillonCopyM GoldC.QuillonWContext</span>
+<span class="l" id="L22"><span class="n">22</span></span>
+<span class="l" id="L23"><span class="n">23</span>/-- `ε = Λ^{-1/200} ≤ δ` eventually. -/</span>
+<span class="l" id="L24"><span class="n">24</span>lemma εp_le_ev (δ : ℝ) (hδ0 : 0 &lt; δ) : ∃ Λ₀ : ℝ, 1 ≤ Λ₀ ∧ ∀ h : ℕ, Λ₀ ≤ Real.log h → εp h ≤ δ := by</span>
+<span class="l" id="L25"><span class="n">25</span>  obtain ⟨Λ₀, hΛ₀, hK⟩ := const_le_rpow (1 / δ) (1 / 200) (by norm_num)</span>
+<span class="l" id="L26"><span class="n">26</span>  refine ⟨max 1 Λ₀, le_max_left _ _, fun h hΛ =&gt; ?_⟩</span>
+<span class="l" id="L27"><span class="n">27</span>  have hΛ1 : 1 ≤ Real.log h := le_trans (le_max_left _ _) hΛ</span>
+<span class="l" id="L28"><span class="n">28</span>  have h1 := hK _ (le_trans (le_max_right _ _) hΛ)</span>
+<span class="l" id="L29"><span class="n">29</span>  unfold εp</span>
+<span class="l" id="L30"><span class="n">30</span>  have hp : 0 &lt; (Real.log h) ^ (1 / 200 : ℝ) := by positivity</span>
+<span class="l" id="L31"><span class="n">31</span>  rw [Real.rpow_neg (by linarith), ← one_div, div_le_iff₀ hp]</span>
+<span class="l" id="L32"><span class="n">32</span>  rw [div_le_iff₀ hδ0] at h1</span>
+<span class="l" id="L33"><span class="n">33</span>  linarith</span>
+<span class="l" id="L34"><span class="n">34</span></span>
+<span class="l" id="L35"><span class="n">35</span>/-- On LONG-left, `s^{1+ε} ≤ r` once `ε ≤ δ`. -/</span>
+<span class="l" id="L36"><span class="n">36</span>lemma LL_eps {h H : ℕ} {δ : ℝ} {r s : ℕ} (hεδ : εp h ≤ δ) (hG : GeoLL h H δ r s) :</span>
+<span class="l" id="L37"><span class="n">37</span>    (s : ℝ) ^ (1 + εp h) ≤ r := by</span>
+<span class="l" id="L38"><span class="n">38</span>  have hL := hG.2.2.1</span>
+<span class="l" id="L39"><span class="n">39</span>  unfold longInverseLeft at hL</span>
+<span class="l" id="L40"><span class="n">40</span>  rcases Nat.eq_zero_or_pos s with h0 | h0</span>
+<span class="l" id="L41"><span class="n">41</span>  · subst h0</span>
+<span class="l" id="L42"><span class="n">42</span>    have hε : 0 &lt; 1 + εp h := by unfold εp; positivity</span>
+<span class="l" id="L43"><span class="n">43</span>    rw [Nat.cast_zero, Real.zero_rpow hε.ne&#x27;]; positivity</span>
+<span class="l" id="L44"><span class="n">44</span>  · have hs1 : (1 : ℝ) ≤ s := by exact_mod_cast h0</span>
+<span class="l" id="L45"><span class="n">45</span>    exact le_trans (Real.rpow_le_rpow_of_exponent_le hs1 (by linarith)) hL.le</span>
+<span class="l" id="L46"><span class="n">46</span></span>
+<span class="l" id="L47"><span class="n">47</span>set_option maxHeartbeats 4000000 in</span>
+<span class="l" id="L48"><span class="n">48</span>/-- **Each region-C `CTerm` is `≤ Λ^{−40}`**, eventually in `h`, uniformly in admissible `s` and</span>
+<span class="l" id="L49"><span class="n">49</span>dyadic pieces `(a, b]` with `s^{1+ε}/2 ≤ a &lt; b ≤ 2a`, `b ≤ H²`. -/</span>
+<span class="l" id="L50"><span class="n">50</span>theorem CTerm_ev4 (q : ℕ) (hq : 0 &lt; q) (δ : ℝ) (hδ0 : 0 &lt; δ) (hδ1 : δ &lt; 1 / 3) :</span>
+<span class="l" id="L51"><span class="n">51</span>    ∃ Λ₀ : ℝ, 2 ≤ Λ₀ ∧ ∀ (h H : ℕ), Λ₀ ≤ Real.log h → H ≤ h →</span>
+<span class="l" id="L52"><span class="n">52</span>      ∀ (s M : ℕ) [NeZero s] [NeZero M] (C U&#x27; JP : Finset ℕ), (∀ p ∈ C, p.Prime) → s = ∏ p ∈ C, p →</span>
+<span class="l" id="L53"><span class="n">53</span>        M = 6 * q → 4 * (Real.log h) ^ σ₀ ≤ Real.log (s : ℝ) →</span>
+<span class="l" id="L54"><span class="n">54</span>        (∀ p ∈ U&#x27;, p.Prime ∧ 5 ≤ p ∧ p ≤ H ^ 2) →</span>
+<span class="l" id="L55"><span class="n">55</span>        ∀ (A : ZMod M → ℕ → ℂ) (c : ℕ → ZMod s),</span>
+<span class="l" id="L56"><span class="n">56</span>          (∀ ρ j, 1 ≤ j → ‖A ρ j‖ ≤ (300 * (q : ℝ) ^ 2) / j) →</span>
+<span class="l" id="L57"><span class="n">57</span>          (∀ j, 1 ≤ j → C.filter (fun p =&gt; (ZMod.cast (c j) : ZMod p) = 0) = C.filter (fun p =&gt; p ∣ j)) →</span>
+<span class="l" id="L58"><span class="n">58</span>          ∀ (Ec a b : ℕ), (Ec : ℝ) ≤ (Real.log h) ^ 2 →</span>
+<span class="l" id="L59"><span class="n">59</span>            (s : ℝ) ^ (1 + εp h) / 2 ≤ a → a &lt; b → b ≤ 2 * a → b ≤ H ^ 2 →</span>
+<span class="l" id="L60"><span class="n">60</span>            GoldC.QuillonCCellApp.CTerm C (Icc 1 (6 * q * h)) A c U&#x27; JP (Xp h) (Yp δ s) (Tpp h)</span>
+<span class="l" id="L61"><span class="n">61</span>              (Uvp s) (Uvp s) (Tvp h) Ec a b ≤ (Real.log h) ^ (-(40 : ℝ)) := by</span>
+<span class="l" id="L62"><span class="n">62</span>  have ha0 := a0_pos hδ0 hδ1</span>
+<span class="l" id="L63"><span class="n">63</span>  have ha0&#x27; := a0_le hδ0</span>
+<span class="l" id="L64"><span class="n">64</span>  have hu0 : 0 &lt; u0 δ := by unfold u0; linarith</span>
+<span class="l" id="L65"><span class="n">65</span>  have hu1 : u0 δ ≤ 1 / 8 := by unfold u0; linarith</span>
+<span class="l" id="L66"><span class="n">66</span>  set Ab : ℝ := 300 * (q : ℝ) ^ 2 with hAb</span>
+<span class="l" id="L67"><span class="n">67</span>  set E : ℝ := Real.exp 10 * (2 * 2 + 1) ^ 10 with hE</span>
+<span class="l" id="L68"><span class="n">68</span>  set Mr : ℝ := ((6 * q : ℕ) : ℝ) with hMr</span>
+<span class="l" id="L69"><span class="n">69</span>  set Kc : ℝ := 5 * Mr * (Mr * Ab * 2) * 82944 + E * (Mr * Ab * 2) * 2 + Mr * Ab * 2 * E with hKc</span>
+<span class="l" id="L70"><span class="n">70</span>  have hKc0 : 0 ≤ Kc := by positivity</span>
+<span class="l" id="L71"><span class="n">71</span>  obtain ⟨Λ₁, hΛ₁, hτ⟩ := sdecay4 2 (u0 δ / 8) 3000 (by positivity) (by norm_num)</span>
+<span class="l" id="L72"><span class="n">72</span>  obtain ⟨Λ₂, hΛ₂, hε⟩ := edecay4 3001 (by norm_num)</span>
+<span class="l" id="L73"><span class="n">73</span>  obtain ⟨L₀, hL₀, h4⟩ := GoldC.QuillonAsymp.four_pow_card_le (u0 δ / 8 / 2) (by positivity)</span>
+<span class="l" id="L74"><span class="n">74</span>  obtain ⟨Λ₃, hΛ₃, hsl⟩ := s_large4 (max (Real.exp L₀) (2 ^ (16 / u0 δ)))</span>
+<span class="l" id="L75"><span class="n">75</span>  obtain ⟨Λ₄, hΛ₄, hAω⟩ := Aω_le 5 (1 / 2) (by norm_num) (by norm_num)</span>
+<span class="l" id="L76"><span class="n">76</span>  obtain ⟨Λ₅, hΛ₅, hK⟩ := const_le_rpow (Kc + Mr + 6 * q + 6 + 200000) 1 one_pos</span>
+<span class="l" id="L77"><span class="n">77</span>  refine ⟨max 2 (max Λ₁ (max Λ₂ (max Λ₃ (max Λ₄ (max Λ₅ (1 + Real.log (6 * q))))))), le_max_left _ _, ?_⟩</span>
+<span class="l" id="L78"><span class="n">78</span>  intro h H hΛ hHh s M _ _ C U&#x27; JP hC hsC hM hlog hU&#x27; A c hA hc Ec a b hEc ha hab hb2 hbH</span>
+<span class="l" id="L79"><span class="n">79</span>  set Λ := Real.log h with hΛdef</span>
+<span class="l" id="L80"><span class="n">80</span>  have hge : ∀ x, x ≤ max 2 (max Λ₁ (max Λ₂ (max Λ₃ (max Λ₄ (max Λ₅ (1 + Real.log (6 * q))))))) → x ≤ Λ :=</span>
+<span class="l" id="L81"><span class="n">81</span>    fun x hx =&gt; le_trans hx hΛ</span>
+<span class="l" id="L82"><span class="n">82</span>  have hΛ2 : 2 ≤ Λ := hge _ (le_max_left _ _)</span>
+<span class="l" id="L83"><span class="n">83</span>  have hΛ0 : 0 &lt; Λ := by linarith</span>
+<span class="l" id="L84"><span class="n">84</span>  have hΛ1 : 1 ≤ Λ := by linarith</span>
+<span class="l" id="L85"><span class="n">85</span>  have L1 := hge Λ₁ (by simp)</span>
+<span class="l" id="L86"><span class="n">86</span>  have L2 := hge Λ₂ (by simp)</span>
+<span class="l" id="L87"><span class="n">87</span>  have L3 := hge Λ₃ (by simp)</span>
+<span class="l" id="L88"><span class="n">88</span>  have L4 := hge Λ₄ (by simp)</span>
+<span class="l" id="L89"><span class="n">89</span>  have L5 := hge Λ₅ (by simp)</span>
+<span class="l" id="L90"><span class="n">90</span>  have L6 := hge (1 + Real.log (6 * q)) (by simp)</span>
+<span class="l" id="L91"><span class="n">91</span>  clear hge hΛ</span>
+<span class="l" id="L92"><span class="n">92</span>  have hKΛ := hK Λ L5</span>
+<span class="l" id="L93"><span class="n">93</span>  rw [Real.rpow_one] at hKΛ</span>
+<span class="l" id="L94"><span class="n">94</span>  have hΛbig : 200000 ≤ Λ := by</span>
+<span class="l" id="L95"><span class="n">95</span>    have : (0 : ℝ) ≤ Mr + 6 * q + 6 := by positivity</span>
+<span class="l" id="L96"><span class="n">96</span>    linarith</span>
+<span class="l" id="L97"><span class="n">97</span>  have hKcΛ : Kc ≤ Λ := by</span>
+<span class="l" id="L98"><span class="n">98</span>    have : (0 : ℝ) ≤ Mr + 6 * q + 6 + 200000 := by positivity</span>
+<span class="l" id="L99"><span class="n">99</span>    linarith</span>
+<span class="l" id="L100"><span class="n">100</span>  have hMΛ : Mr ≤ Λ := by</span>
+<span class="l" id="L101"><span class="n">101</span>    have : (0 : ℝ) ≤ 6 * q + 6 + 200000 := by positivity</span>
+<span class="l" id="L102"><span class="n">102</span>    linarith</span>
+<span class="l" id="L103"><span class="n">103</span>  have hh1n : 1 ≤ h := by</span>
+<span class="l" id="L104"><span class="n">104</span>    rcases Nat.eq_zero_or_pos h with h0 | h0</span>
+<span class="l" id="L105"><span class="n">105</span>    · exfalso</span>
+<span class="l" id="L106"><span class="n">106</span>      have : Real.log (h : ℝ) = 0 := by rw [h0]; simp</span>
+<span class="l" id="L107"><span class="n">107</span>      linarith</span>
+<span class="l" id="L108"><span class="n">108</span>    · exact h0</span>
+<span class="l" id="L109"><span class="n">109</span>  have hh0 : (0 : ℝ) &lt; h := by exact_mod_cast hh1n</span>
+<span class="l" id="L110"><span class="n">110</span>  have hspos : 0 &lt; s := by rw [hsC]; exact prod_pos fun p hp =&gt; (hC p hp).pos</span>
+<span class="l" id="L111"><span class="n">111</span>  have hs0 : (0 : ℝ) &lt; s := by exact_mod_cast hspos</span>
+<span class="l" id="L112"><span class="n">112</span>  have hsbig := hsl Λ L3 s hs0 hlog</span>
+<span class="l" id="L113"><span class="n">113</span>  have hsL₀ : L₀ ≤ Real.log s := by</span>
+<span class="l" id="L114"><span class="n">114</span>    rw [← Real.log_exp L₀]; exact Real.log_le_log (Real.exp_pos _) (le_trans (le_max_left _ _) hsbig)</span>
+<span class="l" id="L115"><span class="n">115</span>  have hτΛ := hτ Λ L1 s hs0 hlog</span>
+<span class="l" id="L116"><span class="n">116</span>  obtain ⟨hs65, hs1, hsu2, hsΛ⟩ := s_facts Λ s (u0 δ) (u0 δ / 8) hΛ2 hu0 hu1 (by linarith)</span>
+<span class="l" id="L117"><span class="n">117</span>    (le_trans (le_max_right _ _) hsbig) hτΛ</span>
+<span class="l" id="L118"><span class="n">118</span>  have h4n : (4 : ℝ) ^ C.card ≤ (s : ℝ) ^ (u0 δ / 8 / 2) := by</span>
+<span class="l" id="L119"><span class="n">119</span>    have := h4 C hC (by rw [← hsC]; exact hsL₀); rwa [← hsC] at this</span>
+<span class="l" id="L120"><span class="n">120</span>  -- `a`, `b`</span>
+<span class="l" id="L121"><span class="n">121</span>  have hε0 : 0 ≤ εp h := by unfold εp; positivity</span>
+<span class="l" id="L122"><span class="n">122</span>  have hs1e : (s : ℝ) ≤ (s : ℝ) ^ (1 + εp h) := by</span>
+<span class="l" id="L123"><span class="n">123</span>    calc (s : ℝ) = (s : ℝ) ^ (1 : ℝ) := (Real.rpow_one _).symm</span>
+<span class="l" id="L124"><span class="n">124</span>      _ ≤ (s : ℝ) ^ (1 + εp h) := Real.rpow_le_rpow_of_exponent_le hs1 (by linarith)</span>
+<span class="l" id="L125"><span class="n">125</span>  have habR : (a : ℝ) ≤ b := by exact_mod_cast hab.le</span>
+<span class="l" id="L126"><span class="n">126</span>  have haR : (s : ℝ) / 2 ≤ a := le_trans (by linarith) ha</span>
+<span class="l" id="L127"><span class="n">127</span>  have hbR : (s : ℝ) / 2 ≤ b := le_trans haR habR</span>
+<span class="l" id="L128"><span class="n">128</span>  have hb1 : 1 ≤ b := by</span>
+<span class="l" id="L129"><span class="n">129</span>    have : (1 : ℝ) ≤ b := by linarith</span>
+<span class="l" id="L130"><span class="n">130</span>    exact_mod_cast this</span>
+<span class="l" id="L131"><span class="n">131</span>  have hb0 : (0 : ℝ) &lt; b := by linarith</span>
+<span class="l" id="L132"><span class="n">132</span>  have hbh : Real.log b ≤ 2 * Λ := by</span>
+<span class="l" id="L133"><span class="n">133</span>    have h1 : (b : ℝ) ≤ (h : ℝ) ^ 2 := by</span>
+<span class="l" id="L134"><span class="n">134</span>      have : b ≤ h ^ 2 := le_trans hbH (Nat.pow_le_pow_left hHh 2)</span>
+<span class="l" id="L135"><span class="n">135</span>      exact_mod_cast this</span>
+<span class="l" id="L136"><span class="n">136</span>    have := Real.log_le_log hb0 h1</span>
+<span class="l" id="L137"><span class="n">137</span>    rwa [Real.log_pow, Nat.cast_ofNat] at this</span>
+<span class="l" id="L138"><span class="n">138</span>  have hlb : (Nat.log 2 b : ℝ) + 1 ≤ 5 * Λ := by</span>
+<span class="l" id="L139"><span class="n">139</span>    have := natlog_le_of b (2 * Λ) hbh</span>
+<span class="l" id="L140"><span class="n">140</span>    rw [max_eq_left (show (0 : ℝ) ≤ 2 * Λ by linarith)] at this</span>
+<span class="l" id="L141"><span class="n">141</span>    linarith</span>
+<span class="l" id="L142"><span class="n">142</span>  have hsb : (s : ℝ) / b ≤ Λ ^ (-(3000 : ℝ)) :=</span>
+<span class="l" id="L143"><span class="n">143</span>    sb_fact Λ s b (εp h) hΛ2 hs0 hb0 (hε Λ L2 s hs0 hlog) (le_trans ha habR)</span>
+<span class="l" id="L144"><span class="n">144</span>  -- `X`, `Y`, `Tp`, `Tv`, `Uv`</span>
+<span class="l" id="L145"><span class="n">145</span>  have hXge := Xp_ge (h := h) hΛ1</span>
+<span class="l" id="L146"><span class="n">146</span>  have hXle := Xp_le (h := h) hΛ1</span>
+<span class="l" id="L147"><span class="n">147</span>  have hX1 : 1 ≤ Xp h := by</span>
+<span class="l" id="L148"><span class="n">148</span>    have : (1 : ℝ) ≤ Xp h := le_trans (Real.one_le_rpow hΛ1 (by norm_num)) hXge</span>
+<span class="l" id="L149"><span class="n">149</span>    exact_mod_cast this</span>
+<span class="l" id="L150"><span class="n">150</span>  obtain ⟨hTp1, hTp2⟩ := Tpp_bounds (h := h) hΛ1</span>
+<span class="l" id="L151"><span class="n">151</span>  obtain ⟨hTv1, hTv2⟩ := Tvp_bounds (h := h) hΛ1</span>
+<span class="l" id="L152"><span class="n">152</span>  have hYge := inv_Yp_le hδ0 hδ1 hsu2</span>
+<span class="l" id="L153"><span class="n">153</span>  have hY1 : 1 ≤ Yp δ s := by</span>
+<span class="l" id="L154"><span class="n">154</span>    have : (1 : ℝ) ≤ Yp δ s := by linarith</span>
+<span class="l" id="L155"><span class="n">155</span>    exact_mod_cast this</span>
+<span class="l" id="L156"><span class="n">156</span>  obtain ⟨hY2, hY12, hsY⟩ := Y_facts Λ s (u0 δ) (u0 δ / 8) (Yp δ s) C.card hΛbig hu0 (by linarith)</span>
+<span class="l" id="L157"><span class="n">157</span>    (by linarith) hs1 hYge hsu2 hτΛ h4n (by positivity)</span>
+<span class="l" id="L158"><span class="n">158</span>  have haX := aX_fact Λ s a (Xp h) hΛbig hX1 hXle haR hsΛ</span>
+<span class="l" id="L159"><span class="n">159</span>  have ha6 : 6 ≤ a / Xp h := by</span>
+<span class="l" id="L160"><span class="n">160</span>    have h6 : (6 * q + 6 : ℝ) ≤ (s : ℝ) / (8 * Λ ^ (200 : ℝ)) := by</span>
+<span class="l" id="L161"><span class="n">161</span>      rw [le_div_iff₀ (by positivity)]</span>
+<span class="l" id="L162"><span class="n">162</span>      have e3 : Λ ^ (3000 : ℝ) = Λ ^ (1 : ℝ) * Λ ^ (200 : ℝ) * Λ ^ (2799 : ℝ) := by</span>
+<span class="l" id="L163"><span class="n">163</span>        rw [rp hΛ0, rp hΛ0]; norm_num</span>
+<span class="l" id="L164"><span class="n">164</span>      have hb8 : (8 : ℝ) ≤ Λ ^ (2799 : ℝ) := le_trans (by linarith) (le_rpow_big Λ hΛ1 2799 (by norm_num))</span>
+<span class="l" id="L165"><span class="n">165</span>      have hq6 : (6 * q + 6 : ℝ) ≤ Λ := by</span>
+<span class="l" id="L166"><span class="n">166</span>        have : (0 : ℝ) ≤ Kc + Mr + 200000 := by positivity</span>
+<span class="l" id="L167"><span class="n">167</span>        linarith</span>
+<span class="l" id="L168"><span class="n">168</span>      rw [e3, Real.rpow_one] at hsΛ</span>
+<span class="l" id="L169"><span class="n">169</span>      have hp : 0 &lt; Λ ^ (200 : ℝ) := by positivity</span>
+<span class="l" id="L170"><span class="n">170</span>      calc (6 * q + 6 : ℝ) * (8 * Λ ^ (200 : ℝ)) ≤ Λ * (8 * Λ ^ (200 : ℝ)) :=</span>
+<span class="l" id="L171"><span class="n">171</span>            mul_le_mul_of_nonneg_right hq6 (by positivity)</span>
+<span class="l" id="L172"><span class="n">172</span>        _ ≤ Λ * (Λ ^ (2799 : ℝ) * Λ ^ (200 : ℝ)) :=</span>
+<span class="l" id="L173"><span class="n">173</span>            mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_right hb8 hp.le) hΛ0.le</span>
+<span class="l" id="L174"><span class="n">174</span>        _ = Λ * Λ ^ (200 : ℝ) * Λ ^ (2799 : ℝ) := by ring</span>
+<span class="l" id="L175"><span class="n">175</span>        _ ≤ s := hsΛ</span>
+<span class="l" id="L176"><span class="n">176</span>    have : (6 : ℝ) ≤ ((a / Xp h : ℕ) : ℝ) := by</span>
+<span class="l" id="L177"><span class="n">177</span>      have : (0 : ℝ) ≤ q := by positivity</span>
+<span class="l" id="L178"><span class="n">178</span>      linarith</span>
+<span class="l" id="L179"><span class="n">179</span>    exact_mod_cast this</span>
+<span class="l" id="L180"><span class="n">180</span>  obtain ⟨hUv2, hUvb⟩ := Uv_b_facts s b hs65 hbR</span>
+<span class="l" id="L181"><span class="n">181</span>  have hXYb := XY_fact Λ s (Xp h) (Yp δ s) b (u0 δ) hΛbig hu1 hs65 hsΛ hXle (Yp_le δ s) hbR</span>
+<span class="l" id="L182"><span class="n">182</span>  -- weights</span>
+<span class="l" id="L183"><span class="n">183</span>  have hAωb : (Real.exp 37.5 * (1 + Nat.log 2 (Nat.log 2 b) : ℝ) ^ 30) ^ 2 ≤ Λ := by</span>
+<span class="l" id="L184"><span class="n">184</span>    have h1 := hAω Λ L4 b (by linarith)</span>
+<span class="l" id="L185"><span class="n">185</span>    have h0 : 0 ≤ Real.exp 37.5 * (1 + Nat.log 2 (Nat.log 2 b) : ℝ) ^ 30 := by positivity</span>
+<span class="l" id="L186"><span class="n">186</span>    calc _ ≤ (Λ ^ (1 / 2 : ℝ)) ^ 2 := pow_le_pow_left₀ h0 h1 2</span>
+<span class="l" id="L187"><span class="n">187</span>      _ = Λ := by rw [← Real.rpow_natCast, ← Real.rpow_mul hΛ0.le]; norm_num</span>
+<span class="l" id="L188"><span class="n">188</span>  have hU&#x27;5 : ∀ p ∈ U&#x27;, 5 ≤ p := fun p hp =&gt; (hU&#x27; p hp).2.1</span>
+<span class="l" id="L189"><span class="n">189</span>  have hlogh2 : Real.log ((h ^ 2 : ℕ) : ℝ) ≤ 2 * Λ := by</span>
+<span class="l" id="L190"><span class="n">190</span>    push_cast; rw [Real.log_pow]; push_cast; exact le_rfl</span>
+<span class="l" id="L191"><span class="n">191</span>  have hWU : ∏ p ∈ U&#x27;, (1 + 1 / ((p : ℝ) - 3)) ≤ E * Λ ^ (10 : ℝ) :=</span>
+<span class="l" id="L192"><span class="n">192</span>    prodU_le_pow U&#x27; (fun p hp =&gt; ⟨(hU&#x27; p hp).1, (hU&#x27; p hp).2.1⟩) (h ^ 2)</span>
+<span class="l" id="L193"><span class="n">193</span>      (fun p hp =&gt; le_trans (hU&#x27; p hp).2.2 (Nat.pow_le_pow_left hHh 2)) 2 Λ (by norm_num) hΛ1 hlogh2</span>
+<span class="l" id="L194"><span class="n">194</span>  have hSm : ∑ B&#x27; ∈ (U&#x27;.filter (fun p =&gt; p &lt; Xp h)).powerset, ωR B&#x27; ≤ E * Λ ^ (10 : ℝ) := by</span>
+<span class="l" id="L195"><span class="n">195</span>    rw [sum_ωR_powerset]</span>
+<span class="l" id="L196"><span class="n">196</span>    exact prodU_le_pow _ (fun p hp =&gt; ⟨(hU&#x27; p (filter_subset _ _ hp)).1, (hU&#x27; p (filter_subset _ _ hp)).2.1⟩)</span>
+<span class="l" id="L197"><span class="n">197</span>      (h ^ 2) (fun p hp =&gt; le_trans (hU&#x27; p (filter_subset _ _ hp)).2.2 (Nat.pow_le_pow_left hHh 2)) 2 Λ</span>
+<span class="l" id="L198"><span class="n">198</span>      (by norm_num) hΛ1 hlogh2</span>
+<span class="l" id="L199"><span class="n">199</span>  have hJm : 1 + Real.log ((6 * q * h : ℕ) : ℝ) ≤ 2 * Λ := by</span>
+<span class="l" id="L200"><span class="n">200</span>    push_cast</span>
+<span class="l" id="L201"><span class="n">201</span>    rw [Real.log_mul (by positivity) hh0.ne&#x27;]</span>
+<span class="l" id="L202"><span class="n">202</span>    linarith</span>
+<span class="l" id="L203"><span class="n">203</span>  have hK1 : (((Nat.log 2 (b / (Xp h * Yp δ s)) + 1 : ℕ)) : ℝ) ≤ 5 * Λ := by</span>
+<span class="l" id="L204"><span class="n">204</span>    have h1 : Nat.log 2 (b / (Xp h * Yp δ s)) ≤ Nat.log 2 b := Nat.log_mono_right (Nat.div_le_self _ _)</span>
+<span class="l" id="L205"><span class="n">205</span>    have : (Nat.log 2 (b / (Xp h * Yp δ s)) : ℝ) ≤ Nat.log 2 b := by exact_mod_cast h1</span>
+<span class="l" id="L206"><span class="n">206</span>    push_cast; linarith</span>
+<span class="l" id="L207"><span class="n">207</span>  subst hM</span>
+<span class="l" id="L208"><span class="n">208</span>  have hM1 : 1 ≤ 6 * q := by omega</span>
+<span class="l" id="L209"><span class="n">209</span>  have hMΛ&#x27; : ((6 * q : ℕ) : ℝ) ≤ Λ := hMΛ</span>
+<span class="l" id="L210"><span class="n">210</span>  have hCT := GoldC.QuillonCEst.CTerm_le (s := s) (M := 6 * q) C hC hsC (6 * q * h) A c Ab (by positivity)</span>
+<span class="l" id="L211"><span class="n">211</span>    hA hc U&#x27; JP hU&#x27;5 (Xp h) (Yp δ s) (Tpp h) (Uvp s) (Uvp s) (Tvp h) Ec a a b hX1 hY1</span>
+<span class="l" id="L212"><span class="n">212</span>    (by have : (1 : ℝ) ≤ Tpp h := le_trans (Real.one_le_rpow hΛ1 (by norm_num)) hTp1</span>
+<span class="l" id="L213"><span class="n">213</span>        exact_mod_cast this)</span>
+<span class="l" id="L214"><span class="n">214</span>    (by omega) le_rfl hb2 hab.le ha6 hUv2 (by omega)</span>
+<span class="l" id="L215"><span class="n">215</span>    (by have : (1 : ℝ) ≤ Tvp h := le_trans (Real.one_le_rpow hΛ1 (by norm_num)) hTv1</span>
+<span class="l" id="L216"><span class="n">216</span>        exact_mod_cast this)</span>
+<span class="l" id="L217"><span class="n">217</span>    hUvb hXYb</span>
+<span class="l" id="L218"><span class="n">218</span>  refine le_trans hCT ?_</span>
+<span class="l" id="L219"><span class="n">219</span>  have hPα := Pα_le Λ hΛ2 s (Xp h) (Yp δ s) (Tpp h) b _ (by positivity) hAωb hb1 hbh hlb hTp1 hTp2 hXge</span>
+<span class="l" id="L220"><span class="n">220</span>    (le_trans hsb (Real.rpow_le_rpow_of_exponent_le hΛ1 (by norm_num))) hY2</span>
+<span class="l" id="L221"><span class="n">221</span>  have hPβ := Pβ_le Λ hΛ2 s (Yp δ s) (Tpp h) b C.card _ (by positivity) hAωb hb1 hbh hlb hTp2 hsY</span>
+<span class="l" id="L222"><span class="n">222</span>  have hVα := Vα_le Λ hΛ2 (by linarith) s (Xp h) a b (Uvp s) (Tvp h) Ec (6 * q) (u0 δ / 8) (by linarith)</span>
+<span class="l" id="L223"><span class="n">223</span>    hs65 hτΛ hsb hX1 hXle hbR hb1 hbh rfl hTv1 hTv2 hEc haX hM1 hMΛ&#x27; hlb</span>
+<span class="l" id="L224"><span class="n">224</span>  have hVβ := Vβ_le Λ hΛ2 (by linarith) s (Xp h) b (Uvp s) (Tvp h) (6 * q) C.card (u0 δ / 8)</span>
+<span class="l" id="L225"><span class="n">225</span>    (by positivity) (by linarith) hs65 hτΛ h4n hX1 hXle hbR hb1 hbh rfl hTv2 hM1 hMΛ&#x27; hlb</span>
+<span class="l" id="L226"><span class="n">226</span>  have hL3 := (L3b_le Λ hΛ2 b hb1 hbh).1</span>
+<span class="l" id="L227"><span class="n">227</span>  have hP0 : 0 ≤ Pα s (Xp h) (Yp δ s) (Tpp h) b</span>
+<span class="l" id="L228"><span class="n">228</span>      ((Real.exp 37.5 * (1 + Nat.log 2 (Nat.log 2 b) : ℝ) ^ 30) ^ 2) +</span>
+<span class="l" id="L229"><span class="n">229</span>      Pβ s (Yp δ s) (Tpp h) b ((Real.exp 37.5 * (1 + Nat.log 2 (Nat.log 2 b) : ℝ) ^ 30) ^ 2) * 2 ^ C.card := by</span>
+<span class="l" id="L230"><span class="n">230</span>    unfold Pα Pβ; positivity</span>
+<span class="l" id="L231"><span class="n">231</span>  have hV0 : 0 ≤ Vα s (Xp h) a b (Uvp s) (Uvp s) (Tvp h) Ec (6 * q) +</span>
+<span class="l" id="L232"><span class="n">232</span>      Vβ s (Xp h) b (Uvp s) (Uvp s) (Tvp h) (6 * q) C.card * 2 ^ C.card := by</span>
+<span class="l" id="L233"><span class="n">233</span>    unfold Vα Vβ</span>
+<span class="l" id="L234"><span class="n">234</span>    have : 0 ≤ Real.log (b : ℝ) := Real.log_nonneg (by exact_mod_cast hb1)</span>
+<span class="l" id="L235"><span class="n">235</span>    have : 0 ≤ Real.log ((Uvp s * Uvp s : ℕ) : ℝ) := Real.log_natCast_nonneg _</span>
+<span class="l" id="L236"><span class="n">236</span>    have : 0 ≤ Real.log (s : ℝ) := Real.log_nonneg hs1</span>
+<span class="l" id="L237"><span class="n">237</span>    positivity</span>
+<span class="l" id="L238"><span class="n">238</span>  have hSm0 : 0 ≤ ∑ B&#x27; ∈ (U&#x27;.filter (fun p =&gt; p &lt; Xp h)).powerset, ωR B&#x27; :=</span>
+<span class="l" id="L239"><span class="n">239</span>    sum_nonneg fun B&#x27; hB&#x27; =&gt; ωR_nonneg B&#x27; fun p hp =&gt; hU&#x27;5 p (filter_subset _ _ ((mem_powerset.1 hB&#x27;) hp))</span>
+<span class="l" id="L240"><span class="n">240</span>  have hWU0 : 0 ≤ ∏ p ∈ U&#x27;, (1 + 1 / ((p : ℝ) - 3)) := prod_nonneg fun p hp =&gt; by</span>
+<span class="l" id="L241"><span class="n">241</span>    have : (5 : ℝ) ≤ p := by exact_mod_cast hU&#x27;5 p hp</span>
+<span class="l" id="L242"><span class="n">242</span>    have : 0 ≤ 1 / ((p : ℝ) - 3) := div_nonneg zero_le_one (by linarith)</span>
+<span class="l" id="L243"><span class="n">243</span>    linarith</span>
+<span class="l" id="L244"><span class="n">244</span>  have hPsum : Pα s (Xp h) (Yp δ s) (Tpp h) b</span>
+<span class="l" id="L245"><span class="n">245</span>      ((Real.exp 37.5 * (1 + Nat.log 2 (Nat.log 2 b) : ℝ) ^ 30) ^ 2) +</span>
+<span class="l" id="L246"><span class="n">246</span>      Pβ s (Yp δ s) (Tpp h) b ((Real.exp 37.5 * (1 + Nat.log 2 (Nat.log 2 b) : ℝ) ^ 30) ^ 2) * 2 ^ C.card ≤</span>
+<span class="l" id="L247"><span class="n">247</span>      82944 * Λ ^ (-(45 : ℝ)) := by</span>
+<span class="l" id="L248"><span class="n">248</span>    have := add_le_add hPα hPβ; linarith</span>
+<span class="l" id="L249"><span class="n">249</span>  have hVsum := add_le_add hVα hVβ</span>
+<span class="l" id="L250"><span class="n">250</span>  exact C_combine Λ _ _ Ab _ _ _ _ _ _ E hΛ2 (by positivity) (by positivity) (by positivity) hK1</span>
+<span class="l" id="L251"><span class="n">251</span>    (by have := Real.log_natCast_nonneg (6 * q * h); linarith) hJm hP0 hPsum hV0 (by linarith)</span>
+<span class="l" id="L252"><span class="n">252</span>    hSm0 hSm hWU0 hWU (by positivity) hY12 (by positivity) (by rw [Real.rpow_one]; exact hKcΛ)</span>
+<span class="l" id="L253"><span class="n">253</span></span>
+<span class="l" id="L254"><span class="n">254</span>/-- `Lw^{−σ_R} ≤ Λ^{−100}` for `Lw ≥ √s`, `log s ≥ 5Λ^σ`. -/</span>
+<span class="l" id="L255"><span class="n">255</span>theorem rankin_Lw_ev4 :</span>
+<span class="l" id="L256"><span class="n">256</span>    ∃ Λ₀ : ℝ, 2 ≤ Λ₀ ∧ ∀ h : ℕ, Λ₀ ≤ Real.log h → ∀ (s Lw : ℝ), 1 ≤ s →</span>
+<span class="l" id="L257"><span class="n">257</span>      4 * (Real.log h) ^ σ₀ ≤ Real.log s → Real.sqrt s ≤ Lw →</span>
+<span class="l" id="L258"><span class="n">258</span>      Lw ^ (-(σRk h)) ≤ (Real.log h) ^ (-(100 : ℝ)) := by</span>
+<span class="l" id="L259"><span class="n">259</span>  have hτ : 0 &lt; σ₀ - 1 / 10 := by unfold σ₀; norm_num</span>
+<span class="l" id="L260"><span class="n">260</span>  obtain ⟨Λ₀, hΛ₀, hd⟩ := decay 0 100 2 (σ₀ - 1 / 10) (by norm_num) (by norm_num) hτ</span>
+<span class="l" id="L261"><span class="n">261</span>  refine ⟨max 2 Λ₀, le_max_left _ _, fun h hΛ s Lw hs1 hlog hLw =&gt; ?_⟩</span>
+<span class="l" id="L262"><span class="n">262</span>  set Λ := Real.log h</span>
+<span class="l" id="L263"><span class="n">263</span>  have hΛ2 : 2 ≤ Λ := le_trans (le_max_left _ _) hΛ</span>
+<span class="l" id="L264"><span class="n">264</span>  have hΛ0 : 0 &lt; Λ := by linarith</span>
+<span class="l" id="L265"><span class="n">265</span>  have h1 := hd Λ (le_trans (le_max_right _ _) hΛ)</span>
+<span class="l" id="L266"><span class="n">266</span>  rw [Real.rpow_zero, one_mul] at h1</span>
+<span class="l" id="L267"><span class="n">267</span>  have hsq0 : 0 &lt; Real.sqrt s := Real.sqrt_pos.2 (by linarith)</span>
+<span class="l" id="L268"><span class="n">268</span>  have hLw0 : 0 &lt; Lw := lt_of_lt_of_le hsq0 hLw</span>
+<span class="l" id="L269"><span class="n">269</span>  have hlogLw : Real.log s / 2 ≤ Real.log Lw := by</span>
+<span class="l" id="L270"><span class="n">270</span>    have := Real.log_le_log hsq0 hLw</span>
+<span class="l" id="L271"><span class="n">271</span>    rw [Real.log_sqrt (by linarith)] at this; exact this</span>
+<span class="l" id="L272"><span class="n">272</span>  have hσ0 : 0 ≤ σRk h := by unfold σRk; positivity</span>
+<span class="l" id="L273"><span class="n">273</span>  have he : σRk h * (4 * Λ ^ σ₀ / 2) = 2 * Λ ^ (σ₀ - 1 / 10) := by</span>
+<span class="l" id="L274"><span class="n">274</span>    unfold σRk</span>
+<span class="l" id="L275"><span class="n">275</span>    have : Λ ^ (-(1 / 10 : ℝ)) * Λ ^ σ₀ = Λ ^ (σ₀ - 1 / 10) := by rw [rp hΛ0]; ring_nf</span>
+<span class="l" id="L276"><span class="n">276</span>    rw [← this]; ring</span>
+<span class="l" id="L277"><span class="n">277</span>  calc Lw ^ (-(σRk h)) = Real.exp (-(σRk h) * Real.log Lw) := by rw [Real.rpow_def_of_pos hLw0]; ring_nf</span>
+<span class="l" id="L278"><span class="n">278</span>    _ ≤ Real.exp (-(2 * Λ ^ (σ₀ - 1 / 10))) := by</span>
+<span class="l" id="L279"><span class="n">279</span>        apply Real.exp_le_exp.2</span>
+<span class="l" id="L280"><span class="n">280</span>        rw [← he]</span>
+<span class="l" id="L281"><span class="n">281</span>        have : 4 * Λ ^ σ₀ / 2 ≤ Real.log Lw := by linarith</span>
+<span class="l" id="L282"><span class="n">282</span>        nlinarith [mul_le_mul_of_nonneg_left this hσ0]</span>
+<span class="l" id="L283"><span class="n">283</span>    _ ≤ Λ ^ (-(100 : ℝ)) := h1</span>
+<span class="l" id="L284"><span class="n">284</span></span>
+<span class="l" id="L285"><span class="n">285</span>open Classical in</span>
+<span class="l" id="L286"><span class="n">286</span>set_option maxHeartbeats 8000000 in</span>
+<span class="l" id="L287"><span class="n">287</span>/-- **The region-C cell for a fixed `C` is `≤ Λ^{−30}`**, eventually in `h`, uniformly. -/</span>
+<span class="l" id="L288"><span class="n">288</span>theorem C_final_L (q : ℕ) (hq : 0 &lt; q) (δ : ℝ) (hδ0 : 0 &lt; δ) (hδ1 : δ &lt; 1 / 3) :</span>
+<span class="l" id="L289"><span class="n">289</span>    ∃ Λ₀ : ℝ, 2 ≤ Λ₀ ∧ ∀ (a h H D : ℕ) (T C E0 : Finset ℕ) (Kc : ℕ → Prop) [DecidablePred Kc],</span>
+<span class="l" id="L290"><span class="n">290</span>      Λ₀ ≤ Real.log h → 2 ≤ h → H ≤ h →</span>
+<span class="l" id="L291"><span class="n">291</span>      (∀ p ∈ T, p.Prime ∧ 5 ≤ p ∧ ¬ p ∣ q ∧ p.Coprime H ∧ p ≤ H ^ 2) →</span>
+<span class="l" id="L292"><span class="n">292</span>      (∀ p, p.Prime → 5 ≤ p → p ≤ H ^ 2 → p ∉ T → p ∈ E0) →</span>
+<span class="l" id="L293"><span class="n">293</span>      ((E0.card + C.card : ℕ) : ℝ) ≤ (Real.log h) ^ 2 → C ⊆ T →</span>
+<span class="l" id="L294"><span class="n">294</span>      |∑ B ∈ (T \ C).powerset.filter (fun B =&gt; B ≠ ∅),</span>
+<span class="l" id="L295"><span class="n">295</span>          (if (Kc B.card ∧ GeoLL h H δ (∏ p ∈ B, p) (∏ p ∈ C, p)) ∧</span>
+<span class="l" id="L296"><span class="n">296</span>              ¬ (B ∩ (T \ C).filter (fun p =&gt; Xp h ≤ p ∧ p ≤ Yp δ (∏ p ∈ C, p))).Nonempty</span>
+<span class="l" id="L297"><span class="n">297</span>            then ωR B * GoldC.QuillonCopyF.foldRow q a D H (∏ p ∈ B, p) (∏ p ∈ C, p) else 0)| ≤</span>
+<span class="l" id="L298"><span class="n">298</span>        (Real.log h) ^ (-(30 : ℝ)) := by</span>
+<span class="l" id="L299"><span class="n">299</span>  have ha0 := a0_pos hδ0 hδ1</span>
+<span class="l" id="L300"><span class="n">300</span>  have ha0&#x27; := a0_le hδ0</span>
+<span class="l" id="L301"><span class="n">301</span>  have hu0 : 0 &lt; u0 δ := by unfold u0; linarith</span>
+<span class="l" id="L302"><span class="n">302</span>  have hu1 : u0 δ ≤ 1 / 8 := by unfold u0; linarith</span>
+<span class="l" id="L303"><span class="n">303</span>  set E : ℝ := Real.exp 10 * (2 * 2 + 1) ^ 10 with hE</span>
+<span class="l" id="L304"><span class="n">304</span>  set Fm : ℝ := 4 + 48 * q with hFm</span>
+<span class="l" id="L305"><span class="n">305</span>  obtain ⟨Λ₁, hΛ₁, hCT⟩ := CTerm_ev4 q hq δ hδ0 hδ1</span>
+<span class="l" id="L306"><span class="n">306</span>  obtain ⟨Λ₂, hΛ₂, hτ⟩ := sdecay4 2 (u0 δ / 8) 3000 (by positivity) (by norm_num)</span>
+<span class="l" id="L307"><span class="n">307</span>  obtain ⟨Λ₃, hΛ₃, hsl⟩ := s_large4 (2 ^ (16 / u0 δ))</span>
+<span class="l" id="L308"><span class="n">308</span>  obtain ⟨Λ₄, hΛ₄, hrσ⟩ := rankin_σ_ev</span>
+<span class="l" id="L309"><span class="n">309</span>  obtain ⟨Λ₅, hΛ₅, hrL⟩ := rankin_Lw_ev4</span>
+<span class="l" id="L310"><span class="n">310</span>  obtain ⟨Λ₆, hΛ₆, hK⟩ := const_le_rpow (20 + Fm * E ^ 3 + 6 * q + 7 + 200000) 1 one_pos</span>
+<span class="l" id="L311"><span class="n">311</span>  obtain ⟨Λ₇, hΛ₇, hεδ&#x27;⟩ := εp_le_ev δ hδ0</span>
+<span class="l" id="L312"><span class="n">312</span>  refine ⟨max Λ₁ (max Λ₂ (max Λ₃ (max Λ₄ (max Λ₅ (max Λ₆ Λ₇))))), le_trans hΛ₁ (le_max_left _ _), ?_⟩</span>
+<span class="l" id="L313"><span class="n">313</span>  intro a h H D T C E0 Kc _ hΛ hh hHh hT hE0 hEc hCT&#x27;</span>
+<span class="l" id="L314"><span class="n">314</span>  have L1 : Λ₁ ≤ Real.log h := le_trans (by simp) hΛ</span>
+<span class="l" id="L315"><span class="n">315</span>  have L2 : Λ₂ ≤ Real.log h := le_trans (by simp) hΛ</span>
+<span class="l" id="L316"><span class="n">316</span>  have L3 : Λ₃ ≤ Real.log h := le_trans (by simp) hΛ</span>
+<span class="l" id="L317"><span class="n">317</span>  have L4 : Λ₄ ≤ Real.log h := le_trans (by simp) hΛ</span>
+<span class="l" id="L318"><span class="n">318</span>  have L5 : Λ₅ ≤ Real.log h := le_trans (by simp) hΛ</span>
+<span class="l" id="L319"><span class="n">319</span>  have L6 : Λ₆ ≤ Real.log h := le_trans (by simp) hΛ</span>
+<span class="l" id="L320"><span class="n">320</span>  have L7 : Λ₇ ≤ Real.log h := le_trans (by simp) hΛ</span>
+<span class="l" id="L321"><span class="n">321</span>  have hεδ : εp h ≤ δ := hεδ&#x27; h L7</span>
+<span class="l" id="L322"><span class="n">322</span>  clear hΛ</span>
+<span class="l" id="L323"><span class="n">323</span>  set Λ := Real.log h with hΛdef</span>
+<span class="l" id="L324"><span class="n">324</span>  have hΛ2 : 2 ≤ Λ := le_trans hΛ₁ L1</span>
+<span class="l" id="L325"><span class="n">325</span>  have hΛ0 : 0 &lt; Λ := by linarith</span>
+<span class="l" id="L326"><span class="n">326</span>  have hΛ1 : 1 ≤ Λ := by linarith</span>
+<span class="l" id="L327"><span class="n">327</span>  have hKΛ := hK Λ L6</span>
+<span class="l" id="L328"><span class="n">328</span>  rw [Real.rpow_one] at hKΛ</span>
+<span class="l" id="L329"><span class="n">329</span>  have hFm0 : 0 ≤ Fm := by positivity</span>
+<span class="l" id="L330"><span class="n">330</span>  have hE0&#x27; : 0 ≤ E := by positivity</span>
+<span class="l" id="L331"><span class="n">331</span>  have hΛbig : 200000 ≤ Λ := by</span>
+<span class="l" id="L332"><span class="n">332</span>    have : 0 ≤ 20 + Fm * E ^ 3 + 6 * q + 7 := by positivity</span>
+<span class="l" id="L333"><span class="n">333</span>    linarith</span>
+<span class="l" id="L334"><span class="n">334</span>  have hq7 : (6 * q + 7 : ℝ) ≤ Λ := by</span>
+<span class="l" id="L335"><span class="n">335</span>    have : 0 ≤ 20 + Fm * E ^ 3 + 200000 := by positivity</span>
+<span class="l" id="L336"><span class="n">336</span>    linarith</span>
+<span class="l" id="L337"><span class="n">337</span>  have hKfin : 20 + Fm * E ^ 3 ≤ Λ := by</span>
+<span class="l" id="L338"><span class="n">338</span>    have : (0 : ℝ) ≤ 6 * q + 7 + 200000 := by positivity</span>
+<span class="l" id="L339"><span class="n">339</span>    linarith</span>
+<span class="l" id="L340"><span class="n">340</span>  set s := ∏ p ∈ C, p with hs</span>
+<span class="l" id="L341"><span class="n">341</span>  have hpos30 : 0 ≤ Λ ^ (-(30 : ℝ)) := by positivity</span>
+<span class="l" id="L342"><span class="n">342</span>  by_cases hex : ∃ r, GeoLL h H δ r s</span>
+<span class="l" id="L343"><span class="n">343</span>  swap</span>
+<span class="l" id="L344"><span class="n">344</span>  · push_neg at hex</span>
+<span class="l" id="L345"><span class="n">345</span>    rw [sum_eq_zero fun B _ =&gt; by</span>
+<span class="l" id="L346"><span class="n">346</span>      rw [if_neg]; rintro ⟨⟨-, hg⟩, -⟩; exact hex _ hg, abs_zero]</span>
+<span class="l" id="L347"><span class="n">347</span>    exact hpos30</span>
+<span class="l" id="L348"><span class="n">348</span>  obtain ⟨r₀, hr₀⟩ := hex</span>
+<span class="l" id="L349"><span class="n">349</span>  obtain ⟨hlogs, -, hr1, hs1n, -, hsh, -, -, hrsH⟩ := admLL h H r₀ s δ hδ0 hh hHh hr₀</span>
+<span class="l" id="L350"><span class="n">350</span>  have hCp : ∀ p ∈ C, p.Prime := fun p hp =&gt; (hT p (hCT&#x27; hp)).1</span>
+<span class="l" id="L351"><span class="n">351</span>  have hspos : 0 &lt; s := prod_pos fun p hp =&gt; (hCp p hp).pos</span>
+<span class="l" id="L352"><span class="n">352</span>  have hs0 : (0 : ℝ) &lt; s := by exact_mod_cast hspos</span>
+<span class="l" id="L353"><span class="n">353</span>  have hτΛ := hτ Λ L2 s hs0 hlogs</span>
+<span class="l" id="L354"><span class="n">354</span>  obtain ⟨hs65, hs1, hsu2, hsΛ⟩ := s_facts Λ s (u0 δ) (u0 δ / 8) hΛ2 hu0 hu1 (by linarith)</span>
+<span class="l" id="L355"><span class="n">355</span>    (hsl Λ L3 s hs0 hlogs) hτΛ</span>
+<span class="l" id="L356"><span class="n">356</span>  have hs2 : 2 ≤ s := by</span>
+<span class="l" id="L357"><span class="n">357</span>    have : (2 : ℝ) ≤ s := by linarith</span>
+<span class="l" id="L358"><span class="n">358</span>    exact_mod_cast this</span>
+<span class="l" id="L359"><span class="n">359</span>  haveI : NeZero s := ⟨by omega⟩</span>
+<span class="l" id="L360"><span class="n">360</span>  haveI : NeZero (6 * q) := ⟨by omega⟩</span>
+<span class="l" id="L361"><span class="n">361</span>  -- `s ≤ H`</span>
+<span class="l" id="L362"><span class="n">362</span>  have hsH : (s : ℝ) ≤ H := by</span>
+<span class="l" id="L363"><span class="n">363</span>    have hE1 : 1 ≤ Real.exp (Λ ^ (1 / 4 : ℝ)) := Real.one_le_exp (by positivity)</span>
+<span class="l" id="L364"><span class="n">364</span>    have hr1R : (1 : ℝ) ≤ r₀ := by exact_mod_cast hr1</span>
+<span class="l" id="L365"><span class="n">365</span>    calc (s : ℝ) ≤ ((r₀ : ℝ) * s) * Real.exp (Λ ^ (1 / 4 : ℝ)) := by</span>
+<span class="l" id="L366"><span class="n">366</span>          have : (s : ℝ) ≤ (r₀ : ℝ) * s := le_mul_of_one_le_left hs0.le hr1R</span>
+<span class="l" id="L367"><span class="n">367</span>          exact le_trans this (le_mul_of_one_le_right (by positivity) hE1)</span>
+<span class="l" id="L368"><span class="n">368</span>      _ ≤ H := hrsH</span>
+<span class="l" id="L369"><span class="n">369</span>  have hH1 : (1 : ℝ) ≤ H := by linarith</span>
+<span class="l" id="L370"><span class="n">370</span>  -- `Lw`</span>
+<span class="l" id="L371"><span class="n">371</span>  obtain ⟨hLwlo, hLwhi, hLwsq⟩ := LwC_facts h s hΛ1 (by linarith)</span>
+<span class="l" id="L372"><span class="n">372</span>  have hLwH : LwC h s ≤ H ^ 2 := by</span>
+<span class="l" id="L373"><span class="n">373</span>    have : (LwC h s : ℝ) ≤ (H : ℝ) ^ 2 := le_trans hLwhi (pow_le_pow_left₀ hs0.le hsH 2)</span>
+<span class="l" id="L374"><span class="n">374</span>    exact_mod_cast this</span>
+<span class="l" id="L375"><span class="n">375</span>  have hmax : max (H ^ 2) (LwC h s) = H ^ 2 := max_eq_left hLwH</span>
+<span class="l" id="L376"><span class="n">376</span>  -- `X`, `Y`</span>
+<span class="l" id="L377"><span class="n">377</span>  have hXge := Xp_ge (h := h) hΛ1</span>
+<span class="l" id="L378"><span class="n">378</span>  have hXle := Xp_le (h := h) hΛ1</span>
+<span class="l" id="L379"><span class="n">379</span>  have hX2 : 2 ≤ Xp h := Xp_two hΛ2</span>
+<span class="l" id="L380"><span class="n">380</span>  have hX1 : 1 ≤ Xp h := by omega</span>
+<span class="l" id="L381"><span class="n">381</span>  have hY4 : 4 ≤ Yp δ s := by</span>
+<span class="l" id="L382"><span class="n">382</span>    unfold Yp; apply Nat.le_floor; push_cast</span>
+<span class="l" id="L383"><span class="n">383</span>    have h16 : (2 : ℝ) ^ (16 / u0 δ) ≤ s := hsl Λ L3 s hs0 hlogs</span>
+<span class="l" id="L384"><span class="n">384</span>    calc (4 : ℝ) ≤ 2 ^ (16 : ℝ) := by norm_num</span>
+<span class="l" id="L385"><span class="n">385</span>      _ = ((2 : ℝ) ^ (16 / u0 δ)) ^ u0 δ := by</span>
+<span class="l" id="L386"><span class="n">386</span>          rw [← Real.rpow_mul (by norm_num), div_mul_cancel₀ _ hu0.ne&#x27;]</span>
+<span class="l" id="L387"><span class="n">387</span>      _ ≤ (s : ℝ) ^ u0 δ := Real.rpow_le_rpow (by positivity) h16 hu0.le</span>
+<span class="l" id="L388"><span class="n">388</span>  have hYs : (Yp δ s : ℝ) ≤ (s : ℝ) ^ (1 / 8 : ℝ) :=</span>
+<span class="l" id="L389"><span class="n">389</span>    le_trans (Yp_le δ s) (Real.rpow_le_rpow_of_exponent_le hs1 hu1)</span>
+<span class="l" id="L390"><span class="n">390</span>  -- `Lw/X`</span>
+<span class="l" id="L391"><span class="n">391</span>  have hLwX := aX_fact Λ s (LwC h s) (Xp h) hΛbig hX1 hXle (by</span>
+<span class="l" id="L392"><span class="n">392</span>    have : (s : ℝ) ≤ (s : ℝ) ^ (1 + εp h) := by</span>
+<span class="l" id="L393"><span class="n">393</span>      calc (s : ℝ) = (s : ℝ) ^ (1 : ℝ) := (Real.rpow_one _).symm</span>
+<span class="l" id="L394"><span class="n">394</span>        _ ≤ _ := Real.rpow_le_rpow_of_exponent_le hs1 (by linarith [(εp_le_one hΛ1).1])</span>
+<span class="l" id="L395"><span class="n">395</span>    linarith) hsΛ</span>
+<span class="l" id="L396"><span class="n">396</span>  obtain ⟨hd1, hd2⟩ := div8_facts Λ s q hΛbig hq7 hsΛ</span>
+<span class="l" id="L397"><span class="n">397</span>  have hUvs : (Uvp s : ℝ) ≤ (s : ℝ) ^ (1 / 8 : ℝ) := by</span>
+<span class="l" id="L398"><span class="n">398</span>    have : (Uvp s : ℝ) ≤ (s : ℝ) ^ (1 / 16 : ℝ) := Nat.floor_le (by positivity)</span>
+<span class="l" id="L399"><span class="n">399</span>    exact le_trans this (Real.rpow_le_rpow_of_exponent_le hs1 (by norm_num))</span>
+<span class="l" id="L400"><span class="n">400</span>  have hLwM : 6 * q &lt; LwC h s / Xp h := by</span>
+<span class="l" id="L401"><span class="n">401</span>    have : (6 * q : ℝ) &lt; ((LwC h s / Xp h : ℕ) : ℝ) := by linarith</span>
+<span class="l" id="L402"><span class="n">402</span>    exact_mod_cast this</span>
+<span class="l" id="L403"><span class="n">403</span>  have hLw6 : 6 ≤ LwC h s / Xp h := by</span>
+<span class="l" id="L404"><span class="n">404</span>    have : (6 : ℝ) ≤ ((LwC h s / Xp h : ℕ) : ℝ) := by</span>
+<span class="l" id="L405"><span class="n">405</span>      have : (0 : ℝ) ≤ q := by positivity</span>
+<span class="l" id="L406"><span class="n">406</span>      linarith</span>
+<span class="l" id="L407"><span class="n">407</span>    exact_mod_cast this</span>
+<span class="l" id="L408"><span class="n">408</span>  have hLwV : Uvp s ≤ LwC h s / Xp h := by</span>
+<span class="l" id="L409"><span class="n">409</span>    have : (Uvp s : ℝ) ≤ ((LwC h s / Xp h : ℕ) : ℝ) := by linarith</span>
+<span class="l" id="L410"><span class="n">410</span>    exact_mod_cast this</span>
+<span class="l" id="L411"><span class="n">411</span>  have hLwY : Yp δ s ≤ LwC h s / Xp h := by</span>
+<span class="l" id="L412"><span class="n">412</span>    have : (Yp δ s : ℝ) ≤ ((LwC h s / Xp h : ℕ) : ℝ) := by linarith</span>
+<span class="l" id="L413"><span class="n">413</span>    exact_mod_cast this</span>
+<span class="l" id="L414"><span class="n">414</span>  -- source data</span>
+<span class="l" id="L415"><span class="n">415</span>  have hTc : ∀ p ∈ T, p.Prime ∧ 5 ≤ p ∧ p.Coprime (6 * q) ∧ p.Coprime H := fun p hp =&gt;</span>
+<span class="l" id="L416"><span class="n">416</span>    ⟨(hT p hp).1, (hT p hp).2.1, GoldC.QuillonWFinal.coprime_6q (hT p hp).1 (hT p hp).2.1 (hT p hp).2.2.1,</span>
+<span class="l" id="L417"><span class="n">417</span>      (hT p hp).2.2.2.1⟩</span>
+<span class="l" id="L418"><span class="n">418</span>  have hsM : s.Coprime (6 * q) :=</span>
+<span class="l" id="L419"><span class="n">419</span>    GoldC.QuillonWFinal.prod_coprime_of fun p hp =&gt; (hTc p (hCT&#x27; hp)).2.2.1</span>
+<span class="l" id="L420"><span class="n">420</span>  set μ := GoldC.QuillonCopyF.meanWeight q (GoldC.QuillonCopyF.reducedAnchor q a D) H with hμ</span>
+<span class="l" id="L421"><span class="n">421</span>  set Γ := GoldC.QuillonCopyF.gammaClass q a D H with hΓ</span>
+<span class="l" id="L422"><span class="n">422</span>  have hμb : |μ| ≤ 4 := by</span>
+<span class="l" id="L423"><span class="n">423</span>    have := GoldC.QuillonCopyF.meanWeight_bounds q (GoldC.QuillonCopyF.reducedAnchor q a D) H</span>
+<span class="l" id="L424"><span class="n">424</span>    rw [abs_le]; constructor &lt;;&gt; linarith</span>
+<span class="l" id="L425"><span class="n">425</span>  have hΓb : ∀ b ν, |Γ b ν| ≤ 48 * q := fun b ν =&gt; by</span>
+<span class="l" id="L426"><span class="n">426</span>    have := GoldC.QuillonCopyF.abs_gammaClass_le q a D H b ν hq</span>
+<span class="l" id="L427"><span class="n">427</span>    have e : (8 : ℝ) * (6 * q) = 48 * q := by ring</span>
+<span class="l" id="L428"><span class="n">428</span>    linarith</span>
+<span class="l" id="L429"><span class="n">429</span>  have hshn : s ≤ h := by exact_mod_cast hsh</span>
+<span class="l" id="L430"><span class="n">430</span>  have hU&#x27; : ∀ p ∈ (T \ C).filter (fun p =&gt; ¬ (Xp h ≤ p ∧ p ≤ Yp δ s)), p.Prime ∧ 5 ≤ p ∧ p ≤ H ^ 2 :=</span>
+<span class="l" id="L431"><span class="n">431</span>    fun p hp =&gt; have hpT := sdiff_subset (filter_subset _ _ hp)</span>
+<span class="l" id="L432"><span class="n">432</span>      ⟨(hT p hpT).1, (hT p hpT).2.1, (hT p hpT).2.2.2.2⟩</span>
+<span class="l" id="L433"><span class="n">433</span>  have hCH : ∀ p ∈ C, p.Prime ∧ p.Coprime H := fun p hp =&gt; ⟨hCp p hp, (hT p (hCT&#x27; hp)).2.2.2.1⟩</span>
+<span class="l" id="L434"><span class="n">434</span>  have hs1&#x27; : 1 ≤ s := by omega</span>
+<span class="l" id="L435"><span class="n">435</span>  have hEc&#x27; : ((E0.card + C.card : ℕ) : ℝ) ≤ Λ ^ 2 := hEc</span>
+<span class="l" id="L436"><span class="n">436</span>  -- the cell</span>
+<span class="l" id="L437"><span class="n">437</span>  have hcell := GoldC.QuillonCCellApp.C_cell (s := s) (M := 6 * q) (by omega) H μ Γ T C hTc hCT&#x27; rfl hs2</span>
+<span class="l" id="L438"><span class="n">438</span>    (Xp h) (Yp δ s) hX2 (by omega) Kc (fun r =&gt; GeoLL h H δ r s)</span>
+<span class="l" id="L439"><span class="n">439</span>    (H ^ 2) (LwC h s)</span>
+<span class="l" id="L440"><span class="n">440</span>    (fun r hG =&gt; by</span>
+<span class="l" id="L441"><span class="n">441</span>      have h4 := hG.2.1</span>
+<span class="l" id="L442"><span class="n">442</span>      have : r ≤ r * s := Nat.le_mul_of_pos_right r hspos</span>
+<span class="l" id="L443"><span class="n">443</span>      omega)</span>
+<span class="l" id="L444"><span class="n">444</span>    (fun r hG =&gt; by</span>
+<span class="l" id="L445"><span class="n">445</span>      have hr1 : 1 ≤ r := by</span>
+<span class="l" id="L446"><span class="n">446</span>        have := hG.1</span>
+<span class="l" id="L447"><span class="n">447</span>        rcases Nat.eq_zero_or_pos r with h0 | h0</span>
+<span class="l" id="L448"><span class="n">448</span>        · rw [h0] at this; simp at this</span>
+<span class="l" id="L449"><span class="n">449</span>        · exact h0</span>
+<span class="l" id="L450"><span class="n">450</span>      exact LwC_lt (H := H) (δ := δ) hr1 (LL_eps hεδ hG))</span>
+<span class="l" id="L451"><span class="n">451</span>    (geoLL_convex_r h H δ s)</span>
+<span class="l" id="L452"><span class="n">452</span>    (fun r =&gt; GoldC.QuillonCopyF.foldRow q a D H r s)</span>
+<span class="l" id="L453"><span class="n">453</span>    (fun B hB hne _ =&gt; by</span>
+<span class="l" id="L454"><span class="n">454</span>      have hBp : ∀ p ∈ B, p.Prime ∧ 5 ≤ p := fun p hp =&gt;</span>
+<span class="l" id="L455"><span class="n">455</span>        ⟨(hT p (sdiff_subset (hB hp))).1, (hT p (sdiff_subset (hB hp))).2.1⟩</span>
+<span class="l" id="L456"><span class="n">456</span>      obtain ⟨p, hp⟩ := nonempty_iff_ne_empty.2 hne</span>
+<span class="l" id="L457"><span class="n">457</span>      have hr2 : 2 ≤ ∏ p ∈ B, p := by</span>
+<span class="l" id="L458"><span class="n">458</span>        have h1 : p ∣ ∏ p ∈ B, p := dvd_prod_of_mem _ hp</span>
+<span class="l" id="L459"><span class="n">459</span>        have h2 : 0 &lt; ∏ p ∈ B, p := prod_pos fun p hp =&gt; (hBp p hp).1.pos</span>
+<span class="l" id="L460"><span class="n">460</span>        have := Nat.le_of_dvd h2 h1</span>
+<span class="l" id="L461"><span class="n">461</span>        have := (hBp p hp).2; omega</span>
+<span class="l" id="L462"><span class="n">462</span>      exact GoldC.QuillonBridge.foldRow_eq_rowAbs q a D H _ s hq hr2 hs2</span>
+<span class="l" id="L463"><span class="n">463</span>        (GoldC.QuillonWFinal.prod_coprime_of fun p hp =&gt; (hTc p (sdiff_subset (hB hp))).2.2.1) hsM)</span>
+<span class="l" id="L464"><span class="n">464</span>    Fm hFm0 (fun B _ _ =&gt; GoldC.QuillonBridge.abs_foldRow_le q a D H _ s hq)</span>
+<span class="l" id="L465"><span class="n">465</span>    (6 * q * h) (by nlinarith) (Tpp h) (Uvp s) (Uvp s) (Tvp h)</span>
+<span class="l" id="L466"><span class="n">466</span>    (by have : (2 : ℝ) ≤ Tpp h := le_trans (le_trans hΛ2 (le_rpow_big Λ hΛ1 100 (by norm_num)))</span>
+<span class="l" id="L467"><span class="n">467</span>          (Tpp_bounds hΛ1).1</span>
+<span class="l" id="L468"><span class="n">468</span>        exact_mod_cast this)</span>
+<span class="l" id="L469"><span class="n">469</span>    (Uv_b_facts s s hs65 (by linarith)).1</span>
+<span class="l" id="L470"><span class="n">470</span>    (by have : (2 : ℝ) ≤ Tvp h := le_trans (le_trans hΛ2 (le_rpow_big Λ hΛ1 600 (by norm_num)))</span>
+<span class="l" id="L471"><span class="n">471</span>          (Tvp_bounds hΛ1).1</span>
+<span class="l" id="L472"><span class="n">472</span>        exact_mod_cast this)</span>
+<span class="l" id="L473"><span class="n">473</span>    (E0 ∪ C) (E0.card + C.card) (card_union_le _ _)</span>
+<span class="l" id="L474"><span class="n">474</span>    (fun p hp hYp hpN hpT =&gt; by</span>
+<span class="l" id="L475"><span class="n">475</span>      rw [hmax] at hpN</span>
+<span class="l" id="L476"><span class="n">476</span>      have hp5 : 5 ≤ p := by omega</span>
+<span class="l" id="L477"><span class="n">477</span>      by_cases hpC : p ∈ C</span>
+<span class="l" id="L478"><span class="n">478</span>      · exact mem_union_right _ hpC</span>
+<span class="l" id="L479"><span class="n">479</span>      · apply mem_union_left</span>
+<span class="l" id="L480"><span class="n">480</span>        apply hE0 p hp hp5 hpN</span>
+<span class="l" id="L481"><span class="n">481</span>        intro hpT&#x27;</span>
+<span class="l" id="L482"><span class="n">482</span>        exact hpT (mem_filter.2 ⟨mem_sdiff.2 ⟨hpT&#x27;, hpC⟩, hYp⟩))</span>
+<span class="l" id="L483"><span class="n">483</span>    hLwM hLw6 hLwV hLwY (σRk h) (by unfold σRk; positivity) (4 * Λ ^ (-(40 : ℝ))) (by positivity)</span>
+<span class="l" id="L484"><span class="n">484</span>    (fun a&#x27; b&#x27; ha&#x27; hab&#x27; hb2&#x27; hbN =&gt; by</span>
+<span class="l" id="L485"><span class="n">485</span>      rw [hmax] at hbN</span>
+<span class="l" id="L486"><span class="n">486</span>      unfold GoldC.QuillonCCellApp.CSum4</span>
+<span class="l" id="L487"><span class="n">487</span>      have ha&#x27;&#x27; : (s : ℝ) ^ (1 + εp h) / 2 ≤ a&#x27; := le_trans hLwlo (by exact_mod_cast ha&#x27;)</span>
+<span class="l" id="L488"><span class="n">488</span>      have c1 := hCT h H L1 hHh s (6 * q) C _ ((T \ C).filter (fun p =&gt; Yp δ s &lt; p)) hCp rfl rfl hlogs hU&#x27;</span>
+<span class="l" id="L489"><span class="n">489</span>        (fun (_ : ZMod (6 * q)) k =&gt; ((-(2 * μ) : ℝ) : ℂ) * GoldC.QuillonRowNF.αm k s)</span>
+<span class="l" id="L490"><span class="n">490</span>        (fun k =&gt; ((((k : ℤ) * H : ℤ)) : ZMod s))</span>
+<span class="l" id="L491"><span class="n">491</span>        (fun ρ j hj =&gt; GoldC.QuillonRowFacts.coef_main q hq μ hμb s hs1&#x27; (6 * q) ρ j hj)</span>
+<span class="l" id="L492"><span class="n">492</span>        (GoldC.QuillonRowFacts.hc_gen C hCp rfl (H : ℤ) (GoldC.QuillonRowFacts.not_dvd_H hCH) 1</span>
+<span class="l" id="L493"><span class="n">493</span>          (Or.inl rfl) _ (fun j =&gt; by congr 1; ring))</span>
+<span class="l" id="L494"><span class="n">494</span>        (E0.card + C.card) a&#x27; b&#x27; hEc&#x27; ha&#x27;&#x27; hab&#x27; hb2&#x27; hbN</span>
+<span class="l" id="L495"><span class="n">495</span>      have c2 := hCT h H L1 hHh s (6 * q) C _ ((T \ C).filter (fun p =&gt; Yp δ s &lt; p)) hCp rfl rfl hlogs hU&#x27;</span>
+<span class="l" id="L496"><span class="n">496</span>        (fun (_ : ZMod (6 * q)) k =&gt; -(((-(2 * μ) : ℝ) : ℂ) * GoldC.QuillonRowNF.αm k s))</span>
+<span class="l" id="L497"><span class="n">497</span>        (fun k =&gt; ((((-(k : ℤ)) * H : ℤ)) : ZMod s))</span>
+<span class="l" id="L498"><span class="n">498</span>        (fun ρ j hj =&gt; GoldC.QuillonRowFacts.coef_mainN q hq μ hμb s hs1&#x27; (6 * q) ρ j hj)</span>
+<span class="l" id="L499"><span class="n">499</span>        (GoldC.QuillonRowFacts.hc_gen C hCp rfl (H : ℤ) (GoldC.QuillonRowFacts.not_dvd_H hCH) (-1)</span>
+<span class="l" id="L500"><span class="n">500</span>          (Or.inr rfl) _ (fun j =&gt; by congr 1; ring))</span>
+<span class="l" id="L501"><span class="n">501</span>        (E0.card + C.card) a&#x27; b&#x27; hEc&#x27; ha&#x27;&#x27; hab&#x27; hb2&#x27; hbN</span>
+<span class="l" id="L502"><span class="n">502</span>      have c3 := hCT h H L1 hHh s (6 * q) C _ ((T \ C).filter (fun p =&gt; Yp δ s &lt; p)) hCp rfl rfl hlogs hU&#x27;</span>
+<span class="l" id="L503"><span class="n">503</span>        (fun (ρ : ZMod (6 * q)) k =&gt; GoldC.QuillonRowNF.αm k ((6 * q) * s) *</span>
+<span class="l" id="L504"><span class="n">504</span>          GoldC.QuillonRowNF.BclS (6 * q) Γ s (k : ℤ) ρ)</span>
+<span class="l" id="L505"><span class="n">505</span>        (fun k =&gt; ((((k : ℤ) * H * GoldC.QuillonCopyC.invMod (6 * q) s : ℤ)) : ZMod s))</span>
+<span class="l" id="L506"><span class="n">506</span>        (fun ρ j hj =&gt; GoldC.QuillonRowFacts.coef_cls q hq Γ hΓb s hs1&#x27; (fun k =&gt; (k : ℤ)) ρ j hj)</span>
+<span class="l" id="L507"><span class="n">507</span>        (GoldC.QuillonRowFacts.hc_gen C hCp rfl _</span>
+<span class="l" id="L508"><span class="n">508</span>          (GoldC.QuillonRowFacts.not_dvd_HinvM hCH rfl hs2 hsM.symm) 1 (Or.inl rfl) _</span>
+<span class="l" id="L509"><span class="n">509</span>          (fun j =&gt; by congr 1; ring))</span>
+<span class="l" id="L510"><span class="n">510</span>        (E0.card + C.card) a&#x27; b&#x27; hEc&#x27; ha&#x27;&#x27; hab&#x27; hb2&#x27; hbN</span>
+<span class="l" id="L511"><span class="n">511</span>      have c4 := hCT h H L1 hHh s (6 * q) C _ ((T \ C).filter (fun p =&gt; Yp δ s &lt; p)) hCp rfl rfl hlogs hU&#x27;</span>
+<span class="l" id="L512"><span class="n">512</span>        (fun (ρ : ZMod (6 * q)) k =&gt; -(GoldC.QuillonRowNF.αm k ((6 * q) * s) *</span>
+<span class="l" id="L513"><span class="n">513</span>          GoldC.QuillonRowNF.BclS (6 * q) Γ s (-(k : ℤ)) ρ))</span>
+<span class="l" id="L514"><span class="n">514</span>        (fun k =&gt; ((((-(k : ℤ)) * H * GoldC.QuillonCopyC.invMod (6 * q) s : ℤ)) : ZMod s))</span>
+<span class="l" id="L515"><span class="n">515</span>        (fun ρ j hj =&gt; GoldC.QuillonRowFacts.coef_clsN q hq Γ hΓb s hs1&#x27; (fun k =&gt; -(k : ℤ)) ρ j hj)</span>
+<span class="l" id="L516"><span class="n">516</span>        (GoldC.QuillonRowFacts.hc_gen C hCp rfl _</span>
+<span class="l" id="L517"><span class="n">517</span>          (GoldC.QuillonRowFacts.not_dvd_HinvM hCH rfl hs2 hsM.symm) (-1) (Or.inr rfl) _</span>
+<span class="l" id="L518"><span class="n">518</span>          (fun j =&gt; by congr 1; ring))</span>
+<span class="l" id="L519"><span class="n">519</span>        (E0.card + C.card) a&#x27; b&#x27; hEc&#x27; ha&#x27;&#x27; hab&#x27; hb2&#x27; hbN</span>
+<span class="l" id="L520"><span class="n">520</span>      linarith)</span>
+<span class="l" id="L521"><span class="n">521</span>  refine le_trans hcell ?_</span>
+<span class="l" id="L522"><span class="n">522</span>  rw [hmax]</span>
+<span class="l" id="L523"><span class="n">523</span>  -- Rankin pieces</span>
+<span class="l" id="L524"><span class="n">524</span>  have hσX : ∀ p ∈ (T \ C).filter (fun p =&gt; p &lt; Xp h), (p : ℝ) ^ σRk h ≤ 3 := fun p hp =&gt;</span>
+<span class="l" id="L525"><span class="n">525</span>    hrσ h L4 p (by have := (hT p (sdiff_subset (filter_subset _ _ hp))).2.1; omega)</span>
+<span class="l" id="L526"><span class="n">526</span>      (le_of_lt (mem_filter.1 hp).2)</span>
+<span class="l" id="L527"><span class="n">527</span>  have hV5 : ∀ p ∈ (T \ C).filter (fun p =&gt; p &lt; Xp h), 5 ≤ p := fun p hp =&gt;</span>
+<span class="l" id="L528"><span class="n">528</span>    (hT p (sdiff_subset (filter_subset _ _ hp))).2.1</span>
+<span class="l" id="L529"><span class="n">529</span>  have hprod := rankin_prod_le _ hV5 (σRk h) hσX</span>
+<span class="l" id="L530"><span class="n">530</span>  have hlogh2 : Real.log ((h ^ 2 : ℕ) : ℝ) ≤ 2 * Λ := by</span>
+<span class="l" id="L531"><span class="n">531</span>    push_cast; rw [Real.log_pow]; push_cast; exact le_rfl</span>
+<span class="l" id="L532"><span class="n">532</span>  have hprodU : ∏ p ∈ (T \ C).filter (fun p =&gt; p &lt; Xp h), (1 + 1 / ((p : ℝ) - 3)) ≤ E * Λ ^ (10 : ℝ) :=</span>
+<span class="l" id="L533"><span class="n">533</span>    prodU_le_pow _ (fun p hp =&gt; ⟨(hT p (sdiff_subset (filter_subset _ _ hp))).1, hV5 p hp⟩) (h ^ 2)</span>
+<span class="l" id="L534"><span class="n">534</span>      (fun p hp =&gt; le_trans (hT p (sdiff_subset (filter_subset _ _ hp))).2.2.2.2</span>
+<span class="l" id="L535"><span class="n">535</span>        (Nat.pow_le_pow_left hHh 2)) 2 Λ (by norm_num) hΛ1 hlogh2</span>
+<span class="l" id="L536"><span class="n">536</span>  have hprodU0 : 0 ≤ ∏ p ∈ (T \ C).filter (fun p =&gt; p &lt; Xp h), (1 + 1 / ((p : ℝ) - 3)) :=</span>
+<span class="l" id="L537"><span class="n">537</span>    prod_nonneg fun p hp =&gt; by</span>
+<span class="l" id="L538"><span class="n">538</span>      have : (5 : ℝ) ≤ p := by exact_mod_cast hV5 p hp</span>
+<span class="l" id="L539"><span class="n">539</span>      have : 0 ≤ 1 / ((p : ℝ) - 3) := div_nonneg zero_le_one (by linarith)</span>
+<span class="l" id="L540"><span class="n">540</span>      linarith</span>
+<span class="l" id="L541"><span class="n">541</span>  have hP : ∏ p ∈ (T \ C).filter (fun p =&gt; p &lt; Xp h), (1 + (p : ℝ) ^ σRk h / ((p : ℝ) - 3)) ≤</span>
+<span class="l" id="L542"><span class="n">542</span>      (E * Λ ^ (10 : ℝ)) ^ 3 := le_trans hprod (pow_le_pow_left₀ hprodU0 hprodU 3)</span>
+<span class="l" id="L543"><span class="n">543</span>  have hP0 : 0 ≤ ∏ p ∈ (T \ C).filter (fun p =&gt; p &lt; Xp h), (1 + (p : ℝ) ^ σRk h / ((p : ℝ) - 3)) :=</span>
+<span class="l" id="L544"><span class="n">544</span>    prod_nonneg fun p hp =&gt; by</span>
+<span class="l" id="L545"><span class="n">545</span>      have : (5 : ℝ) ≤ p := by exact_mod_cast hV5 p hp</span>
+<span class="l" id="L546"><span class="n">546</span>      have : 0 ≤ (p : ℝ) ^ σRk h / ((p : ℝ) - 3) := div_nonneg (by positivity) (by linarith)</span>
+<span class="l" id="L547"><span class="n">547</span>      linarith</span>
+<span class="l" id="L548"><span class="n">548</span>  have hL := hrL h L5 s (LwC h s) hs1 hlogs hLwsq</span>
+<span class="l" id="L549"><span class="n">549</span>  have hK1 : (((Nat.log 2 (H ^ 2) + 1 : ℕ)) : ℝ) ≤ 5 * Λ := by</span>
+<span class="l" id="L550"><span class="n">550</span>    have hH2 : Real.log ((H ^ 2 : ℕ) : ℝ) ≤ 2 * Λ := by</span>
+<span class="l" id="L551"><span class="n">551</span>      have hHR : (H : ℝ) ≤ h := by exact_mod_cast hHh</span>
+<span class="l" id="L552"><span class="n">552</span>      have h0 : (0 : ℝ) &lt; ((H ^ 2 : ℕ) : ℝ) := by push_cast; positivity</span>
+<span class="l" id="L553"><span class="n">553</span>      have := Real.log_le_log h0 (show ((H ^ 2 : ℕ) : ℝ) ≤ ((h ^ 2 : ℕ) : ℝ) by</span>
+<span class="l" id="L554"><span class="n">554</span>        push_cast; exact pow_le_pow_left₀ (by positivity) hHR 2)</span>
+<span class="l" id="L555"><span class="n">555</span>      linarith</span>
+<span class="l" id="L556"><span class="n">556</span>    have := natlog_le_of (H ^ 2) (2 * Λ) hH2</span>
+<span class="l" id="L557"><span class="n">557</span>    rw [max_eq_left (show (0 : ℝ) ≤ 2 * Λ by linarith)] at this</span>
+<span class="l" id="L558"><span class="n">558</span>    push_cast; linarith</span>
+<span class="l" id="L559"><span class="n">559</span>  exact Cfin_combine Λ _ _ Fm _ _ E hΛ2 (by positivity) hK1 rfl hFm0 (by positivity) hL hP0 hP hE0&#x27; hKfin</span>
+<span class="l" id="L560"><span class="n">560</span></span>
+<span class="l" id="L561"><span class="n">561</span>end GoldC.QuillonLC</span>
+<span class="l" id="L562"><span class="n">562</span></span>
+<span class="l" id="L563"><span class="n">563</span>namespace GoldC.QuillonLC</span>
+<span class="l" id="L564"><span class="n">564</span></span>
+<span class="l" id="L565"><span class="n">565</span>open Classical</span>
+<span class="l" id="L566"><span class="n">566</span>open GoldC.QuillonEv GoldC.QuillonSetup GoldC.QuillonLam GoldC.QuillonCEv GoldC.QuillonCFinal</span>
+<span class="l" id="L567"><span class="n">567</span>  GoldC.QuillonWContext GoldC.QuillonCPhysical GoldC.QuillonLSetup GoldC.QuillonLW</span>
+<span class="l" id="L568"><span class="n">568</span>open GoldC.QuillonCopyS GoldC.QuillonCopyF GoldC.QuillonCopyM GoldC.QuillonWPhysical</span>
+<span class="l" id="L569"><span class="n">569</span></span>
+<span class="l" id="L570"><span class="n">570</span>/-- The LONG-left region-C part at decoration `d`: `s^{1+δ} &lt; r` and `B` misses `[X, ⌊s^{u₀}⌋]`. -/</span>
+<span class="l" id="L571"><span class="n">571</span>noncomputable def CLPart (Jlow Jhigh q a h : ℕ) (δ : ℝ) (d : Finset ℕ) : ℝ :=</span>
+<span class="l" id="L572"><span class="n">572</span>  ∑ B ∈ (Tsrc q h d).powerset, ∑ C ∈ (Tsrc q h d).powerset,</span>
+<span class="l" id="L573"><span class="n">573</span>    if B ≠ ∅ ∧ C ≠ ∅ ∧ Disjoint B C ∧</span>
+<span class="l" id="L574"><span class="n">574</span>        (MkL Jlow Jhigh h (h / primeSetProduct d) δ B C ∧</span>
+<span class="l" id="L575"><span class="n">575</span>          (longInverseLeft δ (primeSetProduct B) (primeSetProduct C) ∧ ¬ WMask h δ (Tsrc q h d) B C)) then</span>
+<span class="l" id="L576"><span class="n">576</span>      omegaWeight B * omegaWeight C *</span>
+<span class="l" id="L577"><span class="n">577</span>        foldRow q a (primeSetProduct d) (h / primeSetProduct d) (primeSetProduct B) (primeSetProduct C)</span>
+<span class="l" id="L578"><span class="n">578</span>    else 0</span>
+<span class="l" id="L579"><span class="n">579</span></span>
+<span class="l" id="L580"><span class="n">580</span>set_option maxHeartbeats 4000000 in</span>
+<span class="l" id="L581"><span class="n">581</span>/-- **Physical region-C theorem.** For `d ⊆ primeFactors h` (every CORE decoration), the</span>
+<span class="l" id="L582"><span class="n">582</span>region-C part of the CORE pair sum is `≤ Λ^{−15}`, eventually in `h`, uniformly in `a`, `d`, `Jlow`, `Jhigh`. -/</span>
+<span class="l" id="L583"><span class="n">583</span>theorem CL_physical (q : ℕ) (hq : 0 &lt; q) (δ : ℝ) (hδ0 : 0 &lt; δ) (hδ1 : δ &lt; 1 / 3) :</span>
+<span class="l" id="L584"><span class="n">584</span>    ∃ Λ₀ : ℝ, 2 ≤ Λ₀ ∧ ∀ (Jlow Jhigh a h : ℕ) (d : Finset ℕ), Λ₀ ≤ Real.log h → 2 ≤ h →</span>
+<span class="l" id="L585"><span class="n">585</span>      d ⊆ h.primeFactors → |CLPart Jlow Jhigh q a h δ d| ≤ (Real.log h) ^ (-(15 : ℝ)) := by</span>
+<span class="l" id="L586"><span class="n">586</span>  obtain ⟨Λ₁, hΛ₁, hCf⟩ := C_final_L q hq δ hδ0 hδ1</span>
+<span class="l" id="L587"><span class="n">587</span>  set E : ℝ := Real.exp 10 * (2 * 2 + 1) ^ 10 with hE</span>
+<span class="l" id="L588"><span class="n">588</span>  obtain ⟨Λ₂, hΛ₂, hKΛ⟩ := const_le_rpow (E + 2 * q + 10) 1 one_pos</span>
+<span class="l" id="L589"><span class="n">589</span>  refine ⟨max Λ₁ Λ₂, le_trans hΛ₁ (le_max_left _ _), ?_⟩</span>
+<span class="l" id="L590"><span class="n">590</span>  intro Jlow Jhigh a h d hΛ hh hd</span>
+<span class="l" id="L591"><span class="n">591</span>  have hΛa : Λ₁ ≤ Real.log h := le_trans (le_max_left _ _) hΛ</span>
+<span class="l" id="L592"><span class="n">592</span>  have hΛb : Λ₂ ≤ Real.log h := le_trans (le_max_right _ _) hΛ</span>
+<span class="l" id="L593"><span class="n">593</span>  set Λ := Real.log h with hΛdef</span>
+<span class="l" id="L594"><span class="n">594</span>  have hΛ2 : 2 ≤ Λ := le_trans hΛ₁ hΛa</span>
+<span class="l" id="L595"><span class="n">595</span>  have hΛ0 : 0 &lt; Λ := by linarith</span>
+<span class="l" id="L596"><span class="n">596</span>  have hK := hKΛ Λ hΛb</span>
+<span class="l" id="L597"><span class="n">597</span>  rw [Real.rpow_one] at hK</span>
+<span class="l" id="L598"><span class="n">598</span>  have hE0&#x27; : 0 ≤ E := by positivity</span>
+<span class="l" id="L599"><span class="n">599</span>  set H := h / primeSetProduct d with hH</span>
+<span class="l" id="L600"><span class="n">600</span>  set T := Tsrc q h d with hT</span>
+<span class="l" id="L601"><span class="n">601</span>  have hTf := Tsrc_facts q h d</span>
+<span class="l" id="L602"><span class="n">602</span>  have hHh : H ≤ h := Nat.div_le_self _ _</span>
+<span class="l" id="L603"><span class="n">603</span>  have hh0&#x27; : h ≠ 0 := by omega</span>
+<span class="l" id="L604"><span class="n">604</span>  -- the exceptional set</span>
+<span class="l" id="L605"><span class="n">605</span>  set E0 := q.primeFactors ∪ H.primeFactors ∪ d with hE0</span>
+<span class="l" id="L606"><span class="n">606</span>  have hE0c : (E0.card : ℝ) ≤ 2 * q + 2 * Λ + 2 * Λ := by</span>
+<span class="l" id="L607"><span class="n">607</span>    have h1 : E0.card ≤ q.primeFactors.card + H.primeFactors.card + d.card :=</span>
+<span class="l" id="L608"><span class="n">608</span>      le_trans (card_union_le _ _) (Nat.add_le_add_right (card_union_le _ _) _)</span>
+<span class="l" id="L609"><span class="n">609</span>    have h1R : (E0.card : ℝ) ≤ q.primeFactors.card + H.primeFactors.card + d.card := by exact_mod_cast h1</span>
+<span class="l" id="L610"><span class="n">610</span>    have hq1 : (q.primeFactors.card : ℝ) ≤ 2 * q := by</span>
+<span class="l" id="L611"><span class="n">611</span>      have := card_primeFactors_le q hq.ne&#x27; _ subset_rfl</span>
+<span class="l" id="L612"><span class="n">612</span>      have hl : Real.log q ≤ q := le_trans (Real.log_le_sub_one_of_pos (by exact_mod_cast hq)) (by linarith)</span>
+<span class="l" id="L613"><span class="n">613</span>      linarith</span>
+<span class="l" id="L614"><span class="n">614</span>    have hH1 : (H.primeFactors.card : ℝ) ≤ 2 * Λ := by</span>
+<span class="l" id="L615"><span class="n">615</span>      rcases Nat.eq_zero_or_pos H with h0 | hpos</span>
+<span class="l" id="L616"><span class="n">616</span>      · rw [h0]; simp; linarith</span>
+<span class="l" id="L617"><span class="n">617</span>      · have := card_primeFactors_le H hpos.ne&#x27; _ subset_rfl</span>
+<span class="l" id="L618"><span class="n">618</span>        have : Real.log H ≤ Λ := Real.log_le_log (by exact_mod_cast hpos) (by exact_mod_cast hHh)</span>
+<span class="l" id="L619"><span class="n">619</span>        linarith</span>
+<span class="l" id="L620"><span class="n">620</span>    have hd1 : (d.card : ℝ) ≤ 2 * Λ := card_primeFactors_le h hh0&#x27; d hd</span>
+<span class="l" id="L621"><span class="n">621</span>    linarith</span>
+<span class="l" id="L622"><span class="n">622</span>  have hE0T : ∀ p, p.Prime → 5 ≤ p → p ≤ H ^ 2 → p ∉ T → p ∈ E0 := fun p hp h5 hpH hpT =&gt;</span>
+<span class="l" id="L623"><span class="n">623</span>    Tsrc_compl q h hq d p hp h5 hpH hpT</span>
+<span class="l" id="L624"><span class="n">624</span>  unfold CLPart</span>
+<span class="l" id="L625"><span class="n">625</span>  rw [GoldC.QuillonCells.double_sum_fixC]</span>
+<span class="l" id="L626"><span class="n">626</span>  have hinner : ∀ C ∈ T.powerset.filter (fun C =&gt; C ≠ ∅),</span>
+<span class="l" id="L627"><span class="n">627</span>      |∑ B ∈ (T \ C).powerset.filter (fun B =&gt; B ≠ ∅),</span>
+<span class="l" id="L628"><span class="n">628</span>        (if MkL Jlow Jhigh h H δ B C ∧ (longInverseLeft δ (primeSetProduct B) (primeSetProduct C) ∧</span>
+<span class="l" id="L629"><span class="n">629</span>            ¬ WMask h δ T B C) then</span>
+<span class="l" id="L630"><span class="n">630</span>          omegaWeight B * omegaWeight C *</span>
+<span class="l" id="L631"><span class="n">631</span>            foldRow q a (primeSetProduct d) H (primeSetProduct B) (primeSetProduct C) else 0)| ≤</span>
+<span class="l" id="L632"><span class="n">632</span>        ωR C * Λ ^ (-(30 : ℝ)) := by</span>
+<span class="l" id="L633"><span class="n">633</span>    intro C hC</span>
+<span class="l" id="L634"><span class="n">634</span>    have hCT : C ⊆ T := mem_powerset.1 (mem_filter.1 hC).1</span>
+<span class="l" id="L635"><span class="n">635</span>    have hω0 : 0 ≤ ωR C := ωR_nonneg C fun p hp =&gt; (hTf p (hCT hp)).2.1</span>
+<span class="l" id="L636"><span class="n">636</span>    have e : ∑ B ∈ (T \ C).powerset.filter (fun B =&gt; B ≠ ∅),</span>
+<span class="l" id="L637"><span class="n">637</span>        (if MkL Jlow Jhigh h H δ B C ∧ (longInverseLeft δ (primeSetProduct B) (primeSetProduct C) ∧</span>
+<span class="l" id="L638"><span class="n">638</span>            ¬ WMask h δ T B C) then</span>
+<span class="l" id="L639"><span class="n">639</span>          omegaWeight B * omegaWeight C *</span>
+<span class="l" id="L640"><span class="n">640</span>            foldRow q a (primeSetProduct d) H (primeSetProduct B) (primeSetProduct C) else 0) =</span>
+<span class="l" id="L641"><span class="n">641</span>        ωR C * ∑ B ∈ (T \ C).powerset.filter (fun B =&gt; B ≠ ∅),</span>
+<span class="l" id="L642"><span class="n">642</span>          (if ((Jlow ≤ B.card + C.card ∧ B.card + C.card &lt; Jhigh) ∧</span>
+<span class="l" id="L643"><span class="n">643</span>              GeoLL h H δ (∏ p ∈ B, p) (∏ p ∈ C, p)) ∧</span>
+<span class="l" id="L644"><span class="n">644</span>              ¬ (B ∩ (T \ C).filter (fun p =&gt; Xp h ≤ p ∧ p ≤ Yp δ (∏ p ∈ C, p))).Nonempty</span>
+<span class="l" id="L645"><span class="n">645</span>            then ωR B * foldRow q a (primeSetProduct d) H (∏ p ∈ B, p) (∏ p ∈ C, p) else 0) := by</span>
+<span class="l" id="L646"><span class="n">646</span>      rw [mul_sum]</span>
+<span class="l" id="L647"><span class="n">647</span>      refine sum_congr rfl fun B _ =&gt; ?_</span>
+<span class="l" id="L648"><span class="n">648</span>      have hiff : (MkL Jlow Jhigh h H δ B C ∧ (longInverseLeft δ (primeSetProduct B) (primeSetProduct C) ∧</span>
+<span class="l" id="L649"><span class="n">649</span>            ¬ WMask h δ T B C)) ↔</span>
+<span class="l" id="L650"><span class="n">650</span>          (((Jlow ≤ B.card + C.card ∧ B.card + C.card &lt; Jhigh) ∧</span>
+<span class="l" id="L651"><span class="n">651</span>              GeoLL h H δ (∏ p ∈ B, p) (∏ p ∈ C, p)) ∧</span>
+<span class="l" id="L652"><span class="n">652</span>              ¬ (B ∩ (T \ C).filter (fun p =&gt; Xp h ≤ p ∧ p ≤ Yp δ (∏ p ∈ C, p))).Nonempty) := by</span>
+<span class="l" id="L653"><span class="n">653</span>        constructor</span>
+<span class="l" id="L654"><span class="n">654</span>        · rintro ⟨⟨h1, h2, h3, h4, -, h6⟩, hL, hw⟩; exact ⟨⟨⟨h3, h4⟩, ⟨h1, h2, hL, h6⟩⟩, hw⟩</span>
+<span class="l" id="L655"><span class="n">655</span>        · rintro ⟨⟨⟨h3, h4⟩, ⟨h1, h2, hL, h6⟩⟩, hw⟩; exact ⟨⟨h1, h2, h3, h4, Or.inl hL, h6⟩, hL, hw⟩</span>
+<span class="l" id="L656"><span class="n">656</span>      split_ifs with h1 h2 h2</span>
+<span class="l" id="L657"><span class="n">657</span>      · show ωR B * ωR C * foldRow q a (primeSetProduct d) H (∏ p ∈ B, p) (∏ p ∈ C, p) =</span>
+<span class="l" id="L658"><span class="n">658</span>          ωR C * (ωR B * foldRow q a (primeSetProduct d) H (∏ p ∈ B, p) (∏ p ∈ C, p))</span>
+<span class="l" id="L659"><span class="n">659</span>        ring</span>
+<span class="l" id="L660"><span class="n">660</span>      · exact absurd (hiff.1 h1) h2</span>
+<span class="l" id="L661"><span class="n">661</span>      · exact absurd (hiff.2 h2) h1</span>
+<span class="l" id="L662"><span class="n">662</span>      · rw [mul_zero]</span>
+<span class="l" id="L663"><span class="n">663</span>    rw [e, abs_mul, abs_of_nonneg hω0]</span>
+<span class="l" id="L664"><span class="n">664</span>    refine mul_le_mul_of_nonneg_left ?_ hω0</span>
+<span class="l" id="L665"><span class="n">665</span>    -- case split on the size of `s`</span>
+<span class="l" id="L666"><span class="n">666</span>    by_cases hsh : ((∏ p ∈ C, p : ℕ) : ℝ) ≤ h</span>
+<span class="l" id="L667"><span class="n">667</span>    · have hCc : (C.card : ℝ) ≤ 2 * Λ := by</span>
+<span class="l" id="L668"><span class="n">668</span>        have := card_le_of_prod_le C (fun p hp =&gt; (hTf p (hCT hp)).1.two_le) h (by exact_mod_cast hsh)</span>
+<span class="l" id="L669"><span class="n">669</span>        exact this</span>
+<span class="l" id="L670"><span class="n">670</span>      have hEc : ((E0.card + C.card : ℕ) : ℝ) ≤ Λ ^ 2 := by</span>
+<span class="l" id="L671"><span class="n">671</span>        push_cast</span>
+<span class="l" id="L672"><span class="n">672</span>        have hq&#x27; : (2 * q + 10 : ℝ) ≤ Λ := by linarith</span>
+<span class="l" id="L673"><span class="n">673</span>        nlinarith</span>
+<span class="l" id="L674"><span class="n">674</span>      exact hCf a h H (primeSetProduct d) T C E0 (fun k =&gt; Jlow ≤ k + C.card ∧ k + C.card &lt; Jhigh) hΛa hh</span>
+<span class="l" id="L675"><span class="n">675</span>        hHh hTf hE0T hEc hCT</span>
+<span class="l" id="L676"><span class="n">676</span>    · -- no admissible `B`: every term vanishes</span>
+<span class="l" id="L677"><span class="n">677</span>      have hzero : ∀ B ∈ (T \ C).powerset.filter (fun B =&gt; B ≠ ∅),</span>
+<span class="l" id="L678"><span class="n">678</span>          (if ((Jlow ≤ B.card + C.card ∧ B.card + C.card &lt; Jhigh) ∧</span>
+<span class="l" id="L679"><span class="n">679</span>              GeoLL h H δ (∏ p ∈ B, p) (∏ p ∈ C, p)) ∧</span>
+<span class="l" id="L680"><span class="n">680</span>              ¬ (B ∩ (T \ C).filter (fun p =&gt; Xp h ≤ p ∧ p ≤ Yp δ (∏ p ∈ C, p))).Nonempty</span>
+<span class="l" id="L681"><span class="n">681</span>            then ωR B * foldRow q a (primeSetProduct d) H (∏ p ∈ B, p) (∏ p ∈ C, p) else 0) = 0 := by</span>
+<span class="l" id="L682"><span class="n">682</span>        intro B _</span>
+<span class="l" id="L683"><span class="n">683</span>        rw [if_neg]</span>
+<span class="l" id="L684"><span class="n">684</span>        rintro ⟨⟨-, hg⟩, -⟩</span>
+<span class="l" id="L685"><span class="n">685</span>        exact hsh (admLL h H _ _ δ hδ0 hh hHh hg).2.2.2.2.2.1</span>
+<span class="l" id="L686"><span class="n">686</span>      rw [sum_eq_zero hzero, abs_zero]; positivity</span>
+<span class="l" id="L687"><span class="n">687</span>  calc _ ≤ ∑ C ∈ T.powerset.filter (fun C =&gt; C ≠ ∅),</span>
+<span class="l" id="L688"><span class="n">688</span>        |∑ B ∈ (T \ C).powerset.filter (fun B =&gt; B ≠ ∅),</span>
+<span class="l" id="L689"><span class="n">689</span>          (if MkL Jlow Jhigh h H δ B C ∧ (longInverseLeft δ (primeSetProduct B) (primeSetProduct C) ∧</span>
+<span class="l" id="L690"><span class="n">690</span>              ¬ WMask h δ T B C) then</span>
+<span class="l" id="L691"><span class="n">691</span>            omegaWeight B * omegaWeight C *</span>
+<span class="l" id="L692"><span class="n">692</span>              foldRow q a (primeSetProduct d) H (primeSetProduct B) (primeSetProduct C) else 0)| :=</span>
+<span class="l" id="L693"><span class="n">693</span>        abs_sum_le_sum_abs _ _</span>
+<span class="l" id="L694"><span class="n">694</span>    _ ≤ ∑ C ∈ T.powerset.filter (fun C =&gt; C ≠ ∅), ωR C * Λ ^ (-(30 : ℝ)) := sum_le_sum hinner</span>
+<span class="l" id="L695"><span class="n">695</span>    _ ≤ ∑ C ∈ T.powerset, ωR C * Λ ^ (-(30 : ℝ)) := by</span>
+<span class="l" id="L696"><span class="n">696</span>        apply sum_le_sum_of_subset_of_nonneg (filter_subset _ _)</span>
+<span class="l" id="L697"><span class="n">697</span>        intro C hC _</span>
+<span class="l" id="L698"><span class="n">698</span>        have hCT : C ⊆ T := mem_powerset.1 hC</span>
+<span class="l" id="L699"><span class="n">699</span>        have := ωR_nonneg C fun p hp =&gt; (hTf p (hCT hp)).2.1</span>
+<span class="l" id="L700"><span class="n">700</span>        positivity</span>
+<span class="l" id="L701"><span class="n">701</span>    _ = (∑ C ∈ T.powerset, ωR C) * Λ ^ (-(30 : ℝ)) := by rw [sum_mul]</span>
+<span class="l" id="L702"><span class="n">702</span>    _ ≤ (E * Λ ^ (10 : ℝ)) * Λ ^ (-(30 : ℝ)) :=</span>
+<span class="l" id="L703"><span class="n">703</span>        mul_le_mul_of_nonneg_right (outer_mass q h d (by linarith)) (by positivity)</span>
+<span class="l" id="L704"><span class="n">704</span>    _ = E * Λ ^ (-(20 : ℝ)) := by rw [mul_assoc, rp hΛ0]; norm_num</span>
+<span class="l" id="L705"><span class="n">705</span>    _ ≤ Λ * Λ ^ (-(20 : ℝ)) := by</span>
+<span class="l" id="L706"><span class="n">706</span>        apply mul_le_mul_of_nonneg_right _ (by positivity)</span>
+<span class="l" id="L707"><span class="n">707</span>        have : (0 : ℝ) ≤ 2 * q + 10 := by positivity</span>
+<span class="l" id="L708"><span class="n">708</span>        linarith</span>
+<span class="l" id="L709"><span class="n">709</span>    _ = Λ ^ (-(19 : ℝ)) := by</span>
+<span class="l" id="L710"><span class="n">710</span>        rw [show Λ * Λ ^ (-(20 : ℝ)) = Λ ^ (1 : ℝ) * Λ ^ (-(20 : ℝ)) by rw [Real.rpow_one], rp hΛ0]</span>
+<span class="l" id="L711"><span class="n">711</span>        norm_num</span>
+<span class="l" id="L712"><span class="n">712</span>    _ ≤ Λ ^ (-(15 : ℝ)) := Real.rpow_le_rpow_of_exponent_le (by linarith) (by norm_num)</span>
+<span class="l" id="L713"><span class="n">713</span></span>
+<span class="l" id="L714"><span class="n">714</span>end GoldC.QuillonLC</span>
+<span class="l" id="L715"><span class="n">715</span></span>
+<span class="l" id="L716"><span class="n">716</span>#print axioms GoldC.QuillonLC.CTerm_ev4</span>
+<span class="l" id="L717"><span class="n">717</span>#print axioms GoldC.QuillonLC.rankin_Lw_ev4</span>
+<span class="l" id="L718"><span class="n">718</span>#print axioms GoldC.QuillonLC.C_final_L</span>
+<span class="l" id="L719"><span class="n">719</span>#print axioms GoldC.QuillonLC.CL_physical</span></pre></div></body></html>

@@ -1,0 +1,378 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LEAN/GoldC/QuillonDecorationGronwall.lean</title><style>body{background:#f9f8f4;color:#27332d;font:16px/1.5 Georgia,serif;margin:0}a{color:#2d6255}.wrap{max-width:1160px;margin:0 auto;padding:30px 24px}header{border-bottom:1px solid #d8ded7;margin-bottom:22px}h1{font-size:29px;font-weight:normal;overflow-wrap:anywhere}.meta,nav,th{font:13px/1.5 system-ui,sans-serif;color:#5b6b63}nav a{margin-right:18px}.tblwrap{overflow-x:auto}table{border-collapse:collapse;width:100%}td,th{padding:9px 12px;border-bottom:1px solid #e0e3de;text-align:left;vertical-align:top}td code{overflow-wrap:anywhere}code,pre{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}pre{font-size:12.5px;white-space:pre;overflow-x:auto;line-height:1.6;background:#fff;padding:12px;border:1px solid #e2e4df}.ln{color:#8b968e;padding-right:15px;user-select:none}.line{display:block}.focus{background:#e9f1ec}.line:target{outline:2px solid #276b54;outline-offset:1px;background:#f6f4e7}.legend{padding:12px 15px;background:#fff;border-left:2px solid #629280;margin:24px 0}@media(max-width:640px){.wrap{padding:18px 12px}h1{font-size:21px}td,th{padding:8px}.meta{font-size:11px}pre{font-size:11px}}</style></head><body><div class="wrap"><header><nav><a href="../source_index.html">All source waypoints</a><a href="../../../Docs/companion/reading_room/index.html">Reading room</a></nav><h1>LEAN/GoldC/QuillonDecorationGronwall.lean</h1><p class="meta">Exact archived source · SHA-256 5e0b9942e41e193f177013db4233c7265f16f9dd4a4450c26465b9a92db0e13f · Original line numbers · Not a new Lean replay</p></header><p class="meta">Deep source proof text is reproduced verbatim for inspection; this page does not assert a compiler-derived proof-dependency graph.</p><pre><span class="line" id="L1"><span class="ln">    1</span>import Mathlib.NumberTheory.Primorial</span>
+<span class="line" id="L2"><span class="ln">    2</span>import Mathlib.NumberTheory.Harmonic.Bounds</span>
+<span class="line" id="L3"><span class="ln">    3</span>import Mathlib.Algebra.BigOperators.Ring.Finset</span>
+<span class="line" id="L4"><span class="ln">    4</span>import Mathlib.Analysis.SpecialFunctions.Log.Basic</span>
+<span class="line" id="L5"><span class="ln">    5</span>import Mathlib.Analysis.SpecialFunctions.Exp</span>
+<span class="line" id="L6"><span class="ln">    6</span>import Mathlib.Analysis.Complex.ExponentialBounds</span>
+<span class="line" id="L7"><span class="ln">    7</span>import Mathlib.Tactic</span>
+<span class="line" id="L8"><span class="ln">    8</span></span>
+<span class="line" id="L9"><span class="ln">    9</span>/-!</span>
+<span class="line" id="L10"><span class="ln">   10</span># Quillon CSC3 — decoration-mass Gronwall-type bound (Lemma G)</span>
+<span class="line" id="L11"><span class="ln">   11</span></span>
+<span class="line" id="L12"><span class="ln">   12</span>The decoration definitions below are **verbatim copies** of the curated</span>
+<span class="line" id="L13"><span class="ln">   13</span>`GoldC/SourceCore.lean` (SHA-256 `0888e660…0362`, byte-identical in the curated</span>
+<span class="line" id="L14"><span class="ln">   14</span>supplement and in this workspace). The full `import Mathlib` that SourceCore uses is not</span>
+<span class="line" id="L15"><span class="ln">   15</span>built here, so the copies live in `GoldC.QuillonCopyG`. Replaying against production</span>
+<span class="line" id="L16"><span class="ln">   16</span>means deleting the copies and importing `GoldC.SourceCore`. Every proof below uses only</span>
+<span class="line" id="L17"><span class="ln">   17</span>the definitions&#x27; bodies.</span>
+<span class="line" id="L18"><span class="ln">   18</span></span>
+<span class="line" id="L19"><span class="ln">   19</span>Main results:</span>
+<span class="line" id="L20"><span class="ln">   20</span>* `decoration_mass_eq_prod`: Σ_{d ⊆ P} decorationWeight h d = ∏_{p∈P} (1 + 1/(p-2)) (exact).</span>
+<span class="line" id="L21"><span class="ln">   21</span>* `sum_inv_primes_below_two_pow`: Σ_{p&lt;2^(K+1)} 1/p ≤ 4·H_K (Chebyshev via `primorial_le_four_pow`).</span>
+<span class="line" id="L22"><span class="ln">   22</span>* `decoration_mass_le_exp_loglog`: for 16 ≤ h, the mass is</span>
+<span class="line" id="L23"><span class="ln">   23</span>  ≤ exp (10 + 8·log (Nat.log 2 ⌊log h⌋₊)), i.e. `≪ (log log h)^8`.</span>
+<span class="line" id="L24"><span class="ln">   24</span>No axioms beyond Lean/Mathlib standard ones.</span>
+<span class="line" id="L25"><span class="ln">   25</span>-/</span>
+<span class="line" id="L26"><span class="ln">   26</span></span>
+<span class="line" id="L27"><span class="ln">   27</span>open scoped BigOperators Classical</span>
+<span class="line" id="L28"><span class="ln">   28</span>open Finset Real</span>
+<span class="line" id="L29"><span class="ln">   29</span></span>
+<span class="line" id="L30"><span class="ln">   30</span>namespace GoldC.QuillonCopyG</span>
+<span class="line" id="L31"><span class="ln">   31</span></span>
+<span class="line" id="L32"><span class="ln">   32</span>/-- Verbatim copy of `GoldC.decoratedHeightPrimeSet`. -/</span>
+<span class="line" id="L33"><span class="ln">   33</span>def decoratedHeightPrimeSet (q h : ℕ) : Finset ℕ :=</span>
+<span class="line" id="L34"><span class="ln">   34</span>  h.primeFactors.filter (fun p =&gt; 5 ≤ p ∧ ¬ p ∣ q)</span>
+<span class="line" id="L35"><span class="ln">   35</span></span>
+<span class="line" id="L36"><span class="ln">   36</span>/-- Verbatim copy of `GoldC.decorationWeight`. -/</span>
+<span class="line" id="L37"><span class="ln">   37</span>noncomputable def decorationWeight (h : ℕ) (s : Finset ℕ) : ℝ :=</span>
+<span class="line" id="L38"><span class="ln">   38</span>  ∏ p ∈ s, if p ∣ h then 1 / ((p : ℝ) - 2) else 1 / ((p : ℝ) - 3)</span>
+<span class="line" id="L39"><span class="ln">   39</span></span>
+<span class="line" id="L40"><span class="ln">   40</span>lemma mem_P {q h p : ℕ} (hp : p ∈ decoratedHeightPrimeSet q h) :</span>
+<span class="line" id="L41"><span class="ln">   41</span>    p.Prime ∧ p ∣ h ∧ 5 ≤ p ∧ h ≠ 0 := by</span>
+<span class="line" id="L42"><span class="ln">   42</span>  unfold decoratedHeightPrimeSet at hp</span>
+<span class="line" id="L43"><span class="ln">   43</span>  rw [Finset.mem_filter, Nat.mem_primeFactors] at hp</span>
+<span class="line" id="L44"><span class="ln">   44</span>  exact ⟨hp.1.1, hp.1.2.1, hp.2.1, hp.1.2.2⟩</span>
+<span class="line" id="L45"><span class="ln">   45</span></span>
+<span class="line" id="L46"><span class="ln">   46</span>/-- **Exact identity**: the decoration mass is an Euler product. -/</span>
+<span class="line" id="L47"><span class="ln">   47</span>theorem decoration_mass_eq_prod (q h : ℕ) :</span>
+<span class="line" id="L48"><span class="ln">   48</span>    ∑ d ∈ (decoratedHeightPrimeSet q h).powerset, decorationWeight h d =</span>
+<span class="line" id="L49"><span class="ln">   49</span>      ∏ p ∈ decoratedHeightPrimeSet q h, (1 + 1 / ((p : ℝ) - 2)) := by</span>
+<span class="line" id="L50"><span class="ln">   50</span>  rw [Finset.prod_one_add]</span>
+<span class="line" id="L51"><span class="ln">   51</span>  refine Finset.sum_congr rfl fun d hd =&gt; ?_</span>
+<span class="line" id="L52"><span class="ln">   52</span>  unfold decorationWeight</span>
+<span class="line" id="L53"><span class="ln">   53</span>  refine Finset.prod_congr rfl fun p hp =&gt; ?_</span>
+<span class="line" id="L54"><span class="ln">   54</span>  have := (mem_P (Finset.mem_powerset.1 hd hp)).2.1</span>
+<span class="line" id="L55"><span class="ln">   55</span>  simp [this]</span>
+<span class="line" id="L56"><span class="ln">   56</span></span>
+<span class="line" id="L57"><span class="ln">   57</span>/-- `∏ (1 + x) ≤ exp (Σ x)` for nonnegative `x`. -/</span>
+<span class="line" id="L58"><span class="ln">   58</span>lemma prod_one_add_le_exp_sum {ι : Type*} (s : Finset ι) (x : ι → ℝ)</span>
+<span class="line" id="L59"><span class="ln">   59</span>    (hx : ∀ i ∈ s, 0 ≤ x i) : ∏ i ∈ s, (1 + x i) ≤ Real.exp (∑ i ∈ s, x i) := by</span>
+<span class="line" id="L60"><span class="ln">   60</span>  rw [Real.exp_sum]</span>
+<span class="line" id="L61"><span class="ln">   61</span>  refine Finset.prod_le_prod₀ (fun i hi =&gt; by linarith [hx i hi]) fun i _ =&gt; ?_</span>
+<span class="line" id="L62"><span class="ln">   62</span>  linarith [Real.add_one_le_exp (x i)]</span>
+<span class="line" id="L63"><span class="ln">   63</span></span>
+<span class="line" id="L64"><span class="ln">   64</span>/-! ## Chebyshev-type dyadic block bound -/</span>
+<span class="line" id="L65"><span class="ln">   65</span></span>
+<span class="line" id="L66"><span class="ln">   66</span>/-- Primes in the dyadic block `[2^k, 2^(k+1))`. -/</span>
+<span class="line" id="L67"><span class="ln">   67</span>def block (k : ℕ) : Finset ℕ := (Finset.Ico (2 ^ k) (2 ^ (k + 1))).filter Nat.Prime</span>
+<span class="line" id="L68"><span class="ln">   68</span></span>
+<span class="line" id="L69"><span class="ln">   69</span>lemma block_card_mul_le (k : ℕ) : k * (block k).card ≤ 2 ^ (k + 2) := by</span>
+<span class="line" id="L70"><span class="ln">   70</span>  -- (2^k)^card ≤ ∏ block ≤ primorial (2^(k+1)) ≤ 4^(2^(k+1)) = 2^(2^(k+2))</span>
+<span class="line" id="L71"><span class="ln">   71</span>  have h1 : (2 ^ k) ^ (block k).card ≤ ∏ p ∈ block k, p :=</span>
+<span class="line" id="L72"><span class="ln">   72</span>    Finset.pow_card_le_prod _ _ _ fun p hp =&gt; (Finset.mem_Ico.1 (Finset.mem_filter.1 hp).1).1</span>
+<span class="line" id="L73"><span class="ln">   73</span>  have hsub : block k ⊆ (Finset.range (2 ^ (k + 1) + 1)).filter Nat.Prime := by</span>
+<span class="line" id="L74"><span class="ln">   74</span>    intro p hp</span>
+<span class="line" id="L75"><span class="ln">   75</span>    rw [block, Finset.mem_filter, Finset.mem_Ico] at hp</span>
+<span class="line" id="L76"><span class="ln">   76</span>    rw [Finset.mem_filter, Finset.mem_range]</span>
+<span class="line" id="L77"><span class="ln">   77</span>    exact ⟨by omega, hp.2⟩</span>
+<span class="line" id="L78"><span class="ln">   78</span>  have h2 : ∏ p ∈ block k, p ≤ primorial (2 ^ (k + 1)) := by</span>
+<span class="line" id="L79"><span class="ln">   79</span>    unfold primorial</span>
+<span class="line" id="L80"><span class="ln">   80</span>    apply Nat.le_of_dvd</span>
+<span class="line" id="L81"><span class="ln">   81</span>    · exact Finset.prod_pos fun p hp =&gt; (Finset.mem_filter.1 hp).2.pos</span>
+<span class="line" id="L82"><span class="ln">   82</span>    · exact Finset.prod_dvd_prod_of_subset _ _ _ hsub</span>
+<span class="line" id="L83"><span class="ln">   83</span>  have h3 := primorial_le_four_pow (2 ^ (k + 1))</span>
+<span class="line" id="L84"><span class="ln">   84</span>  have h4 : (4 : ℕ) ^ (2 ^ (k + 1)) = 2 ^ (2 ^ (k + 2)) := by</span>
+<span class="line" id="L85"><span class="ln">   85</span>    rw [show (4 : ℕ) = 2 ^ 2 by norm_num, ← pow_mul]; congr 1; ring</span>
+<span class="line" id="L86"><span class="ln">   86</span>  have h5 : 2 ^ (k * (block k).card) ≤ 2 ^ (2 ^ (k + 2)) := by</span>
+<span class="line" id="L87"><span class="ln">   87</span>    rw [pow_mul]; calc _ ≤ _ := h1</span>
+<span class="line" id="L88"><span class="ln">   88</span>      _ ≤ _ := h2</span>
+<span class="line" id="L89"><span class="ln">   89</span>      _ ≤ _ := h3</span>
+<span class="line" id="L90"><span class="ln">   90</span>      _ = _ := h4</span>
+<span class="line" id="L91"><span class="ln">   91</span>  exact (Nat.pow_le_pow_iff_right (by norm_num)).1 h5</span>
+<span class="line" id="L92"><span class="ln">   92</span></span>
+<span class="line" id="L93"><span class="ln">   93</span>lemma block_sum_le (k : ℕ) (hk : 1 ≤ k) :</span>
+<span class="line" id="L94"><span class="ln">   94</span>    ∑ p ∈ block k, (1 / (p : ℝ)) ≤ 4 / k := by</span>
+<span class="line" id="L95"><span class="ln">   95</span>  have hk&#x27; : (0 : ℝ) &lt; k := by exact_mod_cast hk</span>
+<span class="line" id="L96"><span class="ln">   96</span>  have hpos : (0 : ℝ) &lt; 2 ^ k := by positivity</span>
+<span class="line" id="L97"><span class="ln">   97</span>  calc ∑ p ∈ block k, (1 / (p : ℝ)) ≤ ∑ _p ∈ block k, (1 / (2 : ℝ) ^ k) := by</span>
+<span class="line" id="L98"><span class="ln">   98</span>        refine Finset.sum_le_sum fun p hp =&gt; ?_</span>
+<span class="line" id="L99"><span class="ln">   99</span>        have : 2 ^ k ≤ p := (Finset.mem_Ico.1 (Finset.mem_filter.1 hp).1).1</span>
+<span class="line" id="L100"><span class="ln">  100</span>        have : (2 : ℝ) ^ k ≤ p := by exact_mod_cast this</span>
+<span class="line" id="L101"><span class="ln">  101</span>        exact one_div_le_one_div_of_le hpos this</span>
+<span class="line" id="L102"><span class="ln">  102</span>    _ = (block k).card / (2 : ℝ) ^ k := by rw [Finset.sum_const, nsmul_eq_mul]; ring</span>
+<span class="line" id="L103"><span class="ln">  103</span>    _ ≤ 4 / k := by</span>
+<span class="line" id="L104"><span class="ln">  104</span>        rw [div_le_div_iff₀ hpos hk&#x27;]</span>
+<span class="line" id="L105"><span class="ln">  105</span>        have h := block_card_mul_le k</span>
+<span class="line" id="L106"><span class="ln">  106</span>        have h&#x27; : (k : ℝ) * (block k).card ≤ 2 ^ (k + 2) := by exact_mod_cast h</span>
+<span class="line" id="L107"><span class="ln">  107</span>        rw [pow_add] at h&#x27;; nlinarith</span>
+<span class="line" id="L108"><span class="ln">  108</span></span>
+<span class="line" id="L109"><span class="ln">  109</span>/-- Primes below `2^K`. -/</span>
+<span class="line" id="L110"><span class="ln">  110</span>def primesBelowPow (K : ℕ) : Finset ℕ := (Finset.range (2 ^ K)).filter Nat.Prime</span>
+<span class="line" id="L111"><span class="ln">  111</span></span>
+<span class="line" id="L112"><span class="ln">  112</span>lemma primesBelowPow_succ (K : ℕ) :</span>
+<span class="line" id="L113"><span class="ln">  113</span>    primesBelowPow (K + 1) = primesBelowPow K ∪ block K := by</span>
+<span class="line" id="L114"><span class="ln">  114</span>  ext p</span>
+<span class="line" id="L115"><span class="ln">  115</span>  simp only [primesBelowPow, block, Finset.mem_union, Finset.mem_filter, Finset.mem_range,</span>
+<span class="line" id="L116"><span class="ln">  116</span>    Finset.mem_Ico]</span>
+<span class="line" id="L117"><span class="ln">  117</span>  have : 2 ^ K ≤ 2 ^ (K + 1) := Nat.pow_le_pow_right (by norm_num) (by omega)</span>
+<span class="line" id="L118"><span class="ln">  118</span>  constructor</span>
+<span class="line" id="L119"><span class="ln">  119</span>  · rintro ⟨h1, h2⟩; by_cases h : p &lt; 2 ^ K</span>
+<span class="line" id="L120"><span class="ln">  120</span>    · exact Or.inl ⟨h, h2⟩</span>
+<span class="line" id="L121"><span class="ln">  121</span>    · exact Or.inr ⟨⟨by omega, h1⟩, h2⟩</span>
+<span class="line" id="L122"><span class="ln">  122</span>  · rintro (⟨h1, h2⟩ | ⟨⟨h1, h1&#x27;⟩, h2⟩)</span>
+<span class="line" id="L123"><span class="ln">  123</span>    · exact ⟨by omega, h2⟩</span>
+<span class="line" id="L124"><span class="ln">  124</span>    · exact ⟨h1&#x27;, h2⟩</span>
+<span class="line" id="L125"><span class="ln">  125</span></span>
+<span class="line" id="L126"><span class="ln">  126</span>lemma disjoint_block (K : ℕ) : Disjoint (primesBelowPow K) (block K) := by</span>
+<span class="line" id="L127"><span class="ln">  127</span>  rw [Finset.disjoint_left]</span>
+<span class="line" id="L128"><span class="ln">  128</span>  intro p h1 h2</span>
+<span class="line" id="L129"><span class="ln">  129</span>  simp only [primesBelowPow, block, Finset.mem_filter, Finset.mem_range, Finset.mem_Ico] at h1 h2</span>
+<span class="line" id="L130"><span class="ln">  130</span>  omega</span>
+<span class="line" id="L131"><span class="ln">  131</span></span>
+<span class="line" id="L132"><span class="ln">  132</span>/-- **Dyadic Mertens-type bound**: `Σ_{p &lt; 2^(K+1)} 1/p ≤ 4·H_K`. -/</span>
+<span class="line" id="L133"><span class="ln">  133</span>theorem sum_inv_primes_below_two_pow (K : ℕ) :</span>
+<span class="line" id="L134"><span class="ln">  134</span>    ∑ p ∈ primesBelowPow (K + 1), (1 / (p : ℝ)) ≤ 4 * (harmonic K : ℝ) := by</span>
+<span class="line" id="L135"><span class="ln">  135</span>  induction K with</span>
+<span class="line" id="L136"><span class="ln">  136</span>  | zero =&gt;</span>
+<span class="line" id="L137"><span class="ln">  137</span>    have : primesBelowPow 1 = ∅ := by</span>
+<span class="line" id="L138"><span class="ln">  138</span>      ext p; simp only [primesBelowPow, Finset.mem_filter, Finset.mem_range,</span>
+<span class="line" id="L139"><span class="ln">  139</span>        Finset.notMem_empty, iff_false, not_and]</span>
+<span class="line" id="L140"><span class="ln">  140</span>      intro hp hpr; have := hpr.two_le; norm_num at hp; omega</span>
+<span class="line" id="L141"><span class="ln">  141</span>    simp [this]</span>
+<span class="line" id="L142"><span class="ln">  142</span>  | succ K ih =&gt;</span>
+<span class="line" id="L143"><span class="ln">  143</span>    rw [primesBelowPow_succ, Finset.sum_union (disjoint_block _), harmonic_succ]</span>
+<span class="line" id="L144"><span class="ln">  144</span>    have hb := block_sum_le (K + 1) (by omega)</span>
+<span class="line" id="L145"><span class="ln">  145</span>    push_cast at hb ⊢</span>
+<span class="line" id="L146"><span class="ln">  146</span>    have : (4 : ℝ) / (K + 1) = 4 * (K + 1 : ℝ)⁻¹ := by ring</span>
+<span class="line" id="L147"><span class="ln">  147</span>    linarith</span>
+<span class="line" id="L148"><span class="ln">  148</span></span>
+<span class="line" id="L149"><span class="ln">  149</span>/-! ## Assembly -/</span>
+<span class="line" id="L150"><span class="ln">  150</span></span>
+<span class="line" id="L151"><span class="ln">  151</span>lemma inv_sub_two_le (p : ℕ) (hp : 5 ≤ p) : 1 / ((p : ℝ) - 2) ≤ 2 * (1 / (p : ℝ)) := by</span>
+<span class="line" id="L152"><span class="ln">  152</span>  have : (5 : ℝ) ≤ p := by exact_mod_cast hp</span>
+<span class="line" id="L153"><span class="ln">  153</span>  rw [div_le_iff₀ (by linarith)]</span>
+<span class="line" id="L154"><span class="ln">  154</span>  field_simp</span>
+<span class="line" id="L155"><span class="ln">  155</span>  linarith</span>
+<span class="line" id="L156"><span class="ln">  156</span></span>
+<span class="line" id="L157"><span class="ln">  157</span>/-- Large decorated primes: at most `log h / log (Y+1)` of them exceed `Y`. -/</span>
+<span class="line" id="L158"><span class="ln">  158</span>lemma large_part_le (q h Y : ℕ) (hh : 0 &lt; h) :</span>
+<span class="line" id="L159"><span class="ln">  159</span>    ∑ p ∈ (decoratedHeightPrimeSet q h).filter (fun p =&gt; Y &lt; p), (1 / (p : ℝ)) ≤</span>
+<span class="line" id="L160"><span class="ln">  160</span>      Real.log h / (((Y : ℝ) + 1) * Real.log ((Y : ℝ) + 1)) ∨ Y = 0 := by</span>
+<span class="line" id="L161"><span class="ln">  161</span>  rcases Nat.eq_zero_or_pos Y with hY | hY</span>
+<span class="line" id="L162"><span class="ln">  162</span>  · exact Or.inr hY</span>
+<span class="line" id="L163"><span class="ln">  163</span>  left</span>
+<span class="line" id="L164"><span class="ln">  164</span>  set S := (decoratedHeightPrimeSet q h).filter (fun p =&gt; Y &lt; p)</span>
+<span class="line" id="L165"><span class="ln">  165</span>  have hY0 : (0:ℝ) &lt; Y := by exact_mod_cast hY</span>
+<span class="line" id="L166"><span class="ln">  166</span>  have hY1 : (1 : ℝ) &lt; (Y : ℝ) + 1 := by linarith</span>
+<span class="line" id="L167"><span class="ln">  167</span>  have hlogY : 0 &lt; Real.log ((Y : ℝ) + 1) := Real.log_pos hY1</span>
+<span class="line" id="L168"><span class="ln">  168</span>  -- (Y+1)^card ≤ ∏ S ≤ h</span>
+<span class="line" id="L169"><span class="ln">  169</span>  have hprod : ((Y + 1) ^ S.card : ℕ) ≤ h := by</span>
+<span class="line" id="L170"><span class="ln">  170</span>    have h1 : (Y + 1) ^ S.card ≤ ∏ p ∈ S, p :=</span>
+<span class="line" id="L171"><span class="ln">  171</span>      Finset.pow_card_le_prod _ _ _ fun p hp =&gt; (Finset.mem_filter.1 hp).2</span>
+<span class="line" id="L172"><span class="ln">  172</span>    have h2 : ∏ p ∈ S, p ∣ h := by</span>
+<span class="line" id="L173"><span class="ln">  173</span>      calc ∏ p ∈ S, p ∣ ∏ p ∈ h.primeFactors, p := by</span>
+<span class="line" id="L174"><span class="ln">  174</span>            refine Finset.prod_dvd_prod_of_subset S h.primeFactors id fun p hp =&gt; ?_</span>
+<span class="line" id="L175"><span class="ln">  175</span>            have := mem_P (Finset.mem_filter.1 hp).1</span>
+<span class="line" id="L176"><span class="ln">  176</span>            exact Nat.mem_primeFactors.2 ⟨this.1, this.2.1, hh.ne&#x27;⟩</span>
+<span class="line" id="L177"><span class="ln">  177</span>        _ ∣ h := Nat.prod_primeFactors_dvd h</span>
+<span class="line" id="L178"><span class="ln">  178</span>    exact h1.trans (Nat.le_of_dvd hh h2)</span>
+<span class="line" id="L179"><span class="ln">  179</span>  have hcard : (S.card : ℝ) * Real.log ((Y : ℝ) + 1) ≤ Real.log h := by</span>
+<span class="line" id="L180"><span class="ln">  180</span>    have : (((Y + 1) ^ S.card : ℕ) : ℝ) ≤ h := by exact_mod_cast hprod</span>
+<span class="line" id="L181"><span class="ln">  181</span>    have hpos : (0 : ℝ) &lt; (((Y + 1) ^ S.card : ℕ) : ℝ) := by positivity</span>
+<span class="line" id="L182"><span class="ln">  182</span>    have := Real.log_le_log hpos this</span>
+<span class="line" id="L183"><span class="ln">  183</span>    push_cast at this</span>
+<span class="line" id="L184"><span class="ln">  184</span>    rwa [Real.log_pow] at this</span>
+<span class="line" id="L185"><span class="ln">  185</span>  calc ∑ p ∈ S, (1 / (p : ℝ)) ≤ ∑ _p ∈ S, (1 / ((Y : ℝ) + 1)) := by</span>
+<span class="line" id="L186"><span class="ln">  186</span>        refine Finset.sum_le_sum fun p hp =&gt; ?_</span>
+<span class="line" id="L187"><span class="ln">  187</span>        have : Y + 1 ≤ p := (Finset.mem_filter.1 hp).2</span>
+<span class="line" id="L188"><span class="ln">  188</span>        have : (Y : ℝ) + 1 ≤ p := by exact_mod_cast this</span>
+<span class="line" id="L189"><span class="ln">  189</span>        exact one_div_le_one_div_of_le (by linarith) this</span>
+<span class="line" id="L190"><span class="ln">  190</span>    _ = S.card / ((Y : ℝ) + 1) := by rw [Finset.sum_const, nsmul_eq_mul]; ring</span>
+<span class="line" id="L191"><span class="ln">  191</span>    _ ≤ Real.log h / (((Y : ℝ) + 1) * Real.log ((Y : ℝ) + 1)) := by</span>
+<span class="line" id="L192"><span class="ln">  192</span>        rw [div_le_div_iff₀ (by linarith) (by positivity)]</span>
+<span class="line" id="L193"><span class="ln">  193</span>        nlinarith</span>
+<span class="line" id="L194"><span class="ln">  194</span></span>
+<span class="line" id="L195"><span class="ln">  195</span>/-- Small decorated primes `≤ Y` lie below `2^(Nat.log 2 Y + 1)`. -/</span>
+<span class="line" id="L196"><span class="ln">  196</span>lemma small_part_le (q h Y : ℕ) :</span>
+<span class="line" id="L197"><span class="ln">  197</span>    ∑ p ∈ (decoratedHeightPrimeSet q h).filter (fun p =&gt; ¬ Y &lt; p), (1 / (p : ℝ)) ≤</span>
+<span class="line" id="L198"><span class="ln">  198</span>      4 * (harmonic (Nat.log 2 Y) : ℝ) := by</span>
+<span class="line" id="L199"><span class="ln">  199</span>  refine le_trans ?_ (sum_inv_primes_below_two_pow (Nat.log 2 Y))</span>
+<span class="line" id="L200"><span class="ln">  200</span>  apply Finset.sum_le_sum_of_subset_of_nonneg</span>
+<span class="line" id="L201"><span class="ln">  201</span>  · intro p hp</span>
+<span class="line" id="L202"><span class="ln">  202</span>    rw [Finset.mem_filter] at hp</span>
+<span class="line" id="L203"><span class="ln">  203</span>    have hP := mem_P hp.1</span>
+<span class="line" id="L204"><span class="ln">  204</span>    simp only [primesBelowPow, Finset.mem_filter, Finset.mem_range]</span>
+<span class="line" id="L205"><span class="ln">  205</span>    exact ⟨lt_of_le_of_lt (not_lt.1 hp.2) (Nat.lt_pow_succ_log_self (by norm_num) Y), hP.1⟩</span>
+<span class="line" id="L206"><span class="ln">  206</span>  · intro p _ _; positivity</span>
+<span class="line" id="L207"><span class="ln">  207</span></span>
+<span class="line" id="L208"><span class="ln">  208</span>/-- **Lemma G (decoration Gronwall, crude scale)**: for `16 ≤ h`,</span>
+<span class="line" id="L209"><span class="ln">  209</span>`Σ_{d ⊆ P} decorationWeight h d ≤ exp (10 + 8 · log (Nat.log 2 ⌊log h⌋₊))`. -/</span>
+<span class="line" id="L210"><span class="ln">  210</span>theorem decoration_mass_le_exp_loglog (q h : ℕ) (hh : 16 ≤ h) :</span>
+<span class="line" id="L211"><span class="ln">  211</span>    ∑ d ∈ (decoratedHeightPrimeSet q h).powerset, decorationWeight h d ≤</span>
+<span class="line" id="L212"><span class="ln">  212</span>      Real.exp (10 + 8 * Real.log (Nat.log 2 ⌊Real.log h⌋₊)) := by</span>
+<span class="line" id="L213"><span class="ln">  213</span>  set P := decoratedHeightPrimeSet q h</span>
+<span class="line" id="L214"><span class="ln">  214</span>  set Y := ⌊Real.log h⌋₊</span>
+<span class="line" id="L215"><span class="ln">  215</span>  have hh0 : 0 &lt; h := by omega</span>
+<span class="line" id="L216"><span class="ln">  216</span>  have hlogh : Real.log 16 ≤ Real.log h :=</span>
+<span class="line" id="L217"><span class="ln">  217</span>    Real.log_le_log (by norm_num) (by exact_mod_cast hh)</span>
+<span class="line" id="L218"><span class="ln">  218</span>  have hlog16 : (2.7 : ℝ) &lt; Real.log 16 := by</span>
+<span class="line" id="L219"><span class="ln">  219</span>    rw [show (16 : ℝ) = 2 ^ 4 by norm_num, Real.log_pow]</span>
+<span class="line" id="L220"><span class="ln">  220</span>    have := Real.log_two_gt_d9; push_cast; linarith</span>
+<span class="line" id="L221"><span class="ln">  221</span>  have hY2 : 2 ≤ Y := by</span>
+<span class="line" id="L222"><span class="ln">  222</span>    apply Nat.le_floor; push_cast; linarith</span>
+<span class="line" id="L223"><span class="ln">  223</span>  have hYlt : Real.log h &lt; (Y : ℝ) + 1 := Nat.lt_floor_add_one _</span>
+<span class="line" id="L224"><span class="ln">  224</span>  -- large part ≤ 1</span>
+<span class="line" id="L225"><span class="ln">  225</span>  have hlarge : ∑ p ∈ P.filter (fun p =&gt; Y &lt; p), (1 / (p : ℝ)) ≤ 1 := by</span>
+<span class="line" id="L226"><span class="ln">  226</span>    rcases large_part_le q h Y hh0 with h1 | h1</span>
+<span class="line" id="L227"><span class="ln">  227</span>    · refine h1.trans ?_</span>
+<span class="line" id="L228"><span class="ln">  228</span>      have hY3 : (3 : ℝ) ≤ (Y : ℝ) + 1 := by</span>
+<span class="line" id="L229"><span class="ln">  229</span>        have : (2 : ℝ) ≤ Y := by exact_mod_cast hY2</span>
+<span class="line" id="L230"><span class="ln">  230</span>        linarith</span>
+<span class="line" id="L231"><span class="ln">  231</span>      have hl3 : 1 &lt; Real.log ((Y : ℝ) + 1) := by</span>
+<span class="line" id="L232"><span class="ln">  232</span>        have : Real.log 3 ≤ Real.log ((Y : ℝ) + 1) := Real.log_le_log (by norm_num) hY3</span>
+<span class="line" id="L233"><span class="ln">  233</span>        have h3 : (1 : ℝ) &lt; Real.log 3 := by</span>
+<span class="line" id="L234"><span class="ln">  234</span>          have := Real.exp_one_lt_d9</span>
+<span class="line" id="L235"><span class="ln">  235</span>          rw [Real.lt_log_iff_exp_lt (by norm_num)]; linarith</span>
+<span class="line" id="L236"><span class="ln">  236</span>        linarith</span>
+<span class="line" id="L237"><span class="ln">  237</span>      rw [div_le_one (by nlinarith)]</span>
+<span class="line" id="L238"><span class="ln">  238</span>      nlinarith</span>
+<span class="line" id="L239"><span class="ln">  239</span>    · omega</span>
+<span class="line" id="L240"><span class="ln">  240</span>  have hsmall := small_part_le q h Y</span>
+<span class="line" id="L241"><span class="ln">  241</span>  have hharm := harmonic_le_one_add_log (Nat.log 2 Y)</span>
+<span class="line" id="L242"><span class="ln">  242</span>  -- Σ 1/(p-2) ≤ 2 Σ 1/p ≤ 2 (4(1+log m) + 1)</span>
+<span class="line" id="L243"><span class="ln">  243</span>  have hsplit : ∑ p ∈ P, (1 / (p : ℝ)) =</span>
+<span class="line" id="L244"><span class="ln">  244</span>      ∑ p ∈ P.filter (fun p =&gt; ¬ Y &lt; p), (1 / (p : ℝ)) +</span>
+<span class="line" id="L245"><span class="ln">  245</span>      ∑ p ∈ P.filter (fun p =&gt; Y &lt; p), (1 / (p : ℝ)) := by</span>
+<span class="line" id="L246"><span class="ln">  246</span>    rw [add_comm]; exact (Finset.sum_filter_add_sum_filter_not P _ _).symm</span>
+<span class="line" id="L247"><span class="ln">  247</span>  have hsum : ∑ p ∈ P, (1 / ((p : ℝ) - 2)) ≤ 10 + 8 * Real.log (Nat.log 2 Y) := by</span>
+<span class="line" id="L248"><span class="ln">  248</span>    calc ∑ p ∈ P, (1 / ((p : ℝ) - 2)) ≤ ∑ p ∈ P, 2 * (1 / (p : ℝ)) :=</span>
+<span class="line" id="L249"><span class="ln">  249</span>          Finset.sum_le_sum fun p hp =&gt; inv_sub_two_le p (mem_P hp).2.2.1</span>
+<span class="line" id="L250"><span class="ln">  250</span>      _ = 2 * ∑ p ∈ P, (1 / (p : ℝ)) := by rw [Finset.mul_sum]</span>
+<span class="line" id="L251"><span class="ln">  251</span>      _ ≤ 10 + 8 * Real.log (Nat.log 2 Y) := by</span>
+<span class="line" id="L252"><span class="ln">  252</span>          rw [hsplit]; nlinarith</span>
+<span class="line" id="L253"><span class="ln">  253</span>  rw [decoration_mass_eq_prod]</span>
+<span class="line" id="L254"><span class="ln">  254</span>  refine (prod_one_add_le_exp_sum P _ fun p hp =&gt; ?_).trans (Real.exp_le_exp.2 hsum)</span>
+<span class="line" id="L255"><span class="ln">  255</span>  have : (5 : ℝ) ≤ p := by exact_mod_cast (mem_P hp).2.2.1</span>
+<span class="line" id="L256"><span class="ln">  256</span>  exact div_nonneg zero_le_one (by linarith)</span>
+<span class="line" id="L257"><span class="ln">  257</span></span>
+<span class="line" id="L258"><span class="ln">  258</span>/-- **Lemma G, `(log log h)^8` form**: for `16 ≤ h`,</span>
+<span class="line" id="L259"><span class="ln">  259</span>`Σ_{d ⊆ P} decorationWeight h d ≤ e^10 · (log log h / log 2 + 1)^8`. -/</span>
+<span class="line" id="L260"><span class="ln">  260</span>theorem decoration_mass_le_loglog_pow (q h : ℕ) (hh : 16 ≤ h) :</span>
+<span class="line" id="L261"><span class="ln">  261</span>    ∑ d ∈ (decoratedHeightPrimeSet q h).powerset, decorationWeight h d ≤</span>
+<span class="line" id="L262"><span class="ln">  262</span>      Real.exp 10 * (Real.log (Real.log h) / Real.log 2 + 1) ^ 8 := by</span>
+<span class="line" id="L263"><span class="ln">  263</span>  refine (decoration_mass_le_exp_loglog q h hh).trans ?_</span>
+<span class="line" id="L264"><span class="ln">  264</span>  set Y := ⌊Real.log h⌋₊</span>
+<span class="line" id="L265"><span class="ln">  265</span>  set m := Nat.log 2 Y</span>
+<span class="line" id="L266"><span class="ln">  266</span>  have hlogh : Real.log 16 ≤ Real.log h :=</span>
+<span class="line" id="L267"><span class="ln">  267</span>    Real.log_le_log (by norm_num) (by exact_mod_cast hh)</span>
+<span class="line" id="L268"><span class="ln">  268</span>  have hlog16 : (2.7 : ℝ) &lt; Real.log 16 := by</span>
+<span class="line" id="L269"><span class="ln">  269</span>    rw [show (16 : ℝ) = 2 ^ 4 by norm_num, Real.log_pow]</span>
+<span class="line" id="L270"><span class="ln">  270</span>    have := Real.log_two_gt_d9; push_cast; linarith</span>
+<span class="line" id="L271"><span class="ln">  271</span>  have hl2 : 0 &lt; Real.log 2 := Real.log_pos (by norm_num)</span>
+<span class="line" id="L272"><span class="ln">  272</span>  have hll : 0 ≤ Real.log (Real.log h) := Real.log_nonneg (by linarith)</span>
+<span class="line" id="L273"><span class="ln">  273</span>  have hbase : 0 ≤ Real.log (Real.log h) / Real.log 2 := div_nonneg hll hl2.le</span>
+<span class="line" id="L274"><span class="ln">  274</span>  rcases Nat.eq_zero_or_pos m with hm | hm</span>
+<span class="line" id="L275"><span class="ln">  275</span>  · rw [hm]; simp only [Nat.cast_zero, Real.log_zero, mul_zero, add_zero]</span>
+<span class="line" id="L276"><span class="ln">  276</span>    have : (1 : ℝ) ≤ (Real.log (Real.log h) / Real.log 2 + 1) ^ 8 :=</span>
+<span class="line" id="L277"><span class="ln">  277</span>      one_le_pow₀ (by linarith)</span>
+<span class="line" id="L278"><span class="ln">  278</span>    nlinarith [Real.exp_pos 10]</span>
+<span class="line" id="L279"><span class="ln">  279</span>  · have hmpos : (0 : ℝ) &lt; m := by exact_mod_cast hm</span>
+<span class="line" id="L280"><span class="ln">  280</span>    rw [Real.exp_add, show 8 * Real.log m = Real.log ((m : ℝ) ^ 8) by</span>
+<span class="line" id="L281"><span class="ln">  281</span>      rw [Real.log_pow]; push_cast; ring, Real.exp_log (by positivity)]</span>
+<span class="line" id="L282"><span class="ln">  282</span>    refine mul_le_mul_of_nonneg_left ?_ (Real.exp_pos 10).le</span>
+<span class="line" id="L283"><span class="ln">  283</span>    apply pow_le_pow_left₀ hmpos.le</span>
+<span class="line" id="L284"><span class="ln">  284</span>    -- 2^m ≤ Y ≤ log h, so m·log 2 ≤ log log h</span>
+<span class="line" id="L285"><span class="ln">  285</span>    have hY0 : Y ≠ 0 := by</span>
+<span class="line" id="L286"><span class="ln">  286</span>      intro h0; simp [m, h0] at hm</span>
+<span class="line" id="L287"><span class="ln">  287</span>    have h2m : 2 ^ m ≤ Y := Nat.pow_log_le_self 2 hY0</span>
+<span class="line" id="L288"><span class="ln">  288</span>    have h2mR : (2 : ℝ) ^ m ≤ Real.log h := by</span>
+<span class="line" id="L289"><span class="ln">  289</span>      have : ((2 ^ m : ℕ) : ℝ) ≤ (Y : ℝ) := by exact_mod_cast h2m</span>
+<span class="line" id="L290"><span class="ln">  290</span>      push_cast at this</span>
+<span class="line" id="L291"><span class="ln">  291</span>      exact this.trans (Nat.floor_le (by linarith))</span>
+<span class="line" id="L292"><span class="ln">  292</span>    have := Real.log_le_log (by positivity) h2mR</span>
+<span class="line" id="L293"><span class="ln">  293</span>    rw [Real.log_pow] at this</span>
+<span class="line" id="L294"><span class="ln">  294</span>    have : (m : ℝ) ≤ Real.log (Real.log h) / Real.log 2 := by</span>
+<span class="line" id="L295"><span class="ln">  295</span>      rw [le_div_iff₀ hl2]; linarith</span>
+<span class="line" id="L296"><span class="ln">  296</span>    linarith</span>
+<span class="line" id="L297"><span class="ln">  297</span></span>
+<span class="line" id="L298"><span class="ln">  298</span>/-! ## Sign-safe exact decomposition (replaces any &quot;sandwich&quot; of a signed sum)</span>
+<span class="line" id="L299"><span class="ln">  299</span></span>
+<span class="line" id="L300"><span class="ln">  300</span>If a coupled mask is written exactly as `G = A + E` with `E ≥ 0`, then for any signed</span>
+<span class="line" id="L301"><span class="ln">  301</span>summand `F` with `|F| ≤ C` and nonnegative weights `w`, the error made by replacing `G`</span>
+<span class="line" id="L302"><span class="ln">  302</span>by `A` is at most `C · Σ w E`. No upper/lower sandwich of a signed sum is used. -/</span>
+<span class="line" id="L303"><span class="ln">  303</span>theorem signed_mask_replace {ι : Type*} (S : Finset ι) (w F G A E : ι → ℝ) (C : ℝ)</span>
+<span class="line" id="L304"><span class="ln">  304</span>    (hw : ∀ i ∈ S, 0 ≤ w i) (hF : ∀ i ∈ S, |F i| ≤ C)</span>
+<span class="line" id="L305"><span class="ln">  305</span>    (hdec : ∀ i ∈ S, G i = A i + E i) (hE : ∀ i ∈ S, 0 ≤ E i) :</span>
+<span class="line" id="L306"><span class="ln">  306</span>    |∑ i ∈ S, w i * F i * G i - ∑ i ∈ S, w i * F i * A i| ≤ C * ∑ i ∈ S, w i * E i := by</span>
+<span class="line" id="L307"><span class="ln">  307</span>  rw [← Finset.sum_sub_distrib, Finset.mul_sum]</span>
+<span class="line" id="L308"><span class="ln">  308</span>  refine (Finset.abs_sum_le_sum_abs _ _).trans (Finset.sum_le_sum fun i hi =&gt; ?_)</span>
+<span class="line" id="L309"><span class="ln">  309</span>  rw [hdec i hi, show w i * F i * (A i + E i) - w i * F i * A i = F i * (w i * E i) by ring,</span>
+<span class="line" id="L310"><span class="ln">  310</span>    abs_mul, abs_of_nonneg (mul_nonneg (hw i hi) (hE i hi))]</span>
+<span class="line" id="L311"><span class="ln">  311</span>  exact mul_le_mul_of_nonneg_right (hF i hi) (mul_nonneg (hw i hi) (hE i hi))</span>
+<span class="line" id="L312"><span class="ln">  312</span></span>
+<span class="line" id="L313"><span class="ln">  313</span>/-! ## Corrected W-diagonal gcd count (checkpoint §4)</span>
+<span class="line" id="L314"><span class="ln">  314</span></span>
+<span class="line" id="L315"><span class="ln">  315</span>The naive count `max_y Σ_{y&#x27;≡y (g)} α_{y&#x27;} ≤ C/Y₀` loses a fatal `Y^{1/2}/Y₀`. The symmetric</span>
+<span class="line" id="L316"><span class="ln">  316</span>double count below is the correct one: `Σ_{y&lt;y&#x27;, g | y&#x27;-y} 1/(y y&#x27;) ≤ (1+log Y)²/g`. The</span>
+<span class="line" id="L317"><span class="ln">  317</span>full off-diagonal (`y ≠ y&#x27;`) is twice this, by symmetry. -/</span>
+<span class="line" id="L318"><span class="ln">  318</span>theorem gcd_pair_sum_le (g Y : ℕ) (hg : 1 ≤ g) :</span>
+<span class="line" id="L319"><span class="ln">  319</span>    ∑ y ∈ Finset.Icc 1 Y, ∑ y&#x27; ∈ (Finset.Icc 1 Y).filter (fun y&#x27; =&gt; y &lt; y&#x27; ∧ g ∣ y&#x27; - y),</span>
+<span class="line" id="L320"><span class="ln">  320</span>      (1 / ((y : ℝ) * y&#x27;)) ≤ (1 + Real.log Y) ^ 2 / g := by</span>
+<span class="line" id="L321"><span class="ln">  321</span>  have hgR : (0 : ℝ) &lt; g := by exact_mod_cast hg</span>
+<span class="line" id="L322"><span class="ln">  322</span>  set H : ℝ := ∑ k ∈ Finset.Icc 1 Y, (1 / (k : ℝ)) with hH</span>
+<span class="line" id="L323"><span class="ln">  323</span>  have hHle : H ≤ 1 + Real.log Y := by</span>
+<span class="line" id="L324"><span class="ln">  324</span>    have := harmonic_le_one_add_log Y</span>
+<span class="line" id="L325"><span class="ln">  325</span>    rw [harmonic_eq_sum_Icc] at this; push_cast at this</span>
+<span class="line" id="L326"><span class="ln">  326</span>    simpa [hH, one_div] using this</span>
+<span class="line" id="L327"><span class="ln">  327</span>  have hH0 : 0 ≤ H := Finset.sum_nonneg fun k _ =&gt; by positivity</span>
+<span class="line" id="L328"><span class="ln">  328</span>  have inner : ∀ y ∈ Finset.Icc 1 Y,</span>
+<span class="line" id="L329"><span class="ln">  329</span>      ∑ y&#x27; ∈ (Finset.Icc 1 Y).filter (fun y&#x27; =&gt; y &lt; y&#x27; ∧ g ∣ y&#x27; - y), (1 / ((y : ℝ) * y&#x27;))</span>
+<span class="line" id="L330"><span class="ln">  330</span>        ≤ (1 / (y : ℝ)) * (1 / (g : ℝ)) * H := by</span>
+<span class="line" id="L331"><span class="ln">  331</span>    intro y hy</span>
+<span class="line" id="L332"><span class="ln">  332</span>    have hy1 : 1 ≤ y := (Finset.mem_Icc.1 hy).1</span>
+<span class="line" id="L333"><span class="ln">  333</span>    have hyR : (0 : ℝ) &lt; y := by exact_mod_cast hy1</span>
+<span class="line" id="L334"><span class="ln">  334</span>    have hinj : Set.InjOn (fun k =&gt; y + k * g) (Finset.Icc 1 Y : Set ℕ) := by</span>
+<span class="line" id="L335"><span class="ln">  335</span>      intro a _ b _ hab</span>
+<span class="line" id="L336"><span class="ln">  336</span>      exact Nat.eq_of_mul_eq_mul_right (show 0 &lt; g by omega) (Nat.add_left_cancel hab)</span>
+<span class="line" id="L337"><span class="ln">  337</span>    have hsub : (Finset.Icc 1 Y).filter (fun y&#x27; =&gt; y &lt; y&#x27; ∧ g ∣ y&#x27; - y) ⊆</span>
+<span class="line" id="L338"><span class="ln">  338</span>        (Finset.Icc 1 Y).image (fun k =&gt; y + k * g) := by</span>
+<span class="line" id="L339"><span class="ln">  339</span>      intro y&#x27; hy&#x27;</span>
+<span class="line" id="L340"><span class="ln">  340</span>      rw [Finset.mem_filter, Finset.mem_Icc] at hy&#x27;</span>
+<span class="line" id="L341"><span class="ln">  341</span>      obtain ⟨⟨_, hy&#x27;Y⟩, hlt, k, hk⟩ := hy&#x27;</span>
+<span class="line" id="L342"><span class="ln">  342</span>      rw [Finset.mem_image]</span>
+<span class="line" id="L343"><span class="ln">  343</span>      refine ⟨k, Finset.mem_Icc.2 ⟨?_, ?_⟩, by rw [mul_comm]; omega⟩</span>
+<span class="line" id="L344"><span class="ln">  344</span>      · rcases Nat.eq_zero_or_pos k with h0 | h0</span>
+<span class="line" id="L345"><span class="ln">  345</span>        · rw [h0, mul_zero] at hk; omega</span>
+<span class="line" id="L346"><span class="ln">  346</span>        · exact h0</span>
+<span class="line" id="L347"><span class="ln">  347</span>      · have : k ≤ g * k := Nat.le_mul_of_pos_left k (by omega)</span>
+<span class="line" id="L348"><span class="ln">  348</span>        omega</span>
+<span class="line" id="L349"><span class="ln">  349</span>    calc ∑ y&#x27; ∈ (Finset.Icc 1 Y).filter (fun y&#x27; =&gt; y &lt; y&#x27; ∧ g ∣ y&#x27; - y), (1 / ((y : ℝ) * y&#x27;))</span>
+<span class="line" id="L350"><span class="ln">  350</span>        ≤ ∑ y&#x27; ∈ (Finset.Icc 1 Y).image (fun k =&gt; y + k * g), (1 / ((y : ℝ) * y&#x27;)) :=</span>
+<span class="line" id="L351"><span class="ln">  351</span>          Finset.sum_le_sum_of_subset_of_nonneg hsub fun _ _ _ =&gt; by positivity</span>
+<span class="line" id="L352"><span class="ln">  352</span>      _ = ∑ k ∈ Finset.Icc 1 Y, (1 / ((y : ℝ) * ((y + k * g : ℕ) : ℝ))) :=</span>
+<span class="line" id="L353"><span class="ln">  353</span>          Finset.sum_image hinj</span>
+<span class="line" id="L354"><span class="ln">  354</span>      _ ≤ ∑ k ∈ Finset.Icc 1 Y, (1 / (y : ℝ)) * (1 / (g : ℝ)) * (1 / (k : ℝ)) := by</span>
+<span class="line" id="L355"><span class="ln">  355</span>          refine Finset.sum_le_sum fun k hk =&gt; ?_</span>
+<span class="line" id="L356"><span class="ln">  356</span>          have hk1 : (1 : ℝ) ≤ k := by exact_mod_cast (Finset.mem_Icc.1 hk).1</span>
+<span class="line" id="L357"><span class="ln">  357</span>          have hle : (k : ℝ) * g ≤ ((y + k * g : ℕ) : ℝ) := by push_cast; linarith</span>
+<span class="line" id="L358"><span class="ln">  358</span>          rw [show (1 / (y : ℝ)) * (1 / (g : ℝ)) * (1 / (k : ℝ)) = 1 / ((y : ℝ) * (k * g)) by</span>
+<span class="line" id="L359"><span class="ln">  359</span>            field_simp]</span>
+<span class="line" id="L360"><span class="ln">  360</span>          apply one_div_le_one_div_of_le (by positivity)</span>
+<span class="line" id="L361"><span class="ln">  361</span>          exact mul_le_mul_of_nonneg_left hle hyR.le</span>
+<span class="line" id="L362"><span class="ln">  362</span>      _ = (1 / (y : ℝ)) * (1 / (g : ℝ)) * H := by rw [← Finset.mul_sum]</span>
+<span class="line" id="L363"><span class="ln">  363</span>  calc _ ≤ ∑ y ∈ Finset.Icc 1 Y, (1 / (y : ℝ)) * (1 / (g : ℝ)) * H := Finset.sum_le_sum inner</span>
+<span class="line" id="L364"><span class="ln">  364</span>    _ = H * H / g := by</span>
+<span class="line" id="L365"><span class="ln">  365</span>        rw [← Finset.sum_mul, ← Finset.sum_mul, ← hH]; field_simp</span>
+<span class="line" id="L366"><span class="ln">  366</span>    _ ≤ (1 + Real.log Y) ^ 2 / g := by</span>
+<span class="line" id="L367"><span class="ln">  367</span>        apply div_le_div_of_nonneg_right _ hgR.le</span>
+<span class="line" id="L368"><span class="ln">  368</span>        nlinarith</span>
+<span class="line" id="L369"><span class="ln">  369</span></span>
+<span class="line" id="L370"><span class="ln">  370</span>end GoldC.QuillonCopyG</span>
+<span class="line" id="L371"><span class="ln">  371</span></span>
+<span class="line" id="L372"><span class="ln">  372</span>#print axioms GoldC.QuillonCopyG.decoration_mass_eq_prod</span>
+<span class="line" id="L373"><span class="ln">  373</span>#print axioms GoldC.QuillonCopyG.sum_inv_primes_below_two_pow</span>
+<span class="line" id="L374"><span class="ln">  374</span>#print axioms GoldC.QuillonCopyG.decoration_mass_le_exp_loglog</span>
+<span class="line" id="L375"><span class="ln">  375</span>#print axioms GoldC.QuillonCopyG.decoration_mass_le_loglog_pow</span>
+<span class="line" id="L376"><span class="ln">  376</span>#print axioms GoldC.QuillonCopyG.signed_mask_replace</span>
+<span class="line" id="L377"><span class="ln">  377</span>#print axioms GoldC.QuillonCopyG.gcd_pair_sum_le</span>
+</pre></div></body></html>

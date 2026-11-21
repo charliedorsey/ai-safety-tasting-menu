@@ -1,0 +1,100 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · PaperB/Gate3/VaalerFullPointwise.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>PaperB/Gate3/VaalerFullPointwise.lean</h1><p class="meta">LEAN/PaperB/Gate3/VaalerFullPointwise.lean · 99 lines · SHA-256 3ca69423f8c6de0062e3e66e4303b682f3ebcbfd782361548c21be064aa2a9f7</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import PaperB.Gate3.VaalerErrorPolynomial</span>
+<span class="l" id="L2"><span class="n">2</span></span>
+<span class="l" id="L3"><span class="n">3</span>open Finset</span>
+<span class="l" id="L4"><span class="n">4</span>namespace OrielUpper</span>
+<span class="l" id="L5"><span class="n">5</span>open PaperB.FixedQ</span>
+<span class="l" id="L6"><span class="n">6</span></span>
+<span class="l" id="L7"><span class="n">7</span>private theorem yevorin_mode_sum_fract (J : ℕ) (a : ℕ → ℂ) (t : ℝ) :</span>
+<span class="l" id="L8"><span class="n">8</span>    (∑ j ∈ Finset.Icc 1 J, (a j * realVaalerMode j t).re) =</span>
+<span class="l" id="L9"><span class="n">9</span>    (∑ j ∈ Finset.Icc 1 J, (a j * realVaalerMode j (Int.fract t)).re) := by</span>
+<span class="l" id="L10"><span class="n">10</span>  apply Finset.sum_congr rfl</span>
+<span class="l" id="L11"><span class="n">11</span>  intro j hj</span>
+<span class="l" id="L12"><span class="n">12</span>  rw [yevorin_mode_fract]</span>
+<span class="l" id="L13"><span class="n">13</span></span>
+<span class="l" id="L14"><span class="n">14</span>private theorem yevorin_main_zero (J : ℕ) :</span>
+<span class="l" id="L15"><span class="n">15</span>    (∑ j ∈ Finset.Icc 1 J,</span>
+<span class="l" id="L16"><span class="n">16</span>      (yevorin_vaalerMainCoeff J j * realVaalerMode j 0).re) = 0 := by</span>
+<span class="l" id="L17"><span class="n">17</span>  rw [yevorin_vaalerMainCoeff_sum_eq_poly, h3VaalerPolyReal_eq_sineSum]</span>
+<span class="l" id="L18"><span class="n">18</span>  simp</span>
+<span class="l" id="L19"><span class="n">19</span></span>
+<span class="l" id="L20"><span class="n">20</span>private theorem yevorin_dirichlet_zero (J : ℕ) :</span>
+<span class="l" id="L21"><span class="n">21</span>    h3RealDirichletSum J 0 = ((J + 1 : ℕ) : ℂ) := by</span>
+<span class="l" id="L22"><span class="n">22</span>  unfold h3RealDirichletSum</span>
+<span class="l" id="L23"><span class="n">23</span>  simp</span>
+<span class="l" id="L24"><span class="n">24</span></span>
+<span class="l" id="L25"><span class="n">25</span>/-- Exact finite classical positive Vaaler theorem, including integer jumps. -/</span>
+<span class="l" id="L26"><span class="n">26</span>theorem yevorin_realPositiveVaalerPointwise :</span>
+<span class="l" id="L27"><span class="n">27</span>    RealPositiveVaalerPointwise := by</span>
+<span class="l" id="L28"><span class="n">28</span>  intro J hJ</span>
+<span class="l" id="L29"><span class="n">29</span>  refine ⟨yevorin_vaalerMainCoeff J, yevorin_vaalerErrorCoeff J, ?_, ?_⟩</span>
+<span class="l" id="L30"><span class="n">30</span>  · intro j hj</span>
+<span class="l" id="L31"><span class="n">31</span>    exact ⟨yevorin_vaalerMainCoeff_norm_le J j (Finset.mem_Icc.mp hj).1,</span>
+<span class="l" id="L32"><span class="n">32</span>      yevorin_vaalerErrorCoeff_norm_le J j hj⟩</span>
+<span class="l" id="L33"><span class="n">33</span>  · intro t</span>
+<span class="l" id="L34"><span class="n">34</span>    let x := Int.fract t</span>
+<span class="l" id="L35"><span class="n">35</span>    have hmain := yevorin_mode_sum_fract J (yevorin_vaalerMainCoeff J) t</span>
+<span class="l" id="L36"><span class="n">36</span>    have herr := yevorin_mode_sum_fract J (yevorin_vaalerErrorCoeff J) t</span>
+<span class="l" id="L37"><span class="n">37</span>    have hDpos : (0 : ℝ) &lt; ((J + 1 : ℕ) : ℝ) := by positivity</span>
+<span class="l" id="L38"><span class="n">38</span>    have hDne : (((J + 1 : ℕ) : ℝ)) ≠ 0 := ne_of_gt hDpos</span>
+<span class="l" id="L39"><span class="n">39</span>    have hsaw : saw t = x - 1/2 := by rfl</span>
+<span class="l" id="L40"><span class="n">40</span>    rw [hsaw, hmain, herr, yevorin_vaalerMainCoeff_sum_eq_poly]</span>
+<span class="l" id="L41"><span class="n">41</span>    change |x - 1/2 - (h3VaalerPolyReal J x).re| ≤</span>
+<span class="l" id="L42"><span class="n">42</span>      1 / ((J : ℝ) + 1) +</span>
+<span class="l" id="L43"><span class="n">43</span>        ∑ j ∈ Finset.Icc 1 J,</span>
+<span class="l" id="L44"><span class="n">44</span>          (yevorin_vaalerErrorCoeff J j * realVaalerMode j x).re</span>
+<span class="l" id="L45"><span class="n">45</span>    by_cases hx : x = 0</span>
+<span class="l" id="L46"><span class="n">46</span>    · rw [hx]</span>
+<span class="l" id="L47"><span class="n">47</span>      have hMain0 := yevorin_main_zero J</span>
+<span class="l" id="L48"><span class="n">48</span>      rw [yevorin_vaalerMainCoeff_sum_eq_poly] at hMain0</span>
+<span class="l" id="L49"><span class="n">49</span>      rw [hMain0]</span>
+<span class="l" id="L50"><span class="n">50</span>      have hError0 := yevorin_vaaler_error_eq_dirichlet J 0</span>
+<span class="l" id="L51"><span class="n">51</span>      simp only [Nat.cast_add, Nat.cast_one] at hError0</span>
+<span class="l" id="L52"><span class="n">52</span>      have hD0 := yevorin_dirichlet_zero J</span>
+<span class="l" id="L53"><span class="n">53</span>      rw [hError0, hD0]</span>
+<span class="l" id="L54"><span class="n">54</span>      have hNorm : ‖((J + 1 : ℕ) : ℂ)‖ =</span>
+<span class="l" id="L55"><span class="n">55</span>          ((J + 1 : ℕ) : ℝ) := by</span>
+<span class="l" id="L56"><span class="n">56</span>            simpa only [Nat.cast_add, Nat.cast_one] using</span>
+<span class="l" id="L57"><span class="n">57</span>              (Complex.norm_natCast (J + 1))</span>
+<span class="l" id="L58"><span class="n">58</span>      rw [hNorm]</span>
+<span class="l" id="L59"><span class="n">59</span>      have hOneHalf : (1 : ℝ)/2 ≤</span>
+<span class="l" id="L60"><span class="n">60</span>          1/(2 * ((J + 1 : ℕ) : ℝ)) +</span>
+<span class="l" id="L61"><span class="n">61</span>          ((J + 1 : ℕ) : ℝ)^2 /</span>
+<span class="l" id="L62"><span class="n">62</span>            (2 * (((J + 1 : ℕ) : ℝ)^2)) := by</span>
+<span class="l" id="L63"><span class="n">63</span>        field_simp</span>
+<span class="l" id="L64"><span class="n">64</span>        nlinarith [hDpos]</span>
+<span class="l" id="L65"><span class="n">65</span>      simpa using hOneHalf</span>
+<span class="l" id="L66"><span class="n">66</span>    · have hx0 : 0 &lt; x :=</span>
+<span class="l" id="L67"><span class="n">67</span>        lt_of_le_of_ne (Int.fract_nonneg t) (Ne.symm hx)</span>
+<span class="l" id="L68"><span class="n">68</span>      have hx1 : x &lt; 1 := Int.fract_lt_one t</span>
+<span class="l" id="L69"><span class="n">69</span>      have hxnonint : ¬ ∃ m : ℤ, x = (m : ℝ) := by</span>
+<span class="l" id="L70"><span class="n">70</span>        rintro ⟨m, hm⟩</span>
+<span class="l" id="L71"><span class="n">71</span>        have hm0 : (0 : ℝ) &lt; (m : ℝ) := by rw [← hm]; exact hx0</span>
+<span class="l" id="L72"><span class="n">72</span>        have hm1 : (m : ℝ) &lt; 1 := by rw [← hm]; exact hx1</span>
+<span class="l" id="L73"><span class="n">73</span>        have hmge : (1 : ℤ) ≤ m := by</span>
+<span class="l" id="L74"><span class="n">74</span>          have hmp : (0 : ℤ) &lt; m := by exact_mod_cast hm0</span>
+<span class="l" id="L75"><span class="n">75</span>          omega</span>
+<span class="l" id="L76"><span class="n">76</span>        have hmger : (1 : ℝ) ≤ m := by exact_mod_cast hmge</span>
+<span class="l" id="L77"><span class="n">77</span>        linarith</span>
+<span class="l" id="L78"><span class="n">78</span>      have hInterior := yevorin_vaaler_real_interior_abs J x hx0 hx1</span>
+<span class="l" id="L79"><span class="n">79</span>      have hF := h3RealFejerClosed_eq_dirichletNormSq J (x := x) hxnonint</span>
+<span class="l" id="L80"><span class="n">80</span>      rw [hF] at hInterior</span>
+<span class="l" id="L81"><span class="n">81</span>      have hError := yevorin_vaaler_error_eq_dirichlet J x</span>
+<span class="l" id="L82"><span class="n">82</span>      calc</span>
+<span class="l" id="L83"><span class="n">83</span>        |x - 1/2 - (h3VaalerPolyReal J x).re| =</span>
+<span class="l" id="L84"><span class="n">84</span>          |(h3VaalerPolyReal J x).re - (x - 1/2)| := by rw [abs_sub_comm]</span>
+<span class="l" id="L85"><span class="n">85</span>        _ ≤ (((J + 1 : ℕ) : ℝ))⁻¹ *</span>
+<span class="l" id="L86"><span class="n">86</span>            ‖h3RealDirichletSum J x‖ ^ 2 /</span>
+<span class="l" id="L87"><span class="n">87</span>              (2 * ((J + 1 : ℕ) : ℝ)) := hInterior</span>
+<span class="l" id="L88"><span class="n">88</span>        _ = ‖h3RealDirichletSum J x‖ ^ 2 /</span>
+<span class="l" id="L89"><span class="n">89</span>            (2 * (((J + 1 : ℕ) : ℝ)^2)) := by</span>
+<span class="l" id="L90"><span class="n">90</span>              field_simp [hDne]</span>
+<span class="l" id="L91"><span class="n">91</span>        _ ≤ 1/(2 * ((J + 1 : ℕ) : ℝ)) +</span>
+<span class="l" id="L92"><span class="n">92</span>              ‖h3RealDirichletSum J x‖ ^ 2 /</span>
+<span class="l" id="L93"><span class="n">93</span>                (2 * (((J + 1 : ℕ) : ℝ)^2)) := by</span>
+<span class="l" id="L94"><span class="n">94</span>                  apply le_add_of_nonneg_left</span>
+<span class="l" id="L95"><span class="n">95</span>                  positivity</span>
+<span class="l" id="L96"><span class="n">96</span>        _ = _ := by simpa only [Nat.cast_add, Nat.cast_one] using hError.symm</span>
+<span class="l" id="L97"><span class="n">97</span></span>
+<span class="l" id="L98"><span class="n">98</span>#print axioms yevorin_realPositiveVaalerPointwise</span>
+<span class="l" id="L99"><span class="n">99</span>end OrielUpper</span></pre></div></body></html>

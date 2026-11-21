@@ -1,0 +1,616 @@
+{
+  "model": "semantic-source-trace-not-exhaustive-kernel-DAG",
+  "nodes": [
+    {
+      "id": "W_fixed",
+      "label": "W before constants",
+      "sector": "CORE",
+      "kind": "estimate",
+      "exponent": "-85",
+      "source": "GoldC/QuillonWPhysical.lean",
+      "line": 85
+    },
+    {
+      "id": "W_paid",
+      "label": "W physical",
+      "sector": "CORE",
+      "kind": "estimate",
+      "exponent": "-80",
+      "source": "GoldC/QuillonWPhysical.lean",
+      "line": 85
+    },
+    {
+      "id": "C_fixed",
+      "label": "C before constants",
+      "sector": "CORE",
+      "kind": "estimate",
+      "exponent": "-20",
+      "source": "GoldC/QuillonCPhysical.lean",
+      "line": 551
+    },
+    {
+      "id": "C_paid",
+      "label": "C physical",
+      "sector": "CORE",
+      "kind": "estimate",
+      "exponent": "-15",
+      "source": "GoldC/QuillonCPhysical.lean",
+      "line": 551
+    },
+    {
+      "id": "R_fixed",
+      "label": "R before constants",
+      "sector": "CORE",
+      "kind": "estimate",
+      "exponent": "-80",
+      "source": "GoldC/QuillonRPhysical.lean",
+      "line": 415
+    },
+    {
+      "id": "R_paid",
+      "label": "R physical",
+      "sector": "CORE",
+      "kind": "estimate",
+      "exponent": "-75",
+      "source": "GoldC/QuillonRPhysical.lean",
+      "line": 415
+    },
+    {
+      "id": "ResA_fixed",
+      "label": "ResA before constants",
+      "sector": "CORE",
+      "kind": "estimate",
+      "exponent": "51/2000",
+      "source": "GoldC/QuillonResPhysical.lean",
+      "line": 245
+    },
+    {
+      "id": "ResA_paid",
+      "label": "ResA physical",
+      "sector": "CORE",
+      "kind": "estimate",
+      "exponent": "1/10",
+      "source": "GoldC/QuillonResPhysical.lean",
+      "line": 245
+    },
+    {
+      "id": "Band_fixed",
+      "label": "Band before constants",
+      "sector": "CORE",
+      "kind": "estimate",
+      "exponent": "1991/2000",
+      "source": "GoldC/QuillonResPhysical.lean",
+      "line": 404
+    },
+    {
+      "id": "Band_paid",
+      "label": "Band physical",
+      "sector": "CORE",
+      "kind": "estimate",
+      "exponent": "499/500",
+      "source": "GoldC/QuillonResPhysical.lean",
+      "line": 404
+    },
+    {
+      "id": "WL_fixed",
+      "label": "WL before constants",
+      "sector": "LONG",
+      "kind": "estimate",
+      "exponent": "-85",
+      "source": "GoldC/QuillonLW.lean",
+      "line": 433
+    },
+    {
+      "id": "WL_paid",
+      "label": "WL physical",
+      "sector": "LONG",
+      "kind": "estimate",
+      "exponent": "-80",
+      "source": "GoldC/QuillonLW.lean",
+      "line": 433
+    },
+    {
+      "id": "CL_fixed",
+      "label": "CL before constants",
+      "sector": "LONG",
+      "kind": "estimate",
+      "exponent": "-20",
+      "source": "GoldC/QuillonLC.lean",
+      "line": 583
+    },
+    {
+      "id": "CL_paid",
+      "label": "CL physical",
+      "sector": "LONG",
+      "kind": "estimate",
+      "exponent": "-15",
+      "source": "GoldC/QuillonLC.lean",
+      "line": 583
+    },
+    {
+      "id": "RL_fixed",
+      "label": "RL before constants",
+      "sector": "LONG",
+      "kind": "estimate",
+      "exponent": "-80",
+      "source": "GoldC/QuillonLR.lean",
+      "line": 540
+    },
+    {
+      "id": "RL_paid",
+      "label": "RL physical",
+      "sector": "LONG",
+      "kind": "estimate",
+      "exponent": "-75",
+      "source": "GoldC/QuillonLR.lean",
+      "line": 540
+    },
+    {
+      "id": "ManyL_fixed",
+      "label": "ManyL before constants",
+      "sector": "LONG",
+      "kind": "estimate",
+      "exponent": "-60",
+      "source": "GoldC/QuillonLRP.lean",
+      "line": 91
+    },
+    {
+      "id": "ManyL_paid",
+      "label": "ManyL physical",
+      "sector": "LONG",
+      "kind": "estimate",
+      "exponent": "-50",
+      "source": "GoldC/QuillonLRP.lean",
+      "line": 91
+    },
+    {
+      "id": "EdgeL_fixed",
+      "label": "EdgeL before constants",
+      "sector": "LONG",
+      "kind": "estimate",
+      "exponent": "3741/4000",
+      "source": "GoldC/QuillonLRP.lean",
+      "line": 385
+    },
+    {
+      "id": "EdgeL_paid",
+      "label": "EdgeL physical",
+      "sector": "LONG",
+      "kind": "estimate",
+      "exponent": "19/20",
+      "source": "GoldC/QuillonLRP.lean",
+      "line": 385
+    },
+    {
+      "id": "ResL_fixed",
+      "label": "ResL before constants",
+      "sector": "LONG",
+      "kind": "estimate",
+      "exponent": "1051/2000",
+      "source": "GoldC/QuillonLRP.lean",
+      "line": 248
+    },
+    {
+      "id": "ResL_paid",
+      "label": "ResL physical",
+      "sector": "LONG",
+      "kind": "estimate",
+      "exponent": "7/10",
+      "source": "GoldC/QuillonLRP.lean",
+      "line": 248
+    },
+    {
+      "id": "WRL_fixed",
+      "label": "WRL before constants",
+      "sector": "LONG",
+      "kind": "estimate",
+      "exponent": "-85",
+      "source": "GoldC/QuillonLRP.lean",
+      "line": 156
+    },
+    {
+      "id": "WRL_paid",
+      "label": "WRL physical",
+      "sector": "LONG",
+      "kind": "estimate",
+      "exponent": "-80",
+      "source": "GoldC/QuillonLRP.lean",
+      "line": 156
+    },
+    {
+      "id": "core_pair",
+      "label": "CORE per decoration",
+      "sector": "CORE",
+      "kind": "assembly",
+      "exponent": "499/500",
+      "constant": "5",
+      "source": "GoldC/QuillonCoreFinal.lean",
+      "line": 72
+    },
+    {
+      "id": "long_pair",
+      "label": "LONG per decoration",
+      "sector": "LONG",
+      "kind": "assembly",
+      "exponent": "19/20",
+      "constant": "7",
+      "source": "GoldC/QuillonLongFinal.lean",
+      "line": 88
+    },
+    {
+      "id": "decor",
+      "label": "Nonnegative decoration mass",
+      "kind": "majorant",
+      "exponent": "1/1000",
+      "constant": "256 exp(10)",
+      "source": "GoldC/QuillonDecorationGronwall.lean",
+      "line": 260
+    },
+    {
+      "id": "core_global",
+      "label": "CORE decorated bound",
+      "kind": "estimate",
+      "exponent": "999/1000",
+      "constant": "1280 exp(10)",
+      "source": "GoldC/QuillonCoreFinal.lean",
+      "line": 118
+    },
+    {
+      "id": "long_global",
+      "label": "LONG decorated bound",
+      "kind": "estimate",
+      "exponent": "951/1000",
+      "constant": "1792 exp(10)",
+      "source": "GoldC/QuillonLongFinal.lean",
+      "line": 148
+    },
+    {
+      "id": "core_sublog",
+      "label": "CORE uniform SourceUniformSublog",
+      "kind": "uniform_rate",
+      "source": "GoldC/QuillonCoreFinal.lean",
+      "line": 118
+    },
+    {
+      "id": "long_sublog",
+      "label": "LONG uniform SourceUniformSublog",
+      "kind": "uniform_rate",
+      "source": "GoldC/QuillonLongFinal.lean",
+      "line": 148
+    },
+    {
+      "id": "WeilHyp",
+      "label": "General Weil–Estermann supplied",
+      "kind": "classical_input",
+      "source": "Orienne/CSC3/WeilQuillonBridgeR0002.lean",
+      "line": 16
+    },
+    {
+      "id": "WRL_coupled",
+      "label": "WRL Weil/Cauchy/gcd pipeline",
+      "kind": "analytic_mechanism",
+      "source": "GoldC/QuillonLWeil.lean",
+      "line": 226
+    },
+    {
+      "id": "high_global",
+      "label": "HIGH O_q(1)",
+      "kind": "estimate",
+      "source": "Orienne/Central/HighCardGrowingR0001.lean",
+      "line": 23
+    },
+    {
+      "id": "high_sublog",
+      "label": "HIGH SourceUniformSublog",
+      "kind": "uniform_rate",
+      "source": "Orienne/Central/HighCardRateR0002.lean",
+      "line": 20
+    },
+    {
+      "id": "middle",
+      "label": "MIDDLE=LONG+CORE",
+      "kind": "exact_partition",
+      "source": "PaperB/Gate3/CentralTransfer/MiddleLongCoreConsumer.lean",
+      "line": 29
+    },
+    {
+      "id": "low_zero",
+      "label": "LOW(0)=0",
+      "kind": "exact_identity",
+      "source": "Orienne/CSC3/LowZeroTerminalR0001.lean",
+      "line": 8
+    },
+    {
+      "id": "folded",
+      "label": "Physical folded CENTRAL sublog",
+      "kind": "uniform_rate",
+      "source": "PaperB/Gate3/CentralTransfer/ThreeSectorConsumer.lean",
+      "line": 130
+    },
+    {
+      "id": "activecentral",
+      "label": "Active Central with rounding error",
+      "kind": "uniform_rate",
+      "source": "PaperB/Gate3/CentralTransfer/ThreeSectorTerminalAssembly.lean",
+      "line": 66
+    },
+    {
+      "id": "native",
+      "label": "PaperBTerminalStatement",
+      "kind": "terminal",
+      "source": "Orienne/CSC3/LowZeroTerminalR0001.lean",
+      "line": 33
+    },
+    {
+      "id": "printed",
+      "label": "Literal printed A–B terminal",
+      "kind": "terminal",
+      "source": "Orienne/Publication/PaperBPrintedTerminalR0001.lean",
+      "line": 10
+    }
+  ],
+  "edges": [
+    {
+      "from": "W_fixed",
+      "to": "W_paid",
+      "kind": "eventual_absorption",
+      "operation": "Λ^5 absorbs fixed q,δ-dependent multiplicative constant",
+      "slack": "5"
+    },
+    {
+      "from": "C_fixed",
+      "to": "C_paid",
+      "kind": "eventual_absorption",
+      "operation": "Λ^5 absorbs fixed q,δ-dependent multiplicative constant",
+      "slack": "5"
+    },
+    {
+      "from": "R_fixed",
+      "to": "R_paid",
+      "kind": "eventual_absorption",
+      "operation": "Λ^5 absorbs fixed q,δ-dependent multiplicative constant",
+      "slack": "5"
+    },
+    {
+      "from": "ResA_fixed",
+      "to": "ResA_paid",
+      "kind": "eventual_absorption",
+      "operation": "Λ^149/2000 absorbs fixed q,δ-dependent multiplicative constant",
+      "slack": "149/2000"
+    },
+    {
+      "from": "Band_fixed",
+      "to": "Band_paid",
+      "kind": "eventual_absorption",
+      "operation": "Λ^1/400 absorbs fixed q,δ-dependent multiplicative constant",
+      "slack": "1/400"
+    },
+    {
+      "from": "WL_fixed",
+      "to": "WL_paid",
+      "kind": "eventual_absorption",
+      "operation": "Λ^5 absorbs fixed q,δ-dependent multiplicative constant",
+      "slack": "5"
+    },
+    {
+      "from": "CL_fixed",
+      "to": "CL_paid",
+      "kind": "eventual_absorption",
+      "operation": "Λ^5 absorbs fixed q,δ-dependent multiplicative constant",
+      "slack": "5"
+    },
+    {
+      "from": "RL_fixed",
+      "to": "RL_paid",
+      "kind": "eventual_absorption",
+      "operation": "Λ^5 absorbs fixed q,δ-dependent multiplicative constant",
+      "slack": "5"
+    },
+    {
+      "from": "ManyL_fixed",
+      "to": "ManyL_paid",
+      "kind": "eventual_absorption",
+      "operation": "Λ^10 absorbs fixed q,δ-dependent multiplicative constant",
+      "slack": "10"
+    },
+    {
+      "from": "EdgeL_fixed",
+      "to": "EdgeL_paid",
+      "kind": "eventual_absorption",
+      "operation": "Λ^59/4000 absorbs fixed q,δ-dependent multiplicative constant",
+      "slack": "59/4000"
+    },
+    {
+      "from": "ResL_fixed",
+      "to": "ResL_paid",
+      "kind": "eventual_absorption",
+      "operation": "Λ^349/2000 absorbs fixed q,δ-dependent multiplicative constant",
+      "slack": "349/2000"
+    },
+    {
+      "from": "WRL_fixed",
+      "to": "WRL_paid",
+      "kind": "eventual_absorption",
+      "operation": "Λ^5 absorbs fixed q,δ-dependent multiplicative constant",
+      "slack": "5"
+    },
+    {
+      "from": "W_paid",
+      "to": "core_pair",
+      "kind": "triangle_and_domination",
+      "operation": "Exact split5/split7 then |sum|≤sum|cell| and Λ^e≤Λ^max when Λ≥1"
+    },
+    {
+      "from": "C_paid",
+      "to": "core_pair",
+      "kind": "triangle_and_domination",
+      "operation": "Exact split5/split7 then |sum|≤sum|cell| and Λ^e≤Λ^max when Λ≥1"
+    },
+    {
+      "from": "R_paid",
+      "to": "core_pair",
+      "kind": "triangle_and_domination",
+      "operation": "Exact split5/split7 then |sum|≤sum|cell| and Λ^e≤Λ^max when Λ≥1"
+    },
+    {
+      "from": "ResA_paid",
+      "to": "core_pair",
+      "kind": "triangle_and_domination",
+      "operation": "Exact split5/split7 then |sum|≤sum|cell| and Λ^e≤Λ^max when Λ≥1"
+    },
+    {
+      "from": "Band_paid",
+      "to": "core_pair",
+      "kind": "triangle_and_domination",
+      "operation": "Exact split5/split7 then |sum|≤sum|cell| and Λ^e≤Λ^max when Λ≥1"
+    },
+    {
+      "from": "WL_paid",
+      "to": "long_pair",
+      "kind": "triangle_and_domination",
+      "operation": "Exact split5/split7 then |sum|≤sum|cell| and Λ^e≤Λ^max when Λ≥1"
+    },
+    {
+      "from": "CL_paid",
+      "to": "long_pair",
+      "kind": "triangle_and_domination",
+      "operation": "Exact split5/split7 then |sum|≤sum|cell| and Λ^e≤Λ^max when Λ≥1"
+    },
+    {
+      "from": "RL_paid",
+      "to": "long_pair",
+      "kind": "triangle_and_domination",
+      "operation": "Exact split5/split7 then |sum|≤sum|cell| and Λ^e≤Λ^max when Λ≥1"
+    },
+    {
+      "from": "ManyL_paid",
+      "to": "long_pair",
+      "kind": "triangle_and_domination",
+      "operation": "Exact split5/split7 then |sum|≤sum|cell| and Λ^e≤Λ^max when Λ≥1"
+    },
+    {
+      "from": "EdgeL_paid",
+      "to": "long_pair",
+      "kind": "triangle_and_domination",
+      "operation": "Exact split5/split7 then |sum|≤sum|cell| and Λ^e≤Λ^max when Λ≥1"
+    },
+    {
+      "from": "ResL_paid",
+      "to": "long_pair",
+      "kind": "triangle_and_domination",
+      "operation": "Exact split5/split7 then |sum|≤sum|cell| and Λ^e≤Λ^max when Λ≥1"
+    },
+    {
+      "from": "WRL_paid",
+      "to": "long_pair",
+      "kind": "triangle_and_domination",
+      "operation": "Exact split5/split7 then |sum|≤sum|cell| and Λ^e≤Λ^max when Λ≥1"
+    },
+    {
+      "from": "core_pair",
+      "to": "core_global",
+      "kind": "decorate",
+      "operation": "|Σ_d w_d S_d|≤Σ_d w_d|S_d|; w_d≥0, d⊆primeFactors(h)",
+      "preserves_original_signed_row": true
+    },
+    {
+      "from": "long_pair",
+      "to": "long_global",
+      "kind": "decorate",
+      "operation": "|Σ_d w_d S_d|≤Σ_d w_d|S_d|; w_d≥0, d⊆primeFactors(h)",
+      "preserves_original_signed_row": true
+    },
+    {
+      "from": "decor",
+      "to": "core_global",
+      "kind": "multiply_majorant",
+      "operation": "Σ_d w_d≤256e^10 Λ^(1/1000); no second decoration charge"
+    },
+    {
+      "from": "decor",
+      "to": "long_global",
+      "kind": "multiply_majorant",
+      "operation": "Σ_d w_d≤256e^10 Λ^(1/1000); no second decoration charge"
+    },
+    {
+      "from": "core_global",
+      "to": "core_sublog",
+      "kind": "epsilon_conversion",
+      "operation": "Require Λ^(1/1000)≥1280 exp(10)/epsilon; H0=ceil(exp(max thresholds))+16",
+      "margin": "1/1000"
+    },
+    {
+      "from": "long_global",
+      "to": "long_sublog",
+      "kind": "epsilon_conversion",
+      "operation": "Require Λ^(49/1000)≥1792 exp(10)/epsilon; H0=ceil(exp(max thresholds))+16",
+      "margin": "49/1000"
+    },
+    {
+      "from": "WeilHyp",
+      "to": "WRL_coupled",
+      "kind": "apply_classical",
+      "operation": "τ(s) sqrt(s*gcd), squarefree majorant with 4^(|P|/2) s^(1/2) G^(1/2)"
+    },
+    {
+      "from": "WRL_coupled",
+      "to": "WRL_paid",
+      "kind": "frequency_summed",
+      "operation": "After Cauchy G^(1/4), harmonic gcd moment and fixed q coefficient bounds; outer mass charged"
+    },
+    {
+      "from": "high_global",
+      "to": "high_sublog",
+      "kind": "epsilon_conversion",
+      "operation": "Fixed C(q) bounded by epsilon log h once log h≥C(q)/epsilon"
+    },
+    {
+      "from": "core_sublog",
+      "to": "middle",
+      "kind": "epsilon_split",
+      "operation": "Each rate requested at epsilon/2"
+    },
+    {
+      "from": "long_sublog",
+      "to": "middle",
+      "kind": "epsilon_split",
+      "operation": "Each rate requested at epsilon/2"
+    },
+    {
+      "from": "middle",
+      "to": "folded",
+      "kind": "exact_partition_and_epsilon",
+      "operation": "Source identity LOW+MIDDLE+HIGH; rates requested at epsilon/3; Jlow=0"
+    },
+    {
+      "from": "high_sublog",
+      "to": "folded",
+      "kind": "exact_partition_and_epsilon",
+      "operation": "Source identity LOW+MIDDLE+HIGH; rates requested at epsilon/3; Jlow=0"
+    },
+    {
+      "from": "low_zero",
+      "to": "folded",
+      "kind": "exact_partition_and_epsilon",
+      "operation": "Source identity LOW+MIDDLE+HIGH; rates requested at epsilon/3; Jlow=0"
+    },
+    {
+      "from": "folded",
+      "to": "activecentral",
+      "kind": "error_control",
+      "operation": "|activeCentral-folded| ≤ (6q+2)*baseRate(h); use epsilon/2 plus epsilon/(2(6q+2))"
+    },
+    {
+      "from": "activecentral",
+      "to": "native",
+      "kind": "source_to_terminal",
+      "operation": "Central R0056 rounding debt adapter + already-paid GoldB Suzuki"
+    },
+    {
+      "from": "native",
+      "to": "printed",
+      "kind": "literal_identity",
+      "operation": "F-01 printed Euler equality rewrites literal difference into manuscript kernels; same epsilon,h0"
+    }
+  ]
+}

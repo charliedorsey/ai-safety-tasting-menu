@@ -1,0 +1,285 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · GoldC/QuillonAsymp.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>GoldC/QuillonAsymp.lean</h1><p class="meta">LEAN/GoldC/QuillonAsymp.lean · 284 lines · SHA-256 a635a418a1bce86e183b781af9b71c123b453ab695f596f8ba29c03a0420fe25</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import GoldC.QuillonDivisorMoment</span>
+<span class="l" id="L2"><span class="n">2</span>import GoldC.QuillonWContext</span>
+<span class="l" id="L3"><span class="n">3</span>import Mathlib.Analysis.SpecialFunctions.Pow.Real</span>
+<span class="l" id="L4"><span class="n">4</span></span>
+<span class="l" id="L5"><span class="n">5</span>/-!</span>
+<span class="l" id="L6"><span class="n">6</span># Quillon CSC3 F7.9a: asymptotic toolkit (number of prime factors, gcd mode sums)</span>
+<span class="l" id="L7"><span class="n">7</span></span>
+<span class="l" id="L8"><span class="n">8</span>* `card_le_y`: for a set `C` of primes and any `y &gt; 1`, `|C| ≤ y + 1 + log(∏C)/log y`.</span>
+<span class="l" id="L9"><span class="n">9</span>* `four_pow_card_le`: for every `η &gt; 0` there is `L₀` such that `log ∏C ≥ L₀` implies</span>
+<span class="l" id="L10"><span class="n">10</span>  `4^{|C|} ≤ (∏C)^η`. This is the bound `ω(s) = o(log s)` in the form the routes use.</span>
+<span class="l" id="L11"><span class="n">11</span>* `gcd_mode_sum`: `Σ_{j≤J} (1/j)·(∏_{p∈C, p|j} p)^a ≤ (1 + log J)·∏_{p∈C}(1 + p^{a−1})` for `0 ≤ a ≤ 1`.</span>
+<span class="l" id="L12"><span class="n">12</span></span>
+<span class="l" id="L13"><span class="n">13</span>No axiom, no `sorry`.</span>
+<span class="l" id="L14"><span class="n">14</span>-/</span>
+<span class="l" id="L15"><span class="n">15</span></span>
+<span class="l" id="L16"><span class="n">16</span>open scoped BigOperators</span>
+<span class="l" id="L17"><span class="n">17</span>open Finset</span>
+<span class="l" id="L18"><span class="n">18</span></span>
+<span class="l" id="L19"><span class="n">19</span>namespace GoldC.QuillonAsymp</span>
+<span class="l" id="L20"><span class="n">20</span></span>
+<span class="l" id="L21"><span class="n">21</span>lemma card_le_y (C : Finset ℕ) (hC : ∀ p ∈ C, p.Prime) (y : ℝ) (hy : 1 &lt; y) :</span>
+<span class="l" id="L22"><span class="n">22</span>    (C.card : ℝ) ≤ y + 1 + Real.log ((∏ p ∈ C, p : ℕ) : ℝ) / Real.log y := by</span>
+<span class="l" id="L23"><span class="n">23</span>  classical</span>
+<span class="l" id="L24"><span class="n">24</span>  set Cs := C.filter (fun p : ℕ =&gt; (p : ℝ) &lt; y) with hCs</span>
+<span class="l" id="L25"><span class="n">25</span>  set Cb := C.filter (fun p : ℕ =&gt; ¬ (p : ℝ) &lt; y) with hCb</span>
+<span class="l" id="L26"><span class="n">26</span>  have hsplit : C.card = Cs.card + Cb.card := (card_filter_add_card_filter_not _).symm</span>
+<span class="l" id="L27"><span class="n">27</span>  -- small primes</span>
+<span class="l" id="L28"><span class="n">28</span>  have hs : (Cs.card : ℝ) ≤ y + 1 := by</span>
+<span class="l" id="L29"><span class="n">29</span>    have hsub : Cs ⊆ range ⌈y⌉₊ := by</span>
+<span class="l" id="L30"><span class="n">30</span>      intro p hp</span>
+<span class="l" id="L31"><span class="n">31</span>      rw [hCs, mem_filter] at hp</span>
+<span class="l" id="L32"><span class="n">32</span>      rw [mem_range]</span>
+<span class="l" id="L33"><span class="n">33</span>      exact Nat.cast_lt.1 (lt_of_lt_of_le hp.2 (Nat.le_ceil y))</span>
+<span class="l" id="L34"><span class="n">34</span>    have := card_le_card hsub</span>
+<span class="l" id="L35"><span class="n">35</span>    rw [card_range] at this</span>
+<span class="l" id="L36"><span class="n">36</span>    have h2 : (⌈y⌉₊ : ℝ) ≤ y + 1 := (Nat.ceil_lt_add_one (by linarith)).le</span>
+<span class="l" id="L37"><span class="n">37</span>    exact (Nat.cast_le.2 this).trans h2</span>
+<span class="l" id="L38"><span class="n">38</span>  -- large primes</span>
+<span class="l" id="L39"><span class="n">39</span>  have hlogy : 0 &lt; Real.log y := Real.log_pos hy</span>
+<span class="l" id="L40"><span class="n">40</span>  have hb : (Cb.card : ℝ) ≤ Real.log ((∏ p ∈ C, p : ℕ) : ℝ) / Real.log y := by</span>
+<span class="l" id="L41"><span class="n">41</span>    rw [le_div_iff₀ hlogy]</span>
+<span class="l" id="L42"><span class="n">42</span>    have hpos : ∀ p ∈ C, (0 : ℝ) &lt; p := fun p hp =&gt; by exact_mod_cast (hC p hp).pos</span>
+<span class="l" id="L43"><span class="n">43</span>    have h1 : y ^ Cb.card ≤ ∏ p ∈ Cb, (p : ℝ) := by</span>
+<span class="l" id="L44"><span class="n">44</span>      rw [← prod_const]</span>
+<span class="l" id="L45"><span class="n">45</span>      refine prod_le_prod₀ (fun _ _ =&gt; by linarith) fun p hp =&gt; ?_</span>
+<span class="l" id="L46"><span class="n">46</span>      rw [hCb, mem_filter] at hp; push Not at hp; exact hp.2</span>
+<span class="l" id="L47"><span class="n">47</span>    have h2 : ∏ p ∈ Cb, (p : ℝ) ≤ ∏ p ∈ C, (p : ℝ) := by</span>
+<span class="l" id="L48"><span class="n">48</span>      rw [← prod_filter_mul_prod_filter_not C (fun p : ℕ =&gt; ¬ (p : ℝ) &lt; y)]</span>
+<span class="l" id="L49"><span class="n">49</span>      have h1&#x27; : (1 : ℝ) ≤ ∏ p ∈ C.filter (fun p : ℕ =&gt; ¬ ¬ (p : ℝ) &lt; y), (p : ℝ) :=</span>
+<span class="l" id="L50"><span class="n">50</span>        one_le_prod₀ fun p hp =&gt; by exact_mod_cast (hC p (filter_subset _ _ hp)).one_le</span>
+<span class="l" id="L51"><span class="n">51</span>      have h0 : 0 ≤ ∏ p ∈ Cb, (p : ℝ) := prod_nonneg fun p _ =&gt; Nat.cast_nonneg _</span>
+<span class="l" id="L52"><span class="n">52</span>      rw [hCb] at h0 ⊢</span>
+<span class="l" id="L53"><span class="n">53</span>      nlinarith</span>
+<span class="l" id="L54"><span class="n">54</span>    have h3 : Real.log (y ^ Cb.card) ≤ Real.log ((∏ p ∈ C, p : ℕ) : ℝ) := by</span>
+<span class="l" id="L55"><span class="n">55</span>      apply Real.log_le_log (by positivity)</span>
+<span class="l" id="L56"><span class="n">56</span>      push_cast; linarith</span>
+<span class="l" id="L57"><span class="n">57</span>    rw [Real.log_pow] at h3</span>
+<span class="l" id="L58"><span class="n">58</span>    linarith</span>
+<span class="l" id="L59"><span class="n">59</span>  rw [hsplit, Nat.cast_add]; linarith</span>
+<span class="l" id="L60"><span class="n">60</span></span>
+<span class="l" id="L61"><span class="n">61</span>/-- `ω(s) = o(log s)`, in the form `4^{ω(s)} ≤ s^η`. -/</span>
+<span class="l" id="L62"><span class="n">62</span>theorem four_pow_card_le (η : ℝ) (hη : 0 &lt; η) :</span>
+<span class="l" id="L63"><span class="n">63</span>    ∃ L₀ : ℝ, 0 &lt; L₀ ∧ ∀ C : Finset ℕ, (∀ p ∈ C, p.Prime) →</span>
+<span class="l" id="L64"><span class="n">64</span>      L₀ ≤ Real.log ((∏ p ∈ C, p : ℕ) : ℝ) →</span>
+<span class="l" id="L65"><span class="n">65</span>        (4 : ℝ) ^ C.card ≤ ((∏ p ∈ C, p : ℕ) : ℝ) ^ η := by</span>
+<span class="l" id="L66"><span class="n">66</span>  set c := Real.log 4 with hc</span>
+<span class="l" id="L67"><span class="n">67</span>  have hc0 : 0 &lt; c := Real.log_pos (by norm_num)</span>
+<span class="l" id="L68"><span class="n">68</span>  set L₀ := max 16 (max ((8 * c / η) ^ 2) (Real.exp (8 * c / η))) with hL₀</span>
+<span class="l" id="L69"><span class="n">69</span>  refine ⟨L₀, by positivity, fun C hC hL =&gt; ?_⟩</span>
+<span class="l" id="L70"><span class="n">70</span>  set ℓ := Real.log ((∏ p ∈ C, p : ℕ) : ℝ) with hℓ</span>
+<span class="l" id="L71"><span class="n">71</span>  have hℓ16 : 16 ≤ ℓ := le_trans (le_max_left _ _) hL</span>
+<span class="l" id="L72"><span class="n">72</span>  have hℓsq : (8 * c / η) ^ 2 ≤ ℓ := le_trans (le_trans (le_max_left _ _) (le_max_right _ _)) hL</span>
+<span class="l" id="L73"><span class="n">73</span>  have hℓexp : Real.exp (8 * c / η) ≤ ℓ := le_trans (le_trans (le_max_right _ _) (le_max_right _ _)) hL</span>
+<span class="l" id="L74"><span class="n">74</span>  have hsqrt : 4 ≤ Real.sqrt ℓ := by</span>
+<span class="l" id="L75"><span class="n">75</span>    rw [show (4 : ℝ) = Real.sqrt 16 by rw [show (16 : ℝ) = 4 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]]</span>
+<span class="l" id="L76"><span class="n">76</span>    exact Real.sqrt_le_sqrt hℓ16</span>
+<span class="l" id="L77"><span class="n">77</span>  have hcard := card_le_y C hC (Real.sqrt ℓ) (by linarith)</span>
+<span class="l" id="L78"><span class="n">78</span>  have hlogsqrt : Real.log (Real.sqrt ℓ) = Real.log ℓ / 2 := by</span>
+<span class="l" id="L79"><span class="n">79</span>    rw [Real.log_sqrt (by linarith)]</span>
+<span class="l" id="L80"><span class="n">80</span>  have hlogℓ : 8 * c / η ≤ Real.log ℓ := by</span>
+<span class="l" id="L81"><span class="n">81</span>    rw [← Real.log_exp (8 * c / η)]; exact Real.log_le_log (Real.exp_pos _) hℓexp</span>
+<span class="l" id="L82"><span class="n">82</span>  have hlogℓpos : 0 &lt; Real.log ℓ := lt_of_lt_of_le (by positivity) hlogℓ</span>
+<span class="l" id="L83"><span class="n">83</span>  have hsq2 : 8 * c / η ≤ Real.sqrt ℓ := by</span>
+<span class="l" id="L84"><span class="n">84</span>    rw [← Real.sqrt_sq (by positivity : 0 ≤ 8 * c / η)]; exact Real.sqrt_le_sqrt hℓsq</span>
+<span class="l" id="L85"><span class="n">85</span>  have hsqℓ : Real.sqrt ℓ * Real.sqrt ℓ = ℓ := Real.mul_self_sqrt (by linarith)</span>
+<span class="l" id="L86"><span class="n">86</span>  -- `|C|·c ≤ η ℓ`</span>
+<span class="l" id="L87"><span class="n">87</span>  have hkey : (C.card : ℝ) * c ≤ η * ℓ := by</span>
+<span class="l" id="L88"><span class="n">88</span>    rw [hlogsqrt] at hcard</span>
+<span class="l" id="L89"><span class="n">89</span>    have e1 : ℓ / (Real.log ℓ / 2) = 2 * ℓ / Real.log ℓ := by field_simp</span>
+<span class="l" id="L90"><span class="n">90</span>    rw [e1] at hcard</span>
+<span class="l" id="L91"><span class="n">91</span>    have t1 : (Real.sqrt ℓ + 1) * c ≤ η * ℓ / 2 := by</span>
+<span class="l" id="L92"><span class="n">92</span>      have : (Real.sqrt ℓ + 1) * c ≤ 2 * Real.sqrt ℓ * c := by nlinarith</span>
+<span class="l" id="L93"><span class="n">93</span>      have h2 : 2 * Real.sqrt ℓ * c ≤ η * ℓ / 2 := by</span>
+<span class="l" id="L94"><span class="n">94</span>        have h8 : 8 * c ≤ η * Real.sqrt ℓ := by</span>
+<span class="l" id="L95"><span class="n">95</span>          have := hsq2; rw [div_le_iff₀ hη] at this; linarith</span>
+<span class="l" id="L96"><span class="n">96</span>        have hs0 : 0 ≤ Real.sqrt ℓ := Real.sqrt_nonneg _</span>
+<span class="l" id="L97"><span class="n">97</span>        nlinarith</span>
+<span class="l" id="L98"><span class="n">98</span>      linarith</span>
+<span class="l" id="L99"><span class="n">99</span>    have t2 : 2 * ℓ / Real.log ℓ * c ≤ η * ℓ / 2 := by</span>
+<span class="l" id="L100"><span class="n">100</span>      rw [div_mul_eq_mul_div, div_le_iff₀ hlogℓpos]</span>
+<span class="l" id="L101"><span class="n">101</span>      have := mul_le_mul_of_nonneg_left hlogℓ (show 0 ≤ η * ℓ / 2 by positivity)</span>
+<span class="l" id="L102"><span class="n">102</span>      have h4 : η * ℓ / 2 * (8 * c / η) = 4 * c * ℓ := by field_simp; ring</span>
+<span class="l" id="L103"><span class="n">103</span>      nlinarith</span>
+<span class="l" id="L104"><span class="n">104</span>    nlinarith</span>
+<span class="l" id="L105"><span class="n">105</span>  have hprod_pos : (0 : ℝ) &lt; ((∏ p ∈ C, p : ℕ) : ℝ) := by</span>
+<span class="l" id="L106"><span class="n">106</span>    have : 0 &lt; ∏ p ∈ C, p := prod_pos fun p hp =&gt; (hC p hp).pos</span>
+<span class="l" id="L107"><span class="n">107</span>    exact_mod_cast this</span>
+<span class="l" id="L108"><span class="n">108</span>  rw [← Real.exp_log hprod_pos, ← Real.exp_mul, ← hℓ]</span>
+<span class="l" id="L109"><span class="n">109</span>  rw [show (4 : ℝ) ^ C.card = Real.exp (C.card * c) by</span>
+<span class="l" id="L110"><span class="n">110</span>    rw [hc, mul_comm, Real.exp_mul, Real.exp_log (by norm_num)]; norm_cast]</span>
+<span class="l" id="L111"><span class="n">111</span>  exact Real.exp_le_exp.2 (by linarith)</span>
+<span class="l" id="L112"><span class="n">112</span></span>
+<span class="l" id="L113"><span class="n">113</span>/-- A set of distinct primes divides `j` iff each of them does. -/</span>
+<span class="l" id="L114"><span class="n">114</span>lemma prod_dvd_iff (D : Finset ℕ) (hD : ∀ p ∈ D, p.Prime) (j : ℕ) :</span>
+<span class="l" id="L115"><span class="n">115</span>    (∏ p ∈ D, p) ∣ j ↔ ∀ p ∈ D, p ∣ j := by</span>
+<span class="l" id="L116"><span class="n">116</span>  constructor</span>
+<span class="l" id="L117"><span class="n">117</span>  · intro h p hp; exact (dvd_prod_of_mem _ hp).trans h</span>
+<span class="l" id="L118"><span class="n">118</span>  · intro h</span>
+<span class="l" id="L119"><span class="n">119</span>    exact Finset.prod_primes_dvd j (fun p hp =&gt; (hD p hp).prime) h</span>
+<span class="l" id="L120"><span class="n">120</span></span>
+<span class="l" id="L121"><span class="n">121</span>/-- **The gcd mode sum.** -/</span>
+<span class="l" id="L122"><span class="n">122</span>theorem gcd_mode_sum (C : Finset ℕ) (hC : ∀ p ∈ C, p.Prime) (J : ℕ) (a : ℝ) (ha0 : 0 ≤ a)</span>
+<span class="l" id="L123"><span class="n">123</span>    (ha1 : a ≤ 1) :</span>
+<span class="l" id="L124"><span class="n">124</span>    ∑ j ∈ Icc 1 J, (1 / (j : ℝ)) * (((∏ p ∈ C.filter (fun p =&gt; p ∣ j), p : ℕ) : ℝ) ^ a) ≤</span>
+<span class="l" id="L125"><span class="n">125</span>      (1 + Real.log J) * ∏ p ∈ C, (1 + (p : ℝ) ^ (a - 1)) := by</span>
+<span class="l" id="L126"><span class="n">126</span>  classical</span>
+<span class="l" id="L127"><span class="n">127</span>  set w : Finset ℕ → ℝ := fun D =&gt; ∏ p ∈ D, ((p : ℝ) ^ a - 1) with hw</span>
+<span class="l" id="L128"><span class="n">128</span>  have hw0 : ∀ D ⊆ C, 0 ≤ w D := fun D hD =&gt; prod_nonneg fun p hp =&gt; by</span>
+<span class="l" id="L129"><span class="n">129</span>    have : (1 : ℝ) ≤ (p : ℝ) ^ a := Real.one_le_rpow (by exact_mod_cast (hC p (hD hp)).one_le) ha0</span>
+<span class="l" id="L130"><span class="n">130</span>    linarith</span>
+<span class="l" id="L131"><span class="n">131</span>  have hexp : ∀ j, (((∏ p ∈ C.filter (fun p =&gt; p ∣ j), p : ℕ) : ℝ) ^ a) =</span>
+<span class="l" id="L132"><span class="n">132</span>      ∑ D ∈ C.powerset, (if (∏ p ∈ D, p) ∣ j then w D else 0) := by</span>
+<span class="l" id="L133"><span class="n">133</span>    intro j</span>
+<span class="l" id="L134"><span class="n">134</span>    rw [Nat.cast_prod, ← Real.finset_prod_rpow _ _ (fun p _ =&gt; Nat.cast_nonneg p)]</span>
+<span class="l" id="L135"><span class="n">135</span>    have h1 : ∏ p ∈ C.filter (fun p =&gt; p ∣ j), (p : ℝ) ^ a =</span>
+<span class="l" id="L136"><span class="n">136</span>        ∏ p ∈ C.filter (fun p =&gt; p ∣ j), (1 + ((p : ℝ) ^ a - 1)) :=</span>
+<span class="l" id="L137"><span class="n">137</span>      prod_congr rfl fun p _ =&gt; by ring</span>
+<span class="l" id="L138"><span class="n">138</span>    rw [h1, prod_one_add]</span>
+<span class="l" id="L139"><span class="n">139</span>    rw [← sum_filter]</span>
+<span class="l" id="L140"><span class="n">140</span>    apply sum_congr</span>
+<span class="l" id="L141"><span class="n">141</span>    · ext D</span>
+<span class="l" id="L142"><span class="n">142</span>      simp only [mem_powerset, mem_filter]</span>
+<span class="l" id="L143"><span class="n">143</span>      constructor</span>
+<span class="l" id="L144"><span class="n">144</span>      · intro hD</span>
+<span class="l" id="L145"><span class="n">145</span>        exact ⟨hD.trans (filter_subset _ _), (prod_dvd_iff D (fun p hp =&gt; hC p ((hD.trans</span>
+<span class="l" id="L146"><span class="n">146</span>          (filter_subset _ _)) hp)) j).2 fun p hp =&gt; (mem_filter.1 (hD hp)).2⟩</span>
+<span class="l" id="L147"><span class="n">147</span>      · rintro ⟨hD, hdvd⟩ p hp</span>
+<span class="l" id="L148"><span class="n">148</span>        exact mem_filter.2 ⟨hD hp, (prod_dvd_iff D (fun p hp =&gt; hC p (hD hp)) j).1 hdvd p hp⟩</span>
+<span class="l" id="L149"><span class="n">149</span>    · intro D _; rfl</span>
+<span class="l" id="L150"><span class="n">150</span>  have hJ : Icc 1 J = Ioc 0 J := by ext j; simp only [mem_Icc, mem_Ioc]; omega</span>
+<span class="l" id="L151"><span class="n">151</span>  calc ∑ j ∈ Icc 1 J, (1 / (j : ℝ)) * (((∏ p ∈ C.filter (fun p =&gt; p ∣ j), p : ℕ) : ℝ) ^ a)</span>
+<span class="l" id="L152"><span class="n">152</span>      = ∑ D ∈ C.powerset, w D * ∑ j ∈ (Ioc 0 J).filter (fun j =&gt; (∏ p ∈ D, p) ∣ j), (1 / (j : ℝ)) := by</span>
+<span class="l" id="L153"><span class="n">153</span>        simp only [hexp, mul_sum]</span>
+<span class="l" id="L154"><span class="n">154</span>        rw [hJ, sum_comm]</span>
+<span class="l" id="L155"><span class="n">155</span>        refine sum_congr rfl fun D _ =&gt; ?_</span>
+<span class="l" id="L156"><span class="n">156</span>        rw [sum_filter]</span>
+<span class="l" id="L157"><span class="n">157</span>        refine sum_congr rfl fun j _ =&gt; ?_</span>
+<span class="l" id="L158"><span class="n">158</span>        split_ifs &lt;;&gt; ring</span>
+<span class="l" id="L159"><span class="n">159</span>    _ ≤ ∑ D ∈ C.powerset, w D * ((1 / ((∏ p ∈ D, p : ℕ) : ℝ)) * (1 + Real.log J)) := by</span>
+<span class="l" id="L160"><span class="n">160</span>        refine sum_le_sum fun D hD =&gt; mul_le_mul_of_nonneg_left ?_ (hw0 D (mem_powerset.1 hD))</span>
+<span class="l" id="L161"><span class="n">161</span>        exact GoldC.QuillonDivisorMoment.sum_inv_multiples _ J (Nat.one_le_iff_ne_zero.2 (prod_ne_zero_iff.2 fun p hp =&gt;</span>
+<span class="l" id="L162"><span class="n">162</span>          (hC p ((mem_powerset.1 hD) hp)).ne_zero))</span>
+<span class="l" id="L163"><span class="n">163</span>    _ ≤ ∑ D ∈ C.powerset, (∏ p ∈ D, (p : ℝ) ^ (a - 1)) * (1 + Real.log J) := by</span>
+<span class="l" id="L164"><span class="n">164</span>        refine sum_le_sum fun D hD =&gt; ?_</span>
+<span class="l" id="L165"><span class="n">165</span>        have hDC := mem_powerset.1 hD</span>
+<span class="l" id="L166"><span class="n">166</span>        have hlog : 0 ≤ 1 + Real.log J := GoldC.QuillonDivisorMoment.one_add_log_nonneg J</span>
+<span class="l" id="L167"><span class="n">167</span>        rw [← mul_assoc]</span>
+<span class="l" id="L168"><span class="n">168</span>        apply mul_le_mul_of_nonneg_right _ hlog</span>
+<span class="l" id="L169"><span class="n">169</span>        rw [Nat.cast_prod, one_div, ← prod_inv_distrib]</span>
+<span class="l" id="L170"><span class="n">170</span>        simp only [hw]</span>
+<span class="l" id="L171"><span class="n">171</span>        rw [← prod_mul_distrib]</span>
+<span class="l" id="L172"><span class="n">172</span>        refine prod_le_prod₀ (fun p hp =&gt; ?_) fun p hp =&gt; ?_</span>
+<span class="l" id="L173"><span class="n">173</span>        · have : (1 : ℝ) ≤ (p : ℝ) ^ a := Real.one_le_rpow (by exact_mod_cast (hC p (hDC hp)).one_le) ha0</span>
+<span class="l" id="L174"><span class="n">174</span>          have : (0 : ℝ) &lt; p := by exact_mod_cast (hC p (hDC hp)).pos</span>
+<span class="l" id="L175"><span class="n">175</span>          have : 0 ≤ (p : ℝ) ^ a - 1 := by linarith</span>
+<span class="l" id="L176"><span class="n">176</span>          positivity</span>
+<span class="l" id="L177"><span class="n">177</span>        · have hp0 : (0 : ℝ) &lt; p := by exact_mod_cast (hC p (hDC hp)).pos</span>
+<span class="l" id="L178"><span class="n">178</span>          rw [Real.rpow_sub hp0, Real.rpow_one, div_eq_mul_inv]</span>
+<span class="l" id="L179"><span class="n">179</span>          apply mul_le_mul_of_nonneg_right _ (by positivity)</span>
+<span class="l" id="L180"><span class="n">180</span>          linarith</span>
+<span class="l" id="L181"><span class="n">181</span>    _ = (1 + Real.log J) * ∏ p ∈ C, (1 + (p : ℝ) ^ (a - 1)) := by</span>
+<span class="l" id="L182"><span class="n">182</span>        rw [← sum_mul, mul_comm, prod_one_add]</span>
+<span class="l" id="L183"><span class="n">183</span></span>
+<span class="l" id="L184"><span class="n">184</span>/-- `b^{ω(s)} ≤ s^η` for large `log s` (any base `b ≥ 2`). -/</span>
+<span class="l" id="L185"><span class="n">185</span>theorem base_pow_card_le (b : ℝ) (hb : 2 ≤ b) (η : ℝ) (hη : 0 &lt; η) :</span>
+<span class="l" id="L186"><span class="n">186</span>    ∃ L₀ : ℝ, 0 &lt; L₀ ∧ ∀ C : Finset ℕ, (∀ p ∈ C, p.Prime) →</span>
+<span class="l" id="L187"><span class="n">187</span>      L₀ ≤ Real.log ((∏ p ∈ C, p : ℕ) : ℝ) →</span>
+<span class="l" id="L188"><span class="n">188</span>        b ^ C.card ≤ ((∏ p ∈ C, p : ℕ) : ℝ) ^ η := by</span>
+<span class="l" id="L189"><span class="n">189</span>  -- reduce to base 4: `b ≤ 4^{t}` with `t = log b / log 4`</span>
+<span class="l" id="L190"><span class="n">190</span>  set t := Real.log b / Real.log 4 with ht</span>
+<span class="l" id="L191"><span class="n">191</span>  have hl4 : 0 &lt; Real.log 4 := Real.log_pos (by norm_num)</span>
+<span class="l" id="L192"><span class="n">192</span>  have hlb : 0 &lt; Real.log b := Real.log_pos (by linarith)</span>
+<span class="l" id="L193"><span class="n">193</span>  have ht0 : 0 &lt; t := div_pos hlb hl4</span>
+<span class="l" id="L194"><span class="n">194</span>  obtain ⟨L₀, hL₀, hL⟩ := four_pow_card_le (η / t) (div_pos hη ht0)</span>
+<span class="l" id="L195"><span class="n">195</span>  refine ⟨L₀, hL₀, fun C hC hLC =&gt; ?_⟩</span>
+<span class="l" id="L196"><span class="n">196</span>  have h1 := hL C hC hLC</span>
+<span class="l" id="L197"><span class="n">197</span>  have hb4 : b = (4 : ℝ) ^ t := by</span>
+<span class="l" id="L198"><span class="n">198</span>    rw [ht, Real.rpow_def_of_pos (by norm_num),</span>
+<span class="l" id="L199"><span class="n">199</span>      show Real.log 4 * (Real.log b / Real.log 4) = Real.log b by field_simp,</span>
+<span class="l" id="L200"><span class="n">200</span>      Real.exp_log (by linarith)]</span>
+<span class="l" id="L201"><span class="n">201</span>  have hprod_pos : (0 : ℝ) &lt; ((∏ p ∈ C, p : ℕ) : ℝ) := by</span>
+<span class="l" id="L202"><span class="n">202</span>    have : 0 &lt; ∏ p ∈ C, p := prod_pos fun p hp =&gt; (hC p hp).pos</span>
+<span class="l" id="L203"><span class="n">203</span>    exact_mod_cast this</span>
+<span class="l" id="L204"><span class="n">204</span>  calc b ^ C.card = ((4 : ℝ) ^ C.card) ^ t := by</span>
+<span class="l" id="L205"><span class="n">205</span>        rw [hb4, ← Real.rpow_natCast, ← Real.rpow_natCast, ← Real.rpow_mul (by norm_num),</span>
+<span class="l" id="L206"><span class="n">206</span>          ← Real.rpow_mul (by norm_num), mul_comm]</span>
+<span class="l" id="L207"><span class="n">207</span>    _ ≤ (((∏ p ∈ C, p : ℕ) : ℝ) ^ (η / t)) ^ t :=</span>
+<span class="l" id="L208"><span class="n">208</span>        Real.rpow_le_rpow (by positivity) h1 ht0.le</span>
+<span class="l" id="L209"><span class="n">209</span>    _ = ((∏ p ∈ C, p : ℕ) : ℝ) ^ η := by</span>
+<span class="l" id="L210"><span class="n">210</span>        rw [← Real.rpow_mul hprod_pos.le, div_mul_cancel₀ _ ht0.ne&#x27;]</span>
+<span class="l" id="L211"><span class="n">211</span></span>
+<span class="l" id="L212"><span class="n">212</span>/-- `(1 + log x)^m ≤ x^c` for large `x`. -/</span>
+<span class="l" id="L213"><span class="n">213</span>theorem one_add_log_pow_le (m : ℕ) (c : ℝ) (hc : 0 &lt; c) :</span>
+<span class="l" id="L214"><span class="n">214</span>    ∃ x₀ : ℝ, 1 ≤ x₀ ∧ ∀ x : ℝ, x₀ ≤ x → (1 + Real.log x) ^ m ≤ x ^ c := by</span>
+<span class="l" id="L215"><span class="n">215</span>  rcases Nat.eq_zero_or_pos m with hm | hm</span>
+<span class="l" id="L216"><span class="n">216</span>  · refine ⟨1, le_rfl, fun x hx =&gt; ?_⟩</span>
+<span class="l" id="L217"><span class="n">217</span>    rw [hm, pow_zero]; exact Real.one_le_rpow hx hc.le</span>
+<span class="l" id="L218"><span class="n">218</span>  set η := c / (2 * m) with hη</span>
+<span class="l" id="L219"><span class="n">219</span>  have hmR : (0 : ℝ) &lt; m := by exact_mod_cast hm</span>
+<span class="l" id="L220"><span class="n">220</span>  have hη0 : 0 &lt; η := by positivity</span>
+<span class="l" id="L221"><span class="n">221</span>  set K := (1 + 1 / η) ^ m with hK</span>
+<span class="l" id="L222"><span class="n">222</span>  have hK1 : 1 ≤ K := one_le_pow₀ (by have : 0 &lt; 1 / η := by positivity</span>
+<span class="l" id="L223"><span class="n">223</span>                                      linarith)</span>
+<span class="l" id="L224"><span class="n">224</span>  refine ⟨max 1 (K ^ (2 / c)), le_max_left _ _, fun x hx =&gt; ?_⟩</span>
+<span class="l" id="L225"><span class="n">225</span>  have hx1 : 1 ≤ x := le_trans (le_max_left _ _) hx</span>
+<span class="l" id="L226"><span class="n">226</span>  have hx0 : 0 &lt; x := by linarith</span>
+<span class="l" id="L227"><span class="n">227</span>  have hxη : 1 ≤ x ^ η := Real.one_le_rpow hx1 hη0.le</span>
+<span class="l" id="L228"><span class="n">228</span>  have hlog : 1 + Real.log x ≤ (1 + 1 / η) * x ^ η := by</span>
+<span class="l" id="L229"><span class="n">229</span>    have := Real.log_le_rpow_div hx0.le hη0</span>
+<span class="l" id="L230"><span class="n">230</span>    have : x ^ η / η = (1 / η) * x ^ η := by ring</span>
+<span class="l" id="L231"><span class="n">231</span>    nlinarith</span>
+<span class="l" id="L232"><span class="n">232</span>  have hlog0 : 0 ≤ 1 + Real.log x := by have := Real.log_nonneg hx1; linarith</span>
+<span class="l" id="L233"><span class="n">233</span>  have h1 : (1 + Real.log x) ^ m ≤ K * x ^ (c / 2) := by</span>
+<span class="l" id="L234"><span class="n">234</span>    calc (1 + Real.log x) ^ m ≤ ((1 + 1 / η) * x ^ η) ^ m := pow_le_pow_left₀ hlog0 hlog m</span>
+<span class="l" id="L235"><span class="n">235</span>      _ = K * (x ^ η) ^ m := by rw [mul_pow]</span>
+<span class="l" id="L236"><span class="n">236</span>      _ = K * x ^ (c / 2) := by</span>
+<span class="l" id="L237"><span class="n">237</span>          rw [← Real.rpow_natCast, ← Real.rpow_mul hx0.le]; congr 2; rw [hη]; field_simp</span>
+<span class="l" id="L238"><span class="n">238</span>  have h2 : K ≤ x ^ (c / 2) := by</span>
+<span class="l" id="L239"><span class="n">239</span>    have hx2 : K ^ (2 / c) ≤ x := le_trans (le_max_right _ _) hx</span>
+<span class="l" id="L240"><span class="n">240</span>    calc K = (K ^ (2 / c)) ^ (c / 2) := by</span>
+<span class="l" id="L241"><span class="n">241</span>          rw [← Real.rpow_mul (by linarith)]; field_simp; simp</span>
+<span class="l" id="L242"><span class="n">242</span>      _ ≤ x ^ (c / 2) := Real.rpow_le_rpow (by positivity) hx2 (by positivity)</span>
+<span class="l" id="L243"><span class="n">243</span>  calc (1 + Real.log x) ^ m ≤ K * x ^ (c / 2) := h1</span>
+<span class="l" id="L244"><span class="n">244</span>    _ ≤ x ^ (c / 2) * x ^ (c / 2) := mul_le_mul_of_nonneg_right h2 (by positivity)</span>
+<span class="l" id="L245"><span class="n">245</span>    _ = x ^ c := by rw [← Real.rpow_add hx0]; ring_nf</span>
+<span class="l" id="L246"><span class="n">246</span></span>
+<span class="l" id="L247"><span class="n">247</span>/-- `Λ^k ≤ exp(c Λ^σ)` for large `Λ`. -/</span>
+<span class="l" id="L248"><span class="n">248</span>theorem rpow_le_exp_rpow (k c σ : ℝ) (hk : 0 ≤ k) (hc : 0 &lt; c) (hσ : 0 &lt; σ) :</span>
+<span class="l" id="L249"><span class="n">249</span>    ∃ Λ₀ : ℝ, 1 ≤ Λ₀ ∧ ∀ Λ : ℝ, Λ₀ ≤ Λ → Λ ^ k ≤ Real.exp (c * Λ ^ σ) := by</span>
+<span class="l" id="L250"><span class="n">250</span>  set τ := σ / 2 with hτ</span>
+<span class="l" id="L251"><span class="n">251</span>  have hτ0 : 0 &lt; τ := by positivity</span>
+<span class="l" id="L252"><span class="n">252</span>  -- `k log Λ ≤ (k/τ) Λ^τ ≤ c Λ^σ` once `Λ^τ ≥ k/(τ c)`</span>
+<span class="l" id="L253"><span class="n">253</span>  set A := k / (τ * c) with hA</span>
+<span class="l" id="L254"><span class="n">254</span>  refine ⟨max 1 ((A + 1) ^ (1 / τ)), le_max_left _ _, fun Λ hΛ =&gt; ?_⟩</span>
+<span class="l" id="L255"><span class="n">255</span>  have hΛ1 : 1 ≤ Λ := le_trans (le_max_left _ _) hΛ</span>
+<span class="l" id="L256"><span class="n">256</span>  have hΛ0 : 0 &lt; Λ := by linarith</span>
+<span class="l" id="L257"><span class="n">257</span>  rw [← Real.exp_log (Real.rpow_pos_of_pos hΛ0 k), Real.log_rpow hΛ0]</span>
+<span class="l" id="L258"><span class="n">258</span>  apply Real.exp_le_exp.2</span>
+<span class="l" id="L259"><span class="n">259</span>  have hlog := Real.log_le_rpow_div hΛ0.le hτ0</span>
+<span class="l" id="L260"><span class="n">260</span>  have hΛτ : A + 1 ≤ Λ ^ τ := by</span>
+<span class="l" id="L261"><span class="n">261</span>    have h1 : (A + 1) ^ (1 / τ) ≤ Λ := le_trans (le_max_right _ _) hΛ</span>
+<span class="l" id="L262"><span class="n">262</span>    have hA0 : 0 ≤ A := by positivity</span>
+<span class="l" id="L263"><span class="n">263</span>    calc A + 1 = ((A + 1) ^ (1 / τ)) ^ τ := by</span>
+<span class="l" id="L264"><span class="n">264</span>          rw [← Real.rpow_mul (by linarith)]; field_simp; simp</span>
+<span class="l" id="L265"><span class="n">265</span>      _ ≤ Λ ^ τ := Real.rpow_le_rpow (by positivity) h1 hτ0.le</span>
+<span class="l" id="L266"><span class="n">266</span>  have hσ2 : Λ ^ σ = Λ ^ τ * Λ ^ τ := by</span>
+<span class="l" id="L267"><span class="n">267</span>    rw [← Real.rpow_add hΛ0]; congr 1; rw [hτ]; ring</span>
+<span class="l" id="L268"><span class="n">268</span>  have hΛτ0 : 0 &lt; Λ ^ τ := Real.rpow_pos_of_pos hΛ0 τ</span>
+<span class="l" id="L269"><span class="n">269</span>  calc k * Real.log Λ ≤ k * (Λ ^ τ / τ) := mul_le_mul_of_nonneg_left hlog hk</span>
+<span class="l" id="L270"><span class="n">270</span>    _ = (k / τ) * Λ ^ τ := by ring</span>
+<span class="l" id="L271"><span class="n">271</span>    _ ≤ (c * Λ ^ τ) * Λ ^ τ := by</span>
+<span class="l" id="L272"><span class="n">272</span>        apply mul_le_mul_of_nonneg_right _ hΛτ0.le</span>
+<span class="l" id="L273"><span class="n">273</span>        have : k / τ = c * A := by rw [hA]; field_simp</span>
+<span class="l" id="L274"><span class="n">274</span>        rw [this]; nlinarith</span>
+<span class="l" id="L275"><span class="n">275</span>    _ = c * Λ ^ σ := by rw [hσ2]; ring</span>
+<span class="l" id="L276"><span class="n">276</span></span>
+<span class="l" id="L277"><span class="n">277</span>end GoldC.QuillonAsymp</span>
+<span class="l" id="L278"><span class="n">278</span></span>
+<span class="l" id="L279"><span class="n">279</span>#print axioms GoldC.QuillonAsymp.card_le_y</span>
+<span class="l" id="L280"><span class="n">280</span>#print axioms GoldC.QuillonAsymp.four_pow_card_le</span>
+<span class="l" id="L281"><span class="n">281</span>#print axioms GoldC.QuillonAsymp.gcd_mode_sum</span>
+<span class="l" id="L282"><span class="n">282</span>#print axioms GoldC.QuillonAsymp.base_pow_card_le</span>
+<span class="l" id="L283"><span class="n">283</span>#print axioms GoldC.QuillonAsymp.one_add_log_pow_le</span>
+<span class="l" id="L284"><span class="n">284</span>#print axioms GoldC.QuillonAsymp.rpow_le_exp_rpow</span></pre></div></body></html>

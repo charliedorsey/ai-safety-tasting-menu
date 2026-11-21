@@ -1,0 +1,548 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LEAN/GoldC/QuillonResidue.lean</title><style>body{background:#f9f8f4;color:#27332d;font:16px/1.5 Georgia,serif;margin:0}a{color:#2d6255}.wrap{max-width:1160px;margin:0 auto;padding:30px 24px}header{border-bottom:1px solid #d8ded7;margin-bottom:22px}h1{font-size:29px;font-weight:normal;overflow-wrap:anywhere}.meta,nav,th{font:13px/1.5 system-ui,sans-serif;color:#5b6b63}nav a{margin-right:18px}.tblwrap{overflow-x:auto}table{border-collapse:collapse;width:100%}td,th{padding:9px 12px;border-bottom:1px solid #e0e3de;text-align:left;vertical-align:top}td code{overflow-wrap:anywhere}code,pre{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}pre{font-size:12.5px;white-space:pre;overflow-x:auto;line-height:1.6;background:#fff;padding:12px;border:1px solid #e2e4df}.ln{color:#8b968e;padding-right:15px;user-select:none}.line{display:block}.focus{background:#e9f1ec}.line:target{outline:2px solid #276b54;outline-offset:1px;background:#f6f4e7}.legend{padding:12px 15px;background:#fff;border-left:2px solid #629280;margin:24px 0}@media(max-width:640px){.wrap{padding:18px 12px}h1{font-size:21px}td,th{padding:8px}.meta{font-size:11px}pre{font-size:11px}}</style></head><body><div class="wrap"><header><nav><a href="../source_index.html">All source waypoints</a><a href="../../../Docs/companion/reading_room/index.html">Reading room</a></nav><h1>LEAN/GoldC/QuillonResidue.lean</h1><p class="meta">Exact archived source · SHA-256 8e1c0cc47bfec3e2c3d4e344c40c0c736bb3e1fa7053b3c1d9982d27a48cc26e · Original line numbers · Not a new Lean replay</p></header><p class="meta">Deep source proof text is reproduced verbatim for inspection; this page does not assert a compiler-derived proof-dependency graph.</p><pre><span class="line" id="L1"><span class="ln">    1</span>import GoldC.QuillonSieve2</span>
+<span class="line" id="L2"><span class="ln">    2</span>import GoldC.QuillonWContext</span>
+<span class="line" id="L3"><span class="ln">    3</span>import GoldC.QuillonOmega</span>
+<span class="line" id="L4"><span class="ln">    4</span></span>
+<span class="line" id="L5"><span class="ln">    5</span>/-!</span>
+<span class="line" id="L6"><span class="ln">    6</span># Quillon CSC3 F7.8a: rough-number masses for the residues (crude sieve only)</span>
+<span class="line" id="L7"><span class="ln">    7</span></span>
+<span class="line" id="L8"><span class="ln">    8</span>* `omega_le_kappa_inv_prod`: `ω(B) ≤ e^{3|B|/(z−3)}/∏B` when all primes are `≥ z ≥ 4`.</span>
+<span class="line" id="L9"><span class="ln">    9</span>* `block_rough`: one dyadic block `∏B ∈ [2^i, 2^{i+1})` of a set whose primes are all `≥ 2^k`</span>
+<span class="line" id="L10"><span class="ln">   10</span>  (`k ≥ 3`, `k ≤ i`) has `1/∏`-mass `≤ (12/k)·e⁴((i+1)/k)⁴` (`rough_mass` + harmonic prime sums).</span>
+<span class="line" id="L11"><span class="ln">   11</span>* `selfrough_mass`: if all primes of `B` exceed `(∏B)^u` and `z₀ = 2^{k₀}` (`k₀ ≥ 3`),</span>
+<span class="line" id="L12"><span class="ln">   12</span>  `∏B ≤ N₁ &lt; 2^{I+1}`, then `Σ ω(B) ≤ κ·e⁴·2916·(1 + log(I+1))/u⁵`.</span>
+<span class="line" id="L13"><span class="ln">   13</span></span>
+<span class="line" id="L14"><span class="ln">   14</span>No axiom, no `sorry`.</span>
+<span class="line" id="L15"><span class="ln">   15</span>-/</span>
+<span class="line" id="L16"><span class="ln">   16</span></span>
+<span class="line" id="L17"><span class="ln">   17</span>open scoped BigOperators</span>
+<span class="line" id="L18"><span class="ln">   18</span>open Finset</span>
+<span class="line" id="L19"><span class="ln">   19</span></span>
+<span class="line" id="L20"><span class="ln">   20</span>namespace GoldC.QuillonResidue</span>
+<span class="line" id="L21"><span class="ln">   21</span></span>
+<span class="line" id="L22"><span class="ln">   22</span>open GoldC.QuillonSieve GoldC.QuillonWContext</span>
+<span class="line" id="L23"><span class="ln">   23</span></span>
+<span class="line" id="L24"><span class="ln">   24</span>/-- `ω(B)·∏B = ∏ p/(p−3) ≤ exp(3|B|/(z−3))` when all primes are `≥ z ≥ 4`. -/</span>
+<span class="line" id="L25"><span class="ln">   25</span>lemma omega_mul_prod_le (B : Finset ℕ) (z : ℕ) (hz : 4 ≤ z) (hB : ∀ p ∈ B, z ≤ p) :</span>
+<span class="line" id="L26"><span class="ln">   26</span>    ωR B * ∏ p ∈ B, (p : ℝ) ≤ Real.exp (3 * B.card / ((z : ℝ) - 3)) := by</span>
+<span class="line" id="L27"><span class="ln">   27</span>  have hzR : (4 : ℝ) ≤ z := by exact_mod_cast hz</span>
+<span class="line" id="L28"><span class="ln">   28</span>  unfold ωR</span>
+<span class="line" id="L29"><span class="ln">   29</span>  rw [← prod_mul_distrib]</span>
+<span class="line" id="L30"><span class="ln">   30</span>  have h1 : ∀ p ∈ B, 1 / ((p : ℝ) - 3) * p ≤ Real.exp (3 / ((z : ℝ) - 3)) := by</span>
+<span class="line" id="L31"><span class="ln">   31</span>    intro p hp</span>
+<span class="line" id="L32"><span class="ln">   32</span>    have hpR : (z : ℝ) ≤ p := by exact_mod_cast hB p hp</span>
+<span class="line" id="L33"><span class="ln">   33</span>    have hp3 : (0 : ℝ) &lt; (p : ℝ) - 3 := by linarith</span>
+<span class="line" id="L34"><span class="ln">   34</span>    have : 1 / ((p : ℝ) - 3) * p = 1 + 3 / ((p : ℝ) - 3) := by field_simp; ring</span>
+<span class="line" id="L35"><span class="ln">   35</span>    rw [this]</span>
+<span class="line" id="L36"><span class="ln">   36</span>    refine (Real.add_one_le_exp _).trans&#x27; ?_</span>
+<span class="line" id="L37"><span class="ln">   37</span>    have : 3 / ((p : ℝ) - 3) ≤ 3 / ((z : ℝ) - 3) :=</span>
+<span class="line" id="L38"><span class="ln">   38</span>      div_le_div_of_nonneg_left (by norm_num) (by linarith) (by linarith)</span>
+<span class="line" id="L39"><span class="ln">   39</span>    linarith</span>
+<span class="line" id="L40"><span class="ln">   40</span>  calc ∏ p ∈ B, (1 / ((p : ℝ) - 3) * p) ≤ ∏ _p ∈ B, Real.exp (3 / ((z : ℝ) - 3)) :=</span>
+<span class="line" id="L41"><span class="ln">   41</span>        prod_le_prod₀ (fun p hp =&gt; by</span>
+<span class="line" id="L42"><span class="ln">   42</span>          have hpR : (z : ℝ) ≤ p := by exact_mod_cast hB p hp</span>
+<span class="line" id="L43"><span class="ln">   43</span>          have hp3 : (0 : ℝ) &lt; (p : ℝ) - 3 := by linarith</span>
+<span class="line" id="L44"><span class="ln">   44</span>          positivity) h1</span>
+<span class="line" id="L45"><span class="ln">   45</span>    _ = Real.exp (3 * B.card / ((z : ℝ) - 3)) := by</span>
+<span class="line" id="L46"><span class="ln">   46</span>        rw [prod_const, ← Real.exp_nat_mul]; congr 1; ring</span>
+<span class="line" id="L47"><span class="ln">   47</span></span>
+<span class="line" id="L48"><span class="ln">   48</span>/-- The `1/∏`-mass of all subsets of a prime set `S` is `≤ exp(Σ_S 1/p)`. -/</span>
+<span class="line" id="L49"><span class="ln">   49</span>lemma powerset_inv_mass (S : Finset ℕ) :</span>
+<span class="line" id="L50"><span class="ln">   50</span>    ∑ B&#x27; ∈ S.powerset, (1 / (∏ p ∈ B&#x27;, (p : ℝ))) ≤ Real.exp (∑ p ∈ S, (1 / (p : ℝ))) :=</span>
+<span class="line" id="L51"><span class="ln">   51</span>  sum_inv_prod_subsets_le S</span>
+<span class="line" id="L52"><span class="ln">   52</span></span>
+<span class="line" id="L53"><span class="ln">   53</span>/-- One dyadic block of a `2^k`-rough set. -/</span>
+<span class="line" id="L54"><span class="ln">   54</span>lemma block_rough (T : Finset ℕ) (hT : ∀ p ∈ T, p.Prime) (k i : ℕ) (hk : 3 ≤ k) (hki : k ≤ i + 1)</span>
+<span class="line" id="L55"><span class="ln">   55</span>    (hTk : ∀ p ∈ T, 2 ^ k ≤ p) :</span>
+<span class="line" id="L56"><span class="ln">   56</span>    ∑ B ∈ (T.powerset.filter (fun B =&gt; B.Nonempty)).filter</span>
+<span class="line" id="L57"><span class="ln">   57</span>        (fun B =&gt; 2 ^ i ≤ ∏ p ∈ B, p ∧ ∏ p ∈ B, p &lt; 2 * 2 ^ i), (1 / (∏ p ∈ B, (p : ℝ))) ≤</span>
+<span class="line" id="L58"><span class="ln">   58</span>      (12 / (k : ℝ)) * (Real.exp 4 * (((i + 1 : ℕ) : ℝ) / k) ^ 4) := by</span>
+<span class="line" id="L59"><span class="ln">   59</span>  have hz : 4 ≤ 2 ^ k := by</span>
+<span class="line" id="L60"><span class="ln">   60</span>    calc 4 = 2 ^ 2 := by norm_num</span>
+<span class="line" id="L61"><span class="ln">   61</span>      _ ≤ 2 ^ k := Nat.pow_le_pow_right (by norm_num) (by omega)</span>
+<span class="line" id="L62"><span class="ln">   62</span>  have h := rough_mass T hT (2 ^ k) (2 ^ i) hz hTk</span>
+<span class="line" id="L63"><span class="ln">   63</span>  rw [Nat.log_pow (by norm_num)] at h</span>
+<span class="line" id="L64"><span class="ln">   64</span>  refine h.trans ?_</span>
+<span class="line" id="L65"><span class="ln">   65</span>  have hkR : (3 : ℝ) ≤ k := by exact_mod_cast hk</span>
+<span class="line" id="L66"><span class="ln">   66</span>  have h8 : 8 / ((k : ℝ) - 1) ≤ 12 / (k : ℝ) := by</span>
+<span class="line" id="L67"><span class="ln">   67</span>    rw [div_le_div_iff₀ (by linarith) (by linarith)]; linarith</span>
+<span class="line" id="L68"><span class="ln">   68</span>  -- the second factor</span>
+<span class="line" id="L69"><span class="ln">   69</span>  have hS : ∑ B&#x27; ∈ (T.filter (· &lt; 2 * 2 ^ i)).powerset, (1 / (∏ p ∈ B&#x27;, (p : ℝ))) ≤</span>
+<span class="line" id="L70"><span class="ln">   70</span>      Real.exp 4 * (((i + 1 : ℕ) : ℝ) / k) ^ 4 := by</span>
+<span class="line" id="L71"><span class="ln">   71</span>    refine (powerset_inv_mass _).trans ?_</span>
+<span class="line" id="L72"><span class="ln">   72</span>    have hsub : T.filter (· &lt; 2 * 2 ^ i) ⊆ (Ico (2 ^ k) (2 ^ (i + 1))).filter Nat.Prime := by</span>
+<span class="line" id="L73"><span class="ln">   73</span>      intro p hp</span>
+<span class="line" id="L74"><span class="ln">   74</span>      rw [mem_filter] at hp</span>
+<span class="line" id="L75"><span class="ln">   75</span>      rw [mem_filter, mem_Ico, pow_succ, mul_comm]</span>
+<span class="line" id="L76"><span class="ln">   76</span>      exact ⟨⟨hTk p hp.1, hp.2⟩, hT p hp.1⟩</span>
+<span class="line" id="L77"><span class="ln">   77</span>    have h1 : ∑ p ∈ T.filter (· &lt; 2 * 2 ^ i), (1 / (p : ℝ)) ≤</span>
+<span class="line" id="L78"><span class="ln">   78</span>        ∑ p ∈ (Ico (2 ^ k) (2 ^ (i + 1))).filter Nat.Prime, (1 / (p : ℝ)) :=</span>
+<span class="line" id="L79"><span class="ln">   79</span>      sum_le_sum_of_subset_of_nonneg hsub fun _ _ _ =&gt; by positivity</span>
+<span class="line" id="L80"><span class="ln">   80</span>    have h2 := sum_inv_primes_dyadic_harmonic k (i + 1) (by omega) hki</span>
+<span class="line" id="L81"><span class="ln">   81</span>    have h3 := sum_inv_Ico_le_log k (i + 1) (by omega) hki</span>
+<span class="line" id="L82"><span class="ln">   82</span>    have hkpos : (0 : ℝ) &lt; k := by linarith</span>
+<span class="line" id="L83"><span class="ln">   83</span>    have hratio : (0 : ℝ) &lt; ((i + 1 : ℕ) : ℝ) / k := by</span>
+<span class="line" id="L84"><span class="ln">   84</span>      have : (0 : ℝ) &lt; ((i + 1 : ℕ) : ℝ) := by positivity</span>
+<span class="line" id="L85"><span class="ln">   85</span>      positivity</span>
+<span class="line" id="L86"><span class="ln">   86</span>    calc Real.exp (∑ p ∈ T.filter (· &lt; 2 * 2 ^ i), (1 / (p : ℝ)))</span>
+<span class="line" id="L87"><span class="ln">   87</span>        ≤ Real.exp (4 * (1 + Real.log (((i + 1 : ℕ) : ℝ) / k))) := by</span>
+<span class="line" id="L88"><span class="ln">   88</span>          apply Real.exp_le_exp.2; linarith</span>
+<span class="line" id="L89"><span class="ln">   89</span>      _ = Real.exp 4 * (((i + 1 : ℕ) : ℝ) / k) ^ 4 := by</span>
+<span class="line" id="L90"><span class="ln">   90</span>          rw [mul_add, mul_one, Real.exp_add]</span>
+<span class="line" id="L91"><span class="ln">   91</span>          congr 1</span>
+<span class="line" id="L92"><span class="ln">   92</span>          rw [show (4 : ℝ) * Real.log (((i + 1 : ℕ) : ℝ) / k) = ((4 : ℕ) : ℝ) * Real.log (((i + 1 : ℕ) : ℝ) / k) by</span>
+<span class="line" id="L93"><span class="ln">   93</span>            norm_num, ← Real.log_pow, Real.exp_log (by positivity)]</span>
+<span class="line" id="L94"><span class="ln">   94</span>  have hS0 : 0 ≤ ∑ B&#x27; ∈ (T.filter (· &lt; 2 * 2 ^ i)).powerset, (1 / (∏ p ∈ B&#x27;, (p : ℝ))) :=</span>
+<span class="line" id="L95"><span class="ln">   95</span>    sum_nonneg fun B&#x27; _ =&gt; by</span>
+<span class="line" id="L96"><span class="ln">   96</span>      have : 0 ≤ ∏ p ∈ B&#x27;, (p : ℝ) := prod_nonneg fun _ _ =&gt; Nat.cast_nonneg _</span>
+<span class="line" id="L97"><span class="ln">   97</span>      positivity</span>
+<span class="line" id="L98"><span class="ln">   98</span>  calc 8 / ((k : ℝ) - 1) * _ ≤ 12 / (k : ℝ) * _ := mul_le_mul_of_nonneg_right h8 hS0</span>
+<span class="line" id="L99"><span class="ln">   99</span>    _ ≤ _ := mul_le_mul_of_nonneg_left hS (by positivity)</span>
+<span class="line" id="L100"><span class="ln">  100</span></span>
+<span class="line" id="L101"><span class="ln">  101</span>lemma k_lower (i : ℕ) (u : ℝ) (hu0 : 0 &lt; u) (hu1 : u ≤ 1) (k₀ : ℕ) (hk₀ : 3 ≤ k₀) :</span>
+<span class="line" id="L102"><span class="ln">  102</span>    u * ((i : ℝ) + 1) / 3 ≤ (max ⌊(i : ℝ) * u⌋₊ k₀ : ℕ) := by</span>
+<span class="line" id="L103"><span class="ln">  103</span>  have hfl : (i : ℝ) * u &lt; ⌊(i : ℝ) * u⌋₊ + 1 := Nat.lt_floor_add_one _</span>
+<span class="line" id="L104"><span class="ln">  104</span>  have hiu0 : 0 ≤ (i : ℝ) * u := by positivity</span>
+<span class="line" id="L105"><span class="ln">  105</span>  have hmax1 : (⌊(i : ℝ) * u⌋₊ : ℝ) ≤ (max ⌊(i : ℝ) * u⌋₊ k₀ : ℕ) := by exact_mod_cast le_max_left _ _</span>
+<span class="line" id="L106"><span class="ln">  106</span>  have hmax2 : (k₀ : ℝ) ≤ (max ⌊(i : ℝ) * u⌋₊ k₀ : ℕ) := by exact_mod_cast le_max_right _ _</span>
+<span class="line" id="L107"><span class="ln">  107</span>  have hk₀R : (3 : ℝ) ≤ k₀ := by exact_mod_cast hk₀</span>
+<span class="line" id="L108"><span class="ln">  108</span>  rcases le_or_gt 2 ⌊(i : ℝ) * u⌋₊ with h2 | h2</span>
+<span class="line" id="L109"><span class="ln">  109</span>  · have h2R : (2 : ℝ) ≤ ⌊(i : ℝ) * u⌋₊ := by exact_mod_cast h2</span>
+<span class="line" id="L110"><span class="ln">  110</span>    nlinarith</span>
+<span class="line" id="L111"><span class="ln">  111</span>  · have : (i : ℝ) * u &lt; 2 := by</span>
+<span class="line" id="L112"><span class="ln">  112</span>      have : (⌊(i : ℝ) * u⌋₊ : ℝ) ≤ 1 := by exact_mod_cast (show ⌊(i : ℝ) * u⌋₊ ≤ 1 by omega)</span>
+<span class="line" id="L113"><span class="ln">  113</span>      linarith</span>
+<span class="line" id="L114"><span class="ln">  114</span>    nlinarith</span>
+<span class="line" id="L115"><span class="ln">  115</span></span>
+<span class="line" id="L116"><span class="ln">  116</span>/-- **Self-rough mass.** -/</span>
+<span class="line" id="L117"><span class="ln">  117</span>theorem selfrough_mass (T : Finset ℕ) (hT : ∀ p ∈ T, p.Prime) (u : ℝ) (hu0 : 0 &lt; u) (hu1 : u ≤ 1)</span>
+<span class="line" id="L118"><span class="ln">  118</span>    (k₀ : ℕ) (hk₀ : 3 ≤ k₀) (hTk : ∀ p ∈ T, 2 ^ k₀ ≤ p) (N₁ I : ℕ) (hNI : N₁ &lt; 2 ^ (I + 1))</span>
+<span class="line" id="L119"><span class="ln">  119</span>    (κ : ℝ) (hκ0 : 0 ≤ κ) (hκ : ∀ B ⊆ T, ∏ p ∈ B, p ≤ N₁ → ωR B * ∏ p ∈ B, (p : ℝ) ≤ κ) :</span>
+<span class="line" id="L120"><span class="ln">  120</span>    ∑ B ∈ T.powerset, (if B.Nonempty ∧ ∏ p ∈ B, p ≤ N₁ ∧ ∀ p ∈ B, ((∏ q ∈ B, q : ℕ) : ℝ) ^ u &lt; p</span>
+<span class="line" id="L121"><span class="ln">  121</span>        then ωR B else 0) ≤</span>
+<span class="line" id="L122"><span class="ln">  122</span>      κ * Real.exp 4 * 2916 * (1 + Real.log ((I : ℝ) + 1)) / u ^ 5 := by</span>
+<span class="line" id="L123"><span class="ln">  123</span>  classical</span>
+<span class="line" id="L124"><span class="ln">  124</span>  have hT5 : ∀ p ∈ T, 5 ≤ p := fun p hp =&gt; by</span>
+<span class="line" id="L125"><span class="ln">  125</span>    have := hTk p hp</span>
+<span class="line" id="L126"><span class="ln">  126</span>    have : 2 ^ 3 ≤ 2 ^ k₀ := Nat.pow_le_pow_right (by norm_num) hk₀</span>
+<span class="line" id="L127"><span class="ln">  127</span>    omega</span>
+<span class="line" id="L128"><span class="ln">  128</span>  have hprodpos : ∀ B ⊆ T, 0 &lt; ∏ p ∈ B, p := fun B hB =&gt; prod_pos fun p hp =&gt; (hT p (hB hp)).pos</span>
+<span class="line" id="L129"><span class="ln">  129</span>  set cond : Finset ℕ → Prop := fun B =&gt; B.Nonempty ∧ ∏ p ∈ B, p ≤ N₁ ∧</span>
+<span class="line" id="L130"><span class="ln">  130</span>    ∀ p ∈ B, ((∏ q ∈ B, q : ℕ) : ℝ) ^ u &lt; p with hcond</span>
+<span class="line" id="L131"><span class="ln">  131</span>  -- step 1: fibre by `i = log₂ ∏B`</span>
+<span class="line" id="L132"><span class="ln">  132</span>  have e1 : ∑ B ∈ T.powerset, (if cond B then ωR B else 0) =</span>
+<span class="line" id="L133"><span class="ln">  133</span>      ∑ i ∈ range (I + 1), ∑ B ∈ T.powerset,</span>
+<span class="line" id="L134"><span class="ln">  134</span>        (if cond B ∧ Nat.log 2 (∏ p ∈ B, p) = i then ωR B else 0) := by</span>
+<span class="line" id="L135"><span class="ln">  135</span>    rw [sum_comm]</span>
+<span class="line" id="L136"><span class="ln">  136</span>    refine sum_congr rfl fun B hB =&gt; ?_</span>
+<span class="line" id="L137"><span class="ln">  137</span>    by_cases hc : cond B</span>
+<span class="line" id="L138"><span class="ln">  138</span>    · have hlt : Nat.log 2 (∏ p ∈ B, p) &lt; I + 1 := by</span>
+<span class="line" id="L139"><span class="ln">  139</span>        have h1 : ∏ p ∈ B, p &lt; 2 ^ (I + 1) := lt_of_le_of_lt hc.2.1 hNI</span>
+<span class="line" id="L140"><span class="ln">  140</span>        exact (Nat.log_lt_iff_lt_pow (by norm_num) (hprodpos B (mem_powerset.1 hB)).ne&#x27;).2 h1</span>
+<span class="line" id="L141"><span class="ln">  141</span>      rw [if_pos hc]</span>
+<span class="line" id="L142"><span class="ln">  142</span>      simp only [hc, true_and]</span>
+<span class="line" id="L143"><span class="ln">  143</span>      rw [sum_ite_eq]</span>
+<span class="line" id="L144"><span class="ln">  144</span>      simp [hlt]</span>
+<span class="line" id="L145"><span class="ln">  145</span>    · rw [if_neg hc]; symm; exact sum_eq_zero fun i _ =&gt; by rw [if_neg (fun h =&gt; hc h.1)]</span>
+<span class="line" id="L146"><span class="ln">  146</span>  rw [e1]</span>
+<span class="line" id="L147"><span class="ln">  147</span>  -- step 2: each fibre</span>
+<span class="line" id="L148"><span class="ln">  148</span>  have hblock : ∀ i ∈ range (I + 1), ∑ B ∈ T.powerset,</span>
+<span class="line" id="L149"><span class="ln">  149</span>      (if cond B ∧ Nat.log 2 (∏ p ∈ B, p) = i then ωR B else 0) ≤</span>
+<span class="line" id="L150"><span class="ln">  150</span>      κ * Real.exp 4 * (3 / u) ^ 4 * (36 / (u * ((i : ℝ) + 1))) := by</span>
+<span class="line" id="L151"><span class="ln">  151</span>    intro i _</span>
+<span class="line" id="L152"><span class="ln">  152</span>    set ki := max ⌊(i : ℝ) * u⌋₊ k₀ with hki</span>
+<span class="line" id="L153"><span class="ln">  153</span>    have hki3 : 3 ≤ ki := le_trans hk₀ (le_max_right _ _)</span>
+<span class="line" id="L154"><span class="ln">  154</span>    have hkiR := k_lower i u hu0 hu1 k₀ hk₀</span>
+<span class="line" id="L155"><span class="ln">  155</span>    rw [← hki] at hkiR</span>
+<span class="line" id="L156"><span class="ln">  156</span>    set Ti := T.filter (fun p =&gt; 2 ^ ki ≤ p) with hTi</span>
+<span class="line" id="L157"><span class="ln">  157</span>    -- terms are supported on `B ⊆ Ti` with `∏B ∈ [2^i, 2^{i+1})`</span>
+<span class="line" id="L158"><span class="ln">  158</span>    have hpt : ∀ B ∈ T.powerset, (if cond B ∧ Nat.log 2 (∏ p ∈ B, p) = i then ωR B else 0) ≤</span>
+<span class="line" id="L159"><span class="ln">  159</span>        (if B ⊆ Ti ∧ B.Nonempty ∧ (2 ^ i ≤ ∏ p ∈ B, p ∧ ∏ p ∈ B, p &lt; 2 * 2 ^ i) then</span>
+<span class="line" id="L160"><span class="ln">  160</span>          κ * (1 / (∏ p ∈ B, (p : ℝ))) else 0) := by</span>
+<span class="line" id="L161"><span class="ln">  161</span>      intro B hB</span>
+<span class="line" id="L162"><span class="ln">  162</span>      have hBT := mem_powerset.1 hB</span>
+<span class="line" id="L163"><span class="ln">  163</span>      by_cases hc : cond B ∧ Nat.log 2 (∏ p ∈ B, p) = i</span>
+<span class="line" id="L164"><span class="ln">  164</span>      · rw [if_pos hc]</span>
+<span class="line" id="L165"><span class="ln">  165</span>        have hpos := hprodpos B hBT</span>
+<span class="line" id="L166"><span class="ln">  166</span>        have hlow : 2 ^ i ≤ ∏ p ∈ B, p := by</span>
+<span class="line" id="L167"><span class="ln">  167</span>          rw [← hc.2]; exact Nat.pow_log_le_self 2 hpos.ne&#x27;</span>
+<span class="line" id="L168"><span class="ln">  168</span>        have hup : ∏ p ∈ B, p &lt; 2 * 2 ^ i := by</span>
+<span class="line" id="L169"><span class="ln">  169</span>          rw [← hc.2, ← pow_succ&#x27;]; exact Nat.lt_pow_succ_log_self (by norm_num) _</span>
+<span class="line" id="L170"><span class="ln">  170</span>        have hsub : B ⊆ Ti := by</span>
+<span class="line" id="L171"><span class="ln">  171</span>          intro p hp</span>
+<span class="line" id="L172"><span class="ln">  172</span>          rw [hTi, mem_filter]</span>
+<span class="line" id="L173"><span class="ln">  173</span>          refine ⟨hBT hp, ?_⟩</span>
+<span class="line" id="L174"><span class="ln">  174</span>          rcases le_total ⌊(i : ℝ) * u⌋₊ k₀ with hm | hm</span>
+<span class="line" id="L175"><span class="ln">  175</span>          · rw [hki, max_eq_right hm]; exact hTk p (hBT hp)</span>
+<span class="line" id="L176"><span class="ln">  176</span>          · rw [hki, max_eq_left hm]</span>
+<span class="line" id="L177"><span class="ln">  177</span>            have h1 : ((∏ q ∈ B, q : ℕ) : ℝ) ^ u &lt; p := hc.1.2.2 p hp</span>
+<span class="line" id="L178"><span class="ln">  178</span>            have h2 : (2 : ℝ) ^ (i : ℝ) ≤ ((∏ q ∈ B, q : ℕ) : ℝ) := by</span>
+<span class="line" id="L179"><span class="ln">  179</span>              rw [Real.rpow_natCast]; exact_mod_cast hlow</span>
+<span class="line" id="L180"><span class="ln">  180</span>            have h3 : ((2 : ℝ) ^ (i : ℝ)) ^ u ≤ ((∏ q ∈ B, q : ℕ) : ℝ) ^ u :=</span>
+<span class="line" id="L181"><span class="ln">  181</span>              Real.rpow_le_rpow (by positivity) h2 hu0.le</span>
+<span class="line" id="L182"><span class="ln">  182</span>            have h4 : (2 : ℝ) ^ ((⌊(i : ℝ) * u⌋₊ : ℕ) : ℝ) ≤ ((2 : ℝ) ^ (i : ℝ)) ^ u := by</span>
+<span class="line" id="L183"><span class="ln">  183</span>              rw [← Real.rpow_mul (by norm_num)]</span>
+<span class="line" id="L184"><span class="ln">  184</span>              exact Real.rpow_le_rpow_of_exponent_le (by norm_num) (Nat.floor_le (by positivity))</span>
+<span class="line" id="L185"><span class="ln">  185</span>            have h5 : ((2 ^ ⌊(i : ℝ) * u⌋₊ : ℕ) : ℝ) &lt; p := by</span>
+<span class="line" id="L186"><span class="ln">  186</span>              rw [Nat.cast_pow, ← Real.rpow_natCast]; push_cast; linarith</span>
+<span class="line" id="L187"><span class="ln">  187</span>            exact_mod_cast h5.le</span>
+<span class="line" id="L188"><span class="ln">  188</span>        rw [if_pos ⟨hsub, hc.1.1, hlow, hup⟩]</span>
+<span class="line" id="L189"><span class="ln">  189</span>        have hprodR : (0 : ℝ) &lt; ∏ p ∈ B, (p : ℝ) := by</span>
+<span class="line" id="L190"><span class="ln">  190</span>          rw [← Nat.cast_prod]; exact_mod_cast hpos</span>
+<span class="line" id="L191"><span class="ln">  191</span>        have := hκ B hBT hc.1.2.1</span>
+<span class="line" id="L192"><span class="ln">  192</span>        rw [mul_one_div, le_div_iff₀ hprodR]; exact this</span>
+<span class="line" id="L193"><span class="ln">  193</span>      · rw [if_neg hc]; split_ifs &lt;;&gt; [positivity; exact le_rfl]</span>
+<span class="line" id="L194"><span class="ln">  194</span>    refine (sum_le_sum hpt).trans ?_</span>
+<span class="line" id="L195"><span class="ln">  195</span>    -- move to the `Ti`-powerset and apply `block_rough`</span>
+<span class="line" id="L196"><span class="ln">  196</span>    have hsupp : ∑ B ∈ T.powerset, (if B ⊆ Ti ∧ B.Nonempty ∧</span>
+<span class="line" id="L197"><span class="ln">  197</span>        (2 ^ i ≤ ∏ p ∈ B, p ∧ ∏ p ∈ B, p &lt; 2 * 2 ^ i) then κ * (1 / (∏ p ∈ B, (p : ℝ))) else 0) =</span>
+<span class="line" id="L198"><span class="ln">  198</span>        κ * ∑ B ∈ (Ti.powerset.filter (fun B =&gt; B.Nonempty)).filter</span>
+<span class="line" id="L199"><span class="ln">  199</span>          (fun B =&gt; 2 ^ i ≤ ∏ p ∈ B, p ∧ ∏ p ∈ B, p &lt; 2 * 2 ^ i), (1 / (∏ p ∈ B, (p : ℝ))) := by</span>
+<span class="line" id="L200"><span class="ln">  200</span>      rw [mul_sum, sum_filter, sum_filter]</span>
+<span class="line" id="L201"><span class="ln">  201</span>      symm</span>
+<span class="line" id="L202"><span class="ln">  202</span>      rw [← sum_subset (powerset_mono.2 (filter_subset _ T : Ti ⊆ T)) (fun B hB hBn =&gt; ?_)]</span>
+<span class="line" id="L203"><span class="ln">  203</span>      · refine sum_congr rfl fun B hB =&gt; ?_</span>
+<span class="line" id="L204"><span class="ln">  204</span>        have hBTi : B ⊆ Ti := mem_powerset.1 hB</span>
+<span class="line" id="L205"><span class="ln">  205</span>        by_cases h1 : B.Nonempty &lt;;&gt; by_cases h2 : (2 ^ i ≤ ∏ p ∈ B, p ∧ ∏ p ∈ B, p &lt; 2 * 2 ^ i)</span>
+<span class="line" id="L206"><span class="ln">  206</span>        · rw [if_pos h1, if_pos h2, if_pos ⟨hBTi, h1, h2⟩]</span>
+<span class="line" id="L207"><span class="ln">  207</span>        · rw [if_pos h1, if_neg h2, if_neg (fun h =&gt; h2 h.2.2)]</span>
+<span class="line" id="L208"><span class="ln">  208</span>        · rw [if_neg h1, if_neg (fun h =&gt; h1 h.2.1)]</span>
+<span class="line" id="L209"><span class="ln">  209</span>        · rw [if_neg h1, if_neg (fun h =&gt; h1 h.2.1)]</span>
+<span class="line" id="L210"><span class="ln">  210</span>      · have : ¬ B ⊆ Ti := fun h =&gt; hBn (mem_powerset.2 h)</span>
+<span class="line" id="L211"><span class="ln">  211</span>        simp [this]</span>
+<span class="line" id="L212"><span class="ln">  212</span>    rw [hsupp]</span>
+<span class="line" id="L213"><span class="ln">  213</span>    rcases le_or_gt ki (i + 1) with hle | hgt</span>
+<span class="line" id="L214"><span class="ln">  214</span>    · have hb := block_rough Ti (fun p hp =&gt; hT p (filter_subset _ _ hp)) ki i hki3 hle</span>
+<span class="line" id="L215"><span class="ln">  215</span>        (fun p hp =&gt; (mem_filter.1 hp).2)</span>
+<span class="line" id="L216"><span class="ln">  216</span>      have hkiRpos : (0 : ℝ) &lt; ki := by exact_mod_cast (show 0 &lt; ki by omega)</span>
+<span class="line" id="L217"><span class="ln">  217</span>      have hu3 : ((i + 1 : ℕ) : ℝ) / ki ≤ 3 / u := by</span>
+<span class="line" id="L218"><span class="ln">  218</span>        rw [div_le_div_iff₀ hkiRpos hu0]; push_cast; nlinarith</span>
+<span class="line" id="L219"><span class="ln">  219</span>      have h12 : 12 / (ki : ℝ) ≤ 36 / (u * ((i : ℝ) + 1)) := by</span>
+<span class="line" id="L220"><span class="ln">  220</span>        rw [div_le_div_iff₀ hkiRpos (by positivity)]; nlinarith</span>
+<span class="line" id="L221"><span class="ln">  221</span>      have hr0 : 0 ≤ ((i + 1 : ℕ) : ℝ) / ki := by positivity</span>
+<span class="line" id="L222"><span class="ln">  222</span>      calc κ * _ ≤ κ * ((12 / (ki : ℝ)) * (Real.exp 4 * (((i + 1 : ℕ) : ℝ) / ki) ^ 4)) :=</span>
+<span class="line" id="L223"><span class="ln">  223</span>            mul_le_mul_of_nonneg_left hb hκ0</span>
+<span class="line" id="L224"><span class="ln">  224</span>        _ ≤ κ * ((36 / (u * ((i : ℝ) + 1))) * (Real.exp 4 * (3 / u) ^ 4)) := by</span>
+<span class="line" id="L225"><span class="ln">  225</span>            apply mul_le_mul_of_nonneg_left _ hκ0</span>
+<span class="line" id="L226"><span class="ln">  226</span>            apply mul_le_mul h12 _ (by positivity) (by positivity)</span>
+<span class="line" id="L227"><span class="ln">  227</span>            exact mul_le_mul_of_nonneg_left (pow_le_pow_left₀ hr0 hu3 4) (by positivity)</span>
+<span class="line" id="L228"><span class="ln">  228</span>        _ = κ * Real.exp 4 * (3 / u) ^ 4 * (36 / (u * ((i : ℝ) + 1))) := by ring</span>
+<span class="line" id="L229"><span class="ln">  229</span>    · -- the block is empty</span>
+<span class="line" id="L230"><span class="ln">  230</span>      rw [sum_eq_zero fun B hB =&gt; ?_]</span>
+<span class="line" id="L231"><span class="ln">  231</span>      · rw [mul_zero]; positivity</span>
+<span class="line" id="L232"><span class="ln">  232</span>      · exfalso</span>
+<span class="line" id="L233"><span class="ln">  233</span>        rw [mem_filter, mem_filter, mem_powerset] at hB</span>
+<span class="line" id="L234"><span class="ln">  234</span>        obtain ⟨⟨hBTi, ⟨p, hp⟩⟩, _, hup⟩ := hB</span>
+<span class="line" id="L235"><span class="ln">  235</span>        have h1 : p ≤ ∏ q ∈ B, q := Nat.le_of_dvd (prod_pos fun q hq =&gt;</span>
+<span class="line" id="L236"><span class="ln">  236</span>          (hT q (filter_subset _ _ (hBTi hq))).pos) (dvd_prod_of_mem _ hp)</span>
+<span class="line" id="L237"><span class="ln">  237</span>        have h2 : 2 ^ ki ≤ p := (mem_filter.1 (hBTi hp)).2</span>
+<span class="line" id="L238"><span class="ln">  238</span>        have h3 : 2 * 2 ^ i ≤ 2 ^ ki := by</span>
+<span class="line" id="L239"><span class="ln">  239</span>          rw [← pow_succ&#x27;]; exact Nat.pow_le_pow_right (by norm_num) (by omega)</span>
+<span class="line" id="L240"><span class="ln">  240</span>        omega</span>
+<span class="line" id="L241"><span class="ln">  241</span>  refine (sum_le_sum hblock).trans ?_</span>
+<span class="line" id="L242"><span class="ln">  242</span>  have hharm : ∑ i ∈ range (I + 1), (1 / ((i : ℝ) + 1)) ≤ 1 + Real.log ((I : ℝ) + 1) := by</span>
+<span class="line" id="L243"><span class="ln">  243</span>    have h := harmonic_le_one_add_log (I + 1)</span>
+<span class="line" id="L244"><span class="ln">  244</span>    have e : ((harmonic (I + 1) : ℚ) : ℝ) = ∑ i ∈ range (I + 1), (1 / ((i : ℝ) + 1)) := by</span>
+<span class="line" id="L245"><span class="ln">  245</span>      unfold harmonic; push_cast; simp [one_div]</span>
+<span class="line" id="L246"><span class="ln">  246</span>    rw [← e]; push_cast at h ⊢; exact h</span>
+<span class="line" id="L247"><span class="ln">  247</span>  calc ∑ i ∈ range (I + 1), κ * Real.exp 4 * (3 / u) ^ 4 * (36 / (u * ((i : ℝ) + 1)))</span>
+<span class="line" id="L248"><span class="ln">  248</span>      = κ * Real.exp 4 * (3 / u) ^ 4 * (36 / u) * ∑ i ∈ range (I + 1), (1 / ((i : ℝ) + 1)) := by</span>
+<span class="line" id="L249"><span class="ln">  249</span>        rw [mul_sum]; refine sum_congr rfl fun i _ =&gt; ?_; field_simp</span>
+<span class="line" id="L250"><span class="ln">  250</span>    _ ≤ κ * Real.exp 4 * (3 / u) ^ 4 * (36 / u) * (1 + Real.log ((I : ℝ) + 1)) :=</span>
+<span class="line" id="L251"><span class="ln">  251</span>        mul_le_mul_of_nonneg_left hharm (by positivity)</span>
+<span class="line" id="L252"><span class="ln">  252</span>    _ = κ * Real.exp 4 * 2916 * (1 + Real.log ((I : ℝ) + 1)) / u ^ 5 := by</span>
+<span class="line" id="L253"><span class="ln">  253</span>        field_simp; ring</span>
+<span class="line" id="L254"><span class="ln">  254</span></span>
+<span class="line" id="L255"><span class="ln">  255</span>/-! ## Splitting into the smooth and the rough part -/</span>
+<span class="line" id="L256"><span class="ln">  256</span></span>
+<span class="line" id="L257"><span class="ln">  257</span>lemma ωR_union (B₁ B₂ : Finset ℕ) (h : Disjoint B₁ B₂) : ωR (B₁ ∪ B₂) = ωR B₁ * ωR B₂ := by</span>
+<span class="line" id="L258"><span class="ln">  258</span>  unfold ωR; rw [prod_union h]</span>
+<span class="line" id="L259"><span class="ln">  259</span></span>
+<span class="line" id="L260"><span class="ln">  260</span>lemma powerset_split_sum (T : Finset ℕ) (X : ℕ) (f : Finset ℕ → ℝ) :</span>
+<span class="line" id="L261"><span class="ln">  261</span>    ∑ B ∈ T.powerset, f B =</span>
+<span class="line" id="L262"><span class="ln">  262</span>      ∑ B₁ ∈ (T.filter (· &lt; X)).powerset, ∑ B₂ ∈ (T.filter (X ≤ ·)).powerset, f (B₁ ∪ B₂) := by</span>
+<span class="line" id="L263"><span class="ln">  263</span>  classical</span>
+<span class="line" id="L264"><span class="ln">  264</span>  rw [← sum_product&#x27;]</span>
+<span class="line" id="L265"><span class="ln">  265</span>  refine sum_nbij&#x27; (fun B =&gt; (B.filter (· &lt; X), B.filter (X ≤ ·))) (fun x =&gt; x.1 ∪ x.2) ?_ ?_ ?_ ?_ ?_</span>
+<span class="line" id="L266"><span class="ln">  266</span>  · intro B hB</span>
+<span class="line" id="L267"><span class="ln">  267</span>    simp only [mem_coe, mem_powerset] at hB</span>
+<span class="line" id="L268"><span class="ln">  268</span>    simp only [mem_coe, mem_product, mem_powerset]</span>
+<span class="line" id="L269"><span class="ln">  269</span>    exact ⟨filter_subset_filter _ hB, filter_subset_filter _ hB⟩</span>
+<span class="line" id="L270"><span class="ln">  270</span>  · rintro ⟨B₁, B₂⟩ h</span>
+<span class="line" id="L271"><span class="ln">  271</span>    simp only [mem_coe, mem_product, mem_powerset] at h</span>
+<span class="line" id="L272"><span class="ln">  272</span>    simp only [mem_coe, mem_powerset]</span>
+<span class="line" id="L273"><span class="ln">  273</span>    exact union_subset (h.1.trans (filter_subset _ _)) (h.2.trans (filter_subset _ _))</span>
+<span class="line" id="L274"><span class="ln">  274</span>  · intro B _</span>
+<span class="line" id="L275"><span class="ln">  275</span>    ext p; simp only [mem_union, mem_filter]</span>
+<span class="line" id="L276"><span class="ln">  276</span>    constructor</span>
+<span class="line" id="L277"><span class="ln">  277</span>    · rintro (⟨h, _⟩ | ⟨h, _⟩) &lt;;&gt; exact h</span>
+<span class="line" id="L278"><span class="ln">  278</span>    · intro h; by_cases hx : p &lt; X</span>
+<span class="line" id="L279"><span class="ln">  279</span>      · exact Or.inl ⟨h, hx⟩</span>
+<span class="line" id="L280"><span class="ln">  280</span>      · exact Or.inr ⟨h, by omega⟩</span>
+<span class="line" id="L281"><span class="ln">  281</span>  · rintro ⟨B₁, B₂⟩ h</span>
+<span class="line" id="L282"><span class="ln">  282</span>    simp only [mem_coe, mem_product, mem_powerset] at h</span>
+<span class="line" id="L283"><span class="ln">  283</span>    have h1 : ∀ p ∈ B₁, p &lt; X := fun p hp =&gt; (mem_filter.1 (h.1 hp)).2</span>
+<span class="line" id="L284"><span class="ln">  284</span>    have h2 : ∀ p ∈ B₂, X ≤ p := fun p hp =&gt; (mem_filter.1 (h.2 hp)).2</span>
+<span class="line" id="L285"><span class="ln">  285</span>    simp only [Prod.mk.injEq]</span>
+<span class="line" id="L286"><span class="ln">  286</span>    constructor</span>
+<span class="line" id="L287"><span class="ln">  287</span>    · ext p; simp only [mem_filter, mem_union]</span>
+<span class="line" id="L288"><span class="ln">  288</span>      constructor</span>
+<span class="line" id="L289"><span class="ln">  289</span>      · rintro ⟨h3 | h3, h4⟩</span>
+<span class="line" id="L290"><span class="ln">  290</span>        · exact h3</span>
+<span class="line" id="L291"><span class="ln">  291</span>        · exact absurd (h2 p h3) (by omega)</span>
+<span class="line" id="L292"><span class="ln">  292</span>      · intro h3; exact ⟨Or.inl h3, h1 p h3⟩</span>
+<span class="line" id="L293"><span class="ln">  293</span>    · ext p; simp only [mem_filter, mem_union]</span>
+<span class="line" id="L294"><span class="ln">  294</span>      constructor</span>
+<span class="line" id="L295"><span class="ln">  295</span>      · rintro ⟨h3 | h3, h4⟩</span>
+<span class="line" id="L296"><span class="ln">  296</span>        · exact absurd (h1 p h3) (by omega)</span>
+<span class="line" id="L297"><span class="ln">  297</span>        · exact h3</span>
+<span class="line" id="L298"><span class="ln">  298</span>      · intro h3; exact ⟨Or.inr h3, h2 p h3⟩</span>
+<span class="line" id="L299"><span class="ln">  299</span>  · intro B _</span>
+<span class="line" id="L300"><span class="ln">  300</span>    simp only</span>
+<span class="line" id="L301"><span class="ln">  301</span>    congr 1; ext p; simp only [mem_union, mem_filter]</span>
+<span class="line" id="L302"><span class="ln">  302</span>    constructor</span>
+<span class="line" id="L303"><span class="ln">  303</span>    · intro h; by_cases hx : p &lt; X</span>
+<span class="line" id="L304"><span class="ln">  304</span>      · exact Or.inl ⟨h, hx⟩</span>
+<span class="line" id="L305"><span class="ln">  305</span>      · exact Or.inr ⟨h, by omega⟩</span>
+<span class="line" id="L306"><span class="ln">  306</span>    · rintro (⟨h, _⟩ | ⟨h, _⟩) &lt;;&gt; exact h</span>
+<span class="line" id="L307"><span class="ln">  307</span></span>
+<span class="line" id="L308"><span class="ln">  308</span>/-- The mass of a condition splits into the smooth part times the rough condition. -/</span>
+<span class="line" id="L309"><span class="ln">  309</span>theorem split_mass (T : Finset ℕ) (hT : ∀ p ∈ T, 5 ≤ p) (X : ℕ) (cond cond₂ : Finset ℕ → Prop)</span>
+<span class="line" id="L310"><span class="ln">  310</span>    [DecidablePred cond] [DecidablePred cond₂]</span>
+<span class="line" id="L311"><span class="ln">  311</span>    (h : ∀ B₁ ⊆ T.filter (· &lt; X), ∀ B₂ ⊆ T.filter (X ≤ ·), cond (B₁ ∪ B₂) → cond₂ B₂) :</span>
+<span class="line" id="L312"><span class="ln">  312</span>    ∑ B ∈ T.powerset, (if cond B then ωR B else 0) ≤</span>
+<span class="line" id="L313"><span class="ln">  313</span>      (∑ B₁ ∈ (T.filter (· &lt; X)).powerset, ωR B₁) *</span>
+<span class="line" id="L314"><span class="ln">  314</span>        ∑ B₂ ∈ (T.filter (X ≤ ·)).powerset, (if cond₂ B₂ then ωR B₂ else 0) := by</span>
+<span class="line" id="L315"><span class="ln">  315</span>  classical</span>
+<span class="line" id="L316"><span class="ln">  316</span>  rw [powerset_split_sum T X, sum_mul_sum]</span>
+<span class="line" id="L317"><span class="ln">  317</span>  refine sum_le_sum fun B₁ hB₁ =&gt; sum_le_sum fun B₂ hB₂ =&gt; ?_</span>
+<span class="line" id="L318"><span class="ln">  318</span>  have hB₁T := mem_powerset.1 hB₁</span>
+<span class="line" id="L319"><span class="ln">  319</span>  have hB₂T := mem_powerset.1 hB₂</span>
+<span class="line" id="L320"><span class="ln">  320</span>  have hdisj : Disjoint B₁ B₂ := by</span>
+<span class="line" id="L321"><span class="ln">  321</span>    rw [disjoint_left]; intro p h1 h2</span>
+<span class="line" id="L322"><span class="ln">  322</span>    have := (mem_filter.1 (hB₁T h1)).2; have := (mem_filter.1 (hB₂T h2)).2; omega</span>
+<span class="line" id="L323"><span class="ln">  323</span>  have hω1 := ωR_nonneg B₁ fun p hp =&gt; hT p (filter_subset _ _ (hB₁T hp))</span>
+<span class="line" id="L324"><span class="ln">  324</span>  have hω2 := ωR_nonneg B₂ fun p hp =&gt; hT p (filter_subset _ _ (hB₂T hp))</span>
+<span class="line" id="L325"><span class="ln">  325</span>  by_cases hc : cond (B₁ ∪ B₂)</span>
+<span class="line" id="L326"><span class="ln">  326</span>  · rw [if_pos hc, if_pos (h B₁ hB₁T B₂ hB₂T hc), ωR_union B₁ B₂ hdisj]</span>
+<span class="line" id="L327"><span class="ln">  327</span>  · rw [if_neg hc]; split_ifs &lt;;&gt; positivity</span>
+<span class="line" id="L328"><span class="ln">  328</span></span>
+<span class="line" id="L329"><span class="ln">  329</span>/-- The smooth mass, from the dyadic Mertens-type bound. -/</span>
+<span class="line" id="L330"><span class="ln">  330</span>theorem smooth_mass (V : Finset ℕ) (hV : ∀ p ∈ V, p.Prime ∧ 5 ≤ p) (K : ℕ)</span>
+<span class="line" id="L331"><span class="ln">  331</span>    (hVK : ∀ p ∈ V, p &lt; 2 ^ (K + 1)) :</span>
+<span class="line" id="L332"><span class="ln">  332</span>    ∑ B ∈ V.powerset, ωR B ≤ Real.exp 10 * ((K : ℝ) + 1) ^ 10 := by</span>
+<span class="line" id="L333"><span class="ln">  333</span>  rw [sum_ωR_powerset]</span>
+<span class="line" id="L334"><span class="ln">  334</span>  have h1 : ∏ p ∈ V, (1 + 1 / ((p : ℝ) - 3)) ≤ Real.exp (∑ p ∈ V, 1 / ((p : ℝ) - 3)) :=</span>
+<span class="line" id="L335"><span class="ln">  335</span>    GoldC.QuillonCopyG.prod_one_add_le_exp_sum V _ fun p hp =&gt; by</span>
+<span class="line" id="L336"><span class="ln">  336</span>      have : (5 : ℝ) ≤ p := by exact_mod_cast (hV p hp).2</span>
+<span class="line" id="L337"><span class="ln">  337</span>      apply div_nonneg zero_le_one; linarith</span>
+<span class="line" id="L338"><span class="ln">  338</span>  have h2 : ∑ p ∈ V, 1 / ((p : ℝ) - 3) ≤ 2.5 * ∑ p ∈ GoldC.QuillonCopyG.primesBelowPow (K + 1), (1 / (p : ℝ)) := by</span>
+<span class="line" id="L339"><span class="ln">  339</span>    rw [mul_sum]</span>
+<span class="line" id="L340"><span class="ln">  340</span>    calc ∑ p ∈ V, 1 / ((p : ℝ) - 3) ≤ ∑ p ∈ V, 2.5 * (1 / (p : ℝ)) := by</span>
+<span class="line" id="L341"><span class="ln">  341</span>          refine sum_le_sum fun p hp =&gt; ?_</span>
+<span class="line" id="L342"><span class="ln">  342</span>          have : (5 : ℝ) ≤ p := by exact_mod_cast (hV p hp).2</span>
+<span class="line" id="L343"><span class="ln">  343</span>          rw [div_le_iff₀ (by linarith)]; field_simp; linarith</span>
+<span class="line" id="L344"><span class="ln">  344</span>      _ ≤ _ := by</span>
+<span class="line" id="L345"><span class="ln">  345</span>          refine sum_le_sum_of_subset_of_nonneg ?_ fun _ _ _ =&gt; by positivity</span>
+<span class="line" id="L346"><span class="ln">  346</span>          intro p hp</span>
+<span class="line" id="L347"><span class="ln">  347</span>          simp only [GoldC.QuillonCopyG.primesBelowPow, mem_filter, mem_range]</span>
+<span class="line" id="L348"><span class="ln">  348</span>          exact ⟨hVK p hp, (hV p hp).1⟩</span>
+<span class="line" id="L349"><span class="ln">  349</span>  have h3 := GoldC.QuillonCopyG.sum_inv_primes_below_two_pow K</span>
+<span class="line" id="L350"><span class="ln">  350</span>  have h4 : ((harmonic K : ℚ) : ℝ) ≤ 1 + Real.log ((K : ℝ) + 1) := by</span>
+<span class="line" id="L351"><span class="ln">  351</span>    have := harmonic_le_one_add_log K</span>
+<span class="line" id="L352"><span class="ln">  352</span>    have hl : Real.log (K : ℝ) ≤ Real.log ((K : ℝ) + 1) := by</span>
+<span class="line" id="L353"><span class="ln">  353</span>      rcases Nat.eq_zero_or_pos K with h0 | hpos</span>
+<span class="line" id="L354"><span class="ln">  354</span>      · rw [h0]; simp</span>
+<span class="line" id="L355"><span class="ln">  355</span>      · exact Real.log_le_log (by exact_mod_cast hpos) (by linarith)</span>
+<span class="line" id="L356"><span class="ln">  356</span>    linarith</span>
+<span class="line" id="L357"><span class="ln">  357</span>  calc ∏ p ∈ V, (1 + 1 / ((p : ℝ) - 3)) ≤ Real.exp (10 * (1 + Real.log ((K : ℝ) + 1))) := by</span>
+<span class="line" id="L358"><span class="ln">  358</span>        refine h1.trans (Real.exp_le_exp.2 ?_)</span>
+<span class="line" id="L359"><span class="ln">  359</span>        linarith</span>
+<span class="line" id="L360"><span class="ln">  360</span>    _ = Real.exp 10 * ((K : ℝ) + 1) ^ 10 := by</span>
+<span class="line" id="L361"><span class="ln">  361</span>        rw [mul_add, mul_one, Real.exp_add]</span>
+<span class="line" id="L362"><span class="ln">  362</span>        congr 1</span>
+<span class="line" id="L363"><span class="ln">  363</span>        rw [show (10 : ℝ) * Real.log ((K : ℝ) + 1) = ((10 : ℕ) : ℝ) * Real.log ((K : ℝ) + 1) by norm_num,</span>
+<span class="line" id="L364"><span class="ln">  364</span>          ← Real.log_pow, Real.exp_log (by positivity)]</span>
+<span class="line" id="L365"><span class="ln">  365</span></span>
+<span class="line" id="L366"><span class="ln">  366</span>/-- `Σ_{n∈(a,b]} 1/n ≤ 1 + log(b/a)` for `1 ≤ a ≤ b`. -/</span>
+<span class="line" id="L367"><span class="ln">  367</span>lemma harmonic_add_Ioc (a : ℕ) : ∀ d, ((harmonic (a + d) : ℚ) : ℝ) =</span>
+<span class="line" id="L368"><span class="ln">  368</span>    ((harmonic a : ℚ) : ℝ) + ∑ n ∈ Ioc a (a + d), (1 / (n : ℝ))</span>
+<span class="line" id="L369"><span class="ln">  369</span>  | 0 =&gt; by simp</span>
+<span class="line" id="L370"><span class="ln">  370</span>  | d + 1 =&gt; by</span>
+<span class="line" id="L371"><span class="ln">  371</span>    have hI : Ioc a (a + (d + 1)) = insert (a + d + 1) (Ioc a (a + d)) := by</span>
+<span class="line" id="L372"><span class="ln">  372</span>      ext n; simp only [mem_Ioc, mem_insert]; omega</span>
+<span class="line" id="L373"><span class="ln">  373</span>    have hnot : a + d + 1 ∉ Ioc a (a + d) := by simp</span>
+<span class="line" id="L374"><span class="ln">  374</span>    rw [hI, sum_insert hnot, show a + (d + 1) = (a + d) + 1 by ring, harmonic_succ, Rat.cast_add,</span>
+<span class="line" id="L375"><span class="ln">  375</span>      harmonic_add_Ioc a d]</span>
+<span class="line" id="L376"><span class="ln">  376</span>    push_cast; ring</span>
+<span class="line" id="L377"><span class="ln">  377</span></span>
+<span class="line" id="L378"><span class="ln">  378</span>/-- `Σ_{n∈(a,b]} 1/n ≤ 1 + log(b/a)` for `1 ≤ a ≤ b`. -/</span>
+<span class="line" id="L379"><span class="ln">  379</span>lemma sum_Ioc_inv_le (a b : ℕ) (ha : 1 ≤ a) (hab : a ≤ b) :</span>
+<span class="line" id="L380"><span class="ln">  380</span>    ∑ n ∈ Ioc a b, (1 / (n : ℝ)) ≤ 1 + Real.log ((b : ℝ) / a) := by</span>
+<span class="line" id="L381"><span class="ln">  381</span>  have hsplit := harmonic_add_Ioc a (b - a)</span>
+<span class="line" id="L382"><span class="ln">  382</span>  rw [show a + (b - a) = b by omega] at hsplit</span>
+<span class="line" id="L383"><span class="ln">  383</span>  have h1 := harmonic_le_one_add_log b</span>
+<span class="line" id="L384"><span class="ln">  384</span>  have h2 := log_add_one_le_harmonic a</span>
+<span class="line" id="L385"><span class="ln">  385</span>  have haR : (0 : ℝ) &lt; a := by exact_mod_cast ha</span>
+<span class="line" id="L386"><span class="ln">  386</span>  have hbR : (0 : ℝ) &lt; b := by exact_mod_cast (show 0 &lt; b by omega)</span>
+<span class="line" id="L387"><span class="ln">  387</span>  have hl : Real.log (a : ℝ) ≤ Real.log ((a + 1 : ℕ) : ℝ) :=</span>
+<span class="line" id="L388"><span class="ln">  388</span>    Real.log_le_log haR (by push_cast; linarith)</span>
+<span class="line" id="L389"><span class="ln">  389</span>  rw [Real.log_div hbR.ne&#x27; haR.ne&#x27;]</span>
+<span class="line" id="L390"><span class="ln">  390</span>  linarith</span>
+<span class="line" id="L391"><span class="ln">  391</span></span>
+<span class="line" id="L392"><span class="ln">  392</span>/-- **Interval mass**: `Σ_{C, ∏C ∈ (a,b]} ω(C) ≤ Aω(b)·(1 + log(b/a))`. -/</span>
+<span class="line" id="L393"><span class="ln">  393</span>theorem interval_mass (T : Finset ℕ) (hT : ∀ p ∈ T, p.Prime ∧ 5 ≤ p) (a b : ℕ) (ha : 1 ≤ a)</span>
+<span class="line" id="L394"><span class="ln">  394</span>    (hab : a ≤ b) :</span>
+<span class="line" id="L395"><span class="ln">  395</span>    ∑ C ∈ T.powerset, (if (∏ p ∈ C, p) ∈ Ioc a b then ωR C else 0) ≤</span>
+<span class="line" id="L396"><span class="ln">  396</span>      Real.exp 37.5 * (1 + Nat.log 2 (Nat.log 2 b) : ℝ) ^ 30 * (1 + Real.log ((b : ℝ) / a)) := by</span>
+<span class="line" id="L397"><span class="ln">  397</span>  classical</span>
+<span class="line" id="L398"><span class="ln">  398</span>  set Aω : ℝ := Real.exp 37.5 * (1 + Nat.log 2 (Nat.log 2 b) : ℝ) ^ 30 with hAω</span>
+<span class="line" id="L399"><span class="ln">  399</span>  have hTp : ∀ p ∈ T, p.Prime := fun p hp =&gt; (hT p hp).1</span>
+<span class="line" id="L400"><span class="ln">  400</span>  have hpt : ∀ C ∈ T.powerset, (if (∏ p ∈ C, p) ∈ Ioc a b then ωR C else 0) ≤</span>
+<span class="line" id="L401"><span class="ln">  401</span>      (if (∏ p ∈ C, p) ∈ Ioc a b then Aω * (1 / ((∏ p ∈ C, p : ℕ) : ℝ)) else 0) := by</span>
+<span class="line" id="L402"><span class="ln">  402</span>    intro C hC</span>
+<span class="line" id="L403"><span class="ln">  403</span>    split_ifs with h</span>
+<span class="line" id="L404"><span class="ln">  404</span>    · have hCT := mem_powerset.1 hC</span>
+<span class="line" id="L405"><span class="ln">  405</span>      have := GoldC.QuillonOmega.omega_pointwise C (fun p hp =&gt; hT p (hCT hp)) b (mem_Ioc.1 h).2</span>
+<span class="line" id="L406"><span class="ln">  406</span>      unfold ωR; rw [Nat.cast_prod, mul_one_div]; exact this</span>
+<span class="line" id="L407"><span class="ln">  407</span>    · exact le_rfl</span>
+<span class="line" id="L408"><span class="ln">  408</span>  refine (sum_le_sum hpt).trans ?_</span>
+<span class="line" id="L409"><span class="ln">  409</span>  rw [← sum_filter]</span>
+<span class="line" id="L410"><span class="ln">  410</span>  have hinj := prod_injOn T hTp</span>
+<span class="line" id="L411"><span class="ln">  411</span>  rw [show ∑ C ∈ T.powerset.filter (fun C =&gt; (∏ p ∈ C, p) ∈ Ioc a b),</span>
+<span class="line" id="L412"><span class="ln">  412</span>      Aω * (1 / ((∏ p ∈ C, p : ℕ) : ℝ)) =</span>
+<span class="line" id="L413"><span class="ln">  413</span>      ∑ n ∈ (T.powerset.filter (fun C =&gt; (∏ p ∈ C, p) ∈ Ioc a b)).image (fun C =&gt; ∏ p ∈ C, p),</span>
+<span class="line" id="L414"><span class="ln">  414</span>        Aω * (1 / (n : ℝ)) by</span>
+<span class="line" id="L415"><span class="ln">  415</span>    rw [sum_image (fun C₁ h₁ C₂ h₂ heq =&gt; hinj (mem_filter.1 h₁).1 (mem_filter.1 h₂).1 heq)]]</span>
+<span class="line" id="L416"><span class="ln">  416</span>  rw [← mul_sum]</span>
+<span class="line" id="L417"><span class="ln">  417</span>  apply mul_le_mul_of_nonneg_left _ (by positivity)</span>
+<span class="line" id="L418"><span class="ln">  418</span>  refine (sum_le_sum_of_subset_of_nonneg ?_ fun _ _ _ =&gt; by positivity).trans (sum_Ioc_inv_le a b ha hab)</span>
+<span class="line" id="L419"><span class="ln">  419</span>  intro n hn</span>
+<span class="line" id="L420"><span class="ln">  420</span>  obtain ⟨C, hC, rfl⟩ := mem_image.1 hn</span>
+<span class="line" id="L421"><span class="ln">  421</span>  exact (mem_filter.1 hC).2</span>
+<span class="line" id="L422"><span class="ln">  422</span></span>
+<span class="line" id="L423"><span class="ln">  423</span>/-- **Total rough mass**: subsets `B ⊆ T` with `R₀ ≤ ∏B ≤ N₁` and no prime in `[X, (∏B)^u]`. -/</span>
+<span class="line" id="L424"><span class="ln">  424</span>theorem rough_total (T : Finset ℕ) (hT : ∀ p ∈ T, p.Prime ∧ 5 ≤ p) (X : ℕ) (u : ℝ) (hu0 : 0 &lt; u)</span>
+<span class="line" id="L425"><span class="ln">  425</span>    (hu1 : u ≤ 1) (R₀ N₁ k₀ K I : ℕ) (hk₀ : 3 ≤ k₀) (hR₀ : (2 : ℝ) ^ k₀ ≤ (R₀ : ℝ) ^ u)</span>
+<span class="line" id="L426"><span class="ln">  426</span>    (hXK : ∀ p ∈ T, p &lt; X → p &lt; 2 ^ (K + 1)) (hNI : N₁ &lt; 2 ^ (I + 1)) :</span>
+<span class="line" id="L427"><span class="ln">  427</span>    ∑ B ∈ T.powerset, (if R₀ ≤ ∏ p ∈ B, p ∧ ∏ p ∈ B, p ≤ N₁ ∧</span>
+<span class="line" id="L428"><span class="ln">  428</span>        ∀ p ∈ B, p &lt; X ∨ ((∏ q ∈ B, q : ℕ) : ℝ) ^ u &lt; p then ωR B else 0) ≤</span>
+<span class="line" id="L429"><span class="ln">  429</span>      Real.exp 10 * ((K : ℝ) + 1) ^ 10 *</span>
+<span class="line" id="L430"><span class="ln">  430</span>        (1 + Real.exp (3 * (Nat.log 2 N₁ : ℝ) / ((2 : ℝ) ^ k₀ - 3)) * Real.exp 4 * 2916 *</span>
+<span class="line" id="L431"><span class="ln">  431</span>          (1 + Real.log ((I : ℝ) + 1)) / u ^ 5) := by</span>
+<span class="line" id="L432"><span class="ln">  432</span>  classical</span>
+<span class="line" id="L433"><span class="ln">  433</span>  set κ := Real.exp (3 * (Nat.log 2 N₁ : ℝ) / ((2 : ℝ) ^ k₀ - 3)) with hκ</span>
+<span class="line" id="L434"><span class="ln">  434</span>  have hT5 : ∀ p ∈ T, 5 ≤ p := fun p hp =&gt; (hT p hp).2</span>
+<span class="line" id="L435"><span class="ln">  435</span>  set T₂&#x27; := (T.filter (X ≤ ·)).filter (fun p =&gt; 2 ^ k₀ ≤ p) with hT₂&#x27;</span>
+<span class="line" id="L436"><span class="ln">  436</span>  set cond₂ : Finset ℕ → Prop := fun B₂ =&gt; B₂ = ∅ ∨ (B₂ ⊆ T₂&#x27; ∧ B₂.Nonempty ∧ ∏ p ∈ B₂, p ≤ N₁ ∧</span>
+<span class="line" id="L437"><span class="ln">  437</span>      ∀ p ∈ B₂, ((∏ q ∈ B₂, q : ℕ) : ℝ) ^ u &lt; p) with hcond₂</span>
+<span class="line" id="L438"><span class="ln">  438</span>  have hsplit := split_mass T hT5 X (fun B =&gt; R₀ ≤ ∏ p ∈ B, p ∧ ∏ p ∈ B, p ≤ N₁ ∧</span>
+<span class="line" id="L439"><span class="ln">  439</span>      ∀ p ∈ B, p &lt; X ∨ ((∏ q ∈ B, q : ℕ) : ℝ) ^ u &lt; p) cond₂ (by</span>
+<span class="line" id="L440"><span class="ln">  440</span>    intro B₁ hB₁ B₂ hB₂ hc</span>
+<span class="line" id="L441"><span class="ln">  441</span>    rcases B₂.eq_empty_or_nonempty with h0 | hne</span>
+<span class="line" id="L442"><span class="ln">  442</span>    · exact Or.inl h0</span>
+<span class="line" id="L443"><span class="ln">  443</span>    · right</span>
+<span class="line" id="L444"><span class="ln">  444</span>      have hdisj : Disjoint B₁ B₂ := by</span>
+<span class="line" id="L445"><span class="ln">  445</span>        rw [disjoint_left]; intro p h1 h2</span>
+<span class="line" id="L446"><span class="ln">  446</span>        have := (mem_filter.1 (hB₁ h1)).2; have := (mem_filter.1 (hB₂ h2)).2; omega</span>
+<span class="line" id="L447"><span class="ln">  447</span>      have hprod : ∏ p ∈ B₁ ∪ B₂, p = (∏ p ∈ B₁, p) * ∏ p ∈ B₂, p := prod_union hdisj</span>
+<span class="line" id="L448"><span class="ln">  448</span>      have hB₁pos : 0 &lt; ∏ p ∈ B₁, p := prod_pos fun p hp =&gt; (hT p (filter_subset _ _ (hB₁ hp))).1.pos</span>
+<span class="line" id="L449"><span class="ln">  449</span>      have hle : ∏ p ∈ B₂, p ≤ ∏ p ∈ B₁ ∪ B₂, p := by</span>
+<span class="line" id="L450"><span class="ln">  450</span>        rw [hprod]; exact Nat.le_mul_of_pos_left _ hB₁pos</span>
+<span class="line" id="L451"><span class="ln">  451</span>      have hlarge : ∀ p ∈ B₂, ((∏ q ∈ B₁ ∪ B₂, q : ℕ) : ℝ) ^ u &lt; p := by</span>
+<span class="line" id="L452"><span class="ln">  452</span>        intro p hp</span>
+<span class="line" id="L453"><span class="ln">  453</span>        rcases hc.2.2 p (mem_union_right _ hp) with h | h</span>
+<span class="line" id="L454"><span class="ln">  454</span>        · have := (mem_filter.1 (hB₂ hp)).2; omega</span>
+<span class="line" id="L455"><span class="ln">  455</span>        · exact h</span>
+<span class="line" id="L456"><span class="ln">  456</span>      refine ⟨fun p hp =&gt; ?_, hne, hle.trans hc.2.1, fun p hp =&gt; ?_⟩</span>
+<span class="line" id="L457"><span class="ln">  457</span>      · rw [hT₂&#x27;, mem_filter]</span>
+<span class="line" id="L458"><span class="ln">  458</span>        refine ⟨hB₂ hp, ?_⟩</span>
+<span class="line" id="L459"><span class="ln">  459</span>        have h1 := hlarge p hp</span>
+<span class="line" id="L460"><span class="ln">  460</span>        have h2 : (R₀ : ℝ) ^ u ≤ ((∏ q ∈ B₁ ∪ B₂, q : ℕ) : ℝ) ^ u :=</span>
+<span class="line" id="L461"><span class="ln">  461</span>          Real.rpow_le_rpow (Nat.cast_nonneg _) (by exact_mod_cast hc.1) hu0.le</span>
+<span class="line" id="L462"><span class="ln">  462</span>        have : ((2 ^ k₀ : ℕ) : ℝ) &lt; p := by push_cast; linarith</span>
+<span class="line" id="L463"><span class="ln">  463</span>        exact_mod_cast this.le</span>
+<span class="line" id="L464"><span class="ln">  464</span>      · have h1 := hlarge p hp</span>
+<span class="line" id="L465"><span class="ln">  465</span>        have h2 : ((∏ q ∈ B₂, q : ℕ) : ℝ) ^ u ≤ ((∏ q ∈ B₁ ∪ B₂, q : ℕ) : ℝ) ^ u :=</span>
+<span class="line" id="L466"><span class="ln">  466</span>          Real.rpow_le_rpow (Nat.cast_nonneg _) (by exact_mod_cast hle) hu0.le</span>
+<span class="line" id="L467"><span class="ln">  467</span>        linarith)</span>
+<span class="line" id="L468"><span class="ln">  468</span>  refine hsplit.trans ?_</span>
+<span class="line" id="L469"><span class="ln">  469</span>  have hsm := smooth_mass (T.filter (· &lt; X)) (fun p hp =&gt; hT p (filter_subset _ _ hp)) K</span>
+<span class="line" id="L470"><span class="ln">  470</span>    (fun p hp =&gt; hXK p (filter_subset _ _ hp) (mem_filter.1 hp).2)</span>
+<span class="line" id="L471"><span class="ln">  471</span>  have hsm0 : 0 ≤ ∑ B₁ ∈ (T.filter (· &lt; X)).powerset, ωR B₁ :=</span>
+<span class="line" id="L472"><span class="ln">  472</span>    sum_nonneg fun B hB =&gt; ωR_nonneg B fun p hp =&gt; hT5 p (filter_subset _ _ ((mem_powerset.1 hB) hp))</span>
+<span class="line" id="L473"><span class="ln">  473</span>  have hk8 : (8 : ℝ) ≤ (2 : ℝ) ^ k₀ := by</span>
+<span class="line" id="L474"><span class="ln">  474</span>    have : (2 : ℝ) ^ 3 ≤ (2 : ℝ) ^ k₀ := pow_le_pow_right₀ (by norm_num) hk₀</span>
+<span class="line" id="L475"><span class="ln">  475</span>    norm_num at this; linarith</span>
+<span class="line" id="L476"><span class="ln">  476</span>  have hκ0 : 0 ≤ κ := (Real.exp_pos _).le</span>
+<span class="line" id="L477"><span class="ln">  477</span>  -- the rough factor</span>
+<span class="line" id="L478"><span class="ln">  478</span>  have hrough : ∑ B₂ ∈ (T.filter (X ≤ ·)).powerset, (if cond₂ B₂ then ωR B₂ else 0) ≤</span>
+<span class="line" id="L479"><span class="ln">  479</span>      1 + κ * Real.exp 4 * 2916 * (1 + Real.log ((I : ℝ) + 1)) / u ^ 5 := by</span>
+<span class="line" id="L480"><span class="ln">  480</span>    have hemp : ∅ ∈ (T.filter (X ≤ ·)).powerset := empty_mem_powerset _</span>
+<span class="line" id="L481"><span class="ln">  481</span>    rw [← add_sum_erase _ _ hemp]</span>
+<span class="line" id="L482"><span class="ln">  482</span>    have h0 : (if cond₂ ∅ then ωR ∅ else 0) = 1 := by</span>
+<span class="line" id="L483"><span class="ln">  483</span>      rw [if_pos (Or.inl rfl)]; simp [ωR]</span>
+<span class="line" id="L484"><span class="ln">  484</span>    rw [h0]</span>
+<span class="line" id="L485"><span class="ln">  485</span>    refine add_le_add le_rfl ?_</span>
+<span class="line" id="L486"><span class="ln">  486</span>    have hT₂&#x27;p : ∀ p ∈ T₂&#x27;, p.Prime := fun p hp =&gt; (hT p (filter_subset _ _ (filter_subset _ _ hp))).1</span>
+<span class="line" id="L487"><span class="ln">  487</span>    have hsr := selfrough_mass T₂&#x27; hT₂&#x27;p u hu0 hu1 k₀ hk₀ (fun p hp =&gt; (mem_filter.1 hp).2) N₁ I hNI κ hκ0</span>
+<span class="line" id="L488"><span class="ln">  488</span>      (by</span>
+<span class="line" id="L489"><span class="ln">  489</span>        intro B hB hBN</span>
+<span class="line" id="L490"><span class="ln">  490</span>        have hz : 4 ≤ 2 ^ k₀ := le_trans (by norm_num) (Nat.pow_le_pow_right (by norm_num) hk₀)</span>
+<span class="line" id="L491"><span class="ln">  491</span>        refine (omega_mul_prod_le B (2 ^ k₀) hz fun p hp =&gt; (mem_filter.1 (hB hp)).2).trans ?_</span>
+<span class="line" id="L492"><span class="ln">  492</span>        apply Real.exp_le_exp.2</span>
+<span class="line" id="L493"><span class="ln">  493</span>        have hcard : B.card ≤ Nat.log 2 N₁ := by</span>
+<span class="line" id="L494"><span class="ln">  494</span>          rcases Nat.eq_zero_or_pos B.card with h | h</span>
+<span class="line" id="L495"><span class="ln">  495</span>          · omega</span>
+<span class="line" id="L496"><span class="ln">  496</span>          · apply Nat.le_log_of_pow_le (by norm_num)</span>
+<span class="line" id="L497"><span class="ln">  497</span>            calc 2 ^ B.card = ∏ _p ∈ B, 2 := by rw [prod_const]</span>
+<span class="line" id="L498"><span class="ln">  498</span>              _ ≤ ∏ p ∈ B, p := prod_le_prod&#x27; fun p hp =&gt; (hT₂&#x27;p p (hB hp)).two_le</span>
+<span class="line" id="L499"><span class="ln">  499</span>              _ ≤ N₁ := hBN</span>
+<span class="line" id="L500"><span class="ln">  500</span>        have hcR : (B.card : ℝ) ≤ Nat.log 2 N₁ := by exact_mod_cast hcard</span>
+<span class="line" id="L501"><span class="ln">  501</span>        push_cast</span>
+<span class="line" id="L502"><span class="ln">  502</span>        apply div_le_div_of_nonneg_right _ (by linarith)</span>
+<span class="line" id="L503"><span class="ln">  503</span>        linarith)</span>
+<span class="line" id="L504"><span class="ln">  504</span>    refine le_trans ?_ hsr</span>
+<span class="line" id="L505"><span class="ln">  505</span>    -- terms on the erased powerset are supported on `T₂&#x27;`</span>
+<span class="line" id="L506"><span class="ln">  506</span>    calc ∑ B₂ ∈ ((T.filter (X ≤ ·)).powerset).erase ∅, (if cond₂ B₂ then ωR B₂ else 0)</span>
+<span class="line" id="L507"><span class="ln">  507</span>        ≤ ∑ B₂ ∈ (T.filter (X ≤ ·)).powerset, (if B₂ ⊆ T₂&#x27; ∧ (B₂.Nonempty ∧ ∏ p ∈ B₂, p ≤ N₁ ∧</span>
+<span class="line" id="L508"><span class="ln">  508</span>            ∀ p ∈ B₂, ((∏ q ∈ B₂, q : ℕ) : ℝ) ^ u &lt; p) then ωR B₂ else 0) := by</span>
+<span class="line" id="L509"><span class="ln">  509</span>          refine (sum_le_sum fun B₂ hB₂ =&gt; ?_).trans (sum_le_sum_of_subset_of_nonneg (erase_subset _ _)</span>
+<span class="line" id="L510"><span class="ln">  510</span>            fun B₂ hB₂ _ =&gt; ?_)</span>
+<span class="line" id="L511"><span class="ln">  511</span>          · have hne : B₂ ≠ ∅ := ne_of_mem_erase hB₂</span>
+<span class="line" id="L512"><span class="ln">  512</span>            by_cases hc : cond₂ B₂</span>
+<span class="line" id="L513"><span class="ln">  513</span>            · rcases hc with h | h</span>
+<span class="line" id="L514"><span class="ln">  514</span>              · exact absurd h hne</span>
+<span class="line" id="L515"><span class="ln">  515</span>              · rw [if_pos (Or.inr h), if_pos h]</span>
+<span class="line" id="L516"><span class="ln">  516</span>            · rw [if_neg hc]; split_ifs</span>
+<span class="line" id="L517"><span class="ln">  517</span>              · exact ωR_nonneg B₂ fun p hp =&gt; hT5 p (filter_subset _ _</span>
+<span class="line" id="L518"><span class="ln">  518</span>                  ((mem_powerset.1 (mem_of_mem_erase hB₂)) hp))</span>
+<span class="line" id="L519"><span class="ln">  519</span>              · exact le_rfl</span>
+<span class="line" id="L520"><span class="ln">  520</span>          · split_ifs</span>
+<span class="line" id="L521"><span class="ln">  521</span>            · exact ωR_nonneg B₂ fun p hp =&gt; hT5 p (filter_subset _ _ ((mem_powerset.1 hB₂) hp))</span>
+<span class="line" id="L522"><span class="ln">  522</span>            · exact le_rfl</span>
+<span class="line" id="L523"><span class="ln">  523</span>      _ = ∑ B₂ ∈ T₂&#x27;.powerset, (if B₂.Nonempty ∧ ∏ p ∈ B₂, p ≤ N₁ ∧</span>
+<span class="line" id="L524"><span class="ln">  524</span>            ∀ p ∈ B₂, ((∏ q ∈ B₂, q : ℕ) : ℝ) ^ u &lt; p then ωR B₂ else 0) := by</span>
+<span class="line" id="L525"><span class="ln">  525</span>          rw [← sum_filter, ← sum_filter]</span>
+<span class="line" id="L526"><span class="ln">  526</span>          congr 1</span>
+<span class="line" id="L527"><span class="ln">  527</span>          ext B₂</span>
+<span class="line" id="L528"><span class="ln">  528</span>          simp only [mem_filter, mem_powerset]</span>
+<span class="line" id="L529"><span class="ln">  529</span>          constructor</span>
+<span class="line" id="L530"><span class="ln">  530</span>          · rintro ⟨_, h1, h2⟩; exact ⟨h1, h2⟩</span>
+<span class="line" id="L531"><span class="ln">  531</span>          · rintro ⟨h1, h2⟩; exact ⟨h1.trans (filter_subset _ _), h1, h2⟩</span>
+<span class="line" id="L532"><span class="ln">  532</span>  have hr0 : 0 ≤ ∑ B₂ ∈ (T.filter (X ≤ ·)).powerset, (if cond₂ B₂ then ωR B₂ else 0) :=</span>
+<span class="line" id="L533"><span class="ln">  533</span>    sum_nonneg fun B₂ hB₂ =&gt; by</span>
+<span class="line" id="L534"><span class="ln">  534</span>      split_ifs</span>
+<span class="line" id="L535"><span class="ln">  535</span>      · exact ωR_nonneg B₂ fun p hp =&gt; hT5 p (filter_subset _ _ ((mem_powerset.1 hB₂) hp))</span>
+<span class="line" id="L536"><span class="ln">  536</span>      · exact le_rfl</span>
+<span class="line" id="L537"><span class="ln">  537</span>  exact mul_le_mul hsm hrough hr0 (by positivity)</span>
+<span class="line" id="L538"><span class="ln">  538</span></span>
+<span class="line" id="L539"><span class="ln">  539</span>end GoldC.QuillonResidue</span>
+<span class="line" id="L540"><span class="ln">  540</span></span>
+<span class="line" id="L541"><span class="ln">  541</span>#print axioms GoldC.QuillonResidue.omega_mul_prod_le</span>
+<span class="line" id="L542"><span class="ln">  542</span>#print axioms GoldC.QuillonResidue.block_rough</span>
+<span class="line" id="L543"><span class="ln">  543</span>#print axioms GoldC.QuillonResidue.selfrough_mass</span>
+<span class="line" id="L544"><span class="ln">  544</span>#print axioms GoldC.QuillonResidue.split_mass</span>
+<span class="line" id="L545"><span class="ln">  545</span>#print axioms GoldC.QuillonResidue.smooth_mass</span>
+<span class="line" id="L546"><span class="ln">  546</span>#print axioms GoldC.QuillonResidue.interval_mass</span>
+<span class="line" id="L547"><span class="ln">  547</span>#print axioms GoldC.QuillonResidue.rough_total</span>
+</pre></div></body></html>

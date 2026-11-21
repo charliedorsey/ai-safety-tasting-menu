@@ -1,0 +1,247 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · GoldB/DoubleSum.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>GoldB/DoubleSum.lean</h1><p class="meta">LEAN/GoldB/DoubleSum.lean · 246 lines · SHA-256 0518e9b37241b6aa07f788d8d4579814dfaf9d0226e2c4134ab36edf81d96a1a</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import GoldB.Grid</span>
+<span class="l" id="L2"><span class="n">2</span>import GoldB.RealAux</span>
+<span class="l" id="L3"><span class="n">3</span></span>
+<span class="l" id="L4"><span class="n">4</span>/-!</span>
+<span class="l" id="L5"><span class="n">5</span># GoldB.DoubleSum — Vinogradov&#x27;s lemma on double sums (Karatsuba 1971, (5)–(6))</span>
+<span class="l" id="L6"><span class="n">6</span></span>
+<span class="l" id="L7"><span class="n">7</span>For `Q ≥ 1`, `Z = [0, Q)`, `b ≥ 1` and real `B_j` (`j &lt; k`, attached to `(yz)^{j+1}`):</span>
+<span class="l" id="L8"><span class="n">8</span></span>
+<span class="l" id="L9"><span class="n">9</span>`|∑_{y,z ∈ Z} e(∑_j B_j (yz)^{j+1})|^{4b²} ≤ Q^{8b²-4b} J_{b,k}(Z)² ∏_j 𝔖_j`,</span>
+<span class="l" id="L10"><span class="n">10</span>`𝔖_j = ∑_{|μ| ≤ L_j} min(2L_j+1, 1/(2‖B_j μ‖))`, `L_j = b (Q-1)^{j+1}`.</span>
+<span class="l" id="L11"><span class="n">11</span>-/</span>
+<span class="l" id="L12"><span class="n">12</span></span>
+<span class="l" id="L13"><span class="n">13</span>open Finset Complex</span>
+<span class="l" id="L14"><span class="n">14</span></span>
+<span class="l" id="L15"><span class="n">15</span>namespace GoldB</span>
+<span class="l" id="L16"><span class="n">16</span></span>
+<span class="l" id="L17"><span class="n">17</span>/-- the box radius for the `j`-th power sum -/</span>
+<span class="l" id="L18"><span class="n">18</span>def Lbox (b Q : ℕ) (j : ℕ) : ℕ := b * (Q - 1) ^ (j + 1)</span>
+<span class="l" id="L19"><span class="n">19</span></span>
+<span class="l" id="L20"><span class="n">20</span>/-- the integer interval `[0, Q)` -/</span>
+<span class="l" id="L21"><span class="n">21</span>def Zr (Q : ℕ) : Finset ℤ := Ico (0 : ℤ) Q</span>
+<span class="l" id="L22"><span class="n">22</span></span>
+<span class="l" id="L23"><span class="n">23</span>lemma card_Zr (Q : ℕ) : (Zr Q).card = Q := by simp [Zr]</span>
+<span class="l" id="L24"><span class="n">24</span></span>
+<span class="l" id="L25"><span class="n">25</span>lemma ee_sum_pow (Z : Finset ℤ) (φ : ℤ → ℝ) (b : ℕ) :</span>
+<span class="l" id="L26"><span class="n">26</span>    (∑ z ∈ Z, ee (φ z)) ^ b = ∑ z ∈ tup b Z, ee (∑ i, φ (z i)) := by</span>
+<span class="l" id="L27"><span class="n">27</span>  classical</span>
+<span class="l" id="L28"><span class="n">28</span>  calc</span>
+<span class="l" id="L29"><span class="n">29</span>    (∑ z ∈ Z, ee (φ z)) ^ b =</span>
+<span class="l" id="L30"><span class="n">30</span>        ∑ z ∈ tup b Z, ∏ i, ee (φ (z i)) := by</span>
+<span class="l" id="L31"><span class="n">31</span>          simpa only [tup] using (Finset.sum_pow&#x27; Z (fun z : ℤ =&gt; ee (φ z)) b)</span>
+<span class="l" id="L32"><span class="n">32</span>    _ = ∑ z ∈ tup b Z, ee (∑ i, φ (z i)) := by</span>
+<span class="l" id="L33"><span class="n">33</span>          apply Finset.sum_congr rfl</span>
+<span class="l" id="L34"><span class="n">34</span>          intro z hz</span>
+<span class="l" id="L35"><span class="n">35</span>          simpa using</span>
+<span class="l" id="L36"><span class="n">36</span>            (ee_sum (Finset.univ : Finset (Fin b)) (fun i =&gt; φ (z i))).symm</span>
+<span class="l" id="L37"><span class="n">37</span></span>
+<span class="l" id="L38"><span class="n">38</span>lemma phase_swap {k b : ℕ} (β : Fin k → ℝ) (z : Fin b → ℤ) :</span>
+<span class="l" id="L39"><span class="n">39</span>    ∑ i, ∑ j, β j * ((z i : ℝ)) ^ ((j : ℕ) + 1) = ∑ j, β j * (psv k z j : ℝ) := by</span>
+<span class="l" id="L40"><span class="n">40</span>  rw [Finset.sum_comm]</span>
+<span class="l" id="L41"><span class="n">41</span>  apply sum_congr rfl; intro j _</span>
+<span class="l" id="L42"><span class="n">42</span>  simp [psv, Finset.mul_sum]</span>
+<span class="l" id="L43"><span class="n">43</span></span>
+<span class="l" id="L44"><span class="n">44</span>/-- the `2b`-th moment of a Weyl-type sum as a sum over pairs of tuples -/</span>
+<span class="l" id="L45"><span class="n">45</span>lemma norm_pow_eq_pairs {k : ℕ} (Z : Finset ℤ) (β : Fin k → ℝ) (b : ℕ) :</span>
+<span class="l" id="L46"><span class="n">46</span>    ((‖∑ z ∈ Z, ee (∑ j, β j * (z : ℝ) ^ ((j : ℕ) + 1))‖ ^ (2 * b) : ℝ) : ℂ) =</span>
+<span class="l" id="L47"><span class="n">47</span>      ∑ zz ∈ tup b Z ×ˢ tup b Z,</span>
+<span class="l" id="L48"><span class="n">48</span>        ee (∑ j, β j * ((psv k zz.1 j : ℝ) - (psv k zz.2 j : ℝ))) := by</span>
+<span class="l" id="L49"><span class="n">49</span>  set S := ∑ z ∈ Z, ee (∑ j, β j * (z : ℝ) ^ ((j : ℕ) + 1))</span>
+<span class="l" id="L50"><span class="n">50</span>  have h1 : ((‖S‖ ^ (2 * b) : ℝ) : ℂ) = S ^ b * (starRingEnd ℂ) (S ^ b) := by</span>
+<span class="l" id="L51"><span class="n">51</span>    rw [pow_mul, map_pow, ← mul_pow]</span>
+<span class="l" id="L52"><span class="n">52</span>    rw [Complex.mul_conj, Complex.normSq_eq_norm_sq]; push_cast; ring</span>
+<span class="l" id="L53"><span class="n">53</span>  rw [h1, ee_sum_pow, map_sum, sum_mul_sum, ← sum_product&#x27;]</span>
+<span class="l" id="L54"><span class="n">54</span>  apply sum_congr rfl; intro zz _</span>
+<span class="l" id="L55"><span class="n">55</span>  rw [← ee_neg, ← ee_add, phase_swap, phase_swap]</span>
+<span class="l" id="L56"><span class="n">56</span>  congr 1</span>
+<span class="l" id="L57"><span class="n">57</span>  rw [← sum_neg_distrib, ← sum_add_distrib]</span>
+<span class="l" id="L58"><span class="n">58</span>  apply sum_congr rfl; intro j _; ring</span>
+<span class="l" id="L59"><span class="n">59</span></span>
+<span class="l" id="L60"><span class="n">60</span>lemma psv_Zr_range {k b Q : ℕ} (hQ : 1 ≤ Q) (z : Fin b → ℤ) (hz : z ∈ tup b (Zr Q)) (j : Fin k) :</span>
+<span class="l" id="L61"><span class="n">61</span>    0 ≤ psv k z j ∧ psv k z j ≤ (Lbox b Q j : ℤ) := by</span>
+<span class="l" id="L62"><span class="n">62</span>  unfold psv Lbox</span>
+<span class="l" id="L63"><span class="n">63</span>  have hz&#x27; : ∀ i, 0 ≤ z i ∧ z i ≤ (Q : ℤ) - 1 := by</span>
+<span class="l" id="L64"><span class="n">64</span>    intro i</span>
+<span class="l" id="L65"><span class="n">65</span>    have := Fintype.mem_piFinset.mp hz i</span>
+<span class="l" id="L66"><span class="n">66</span>    simp [Zr] at this; omega</span>
+<span class="l" id="L67"><span class="n">67</span>  constructor</span>
+<span class="l" id="L68"><span class="n">68</span>  · exact sum_nonneg (fun i _ =&gt; pow_nonneg (hz&#x27; i).1 _)</span>
+<span class="l" id="L69"><span class="n">69</span>  · calc ∑ i, z i ^ ((j : ℕ) + 1) ≤ ∑ _i : Fin b, ((Q : ℤ) - 1) ^ ((j : ℕ) + 1) := by</span>
+<span class="l" id="L70"><span class="n">70</span>          apply sum_le_sum; intro i _</span>
+<span class="l" id="L71"><span class="n">71</span>          exact pow_le_pow_left₀ (hz&#x27; i).1 (hz&#x27; i).2 _</span>
+<span class="l" id="L72"><span class="n">72</span>      _ = ((b * (Q - 1) ^ ((j : ℕ) + 1) : ℕ) : ℤ) := by</span>
+<span class="l" id="L73"><span class="n">73</span>          simp; rw [Nat.cast_sub hQ]; simp</span>
+<span class="l" id="L74"><span class="n">74</span></span>
+<span class="l" id="L75"><span class="n">75</span>/-- the box of possible difference vectors -/</span>
+<span class="l" id="L76"><span class="n">76</span>def Lam (k b Q : ℕ) : Finset (Fin k → ℤ) :=</span>
+<span class="l" id="L77"><span class="n">77</span>  Fintype.piFinset fun j : Fin k =&gt; Icc (-(Lbox b Q j : ℤ)) (Lbox b Q j)</span>
+<span class="l" id="L78"><span class="n">78</span></span>
+<span class="l" id="L79"><span class="n">79</span>lemma diff_mem_Lam {k b Q : ℕ} (hQ : 1 ≤ Q) (zz : (Fin b → ℤ) × (Fin b → ℤ))</span>
+<span class="l" id="L80"><span class="n">80</span>    (h : zz ∈ tup b (Zr Q) ×ˢ tup b (Zr Q)) : psv k zz.1 - psv k zz.2 ∈ Lam k b Q := by</span>
+<span class="l" id="L81"><span class="n">81</span>  rw [mem_product] at h</span>
+<span class="l" id="L82"><span class="n">82</span>  rw [Lam, Fintype.mem_piFinset]</span>
+<span class="l" id="L83"><span class="n">83</span>  intro j</span>
+<span class="l" id="L84"><span class="n">84</span>  have h1 := psv_Zr_range (k := k) hQ zz.1 h.1 j</span>
+<span class="l" id="L85"><span class="n">85</span>  have h2 := psv_Zr_range (k := k) hQ zz.2 h.2 j</span>
+<span class="l" id="L86"><span class="n">86</span>  rw [mem_Icc]; simp only [Pi.sub_apply]; constructor &lt;;&gt; linarith [h1.1, h1.2, h2.1, h2.2]</span>
+<span class="l" id="L87"><span class="n">87</span></span>
+<span class="l" id="L88"><span class="n">88</span>/-- grouping a sum over pairs by the difference vector -/</span>
+<span class="l" id="L89"><span class="n">89</span>lemma sum_pairs_le_J {k b Q : ℕ} (hQ : 1 ≤ Q) (F : (Fin k → ℤ) → ℝ) (hF : ∀ l, 0 ≤ F l) :</span>
+<span class="l" id="L90"><span class="n">90</span>    ∑ zz ∈ tup b (Zr Q) ×ˢ tup b (Zr Q), F (psv k zz.1 - psv k zz.2) ≤</span>
+<span class="l" id="L91"><span class="n">91</span>      (Jc k b (Zr Q) : ℝ) * ∑ l ∈ Lam k b Q, F l := by</span>
+<span class="l" id="L92"><span class="n">92</span>  classical</span>
+<span class="l" id="L93"><span class="n">93</span>  rw [← sum_fiberwise_of_maps_to (g := fun zz =&gt; psv k zz.1 - psv k zz.2) (t := Lam k b Q)</span>
+<span class="l" id="L94"><span class="n">94</span>    (fun zz h =&gt; diff_mem_Lam hQ zz h)]</span>
+<span class="l" id="L95"><span class="n">95</span>  rw [mul_sum]</span>
+<span class="l" id="L96"><span class="n">96</span>  apply sum_le_sum; intro l _</span>
+<span class="l" id="L97"><span class="n">97</span>  rw [sum_congr rfl (fun zz hzz =&gt; by rw [(mem_filter.mp hzz).2])]</span>
+<span class="l" id="L98"><span class="n">98</span>  rw [sum_const, nsmul_eq_mul]</span>
+<span class="l" id="L99"><span class="n">99</span>  apply mul_le_mul_of_nonneg_right _ (hF l)</span>
+<span class="l" id="L100"><span class="n">100</span>  have : ((tup b (Zr Q) ×ˢ tup b (Zr Q)).filter fun zz =&gt; psv k zz.1 - psv k zz.2 = l).card =</span>
+<span class="l" id="L101"><span class="n">101</span>      Rc k b (Zr Q) l := by</span>
+<span class="l" id="L102"><span class="n">102</span>    unfold Rc; congr 1; ext zz; simp only [mem_filter]</span>
+<span class="l" id="L103"><span class="n">103</span>    constructor &lt;;&gt; rintro ⟨h1, h2⟩ &lt;;&gt; refine ⟨h1, ?_⟩</span>
+<span class="l" id="L104"><span class="n">104</span>    · rw [← h2]; ring</span>
+<span class="l" id="L105"><span class="n">105</span>    · rw [h2]; ring</span>
+<span class="l" id="L106"><span class="n">106</span>  rw [this]; exact_mod_cast Rc_le_Jc b (Zr Q) l</span>
+<span class="l" id="L107"><span class="n">107</span></span>
+<span class="l" id="L108"><span class="n">108</span>/-- the product of geometric sums over the box -/</span>
+<span class="l" id="L109"><span class="n">109</span>lemma sum_Lam_ee {k b Q : ℕ} (c : Fin k → ℝ) :</span>
+<span class="l" id="L110"><span class="n">110</span>    ∑ l ∈ Lam k b Q, ee (∑ j, c j * (l j : ℝ)) =</span>
+<span class="l" id="L111"><span class="n">111</span>      ∏ j : Fin k, ∑ m ∈ Icc (-(Lbox b Q j : ℤ)) (Lbox b Q j), ee (c j * m) := by</span>
+<span class="l" id="L112"><span class="n">112</span>  rw [Lam, Finset.prod_univ_sum]</span>
+<span class="l" id="L113"><span class="n">113</span>  apply sum_congr rfl; intro l _; rw [ee_sum]</span>
+<span class="l" id="L114"><span class="n">114</span></span>
+<span class="l" id="L115"><span class="n">115</span>/-- `𝔖_j` -/</span>
+<span class="l" id="L116"><span class="n">116</span>noncomputable def Sfrak (b Q : ℕ) (j : ℕ) (Bj : ℝ) : ℝ :=</span>
+<span class="l" id="L117"><span class="n">117</span>  ∑ m ∈ Icc (-(Lbox b Q j : ℤ)) (Lbox b Q j), gmin (2 * (Lbox b Q j : ℝ) + 1) (Bj * m)</span>
+<span class="l" id="L118"><span class="n">118</span></span>
+<span class="l" id="L119"><span class="n">119</span>lemma Sfrak_nonneg (b Q j : ℕ) (Bj : ℝ) : 0 ≤ Sfrak b Q j Bj :=</span>
+<span class="l" id="L120"><span class="n">120</span>  sum_nonneg (fun _ _ =&gt; gmin_nonneg (by positivity) _)</span>
+<span class="l" id="L121"><span class="n">121</span></span>
+<span class="l" id="L122"><span class="n">122</span>/-- **Vinogradov&#x27;s double-sum lemma** -/</span>
+<span class="l" id="L123"><span class="n">123</span>theorem double_sum (k b Q : ℕ) (hb : 1 ≤ b) (hQ : 1 ≤ Q) (B : Fin k → ℝ) :</span>
+<span class="l" id="L124"><span class="n">124</span>    ‖∑ y ∈ Zr Q, ∑ z ∈ Zr Q, ee (∑ j, B j * ((y : ℝ) * z) ^ ((j : ℕ) + 1))‖ ^ (4 * b ^ 2) ≤</span>
+<span class="l" id="L125"><span class="n">125</span>      (Q : ℝ) ^ (8 * b ^ 2 - 4 * b) * (Jc k b (Zr Q) : ℝ) ^ 2 *</span>
+<span class="l" id="L126"><span class="n">126</span>        ∏ j : Fin k, Sfrak b Q j (B j) := by</span>
+<span class="l" id="L127"><span class="n">127</span>  classical</span>
+<span class="l" id="L128"><span class="n">128</span>  set Z := Zr Q</span>
+<span class="l" id="L129"><span class="n">129</span>  set J := (Jc k b Z : ℝ)</span>
+<span class="l" id="L130"><span class="n">130</span>  have hZ : (Z.card : ℝ) = Q := by simp [Z, card_Zr]</span>
+<span class="l" id="L131"><span class="n">131</span>  have hZne : Z.Nonempty := ⟨0, by simp [Z, Zr]; omega⟩</span>
+<span class="l" id="L132"><span class="n">132</span>  set S : ℤ → ℂ := fun y =&gt; ∑ z ∈ Z, ee (∑ j, (B j * (y : ℝ) ^ ((j : ℕ) + 1)) *</span>
+<span class="l" id="L133"><span class="n">133</span>      (z : ℝ) ^ ((j : ℕ) + 1))</span>
+<span class="l" id="L134"><span class="n">134</span>  have hW : ∑ y ∈ Z, ∑ z ∈ Z, ee (∑ j, B j * ((y : ℝ) * z) ^ ((j : ℕ) + 1)) = ∑ y ∈ Z, S y := by</span>
+<span class="l" id="L135"><span class="n">135</span>    apply sum_congr rfl; intro y _; apply sum_congr rfl; intro z _</span>
+<span class="l" id="L136"><span class="n">136</span>    congr 1; apply sum_congr rfl; intro j _; rw [mul_pow]; ring</span>
+<span class="l" id="L137"><span class="n">137</span>  set T : (Fin k → ℤ) → ℂ := fun l =&gt; ∑ y ∈ Z, ee (∑ j, (B j * (l j : ℝ)) *</span>
+<span class="l" id="L138"><span class="n">138</span>      (y : ℝ) ^ ((j : ℕ) + 1))</span>
+<span class="l" id="L139"><span class="n">139</span>  set P := tup b Z ×ˢ tup b Z</span>
+<span class="l" id="L140"><span class="n">140</span>  have hP : (P.card : ℝ) = (Q : ℝ) ^ (2 * b) := by</span>
+<span class="l" id="L141"><span class="n">141</span>    simp [P, card_product, card_tup, Z, card_Zr]; ring</span>
+<span class="l" id="L142"><span class="n">142</span>  -- step (3): ∑_y |S y|^{2b} ≤ ∑_{pairs} |T(λ)|</span>
+<span class="l" id="L143"><span class="n">143</span>  have h3 : ∑ y ∈ Z, ‖S y‖ ^ (2 * b) ≤ ∑ zz ∈ P, ‖T (psv k zz.1 - psv k zz.2)‖ := by</span>
+<span class="l" id="L144"><span class="n">144</span>    have e : ((∑ y ∈ Z, ‖S y‖ ^ (2 * b) : ℝ) : ℂ) = ∑ zz ∈ P, T (psv k zz.1 - psv k zz.2) := by</span>
+<span class="l" id="L145"><span class="n">145</span>      simp only [S]</span>
+<span class="l" id="L146"><span class="n">146</span>      rw [Complex.ofReal_sum]</span>
+<span class="l" id="L147"><span class="n">147</span>      simp_rw [norm_pow_eq_pairs]</span>
+<span class="l" id="L148"><span class="n">148</span>      rw [sum_comm]</span>
+<span class="l" id="L149"><span class="n">149</span>      apply sum_congr rfl; intro zz _</span>
+<span class="l" id="L150"><span class="n">150</span>      simp only [T]</span>
+<span class="l" id="L151"><span class="n">151</span>      apply sum_congr rfl; intro y _</span>
+<span class="l" id="L152"><span class="n">152</span>      congr 1; apply sum_congr rfl; intro j _</span>
+<span class="l" id="L153"><span class="n">153</span>      simp only [Pi.sub_apply, Int.cast_sub]; ring</span>
+<span class="l" id="L154"><span class="n">154</span>    have := congrArg norm e</span>
+<span class="l" id="L155"><span class="n">155</span>    rw [Complex.norm_real, Real.norm_eq_abs,</span>
+<span class="l" id="L156"><span class="n">156</span>      abs_of_nonneg (sum_nonneg (fun _ _ =&gt; by positivity))] at this</span>
+<span class="l" id="L157"><span class="n">157</span>    rw [this]; exact norm_sum_le _ _</span>
+<span class="l" id="L158"><span class="n">158</span>  -- step (6): ∑_{λ ∈ Λ} |T λ|^{2b} ≤ J ∏ 𝔖</span>
+<span class="l" id="L159"><span class="n">159</span>  have h6 : ∑ l ∈ Lam k b Q, ‖T l‖ ^ (2 * b) ≤ J * ∏ j : Fin k, Sfrak b Q j (B j) := by</span>
+<span class="l" id="L160"><span class="n">160</span>    have e : ((∑ l ∈ Lam k b Q, ‖T l‖ ^ (2 * b) : ℝ) : ℂ) =</span>
+<span class="l" id="L161"><span class="n">161</span>        ∑ yy ∈ P, ∏ j : Fin k, ∑ m ∈ Icc (-(Lbox b Q j : ℤ)) (Lbox b Q j),</span>
+<span class="l" id="L162"><span class="n">162</span>          ee ((B j * ((psv k yy.1 j : ℝ) - (psv k yy.2 j : ℝ))) * m) := by</span>
+<span class="l" id="L163"><span class="n">163</span>      simp only [T]</span>
+<span class="l" id="L164"><span class="n">164</span>      rw [Complex.ofReal_sum]</span>
+<span class="l" id="L165"><span class="n">165</span>      simp_rw [norm_pow_eq_pairs]</span>
+<span class="l" id="L166"><span class="n">166</span>      rw [sum_comm]</span>
+<span class="l" id="L167"><span class="n">167</span>      apply sum_congr rfl; intro yy _</span>
+<span class="l" id="L168"><span class="n">168</span>      rw [← sum_Lam_ee]</span>
+<span class="l" id="L169"><span class="n">169</span>      apply sum_congr rfl; intro l _</span>
+<span class="l" id="L170"><span class="n">170</span>      congr 1; apply sum_congr rfl; intro j _; ring</span>
+<span class="l" id="L171"><span class="n">171</span>    have hle : ∑ l ∈ Lam k b Q, ‖T l‖ ^ (2 * b) ≤</span>
+<span class="l" id="L172"><span class="n">172</span>        ∑ yy ∈ P, ∏ j : Fin k, gmin (2 * (Lbox b Q j : ℝ) + 1)</span>
+<span class="l" id="L173"><span class="n">173</span>          (B j * ((psv k yy.1 - psv k yy.2) j : ℝ)) := by</span>
+<span class="l" id="L174"><span class="n">174</span>      have := congrArg norm e</span>
+<span class="l" id="L175"><span class="n">175</span>      rw [Complex.norm_real, Real.norm_eq_abs,</span>
+<span class="l" id="L176"><span class="n">176</span>        abs_of_nonneg (sum_nonneg (fun _ _ =&gt; by positivity))] at this</span>
+<span class="l" id="L177"><span class="n">177</span>      rw [this]</span>
+<span class="l" id="L178"><span class="n">178</span>      refine (norm_sum_le _ _).trans (sum_le_sum ?_)</span>
+<span class="l" id="L179"><span class="n">179</span>      intro yy _</span>
+<span class="l" id="L180"><span class="n">180</span>      rw [norm_prod]</span>
+<span class="l" id="L181"><span class="n">181</span>      gcongr with j</span>
+<span class="l" id="L182"><span class="n">182</span>      have := norm_sym_geom_le_gmin (B j * ((psv k yy.1 j : ℝ) - (psv k yy.2 j : ℝ))) (Lbox b Q j)</span>
+<span class="l" id="L183"><span class="n">183</span>      simpa using this</span>
+<span class="l" id="L184"><span class="n">184</span>    refine hle.trans ?_</span>
+<span class="l" id="L185"><span class="n">185</span>    have hgrp := sum_pairs_le_J (k := k) (b := b) hQ</span>
+<span class="l" id="L186"><span class="n">186</span>      (fun l =&gt; ∏ j : Fin k, gmin (2 * (Lbox b Q j : ℝ) + 1) (B j * (l j : ℝ)))</span>
+<span class="l" id="L187"><span class="n">187</span>      (fun l =&gt; prod_nonneg (fun j _ =&gt; gmin_nonneg (by positivity) _))</span>
+<span class="l" id="L188"><span class="n">188</span>    refine hgrp.trans (le_of_eq ?_)</span>
+<span class="l" id="L189"><span class="n">189</span>    congr 1</span>
+<span class="l" id="L190"><span class="n">190</span>    simp only [Sfrak, Lam]</span>
+<span class="l" id="L191"><span class="n">191</span>    exact (Finset.prod_univ_sum (fun j : Fin k =&gt; Icc (-(Lbox b Q j : ℤ)) (Lbox b Q j)) (fun j m =&gt; gmin (2 * (Lbox b Q j : ℝ) + 1) (B j * m))).symm</span>
+<span class="l" id="L192"><span class="n">192</span>  -- step (5): ∑_{pairs} |T λ|^{2b} ≤ J ∑_{λ ∈ Λ} |T λ|^{2b}</span>
+<span class="l" id="L193"><span class="n">193</span>  have h5 : ∑ zz ∈ P, ‖T (psv k zz.1 - psv k zz.2)‖ ^ (2 * b) ≤</span>
+<span class="l" id="L194"><span class="n">194</span>      J * ∑ l ∈ Lam k b Q, ‖T l‖ ^ (2 * b) :=</span>
+<span class="l" id="L195"><span class="n">195</span>    sum_pairs_le_J hQ (fun l =&gt; ‖T l‖ ^ (2 * b)) (fun _ =&gt; by positivity)</span>
+<span class="l" id="L196"><span class="n">196</span>  -- powers</span>
+<span class="l" id="L197"><span class="n">197</span>  have hW1 : ‖∑ y ∈ Z, S y‖ ^ (2 * b) ≤ (Q : ℝ) ^ (2 * b - 1) * ∑ y ∈ Z, ‖S y‖ ^ (2 * b) := by</span>
+<span class="l" id="L198"><span class="n">198</span>    calc ‖∑ y ∈ Z, S y‖ ^ (2 * b) ≤ (∑ y ∈ Z, ‖S y‖) ^ (2 * b) :=</span>
+<span class="l" id="L199"><span class="n">199</span>          pow_le_pow_left₀ (norm_nonneg _) (norm_sum_le _ _) _</span>
+<span class="l" id="L200"><span class="n">200</span>      _ ≤ ((Z.card : ℝ) ^ (2 * b) / Z.card) * ∑ y ∈ Z, ‖S y‖ ^ (2 * b) :=</span>
+<span class="l" id="L201"><span class="n">201</span>          pow_sum_le_card_pow_div _ _ (fun _ _ =&gt; norm_nonneg _) hZne _</span>
+<span class="l" id="L202"><span class="n">202</span>      _ = (Q : ℝ) ^ (2 * b - 1) * ∑ y ∈ Z, ‖S y‖ ^ (2 * b) := by</span>
+<span class="l" id="L203"><span class="n">203</span>          rw [hZ]; congr 1</span>
+<span class="l" id="L204"><span class="n">204</span>          have hQ0 : (Q : ℝ) ≠ 0 := by exact_mod_cast (by omega : Q ≠ 0)</span>
+<span class="l" id="L205"><span class="n">205</span>          rw [div_eq_iff hQ0, ← pow_succ]; congr 1; omega</span>
+<span class="l" id="L206"><span class="n">206</span>  have hPne : P.Nonempty := by</span>
+<span class="l" id="L207"><span class="n">207</span>    apply Nonempty.product &lt;;&gt; exact Fintype.piFinset_nonempty.mpr (fun _ =&gt; hZne)</span>
+<span class="l" id="L208"><span class="n">208</span>  have hT2b : (∑ zz ∈ P, ‖T (psv k zz.1 - psv k zz.2)‖) ^ (2 * b) ≤</span>
+<span class="l" id="L209"><span class="n">209</span>      ((Q : ℝ) ^ (2 * b)) ^ (2 * b - 1) * ∑ zz ∈ P, ‖T (psv k zz.1 - psv k zz.2)‖ ^ (2 * b) := by</span>
+<span class="l" id="L210"><span class="n">210</span>    calc (∑ zz ∈ P, ‖T (psv k zz.1 - psv k zz.2)‖) ^ (2 * b)</span>
+<span class="l" id="L211"><span class="n">211</span>        ≤ ((P.card : ℝ) ^ (2 * b) / P.card) * ∑ zz ∈ P, ‖T (psv k zz.1 - psv k zz.2)‖ ^ (2 * b) :=</span>
+<span class="l" id="L212"><span class="n">212</span>          pow_sum_le_card_pow_div _ _ (fun _ _ =&gt; norm_nonneg _) hPne _</span>
+<span class="l" id="L213"><span class="n">213</span>      _ = _ := by</span>
+<span class="l" id="L214"><span class="n">214</span>          rw [hP]; congr 1</span>
+<span class="l" id="L215"><span class="n">215</span>          have hQ0 : (Q : ℝ) ^ (2 * b) ≠ 0 := by positivity</span>
+<span class="l" id="L216"><span class="n">216</span>          rw [div_eq_iff hQ0, ← pow_succ]; congr 1; omega</span>
+<span class="l" id="L217"><span class="n">217</span>  rw [hW]</span>
+<span class="l" id="L218"><span class="n">218</span>  have hJ0 : 0 ≤ J := by positivity</span>
+<span class="l" id="L219"><span class="n">219</span>  have hS0 : 0 ≤ ∏ j : Fin k, Sfrak b Q j (B j) := prod_nonneg (fun _ _ =&gt; Sfrak_nonneg _ _ _ _)</span>
+<span class="l" id="L220"><span class="n">220</span>  calc ‖∑ y ∈ Z, S y‖ ^ (4 * b ^ 2) = (‖∑ y ∈ Z, S y‖ ^ (2 * b)) ^ (2 * b) := by</span>
+<span class="l" id="L221"><span class="n">221</span>        rw [← pow_mul]; ring_nf</span>
+<span class="l" id="L222"><span class="n">222</span>    _ ≤ ((Q : ℝ) ^ (2 * b - 1) * ∑ zz ∈ P, ‖T (psv k zz.1 - psv k zz.2)‖) ^ (2 * b) := by</span>
+<span class="l" id="L223"><span class="n">223</span>        apply pow_le_pow_left₀ (by positivity)</span>
+<span class="l" id="L224"><span class="n">224</span>        exact hW1.trans (mul_le_mul_of_nonneg_left h3 (by positivity))</span>
+<span class="l" id="L225"><span class="n">225</span>    _ = ((Q : ℝ) ^ (2 * b - 1)) ^ (2 * b) *</span>
+<span class="l" id="L226"><span class="n">226</span>          (∑ zz ∈ P, ‖T (psv k zz.1 - psv k zz.2)‖) ^ (2 * b) := by rw [mul_pow]</span>
+<span class="l" id="L227"><span class="n">227</span>    _ ≤ ((Q : ℝ) ^ (2 * b - 1)) ^ (2 * b) * (((Q : ℝ) ^ (2 * b)) ^ (2 * b - 1) *</span>
+<span class="l" id="L228"><span class="n">228</span>          (J * (J * ∏ j : Fin k, Sfrak b Q j (B j)))) := by</span>
+<span class="l" id="L229"><span class="n">229</span>        apply mul_le_mul_of_nonneg_left _ (by positivity)</span>
+<span class="l" id="L230"><span class="n">230</span>        refine hT2b.trans (mul_le_mul_of_nonneg_left (h5.trans ?_) (by positivity))</span>
+<span class="l" id="L231"><span class="n">231</span>        exact mul_le_mul_of_nonneg_left h6 hJ0</span>
+<span class="l" id="L232"><span class="n">232</span>    _ = (Q : ℝ) ^ (8 * b ^ 2 - 4 * b) * J ^ 2 * ∏ j : Fin k, Sfrak b Q j (B j) := by</span>
+<span class="l" id="L233"><span class="n">233</span>        rw [← pow_mul, ← pow_mul, mul_comm (2 * b) (2 * b - 1)]</span>
+<span class="l" id="L234"><span class="n">234</span>        have : (Q : ℝ) ^ ((2 * b - 1) * (2 * b)) * (Q : ℝ) ^ ((2 * b - 1) * (2 * b)) =</span>
+<span class="l" id="L235"><span class="n">235</span>            (Q : ℝ) ^ (8 * b ^ 2 - 4 * b) := by</span>
+<span class="l" id="L236"><span class="n">236</span>          rw [← pow_add]; congr 1</span>
+<span class="l" id="L237"><span class="n">237</span>          have : 1 ≤ 2 * b := by omega</span>
+<span class="l" id="L238"><span class="n">238</span>          zify [this, (by nlinarith : 4 * b ≤ 8 * b ^ 2)]</span>
+<span class="l" id="L239"><span class="n">239</span>          ring</span>
+<span class="l" id="L240"><span class="n">240</span>        calc (Q : ℝ) ^ ((2 * b - 1) * (2 * b)) *</span>
+<span class="l" id="L241"><span class="n">241</span>              ((Q : ℝ) ^ ((2 * b - 1) * (2 * b)) * (J * (J * ∏ j : Fin k, Sfrak b Q j (B j))))</span>
+<span class="l" id="L242"><span class="n">242</span>            = ((Q : ℝ) ^ ((2 * b - 1) * (2 * b)) * (Q : ℝ) ^ ((2 * b - 1) * (2 * b))) *</span>
+<span class="l" id="L243"><span class="n">243</span>                J ^ 2 * ∏ j : Fin k, Sfrak b Q j (B j) := by ring</span>
+<span class="l" id="L244"><span class="n">244</span>          _ = _ := by rw [this]</span>
+<span class="l" id="L245"><span class="n">245</span></span>
+<span class="l" id="L246"><span class="n">246</span>end GoldB</span></pre></div></body></html>

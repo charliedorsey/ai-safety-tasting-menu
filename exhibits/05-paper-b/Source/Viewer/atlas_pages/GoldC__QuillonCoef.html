@@ -1,0 +1,123 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · GoldC/QuillonCoef.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>GoldC/QuillonCoef.lean</h1><p class="meta">LEAN/GoldC/QuillonCoef.lean · 122 lines · SHA-256 67b15a1d0265fe1c9c43c606685449ae66b23c7591f29d92870a97ddc28e5b1c</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import GoldC.QuillonRowNF</span>
+<span class="l" id="L2"><span class="n">2</span>import GoldC.QuillonRCellApp</span>
+<span class="l" id="L3"><span class="n">3</span></span>
+<span class="l" id="L4"><span class="n">4</span>/-!</span>
+<span class="l" id="L5"><span class="n">5</span># Quillon CSC3 F7.9e: mode coefficients and gcd identification for the four row types</span>
+<span class="l" id="L6"><span class="n">6</span></span>
+<span class="l" id="L7"><span class="n">7</span>* `norm_main_le`, `norm_class_le`: the `rowW` coefficients satisfy `‖A ρ k‖ ≤ (|μ| + M·Gb)/k`.</span>
+<span class="l" id="L8"><span class="n">8</span>* `filter_cast_eq`: for `c_k = ±k·H·u` with `p ∤ H`, `p ∤ u` (`p | s` prime),</span>
+<span class="l" id="L9"><span class="n">9</span>  `cast(c_k) = 0` in `ZMod p` iff `p | k`. So `G₀(c_k) = ∏_{p|s, p|k} p`.</span>
+<span class="l" id="L10"><span class="n">10</span>* `norm_βk`, `norm_coefR_le`: the `rowR` coefficients satisfy `‖coef k‖ ≤ (|μ| + 2M·Gb + 1)/k`.</span>
+<span class="l" id="L11"><span class="n">11</span></span>
+<span class="l" id="L12"><span class="n">12</span>No axiom, no `sorry`.</span>
+<span class="l" id="L13"><span class="n">13</span>-/</span>
+<span class="l" id="L14"><span class="n">14</span></span>
+<span class="l" id="L15"><span class="n">15</span>open scoped BigOperators</span>
+<span class="l" id="L16"><span class="n">16</span>open Finset</span>
+<span class="l" id="L17"><span class="n">17</span></span>
+<span class="l" id="L18"><span class="n">18</span>namespace GoldC.QuillonCoef</span>
+<span class="l" id="L19"><span class="n">19</span></span>
+<span class="l" id="L20"><span class="n">20</span>open GoldC.QuillonRowNF GoldC.QuillonR</span>
+<span class="l" id="L21"><span class="n">21</span></span>
+<span class="l" id="L22"><span class="n">22</span>lemma norm_main_le (μ : ℝ) (k s : ℕ) (hk : 1 ≤ k) (hs : 1 ≤ s) :</span>
+<span class="l" id="L23"><span class="n">23</span>    ‖((-(2 * μ) : ℝ) : ℂ) * αm k s‖ ≤ |μ| / k := by</span>
+<span class="l" id="L24"><span class="n">24</span>  rw [norm_mul, Complex.norm_real, Real.norm_eq_abs, abs_neg, abs_mul, abs_two]</span>
+<span class="l" id="L25"><span class="n">25</span>  have h := norm_αm_le k s hk hs</span>
+<span class="l" id="L26"><span class="n">26</span>  have hkR : (1 : ℝ) ≤ k := by exact_mod_cast hk</span>
+<span class="l" id="L27"><span class="n">27</span>  have hpi : (2 : ℝ) ≤ Real.pi := Real.two_le_pi</span>
+<span class="l" id="L28"><span class="n">28</span>  calc 2 * |μ| * ‖αm k s‖ ≤ 2 * |μ| * (1 / (2 * Real.pi * k)) := by gcongr</span>
+<span class="l" id="L29"><span class="n">29</span>    _ ≤ |μ| / k := by</span>
+<span class="l" id="L30"><span class="n">30</span>        rw [div_eq_mul_one_div |μ|]</span>
+<span class="l" id="L31"><span class="n">31</span>        have : 2 * |μ| * (1 / (2 * Real.pi * k)) = |μ| * (1 / (Real.pi * k)) := by field_simp</span>
+<span class="l" id="L32"><span class="n">32</span>        rw [this]</span>
+<span class="l" id="L33"><span class="n">33</span>        apply mul_le_mul_of_nonneg_left _ (abs_nonneg _)</span>
+<span class="l" id="L34"><span class="n">34</span>        apply one_div_le_one_div_of_le (by positivity); nlinarith</span>
+<span class="l" id="L35"><span class="n">35</span></span>
+<span class="l" id="L36"><span class="n">36</span>lemma norm_bS_le (M : ℕ) (Γ : ℕ → ℕ → ℝ) (Gb : ℝ) (hGb : ∀ b ν, |Γ b ν| ≤ Gb) (s b : ℕ) (z : ℤ)</span>
+<span class="l" id="L37"><span class="n">37</span>    (ρ : ZMod M) : ‖bS M Γ s b z ρ‖ ≤ 2 * Gb := by</span>
+<span class="l" id="L38"><span class="n">38</span>  unfold bS</span>
+<span class="l" id="L39"><span class="n">39</span>  rw [norm_mul, norm_mul, norm_eR, one_mul, Complex.norm_real, Real.norm_eq_abs]</span>
+<span class="l" id="L40"><span class="n">40</span>  have h1 : ‖eR ((z : ℝ) * ((M - 1 : ℕ) : ℝ) / M) - 1‖ ≤ 2 := by</span>
+<span class="l" id="L41"><span class="n">41</span>    calc _ ≤ ‖eR ((z : ℝ) * ((M - 1 : ℕ) : ℝ) / M)‖ + ‖(1 : ℂ)‖ := norm_sub_le _ _</span>
+<span class="l" id="L42"><span class="n">42</span>      _ = 2 := by rw [norm_eR, norm_one]; norm_num</span>
+<span class="l" id="L43"><span class="n">43</span>  have h0 : 0 ≤ Gb := (abs_nonneg _).trans (hGb b 0)</span>
+<span class="l" id="L44"><span class="n">44</span>  calc |Γ b ((ρ.val * s) % M)| * ‖eR ((z : ℝ) * ((M - 1 : ℕ) : ℝ) / M) - 1‖ ≤ Gb * 2 := by</span>
+<span class="l" id="L45"><span class="n">45</span>        gcongr; exact hGb _ _</span>
+<span class="l" id="L46"><span class="n">46</span>    _ = 2 * Gb := by ring</span>
+<span class="l" id="L47"><span class="n">47</span></span>
+<span class="l" id="L48"><span class="n">48</span>lemma norm_BclS_le (M : ℕ) (Γ : ℕ → ℕ → ℝ) (Gb : ℝ) (hGb : ∀ b ν, |Γ b ν| ≤ Gb) (s : ℕ) (z : ℤ)</span>
+<span class="l" id="L49"><span class="n">49</span>    (ρ : ZMod M) : ‖BclS M Γ s z ρ‖ ≤ 2 * M * Gb := by</span>
+<span class="l" id="L50"><span class="n">50</span>  unfold BclS</span>
+<span class="l" id="L51"><span class="n">51</span>  refine (norm_sum_le _ _).trans ?_</span>
+<span class="l" id="L52"><span class="n">52</span>  calc ∑ b ∈ range M, ‖bS M Γ s b z ρ‖ ≤ ∑ _b ∈ range M, 2 * Gb :=</span>
+<span class="l" id="L53"><span class="n">53</span>        sum_le_sum fun b _ =&gt; norm_bS_le M Γ Gb hGb s b z ρ</span>
+<span class="l" id="L54"><span class="n">54</span>    _ = 2 * M * Gb := by rw [sum_const, card_range, nsmul_eq_mul]; ring</span>
+<span class="l" id="L55"><span class="n">55</span></span>
+<span class="l" id="L56"><span class="n">56</span>lemma norm_class_le (M : ℕ) (Γ : ℕ → ℕ → ℝ) (Gb : ℝ) (hGb : ∀ b ν, |Γ b ν| ≤ Gb) (s k : ℕ) (z : ℤ)</span>
+<span class="l" id="L57"><span class="n">57</span>    (ρ : ZMod M) (hk : 1 ≤ k) (hMs : 1 ≤ M * s) :</span>
+<span class="l" id="L58"><span class="n">58</span>    ‖αm k (M * s) * BclS M Γ s z ρ‖ ≤ M * Gb / k := by</span>
+<span class="l" id="L59"><span class="n">59</span>  rw [norm_mul]</span>
+<span class="l" id="L60"><span class="n">60</span>  have h1 := norm_αm_le k (M * s) hk hMs</span>
+<span class="l" id="L61"><span class="n">61</span>  have h2 := norm_BclS_le M Γ Gb hGb s z ρ</span>
+<span class="l" id="L62"><span class="n">62</span>  have h0 : 0 ≤ Gb := (abs_nonneg _).trans (hGb 0 0)</span>
+<span class="l" id="L63"><span class="n">63</span>  have hkR : (1 : ℝ) ≤ k := by exact_mod_cast hk</span>
+<span class="l" id="L64"><span class="n">64</span>  have hpi : (2 : ℝ) ≤ Real.pi := Real.two_le_pi</span>
+<span class="l" id="L65"><span class="n">65</span>  calc ‖αm k (M * s)‖ * ‖BclS M Γ s z ρ‖ ≤ (1 / (2 * Real.pi * k)) * (2 * M * Gb) :=</span>
+<span class="l" id="L66"><span class="n">66</span>        mul_le_mul h1 h2 (norm_nonneg _) (by positivity)</span>
+<span class="l" id="L67"><span class="n">67</span>    _ ≤ M * Gb / k := by</span>
+<span class="l" id="L68"><span class="n">68</span>        rw [div_eq_mul_one_div (M * Gb : ℝ)]</span>
+<span class="l" id="L69"><span class="n">69</span>        have : 1 / (2 * Real.pi * k) * (2 * M * Gb) = (M * Gb : ℝ) * (1 / (Real.pi * k)) := by field_simp</span>
+<span class="l" id="L70"><span class="n">70</span>        rw [this]</span>
+<span class="l" id="L71"><span class="n">71</span>        apply mul_le_mul_of_nonneg_left _ (by positivity)</span>
+<span class="l" id="L72"><span class="n">72</span>        apply one_div_le_one_div_of_le (by positivity); nlinarith</span>
+<span class="l" id="L73"><span class="n">73</span></span>
+<span class="l" id="L74"><span class="n">74</span>/-- `cast(z·u) = 0` in `ZMod p` iff `p | z`, for a unit factor `u` coprime to `p`. -/</span>
+<span class="l" id="L75"><span class="n">75</span>lemma cast_int_eq_zero_iff {s : ℕ} (p : ℕ) (hp : p.Prime) (hps : p ∣ s) (z u : ℤ)</span>
+<span class="l" id="L76"><span class="n">76</span>    (hu : ¬ (p : ℤ) ∣ u) :</span>
+<span class="l" id="L77"><span class="n">77</span>    ((ZMod.cast (((z * u : ℤ)) : ZMod s) : ZMod p) = 0 ↔ (p : ℤ) ∣ z) := by</span>
+<span class="l" id="L78"><span class="n">78</span>  rw [ZMod.cast_intCast hps, ZMod.intCast_zmod_eq_zero_iff_dvd]</span>
+<span class="l" id="L79"><span class="n">79</span>  constructor</span>
+<span class="l" id="L80"><span class="n">80</span>  · intro h</span>
+<span class="l" id="L81"><span class="n">81</span>    rcases (Int.Prime.dvd_mul&#x27; hp h) with h1 | h1</span>
+<span class="l" id="L82"><span class="n">82</span>    · exact h1</span>
+<span class="l" id="L83"><span class="n">83</span>    · exact absurd h1 hu</span>
+<span class="l" id="L84"><span class="n">84</span>  · intro h; exact Dvd.dvd.mul_right h u</span>
+<span class="l" id="L85"><span class="n">85</span></span>
+<span class="l" id="L86"><span class="n">86</span>lemma filter_cast_eq {s : ℕ} (P : Finset ℕ) (hP : ∀ p ∈ P, p.Prime) (hsP : s = ∏ p ∈ P, p)</span>
+<span class="l" id="L87"><span class="n">87</span>    (u : ℤ) (hu : ∀ p ∈ P, ¬ (p : ℤ) ∣ u) (σ : ℤ) (hσ : σ = 1 ∨ σ = -1) (k : ℕ) :</span>
+<span class="l" id="L88"><span class="n">88</span>    P.filter (fun p =&gt; (ZMod.cast ((((σ * k) * u : ℤ)) : ZMod s) : ZMod p) = 0) =</span>
+<span class="l" id="L89"><span class="n">89</span>      P.filter (fun p =&gt; p ∣ k) := by</span>
+<span class="l" id="L90"><span class="n">90</span>  ext p</span>
+<span class="l" id="L91"><span class="n">91</span>  simp only [mem_filter]</span>
+<span class="l" id="L92"><span class="n">92</span>  constructor</span>
+<span class="l" id="L93"><span class="n">93</span>  · rintro ⟨hpP, h⟩</span>
+<span class="l" id="L94"><span class="n">94</span>    refine ⟨hpP, ?_⟩</span>
+<span class="l" id="L95"><span class="n">95</span>    have hps : p ∣ s := hsP ▸ dvd_prod_of_mem _ hpP</span>
+<span class="l" id="L96"><span class="n">96</span>    have := (cast_int_eq_zero_iff p (hP p hpP) hps (σ * k) u (hu p hpP)).1 h</span>
+<span class="l" id="L97"><span class="n">97</span>    rcases hσ with rfl | rfl</span>
+<span class="l" id="L98"><span class="n">98</span>    · rw [one_mul] at this; exact_mod_cast this</span>
+<span class="l" id="L99"><span class="n">99</span>    · rw [neg_one_mul, Int.dvd_neg] at this; exact_mod_cast this</span>
+<span class="l" id="L100"><span class="n">100</span>  · rintro ⟨hpP, h⟩</span>
+<span class="l" id="L101"><span class="n">101</span>    refine ⟨hpP, ?_⟩</span>
+<span class="l" id="L102"><span class="n">102</span>    have hps : p ∣ s := hsP ▸ dvd_prod_of_mem _ hpP</span>
+<span class="l" id="L103"><span class="n">103</span>    refine (cast_int_eq_zero_iff p (hP p hpP) hps (σ * k) u (hu p hpP)).2 ?_</span>
+<span class="l" id="L104"><span class="n">104</span>    exact Dvd.dvd.mul_left (Int.natCast_dvd_natCast.2 h) σ</span>
+<span class="l" id="L105"><span class="n">105</span></span>
+<span class="l" id="L106"><span class="n">106</span>lemma norm_βk (k : ℕ) (hk : 1 ≤ k) : ‖βk k‖ ≤ 1 / k := by</span>
+<span class="l" id="L107"><span class="n">107</span>  unfold βk</span>
+<span class="l" id="L108"><span class="n">108</span>  rw [norm_div, Complex.norm_I]</span>
+<span class="l" id="L109"><span class="n">109</span>  have hkR : (1 : ℝ) ≤ k := by exact_mod_cast hk</span>
+<span class="l" id="L110"><span class="n">110</span>  have hpi : (2 : ℝ) ≤ Real.pi := Real.two_le_pi</span>
+<span class="l" id="L111"><span class="n">111</span>  have e : ‖(2 * (Real.pi : ℂ) * (k : ℂ))‖ = 2 * Real.pi * k := by</span>
+<span class="l" id="L112"><span class="n">112</span>    rw [show (2 * (Real.pi : ℂ) * (k : ℂ)) = ((2 * Real.pi * k : ℝ) : ℂ) by push_cast; ring,</span>
+<span class="l" id="L113"><span class="n">113</span>      Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg (by positivity)]</span>
+<span class="l" id="L114"><span class="n">114</span>  rw [e]</span>
+<span class="l" id="L115"><span class="n">115</span>  apply one_div_le_one_div_of_le (by positivity); nlinarith</span>
+<span class="l" id="L116"><span class="n">116</span></span>
+<span class="l" id="L117"><span class="n">117</span>end GoldC.QuillonCoef</span>
+<span class="l" id="L118"><span class="n">118</span></span>
+<span class="l" id="L119"><span class="n">119</span>#print axioms GoldC.QuillonCoef.norm_main_le</span>
+<span class="l" id="L120"><span class="n">120</span>#print axioms GoldC.QuillonCoef.norm_class_le</span>
+<span class="l" id="L121"><span class="n">121</span>#print axioms GoldC.QuillonCoef.filter_cast_eq</span>
+<span class="l" id="L122"><span class="n">122</span>#print axioms GoldC.QuillonCoef.norm_βk</span></pre></div></body></html>

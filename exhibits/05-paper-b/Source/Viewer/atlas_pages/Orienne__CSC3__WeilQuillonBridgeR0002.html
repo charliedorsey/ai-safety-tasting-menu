@@ -1,0 +1,26 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · Orienne/CSC3/WeilQuillonBridgeR0002.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>Orienne/CSC3/WeilQuillonBridgeR0002.lean</h1><p class="meta">LEAN/Orienne/CSC3/WeilQuillonBridgeR0002.lean · 25 lines · SHA-256 6e99e4243bfc1cf00935a2bf81f092c5aa4ccf73c256bce520f3ecfa2336da48</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import GeneralKloosterman.General</span>
+<span class="l" id="L2"><span class="n">2</span>import GoldC.QuillonCompletion</span>
+<span class="l" id="L3"><span class="n">3</span></span>
+<span class="l" id="L4"><span class="n">4</span>open scoped BigOperators</span>
+<span class="l" id="L5"><span class="n">5</span>namespace Orienne.CSC3</span>
+<span class="l" id="L6"><span class="n">6</span></span>
+<span class="l" id="L7"><span class="n">7</span>/-- Exact normalization identity: Quillon&#x27;s complete unit-character sum</span>
+<span class="l" id="L8"><span class="n">8</span>is the RML/GenKloosterman complete unit-character sum, with both phase</span>
+<span class="l" id="L9"><span class="n">9</span>coefficients in the same order. -/</span>
+<span class="l" id="L10"><span class="n">10</span>theorem quillon_K_eq_rml (s : ℕ) [NeZero s] (a b : ZMod s) :</span>
+<span class="l" id="L11"><span class="n">11</span>    GoldC.QuillonKl.K s a b = GenKloosterman.kSum s b a := by</span>
+<span class="l" id="L12"><span class="n">12</span>  rfl</span>
+<span class="l" id="L13"><span class="n">13</span></span>
+<span class="l" id="L14"><span class="n">14</span>/-- General-modulus Weil–Estermann bound on the actual complete</span>
+<span class="l" id="L15"><span class="n">15</span>Quillon Kloosterman sum, with full gcd conductor retained. -/</span>
+<span class="l" id="L16"><span class="n">16</span>theorem norm_quillon_K_weil (s : ℕ) [NeZero s] (a b : ZMod s) :</span>
+<span class="l" id="L17"><span class="n">17</span>    ‖GoldC.QuillonKl.K s a b‖ ≤</span>
+<span class="l" id="L18"><span class="n">18</span>      (s.divisors.card : ℝ) *</span>
+<span class="l" id="L19"><span class="n">19</span>        Real.sqrt (Nat.gcd (Nat.gcd a.val b.val) s * s) := by</span>
+<span class="l" id="L20"><span class="n">20</span>  rw [quillon_K_eq_rml]</span>
+<span class="l" id="L21"><span class="n">21</span>  simpa only [GenKloosterman.kgcd, Nat.gcd_comm b.val a.val] using (GenKloosterman.norm_kSum_le s b a)</span>
+<span class="l" id="L22"><span class="n">22</span></span>
+<span class="l" id="L23"><span class="n">23</span>#print axioms quillon_K_eq_rml</span>
+<span class="l" id="L24"><span class="n">24</span>#print axioms norm_quillon_K_weil</span>
+<span class="l" id="L25"><span class="n">25</span>end Orienne.CSC3</span></pre></div></body></html>

@@ -1,0 +1,143 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · PaperB/Gate3/CentralTransfer/ThreeSectorTerminalAssembly.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>PaperB/Gate3/CentralTransfer/ThreeSectorTerminalAssembly.lean</h1><p class="meta">LEAN/PaperB/Gate3/CentralTransfer/ThreeSectorTerminalAssembly.lean · 142 lines · SHA-256 707f87b24b736e763c97aea5d7f4149a6b08d902ba60a0442f5547f2bc549636</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import PaperB.Gate3.CentralTransfer.ThreeSectorConsumer</span>
+<span class="l" id="L2"><span class="n">2</span>import PaperB.Gate3.CentralTransfer.SourceDebtConsumer</span>
+<span class="l" id="L3"><span class="n">3</span></span>
+<span class="l" id="L4"><span class="n">4</span>/-!</span>
+<span class="l" id="L5"><span class="n">5</span># Merivelle R0002 — literal Central terminal from three physical sector rates</span>
+<span class="l" id="L6"><span class="n">6</span></span>
+<span class="l" id="L7"><span class="n">7</span>No new mathematical input: exact GoldC source decomposition,</span>
+<span class="l" id="L8"><span class="n">8</span>swap-symmetric centralGate fold, established negligible inverse/density</span>
+<span class="l" id="L9"><span class="n">9</span>terms, Kelvran&#x27;s kernel-checked source-to-R0056 bridge, and the existing</span>
+<span class="l" id="L10"><span class="n">10</span>Suzuki-paid terminal.</span>
+<span class="l" id="L11"><span class="n">11</span></span>
+<span class="l" id="L12"><span class="n">12</span>Three explicit, uniform, signed sector o(log h) hypotheses remain.</span>
+<span class="l" id="L13"><span class="n">13</span>In particular, the MIDDLE signed hypothesis is *not* proved here.</span>
+<span class="l" id="L14"><span class="n">14</span>-/</span>
+<span class="l" id="L15"><span class="n">15</span></span>
+<span class="l" id="L16"><span class="n">16</span>open scoped BigOperators Classical</span>
+<span class="l" id="L17"><span class="n">17</span>namespace Merivelle.Central</span>
+<span class="l" id="L18"><span class="n">18</span>open GoldC</span>
+<span class="l" id="L19"><span class="n">19</span></span>
+<span class="l" id="L20"><span class="n">20</span>/-- Original balanced Central source = signed folded row plus</span>
+<span class="l" id="L21"><span class="n">21</span>    the already-paid inverse and density errors, with the literal</span>
+<span class="l" id="L22"><span class="n">22</span>    quarter-parent cutoff and all source decorations unchanged. -/</span>
+<span class="l" id="L23"><span class="n">23</span>theorem activeCentral_fold_plus_paid_errors</span>
+<span class="l" id="L24"><span class="n">24</span>    (q a h : ℕ) (hq : 0 &lt; q) :</span>
+<span class="l" id="L25"><span class="n">25</span>    activeCentral q a h =</span>
+<span class="l" id="L26"><span class="n">26</span>      regionSum q h (centralGate h) (foldRow q a) +</span>
+<span class="l" id="L27"><span class="n">27</span>        (regionSum q h (centralGate h) (invRow q a) +</span>
+<span class="l" id="L28"><span class="n">28</span>         regionSum q h (centralGate h) (densRow q a)) := by</span>
+<span class="l" id="L29"><span class="n">29</span>  have hsplit := regionSum_decomp q a h (centralGate h)</span>
+<span class="l" id="L30"><span class="n">30</span>  have hfold := regionSum_fold q a h hq (centralGate h)</span>
+<span class="l" id="L31"><span class="n">31</span>    (fun H r s =&gt; centralGate_swap h H r s)</span>
+<span class="l" id="L32"><span class="n">32</span>  rw [← regionSum_central_eq_activeCentral] </span>
+<span class="l" id="L33"><span class="n">33</span>  rw [hsplit]</span>
+<span class="l" id="L34"><span class="n">34</span>  rw [← hfold]</span>
+<span class="l" id="L35"><span class="n">35</span>  ring</span>
+<span class="l" id="L36"><span class="n">36</span></span>
+<span class="l" id="L37"><span class="n">37</span>/-- A SOURCE-EXACT numerical error for the original Central row:</span>
+<span class="l" id="L38"><span class="n">38</span>    the difference from the signed folded source is bounded by</span>
+<span class="l" id="L39"><span class="n">39</span>    the already-known decaying baseRate. -/</span>
+<span class="l" id="L40"><span class="n">40</span>theorem activeCentral_fold_error_abs_le</span>
+<span class="l" id="L41"><span class="n">41</span>    (q a h : ℕ) (hq : 0 &lt; q) (hh : 0 &lt; h) :</span>
+<span class="l" id="L42"><span class="n">42</span>    |activeCentral q a h -</span>
+<span class="l" id="L43"><span class="n">43</span>      regionSum q h (centralGate h) (foldRow q a)| ≤</span>
+<span class="l" id="L44"><span class="n">44</span>      (6 * (q : ℝ) + 2) * baseRate h := by</span>
+<span class="l" id="L45"><span class="n">45</span>  have heq : activeCentral q a h -</span>
+<span class="l" id="L46"><span class="n">46</span>      regionSum q h (centralGate h) (foldRow q a) =</span>
+<span class="l" id="L47"><span class="n">47</span>      regionSum q h (centralGate h) (invRow q a) +</span>
+<span class="l" id="L48"><span class="n">48</span>      regionSum q h (centralGate h) (densRow q a) := by</span>
+<span class="l" id="L49"><span class="n">49</span>    rw [activeCentral_fold_plus_paid_errors q a h hq]</span>
+<span class="l" id="L50"><span class="n">50</span>    ring</span>
+<span class="l" id="L51"><span class="n">51</span>  rw [heq]</span>
+<span class="l" id="L52"><span class="n">52</span>  calc</span>
+<span class="l" id="L53"><span class="n">53</span>    _ ≤ |regionSum q h (centralGate h) (invRow q a)| +</span>
+<span class="l" id="L54"><span class="n">54</span>      |regionSum q h (centralGate h) (densRow q a)| :=</span>
+<span class="l" id="L55"><span class="n">55</span>        abs_add_le _ _</span>
+<span class="l" id="L56"><span class="n">56</span>    _ ≤ baseRate h + (6 * (q : ℝ) + 1) * baseRate h := by</span>
+<span class="l" id="L57"><span class="n">57</span>      apply add_le_add</span>
+<span class="l" id="L58"><span class="n">58</span>      · exact regionInv_le q a h hh (centralGate h)</span>
+<span class="l" id="L59"><span class="n">59</span>      · exact regionDens_le q a h hq hh (centralGate h)</span>
+<span class="l" id="L60"><span class="n">60</span>    _ = (6 * (q : ℝ) + 2) * baseRate h := by ring</span>
+<span class="l" id="L61"><span class="n">61</span></span>
+<span class="l" id="L62"><span class="n">62</span>/-- The quantitative source comparison gives the original full</span>
+<span class="l" id="L63"><span class="n">63</span>    signed GoldC Central rate from only the physical folded rate.</span>
+<span class="l" id="L64"><span class="n">64</span>    No assumption of signed sawtooth equidistribution is introduced</span>
+<span class="l" id="L65"><span class="n">65</span>    beyond hFold&#x27;s actual weighted source estimate. -/</span>
+<span class="l" id="L66"><span class="n">66</span>theorem signedActiveCentralSublog_of_folded</span>
+<span class="l" id="L67"><span class="n">67</span>    (hFold : SourceUniformSublog</span>
+<span class="l" id="L68"><span class="n">68</span>      (fun q a h =&gt; regionSum q h (centralGate h) (foldRow q a))) :</span>
+<span class="l" id="L69"><span class="n">69</span>    SignedActiveCentralSublog := by</span>
+<span class="l" id="L70"><span class="n">70</span>  intro q hq hsq eps heps</span>
+<span class="l" id="L71"><span class="n">71</span>  let C : ℝ := 6 * (q : ℝ) + 2</span>
+<span class="l" id="L72"><span class="n">72</span>  have hC : 0 &lt; C := by dsimp [C]; positivity</span>
+<span class="l" id="L73"><span class="n">73</span>  have hdelta : 0 &lt; eps / (2 * C) := by positivity</span>
+<span class="l" id="L74"><span class="n">74</span>  obtain ⟨Hfold, hfold⟩ := hFold q hq hsq (eps / 2) (by positivity)</span>
+<span class="l" id="L75"><span class="n">75</span>  obtain ⟨Herr, herr⟩ := baseRate_small (eps / (2 * C)) hdelta</span>
+<span class="l" id="L76"><span class="n">76</span>  refine ⟨max Hfold Herr, ?_⟩</span>
+<span class="l" id="L77"><span class="n">77</span>  intro a h hqa hh hpar hlarge</span>
+<span class="l" id="L78"><span class="n">78</span>  have hFoldBound : |regionSum q h (centralGate h) (foldRow q a)| ≤</span>
+<span class="l" id="L79"><span class="n">79</span>      (eps / 2) * Real.log (h : ℝ) :=</span>
+<span class="l" id="L80"><span class="n">80</span>    hfold a h hqa hh hpar (le_trans (le_max_left _ _) hlarge)</span>
+<span class="l" id="L81"><span class="n">81</span>  obtain ⟨-, hLog, hRate⟩ :=</span>
+<span class="l" id="L82"><span class="n">82</span>    herr h (le_trans (le_max_right _ _) hlarge)</span>
+<span class="l" id="L83"><span class="n">83</span>  have hErr := activeCentral_fold_error_abs_le q a h hq hh</span>
+<span class="l" id="L84"><span class="n">84</span>  have hErrBound :</span>
+<span class="l" id="L85"><span class="n">85</span>      |activeCentral q a h -</span>
+<span class="l" id="L86"><span class="n">86</span>        regionSum q h (centralGate h) (foldRow q a)| ≤</span>
+<span class="l" id="L87"><span class="n">87</span>          (eps / 2) * Real.log (h : ℝ) := by</span>
+<span class="l" id="L88"><span class="n">88</span>    calc</span>
+<span class="l" id="L89"><span class="n">89</span>      _ ≤ C * baseRate h := by simpa only [C] using hErr</span>
+<span class="l" id="L90"><span class="n">90</span>      _ ≤ C * (eps / (2 * C)) :=</span>
+<span class="l" id="L91"><span class="n">91</span>        mul_le_mul_of_nonneg_left hRate hC.le</span>
+<span class="l" id="L92"><span class="n">92</span>      _ = eps / 2 := by</span>
+<span class="l" id="L93"><span class="n">93</span>        field_simp</span>
+<span class="l" id="L94"><span class="n">94</span>      _ ≤ (eps / 2) * Real.log (h : ℝ) := by</span>
+<span class="l" id="L95"><span class="n">95</span>        have he : (eps / 2) * 1 ≤ (eps / 2) * Real.log (h : ℝ) :=</span>
+<span class="l" id="L96"><span class="n">96</span>          mul_le_mul_of_nonneg_left hLog (by positivity)</span>
+<span class="l" id="L97"><span class="n">97</span>        simpa only [mul_one] using he</span>
+<span class="l" id="L98"><span class="n">98</span>  calc</span>
+<span class="l" id="L99"><span class="n">99</span>    |activeCentral q a h| =</span>
+<span class="l" id="L100"><span class="n">100</span>      |(activeCentral q a h -</span>
+<span class="l" id="L101"><span class="n">101</span>         regionSum q h (centralGate h) (foldRow q a)) +</span>
+<span class="l" id="L102"><span class="n">102</span>         regionSum q h (centralGate h) (foldRow q a)| := by</span>
+<span class="l" id="L103"><span class="n">103</span>           simp only [sub_add_cancel]</span>
+<span class="l" id="L104"><span class="n">104</span>    _ ≤ |activeCentral q a h -</span>
+<span class="l" id="L105"><span class="n">105</span>           regionSum q h (centralGate h) (foldRow q a)| +</span>
+<span class="l" id="L106"><span class="n">106</span>         |regionSum q h (centralGate h) (foldRow q a)| :=</span>
+<span class="l" id="L107"><span class="n">107</span>      abs_add_le _ _</span>
+<span class="l" id="L108"><span class="n">108</span>    _ ≤ eps * Real.log (h : ℝ) := by linarith</span>
+<span class="l" id="L109"><span class="n">109</span></span>
+<span class="l" id="L110"><span class="n">110</span>/-- Exact literal R0056 Central rate from the three source-true</span>
+<span class="l" id="L111"><span class="n">111</span>    uniform sector rates; still conditional on all three. -/</span>
+<span class="l" id="L112"><span class="n">112</span>theorem literal_R0056_sublog_of_three_sectors</span>
+<span class="l" id="L113"><span class="n">113</span>    (Jlow Jhigh : ℕ → ℕ) (hord : ∀ h, Jlow h ≤ Jhigh h)</span>
+<span class="l" id="L114"><span class="n">114</span>    (hLow : SourceUniformSublog (lowSector Jlow))</span>
+<span class="l" id="L115"><span class="n">115</span>    (hMiddle : SourceUniformSublog (middleSector Jlow Jhigh))</span>
+<span class="l" id="L116"><span class="n">116</span>    (hHigh : SourceUniformSublog (highSector Jhigh)) :</span>
+<span class="l" id="L117"><span class="n">117</span>    PaperB.FixedQ.virelleR0061CompleteRegionSublog</span>
+<span class="l" id="L118"><span class="n">118</span>      PaperB.FixedQ.virelleR0037Central :=</span>
+<span class="l" id="L119"><span class="n">119</span>  PaperB.FixedQ.central_r0056_of_signed_rounding_debt</span>
+<span class="l" id="L120"><span class="n">120</span>    (debt_of_signedActiveCentralSublog</span>
+<span class="l" id="L121"><span class="n">121</span>      (signedActiveCentralSublog_of_folded</span>
+<span class="l" id="L122"><span class="n">122</span>        (foldedCentral_sublog_of_three Jlow Jhigh hord hLow hMiddle hHigh)))</span>
+<span class="l" id="L123"><span class="n">123</span></span>
+<span class="l" id="L124"><span class="n">124</span>/-- Conditional terminal assembler: LOW + MIDDLE + HIGH, each a</span>
+<span class="l" id="L125"><span class="n">125</span>    verified eventual signed source rate, would close Paper B,</span>
+<span class="l" id="L126"><span class="n">126</span>    using already-paid Suzuki. This is NOT unconditional closure. -/</span>
+<span class="l" id="L127"><span class="n">127</span>theorem paperB_terminal_of_three_sector_rates</span>
+<span class="l" id="L128"><span class="n">128</span>    (Jlow Jhigh : ℕ → ℕ) (hord : ∀ h, Jlow h ≤ Jhigh h)</span>
+<span class="l" id="L129"><span class="n">129</span>    (hLow : SourceUniformSublog (lowSector Jlow))</span>
+<span class="l" id="L130"><span class="n">130</span>    (hMiddle : SourceUniformSublog (middleSector Jlow Jhigh))</span>
+<span class="l" id="L131"><span class="n">131</span>    (hHigh : SourceUniformSublog (highSector Jhigh)) :</span>
+<span class="l" id="L132"><span class="n">132</span>    PaperB.Closure.PaperBTerminalStatement :=</span>
+<span class="l" id="L133"><span class="n">133</span>  PaperB.FixedQ.paperB_terminal_of_central_only</span>
+<span class="l" id="L134"><span class="n">134</span>    (literal_R0056_sublog_of_three_sectors</span>
+<span class="l" id="L135"><span class="n">135</span>      Jlow Jhigh hord hLow hMiddle hHigh)</span>
+<span class="l" id="L136"><span class="n">136</span></span>
+<span class="l" id="L137"><span class="n">137</span>#print axioms activeCentral_fold_plus_paid_errors</span>
+<span class="l" id="L138"><span class="n">138</span>#print axioms activeCentral_fold_error_abs_le</span>
+<span class="l" id="L139"><span class="n">139</span>#print axioms signedActiveCentralSublog_of_folded</span>
+<span class="l" id="L140"><span class="n">140</span>#print axioms literal_R0056_sublog_of_three_sectors</span>
+<span class="l" id="L141"><span class="n">141</span>#print axioms paperB_terminal_of_three_sector_rates</span>
+<span class="l" id="L142"><span class="n">142</span>end Merivelle.Central</span></pre></div></body></html>

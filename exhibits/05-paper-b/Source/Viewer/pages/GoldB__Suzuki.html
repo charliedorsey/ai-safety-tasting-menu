@@ -1,0 +1,302 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LEAN/GoldB/Suzuki.lean</title><style>body{background:#f9f8f4;color:#27332d;font:16px/1.5 Georgia,serif;margin:0}a{color:#2d6255}.wrap{max-width:1160px;margin:0 auto;padding:30px 24px}header{border-bottom:1px solid #d8ded7;margin-bottom:22px}h1{font-size:29px;font-weight:normal;overflow-wrap:anywhere}.meta,nav,th{font:13px/1.5 system-ui,sans-serif;color:#5b6b63}nav a{margin-right:18px}.tblwrap{overflow-x:auto}table{border-collapse:collapse;width:100%}td,th{padding:9px 12px;border-bottom:1px solid #e0e3de;text-align:left;vertical-align:top}td code{overflow-wrap:anywhere}code,pre{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}pre{font-size:12.5px;white-space:pre;overflow-x:auto;line-height:1.6;background:#fff;padding:12px;border:1px solid #e2e4df}.ln{color:#8b968e;padding-right:15px;user-select:none}.line{display:block}.focus{background:#e9f1ec}.line:target{outline:2px solid #276b54;outline-offset:1px;background:#f6f4e7}.legend{padding:12px 15px;background:#fff;border-left:2px solid #629280;margin:24px 0}@media(max-width:640px){.wrap{padding:18px 12px}h1{font-size:21px}td,th{padding:8px}.meta{font-size:11px}pre{font-size:11px}}</style></head><body><div class="wrap"><header><nav><a href="../source_index.html">All source waypoints</a><a href="../../../Docs/companion/reading_room/index.html">Reading room</a></nav><h1>LEAN/GoldB/Suzuki.lean</h1><p class="meta">Exact archived source · SHA-256 230d2ef587618cf0836b734190216a06c011ed5c7acec69675a7bb858ae249ac · Original line numbers · Not a new Lean replay</p></header><p class="meta">Deep source proof text is reproduced verbatim for inspection; this page does not assert a compiler-derived proof-dependency graph.</p><pre><span class="line" id="L1"><span class="ln">    1</span>import GoldB.Final</span>
+<span class="line" id="L2"><span class="ln">    2</span>import GoldB.QuillonSelectedOrders</span>
+<span class="line" id="L3"><span class="ln">    3</span>import GoldB.QuillonDerivativeWindow</span>
+<span class="line" id="L4"><span class="ln">    4</span></span>
+<span class="line" id="L5"><span class="ln">    5</span>/-!</span>
+<span class="line" id="L6"><span class="ln">    6</span># GoldB.Suzuki — the shifted reciprocal phase over arbitrary sharp clips</span>
+<span class="line" id="L7"><span class="ln">    7</span></span>
+<span class="line" id="L8"><span class="ln">    8</span>Instantiates `karatsuba_lemma` with `(c0,c1,c2,c3) = (1/39, 25/26, 599/624, 1/4)` and the</span>
+<span class="line" id="L9"><span class="ln">    9</span>certified scratch facts R0007 (selected orders), R0010 (top derivative), R0015 (normalized</span>
+<span class="line" id="L10"><span class="ln">   10</span>derivative) and R0016 (selected window), for `f(x) = Y/(x+ϑ)` over `Finset.Ioc N U`.</span>
+<span class="line" id="L11"><span class="ln">   11</span></span>
+<span class="line" id="L12"><span class="ln">   12</span>`shiftedExpMode`/`shiftedModeSum` below are verbatim copies of the production definitions in</span>
+<span class="line" id="L13"><span class="ln">   13</span>`PaperB/Gate3/AuvrenClassicalTransfer.lean` (namespace `OrielUpper`), restated here because</span>
+<span class="line" id="L14"><span class="ln">   14</span>that module&#x27;s imports are not in the archive.</span>
+<span class="line" id="L15"><span class="ln">   15</span>-/</span>
+<span class="line" id="L16"><span class="ln">   16</span></span>
+<span class="line" id="L17"><span class="ln">   17</span>open Finset</span>
+<span class="line" id="L18"><span class="ln">   18</span></span>
+<span class="line" id="L19"><span class="ln">   19</span>namespace GoldB.Iface</span>
+<span class="line" id="L20"><span class="ln">   20</span></span>
+<span class="line" id="L21"><span class="ln">   21</span>noncomputable def shiftedExpMode (j : ℕ) (X ϑ γ : ℝ) (m : ℕ) : ℂ :=</span>
+<span class="line" id="L22"><span class="ln">   22</span>  Complex.exp (2 * Real.pi * Complex.I *</span>
+<span class="line" id="L23"><span class="ln">   23</span>    ((j : ℂ) * (((X / ((m : ℝ) + ϑ) + γ) : ℝ) : ℂ)))</span>
+<span class="line" id="L24"><span class="ln">   24</span></span>
+<span class="line" id="L25"><span class="ln">   25</span>noncomputable def shiftedModeSum (j : ℕ) (X ϑ γ : ℝ) (N U : ℕ) : ℂ :=</span>
+<span class="line" id="L26"><span class="ln">   26</span>  ∑ m ∈ Finset.Ioc N U, shiftedExpMode j X ϑ γ m</span>
+<span class="line" id="L27"><span class="ln">   27</span></span>
+<span class="line" id="L28"><span class="ln">   28</span>/-- verbatim `OrielUpper.ShiftedSuzukiCore` -/</span>
+<span class="line" id="L29"><span class="ln">   29</span>def ShiftedSuzukiCore : Prop :=</span>
+<span class="line" id="L30"><span class="ln">   30</span>  ∃ c C : ℝ, 0 &lt; c ∧ 0 ≤ C ∧</span>
+<span class="line" id="L31"><span class="ln">   31</span>    ∀ Y : ℝ, 2 ≤ Y → ∀ N : ℕ, 1 ≤ N →</span>
+<span class="line" id="L32"><span class="ln">   32</span>    ∀ ϑ : ℝ, 0 ≤ ϑ → ϑ ≤ 1 →</span>
+<span class="line" id="L33"><span class="ln">   33</span>    ∀ U : ℕ, U ≤ 2 * N →</span>
+<span class="line" id="L34"><span class="ln">   34</span>      ‖shiftedModeSum 1 Y ϑ 0 N U‖ ≤</span>
+<span class="line" id="L35"><span class="ln">   35</span>        C * ((N : ℝ) * Real.exp</span>
+<span class="line" id="L36"><span class="ln">   36</span>          (-(c * Real.log (N : ℝ)^3 / Real.log Y^2)) +</span>
+<span class="line" id="L37"><span class="ln">   37</span>          (N : ℝ)^2 / Y)</span>
+<span class="line" id="L38"><span class="ln">   38</span></span>
+<span class="line" id="L39"><span class="ln">   39</span>/-- the complementary low-`Y` (Kusmin–Landau) branch, as an exact Prop -/</span>
+<span class="line" id="L40"><span class="ln">   40</span>def ShiftedSuzukiLowY : Prop :=</span>
+<span class="line" id="L41"><span class="ln">   41</span>  ∃ c C : ℝ, 0 &lt; c ∧ 0 ≤ C ∧</span>
+<span class="line" id="L42"><span class="ln">   42</span>    ∀ Y : ℝ, 2 ≤ Y → ∀ N : ℕ, 4096 ≤ N →</span>
+<span class="line" id="L43"><span class="ln">   43</span>    ∀ ϑ : ℝ, 0 ≤ ϑ → ϑ ≤ 1 →</span>
+<span class="line" id="L44"><span class="ln">   44</span>    ∀ U : ℕ, U ≤ 2 * N →</span>
+<span class="line" id="L45"><span class="ln">   45</span>      Real.log Y &lt; (3 / 2) * (Real.log (N : ℝ) + Real.log 2) →</span>
+<span class="line" id="L46"><span class="ln">   46</span>      ‖shiftedModeSum 1 Y ϑ 0 N U‖ ≤</span>
+<span class="line" id="L47"><span class="ln">   47</span>        C * ((N : ℝ) * Real.exp</span>
+<span class="line" id="L48"><span class="ln">   48</span>          (-(c * Real.log (N : ℝ)^3 / Real.log Y^2)) +</span>
+<span class="line" id="L49"><span class="ln">   49</span>          (N : ℝ)^2 / Y)</span>
+<span class="line" id="L50"><span class="ln">   50</span></span>
+<span class="line" id="L51"><span class="ln">   51</span>lemma shiftedModeSum_eq (Y ϑ : ℝ) (N U : ℕ) :</span>
+<span class="line" id="L52"><span class="ln">   52</span>    shiftedModeSum 1 Y ϑ 0 N U =</span>
+<span class="line" id="L53"><span class="ln">   53</span>      ∑ n ∈ Finset.Ioc (N : ℤ) (U : ℤ), GoldB.ee (Y / ((n : ℝ) + ϑ)) := by</span>
+<span class="line" id="L54"><span class="ln">   54</span>  unfold shiftedModeSum shiftedExpMode GoldB.ee</span>
+<span class="line" id="L55"><span class="ln">   55</span>  apply Finset.sum_nbij&#x27; (fun m : ℕ =&gt; (m : ℤ)) (fun n : ℤ =&gt; n.toNat)</span>
+<span class="line" id="L56"><span class="ln">   56</span>  · intro m hm; simp only [Finset.mem_coe, Finset.mem_Ioc] at hm ⊢; omega</span>
+<span class="line" id="L57"><span class="ln">   57</span>  · intro n hn; simp only [Finset.mem_coe, Finset.mem_Ioc] at hn ⊢; omega</span>
+<span class="line" id="L58"><span class="ln">   58</span>  · intro m _; simp</span>
+<span class="line" id="L59"><span class="ln">   59</span>  · intro n hn; simp only [Finset.mem_coe, Finset.mem_Ioc] at hn; simp; omega</span>
+<span class="line" id="L60"><span class="ln">   60</span>  · intro m _; simp</span>
+<span class="line" id="L61"><span class="ln">   61</span></span>
+<span class="line" id="L62"><span class="ln">   62</span>lemma norm_shiftedModeSum_le (Y ϑ : ℝ) (N U : ℕ) (hU : U ≤ 2 * N) :</span>
+<span class="line" id="L63"><span class="ln">   63</span>    ‖shiftedModeSum 1 Y ϑ 0 N U‖ ≤ N := by</span>
+<span class="line" id="L64"><span class="ln">   64</span>  rw [shiftedModeSum_eq]</span>
+<span class="line" id="L65"><span class="ln">   65</span>  calc ‖∑ n ∈ Finset.Ioc (N : ℤ) (U : ℤ), GoldB.ee (Y / ((n : ℝ) + ϑ))‖</span>
+<span class="line" id="L66"><span class="ln">   66</span>      ≤ ∑ n ∈ Finset.Ioc (N : ℤ) (U : ℤ), ‖GoldB.ee (Y / ((n : ℝ) + ϑ))‖ := norm_sum_le _ _</span>
+<span class="line" id="L67"><span class="ln">   67</span>    _ = ((Finset.Ioc (N : ℤ) (U : ℤ)).card : ℝ) := by simp</span>
+<span class="line" id="L68"><span class="ln">   68</span>    _ ≤ N := by</span>
+<span class="line" id="L69"><span class="ln">   69</span>        rw [Int.card_Ioc]</span>
+<span class="line" id="L70"><span class="ln">   70</span>        have : ((U : ℤ) - N).toNat ≤ N := by omega</span>
+<span class="line" id="L71"><span class="ln">   71</span>        exact_mod_cast this</span>
+<span class="line" id="L72"><span class="ln">   72</span></span>
+<span class="line" id="L73"><span class="ln">   73</span>end GoldB.Iface</span>
+<span class="line" id="L74"><span class="ln">   74</span></span>
+<span class="line" id="L75"><span class="ln">   75</span>namespace GoldB</span>
+<span class="line" id="L76"><span class="ln">   76</span></span>
+<span class="line" id="L77"><span class="ln">   77</span>open GoldB.Iface OrielUpper</span>
+<span class="line" id="L78"><span class="ln">   78</span></span>
+<span class="line" id="L79"><span class="ln">   79</span>/-- the Karatsuba constants for the shifted reciprocal phase -/</span>
+<span class="line" id="L80"><span class="ln">   80</span>theorem shifted_highY_bound :</span>
+<span class="line" id="L81"><span class="ln">   81</span>    ∃ c C : ℝ, 0 &lt; c ∧ 0 ≤ C ∧</span>
+<span class="line" id="L82"><span class="ln">   82</span>      ∀ Y : ℝ, 2 ≤ Y → ∀ N : ℕ, 4096 ≤ N → ∀ ϑ : ℝ, 0 ≤ ϑ → ϑ ≤ 1 →</span>
+<span class="line" id="L83"><span class="ln">   83</span>      ∀ U : ℕ, U ≤ 2 * N →</span>
+<span class="line" id="L84"><span class="ln">   84</span>        (3 / 2) * (Real.log (N : ℝ) + Real.log 2) ≤ Real.log Y →</span>
+<span class="line" id="L85"><span class="ln">   85</span>        ‖shiftedModeSum 1 Y ϑ 0 N U‖ ≤</span>
+<span class="line" id="L86"><span class="ln">   86</span>          C * ((N : ℝ) * Real.exp (-(c * Real.log (N : ℝ) ^ 3 / Real.log Y ^ 2))) := by</span>
+<span class="line" id="L87"><span class="ln">   87</span>  obtain ⟨γ, C, hγ, hγ1, hC, hK⟩ := karatsuba_lemma (1 / 39) (25 / 26) (599 / 624) (1 / 4)</span>
+<span class="line" id="L88"><span class="ln">   88</span>    (by norm_num) (by norm_num) (by norm_num) (by norm_num) (by norm_num) (by norm_num)</span>
+<span class="line" id="L89"><span class="ln">   89</span>  refine ⟨γ / 676, C, by positivity, hC, ?_⟩</span>
+<span class="line" id="L90"><span class="ln">   90</span>  intro Y hY N hN ϑ hϑ0 hϑ1 U hU hreg</span>
+<span class="line" id="L91"><span class="ln">   91</span>  set P : ℝ := (N : ℝ)</span>
+<span class="line" id="L92"><span class="ln">   92</span>  have hP : (4096 : ℝ) ≤ P := by simp only [P]; exact_mod_cast hN</span>
+<span class="line" id="L93"><span class="ln">   93</span>  have hP0 : 0 &lt; P := by linarith</span>
+<span class="line" id="L94"><span class="ln">   94</span>  have hP1 : 1 &lt; P := by linarith</span>
+<span class="line" id="L95"><span class="ln">   95</span>  have hY0 : 0 &lt; Y := by linarith</span>
+<span class="line" id="L96"><span class="ln">   96</span>  have hlP : 0 &lt; Real.log P := Real.log_pos hP1</span>
+<span class="line" id="L97"><span class="ln">   97</span>  set t := Real.log Y / Real.log P</span>
+<span class="line" id="L98"><span class="ln">   98</span>  have hl2 : 0 &lt; Real.log 2 := Real.log_pos (by norm_num)</span>
+<span class="line" id="L99"><span class="ln">   99</span>  have ht : (3 / 2 : ℝ) ≤ t := by</span>
+<span class="line" id="L100"><span class="ln">  100</span>    simp only [t]; rw [le_div_iff₀ hlP]; nlinarith</span>
+<span class="line" id="L101"><span class="ln">  101</span>  set k := veylanSuzukiOrder t</span>
+<span class="line" id="L102"><span class="ln">  102</span>  set Js := veylanSuzukiSelected t</span>
+<span class="line" id="L103"><span class="ln">  103</span>  obtain ⟨hcnt1, hcnt2, hcnt3⟩ := veylan_suzuki_selected_count t ht</span>
+<span class="line" id="L104"><span class="ln">  104</span>  have hk39 : 39 ≤ k := by</span>
+<span class="line" id="L105"><span class="ln">  105</span>    simp only [k, veylanSuzukiOrder]</span>
+<span class="line" id="L106"><span class="ln">  106</span>    apply Nat.le_floor; push_cast; linarith</span>
+<span class="line" id="L107"><span class="ln">  107</span>  have hk : 1 ≤ k := by omega</span>
+<span class="line" id="L108"><span class="ln">  108</span>  set f : ℝ → ℝ := fun z =&gt; Y / (z + ϑ)</span>
+<span class="line" id="L109"><span class="ln">  109</span>  -- the hypotheses of the Karatsuba lemma</span>
+<span class="line" id="L110"><span class="ln">  110</span>  have hsmooth : ∀ x ∈ Set.Icc P (P + P), ContDiffAt ℝ (k + 1) f x := by</span>
+<span class="line" id="L111"><span class="ln">  111</span>    intro x hx</span>
+<span class="line" id="L112"><span class="ln">  112</span>    have hx0 : x + ϑ ≠ 0 := by have := hx.1; linarith</span>
+<span class="line" id="L113"><span class="ln">  113</span>    exact contDiffAt_const.div (contDiffAt_id.add contDiffAt_const) hx0</span>
+<span class="line" id="L114"><span class="ln">  114</span>  have hnorm : ∀ x ∈ Set.Icc P (P + P), ∀ j : ℕ,</span>
+<span class="line" id="L115"><span class="ln">  115</span>      |iteratedDeriv j f x| / j.factorial = Y / (x + ϑ) ^ (j + 1) := by</span>
+<span class="line" id="L116"><span class="ln">  116</span>    intro x hx j</span>
+<span class="line" id="L117"><span class="ln">  117</span>    have hx0 : 0 &lt; x + ϑ := by have := hx.1; linarith</span>
+<span class="line" id="L118"><span class="ln">  118</span>    have := veylan_suzuki_normalized_derivative Y ϑ x j hY0.le hx0</span>
+<span class="line" id="L119"><span class="ln">  119</span>    rw [Real.norm_eq_abs, abs_div, abs_of_pos (by exact_mod_cast Nat.factorial_pos j :</span>
+<span class="line" id="L120"><span class="ln">  120</span>      (0 : ℝ) &lt; j.factorial)] at this</span>
+<span class="line" id="L121"><span class="ln">  121</span>    exact this</span>
+<span class="line" id="L122"><span class="ln">  122</span>  have hA : ∀ x ∈ Set.Icc P (P + P),</span>
+<span class="line" id="L123"><span class="ln">  123</span>      |iteratedDeriv (k + 1) f x| / (k + 1).factorial ≤ P ^ (-((25 / 26 : ℝ) * (k + 1))) := by</span>
+<span class="line" id="L124"><span class="ln">  124</span>    intro x hx</span>
+<span class="line" id="L125"><span class="ln">  125</span>    rw [hnorm x hx]</span>
+<span class="line" id="L126"><span class="ln">  126</span>    have := veylan_suzuki_top_derivative_upper P x ϑ Y k hP1 hx.1 hϑ0 hY0 rfl</span>
+<span class="line" id="L127"><span class="ln">  127</span>    simpa [pow_succ, add_assoc] using this</span>
+<span class="line" id="L128"><span class="ln">  128</span>  have hJs : Js ⊆ Finset.Icc 1 k := by</span>
+<span class="line" id="L129"><span class="ln">  129</span>    intro j hj</span>
+<span class="line" id="L130"><span class="ln">  130</span>    obtain ⟨h1, _, _, h4⟩ := veylan_suzuki_selected_order t ht j hj</span>
+<span class="line" id="L131"><span class="ln">  131</span>    exact Finset.mem_Icc.mpr ⟨h1, h4⟩</span>
+<span class="line" id="L132"><span class="ln">  132</span>  have hJc : (1 / 39 : ℝ) * k ≤ Js.card := by</span>
+<span class="line" id="L133"><span class="ln">  133</span>    have := hcnt2; simp only [k] at this ⊢; linarith</span>
+<span class="line" id="L134"><span class="ln">  134</span>  have hB : ∀ j ∈ Js, ∀ x ∈ Set.Icc P (P + P),</span>
+<span class="line" id="L135"><span class="ln">  135</span>      P ^ (-((599 / 624 : ℝ) * j)) ≤ |iteratedDeriv j f x| / j.factorial ∧</span>
+<span class="line" id="L136"><span class="ln">  136</span>        |iteratedDeriv j f x| / j.factorial ≤ P ^ (-((1 / 4 : ℝ) * j)) := by</span>
+<span class="line" id="L137"><span class="ln">  137</span>    intro j hj x hx</span>
+<span class="line" id="L138"><span class="ln">  138</span>    have hwin := veylan_suzuki_literal_selected_derivative_window P x ϑ Y j hP hx.1</span>
+<span class="line" id="L139"><span class="ln">  139</span>      (by linarith [hx.2]) hϑ0 hϑ1 hY0 hreg hj</span>
+<span class="line" id="L140"><span class="ln">  140</span>    have e : |iteratedDeriv j f x| / j.factorial =</span>
+<span class="line" id="L141"><span class="ln">  141</span>        ‖iteratedDeriv j (fun z : ℝ =&gt; Y / (z + ϑ)) x / (j.factorial : ℝ)‖ := by</span>
+<span class="line" id="L142"><span class="ln">  142</span>      rw [Real.norm_eq_abs, abs_div,</span>
+<span class="line" id="L143"><span class="ln">  143</span>        abs_of_pos (by exact_mod_cast Nat.factorial_pos j : (0 : ℝ) &lt; j.factorial)]</span>
+<span class="line" id="L144"><span class="ln">  144</span>    rw [e]</span>
+<span class="line" id="L145"><span class="ln">  145</span>    refine ⟨?_, hwin.2⟩</span>
+<span class="line" id="L146"><span class="ln">  146</span>    have := hwin.1</span>
+<span class="line" id="L147"><span class="ln">  147</span>    convert this using 2; ring</span>
+<span class="line" id="L148"><span class="ln">  148</span>  -- apply the lemma with X = N, P = N, P1 = U - N</span>
+<span class="line" id="L149"><span class="ln">  149</span>  have hmain := hK k hk P P hP1.le f hsmooth hA Js hJs hJc hB ((U : ℝ) - N) (by</span>
+<span class="line" id="L150"><span class="ln">  150</span>    have : (U : ℝ) ≤ 2 * N := by exact_mod_cast hU</span>
+<span class="line" id="L151"><span class="ln">  151</span>    simp only [P]; linarith)</span>
+<span class="line" id="L152"><span class="ln">  152</span>  have hfl1 : ⌊P⌋ = (N : ℤ) := by simp [P]</span>
+<span class="line" id="L153"><span class="ln">  153</span>  have hfl2 : ⌊P + ((U : ℝ) - N)⌋ = (U : ℤ) := by simp [P]</span>
+<span class="line" id="L154"><span class="ln">  154</span>  rw [hfl1, hfl2] at hmain</span>
+<span class="line" id="L155"><span class="ln">  155</span>  rw [shiftedModeSum_eq]</span>
+<span class="line" id="L156"><span class="ln">  156</span>  refine hmain.trans ?_</span>
+<span class="line" id="L157"><span class="ln">  157</span>  -- compare exponents</span>
+<span class="line" id="L158"><span class="ln">  158</span>  apply mul_le_mul_of_nonneg_left _ hC</span>
+<span class="line" id="L159"><span class="ln">  159</span>  have hkt : (k : ℝ) ≤ 26 * t := Nat.floor_le (by positivity)</span>
+<span class="line" id="L160"><span class="ln">  160</span>  have hkpos : (0 : ℝ) &lt; k := by exact_mod_cast (by omega : 0 &lt; k)</span>
+<span class="line" id="L161"><span class="ln">  161</span>  have hlY : 0 &lt; Real.log Y := by</span>
+<span class="line" id="L162"><span class="ln">  162</span>    have := ht; simp only [t] at this; rw [le_div_iff₀ hlP] at this; nlinarith</span>
+<span class="line" id="L163"><span class="ln">  163</span>  have hexp : P ^ (1 - γ / (k : ℝ) ^ 2) = P * Real.exp (-(γ / (k : ℝ) ^ 2 * Real.log P)) := by</span>
+<span class="line" id="L164"><span class="ln">  164</span>    rw [Real.rpow_def_of_pos hP0, sub_eq_add_neg, mul_add, Real.exp_add, mul_one,</span>
+<span class="line" id="L165"><span class="ln">  165</span>      Real.exp_log hP0]</span>
+<span class="line" id="L166"><span class="ln">  166</span>    ring_nf</span>
+<span class="line" id="L167"><span class="ln">  167</span>  rw [hexp]</span>
+<span class="line" id="L168"><span class="ln">  168</span>  apply mul_le_mul_of_nonneg_left _ hP0.le</span>
+<span class="line" id="L169"><span class="ln">  169</span>  apply Real.exp_le_exp.mpr</span>
+<span class="line" id="L170"><span class="ln">  170</span>  rw [neg_le_neg_iff]</span>
+<span class="line" id="L171"><span class="ln">  171</span>  -- γ log³ P / (676 log² Y) ≤ γ log P / k²</span>
+<span class="line" id="L172"><span class="ln">  172</span>  have hk2 : (k : ℝ) ^ 2 ≤ 676 * Real.log Y ^ 2 / Real.log P ^ 2 := by</span>
+<span class="line" id="L173"><span class="ln">  173</span>    have : (k : ℝ) ≤ 26 * (Real.log Y / Real.log P) := hkt</span>
+<span class="line" id="L174"><span class="ln">  174</span>    have h2 : (k : ℝ) ^ 2 ≤ (26 * (Real.log Y / Real.log P)) ^ 2 :=</span>
+<span class="line" id="L175"><span class="ln">  175</span>      pow_le_pow_left₀ hkpos.le this 2</span>
+<span class="line" id="L176"><span class="ln">  176</span>    calc (k : ℝ) ^ 2 ≤ (26 * (Real.log Y / Real.log P)) ^ 2 := h2</span>
+<span class="line" id="L177"><span class="ln">  177</span>      _ = 676 * Real.log Y ^ 2 / Real.log P ^ 2 := by field_simp; ring</span>
+<span class="line" id="L178"><span class="ln">  178</span>  rw [div_le_iff₀ (by positivity)]</span>
+<span class="line" id="L179"><span class="ln">  179</span>  rw [le_div_iff₀ (by positivity)] at hk2</span>
+<span class="line" id="L180"><span class="ln">  180</span>  have : γ / 676 * Real.log P ^ 3 / Real.log Y ^ 2 * Real.log Y ^ 2 =</span>
+<span class="line" id="L181"><span class="ln">  181</span>      γ / 676 * Real.log P ^ 3 := by field_simp</span>
+<span class="line" id="L182"><span class="ln">  182</span>  -- compatibility repair: `div_le_iff₀` now yields `a ≤ b * c` directly</span>
+<span class="line" id="L183"><span class="ln">  183</span>  calc γ / 676 * Real.log P ^ 3</span>
+<span class="line" id="L184"><span class="ln">  184</span>      ≤ γ / (k : ℝ) ^ 2 * Real.log P * Real.log Y ^ 2 := by</span>
+<span class="line" id="L185"><span class="ln">  185</span>        rw [show γ / (k : ℝ) ^ 2 * Real.log P * Real.log Y ^ 2 =</span>
+<span class="line" id="L186"><span class="ln">  186</span>            γ * Real.log P * Real.log Y ^ 2 / (k : ℝ) ^ 2 by ring, le_div_iff₀ (by positivity)]</span>
+<span class="line" id="L187"><span class="ln">  187</span>        have hγ0 : 0 ≤ γ := hγ.le</span>
+<span class="line" id="L188"><span class="ln">  188</span>        nlinarith [mul_le_mul_of_nonneg_left hk2 (by positivity : (0 : ℝ) ≤ γ * Real.log P)]</span>
+<span class="line" id="L189"><span class="ln">  189</span></span>
+<span class="line" id="L190"><span class="ln">  190</span>/-- **Gold B shifted corollary**: the high-`Y` and small-`N` cases of `ShiftedSuzukiCore`,</span>
+<span class="line" id="L191"><span class="ln">  191</span>over the literal sharp clips `Finset.Ioc N U`, all `ϑ ∈ [0,1]`, constants uniform. -/</span>
+<span class="line" id="L192"><span class="ln">  192</span>theorem shifted_suzuki_highY :</span>
+<span class="line" id="L193"><span class="ln">  193</span>    ∃ c C : ℝ, 0 &lt; c ∧ 0 ≤ C ∧</span>
+<span class="line" id="L194"><span class="ln">  194</span>      ∀ Y : ℝ, 2 ≤ Y → ∀ N : ℕ, 1 ≤ N → ∀ ϑ : ℝ, 0 ≤ ϑ → ϑ ≤ 1 →</span>
+<span class="line" id="L195"><span class="ln">  195</span>      ∀ U : ℕ, U ≤ 2 * N →</span>
+<span class="line" id="L196"><span class="ln">  196</span>        (N &lt; 4096 ∨ (3 / 2) * (Real.log (N : ℝ) + Real.log 2) ≤ Real.log Y) →</span>
+<span class="line" id="L197"><span class="ln">  197</span>        ‖shiftedModeSum 1 Y ϑ 0 N U‖ ≤</span>
+<span class="line" id="L198"><span class="ln">  198</span>          C * ((N : ℝ) * Real.exp (-(c * Real.log (N : ℝ) ^ 3 / Real.log Y ^ 2)) +</span>
+<span class="line" id="L199"><span class="ln">  199</span>            (N : ℝ) ^ 2 / Y) := by</span>
+<span class="line" id="L200"><span class="ln">  200</span>  obtain ⟨c, C, hc, hC, hH⟩ := shifted_highY_bound</span>
+<span class="line" id="L201"><span class="ln">  201</span>  set c&#x27; := min c 1</span>
+<span class="line" id="L202"><span class="ln">  202</span>  set E0 : ℝ := c&#x27; * Real.log 4096 ^ 3 / Real.log 2 ^ 2</span>
+<span class="line" id="L203"><span class="ln">  203</span>  refine ⟨c&#x27;, max C (Real.exp E0), lt_min hc one_pos, le_max_of_le_left hC, ?_⟩</span>
+<span class="line" id="L204"><span class="ln">  204</span>  intro Y hY N hN ϑ hϑ0 hϑ1 U hU hcase</span>
+<span class="line" id="L205"><span class="ln">  205</span>  have hNr : (1 : ℝ) ≤ N := by exact_mod_cast hN</span>
+<span class="line" id="L206"><span class="ln">  206</span>  have hY2 : 0 &lt; Real.log 2 := Real.log_pos (by norm_num)</span>
+<span class="line" id="L207"><span class="ln">  207</span>  have hlY : Real.log 2 ≤ Real.log Y := Real.log_le_log (by norm_num) hY</span>
+<span class="line" id="L208"><span class="ln">  208</span>  have hlN : 0 ≤ Real.log (N : ℝ) := Real.log_nonneg hNr</span>
+<span class="line" id="L209"><span class="ln">  209</span>  have hNY : 0 ≤ (N : ℝ) ^ 2 / Y := by positivity</span>
+<span class="line" id="L210"><span class="ln">  210</span>  have hexpmono : Real.exp (-(c * Real.log (N : ℝ) ^ 3 / Real.log Y ^ 2)) ≤</span>
+<span class="line" id="L211"><span class="ln">  211</span>      Real.exp (-(c&#x27; * Real.log (N : ℝ) ^ 3 / Real.log Y ^ 2)) := by</span>
+<span class="line" id="L212"><span class="ln">  212</span>    apply Real.exp_le_exp.mpr; rw [neg_le_neg_iff]</span>
+<span class="line" id="L213"><span class="ln">  213</span>    apply div_le_div_of_nonneg_right _ (by positivity)</span>
+<span class="line" id="L214"><span class="ln">  214</span>    exact mul_le_mul_of_nonneg_right (min_le_left _ _) (by positivity)</span>
+<span class="line" id="L215"><span class="ln">  215</span>  rcases hcase with hsmall | hbig</span>
+<span class="line" id="L216"><span class="ln">  216</span>  · -- trivial bound for small N</span>
+<span class="line" id="L217"><span class="ln">  217</span>    have hlN2 : Real.log (N : ℝ) ≤ Real.log 4096 :=</span>
+<span class="line" id="L218"><span class="ln">  218</span>      Real.log_le_log (by positivity) (by exact_mod_cast hsmall.le)</span>
+<span class="line" id="L219"><span class="ln">  219</span>    have hE : c&#x27; * Real.log (N : ℝ) ^ 3 / Real.log Y ^ 2 ≤ E0 := by</span>
+<span class="line" id="L220"><span class="ln">  220</span>      simp only [E0]</span>
+<span class="line" id="L221"><span class="ln">  221</span>      have hc&#x27;0 : 0 ≤ c&#x27; := le_min hc.le zero_le_one</span>
+<span class="line" id="L222"><span class="ln">  222</span>      calc c&#x27; * Real.log (N : ℝ) ^ 3 / Real.log Y ^ 2</span>
+<span class="line" id="L223"><span class="ln">  223</span>          ≤ c&#x27; * Real.log 4096 ^ 3 / Real.log Y ^ 2 := by</span>
+<span class="line" id="L224"><span class="ln">  224</span>            gcongr</span>
+<span class="line" id="L225"><span class="ln">  225</span>        _ ≤ c&#x27; * Real.log 4096 ^ 3 / Real.log 2 ^ 2 := by</span>
+<span class="line" id="L226"><span class="ln">  226</span>            apply div_le_div_of_nonneg_left (by positivity) (by positivity)</span>
+<span class="line" id="L227"><span class="ln">  227</span>            exact pow_le_pow_left₀ hY2.le hlY 2</span>
+<span class="line" id="L228"><span class="ln">  228</span>    have h1 : (1 : ℝ) ≤ Real.exp E0 * Real.exp (-(c&#x27; * Real.log (N : ℝ) ^ 3 / Real.log Y ^ 2)) := by</span>
+<span class="line" id="L229"><span class="ln">  229</span>      rw [← Real.exp_add]; exact Real.one_le_exp (by linarith)</span>
+<span class="line" id="L230"><span class="ln">  230</span>    calc ‖shiftedModeSum 1 Y ϑ 0 N U‖ ≤ N := norm_shiftedModeSum_le Y ϑ N U hU</span>
+<span class="line" id="L231"><span class="ln">  231</span>      _ ≤ Real.exp E0 * ((N : ℝ) * Real.exp (-(c&#x27; * Real.log (N : ℝ) ^ 3 / Real.log Y ^ 2))) := by</span>
+<span class="line" id="L232"><span class="ln">  232</span>          nlinarith</span>
+<span class="line" id="L233"><span class="ln">  233</span>      _ ≤ max C (Real.exp E0) * ((N : ℝ) * Real.exp (-(c&#x27; * Real.log (N : ℝ) ^ 3 /</span>
+<span class="line" id="L234"><span class="ln">  234</span>            Real.log Y ^ 2)) + (N : ℝ) ^ 2 / Y) := by</span>
+<span class="line" id="L235"><span class="ln">  235</span>          apply mul_le_mul (le_max_right _ _) (by linarith) (by positivity) (by positivity)</span>
+<span class="line" id="L236"><span class="ln">  236</span>  · by_cases hN4 : 4096 ≤ N</span>
+<span class="line" id="L237"><span class="ln">  237</span>    · calc ‖shiftedModeSum 1 Y ϑ 0 N U‖</span>
+<span class="line" id="L238"><span class="ln">  238</span>          ≤ C * ((N : ℝ) * Real.exp (-(c * Real.log (N : ℝ) ^ 3 / Real.log Y ^ 2))) :=</span>
+<span class="line" id="L239"><span class="ln">  239</span>            hH Y hY N hN4 ϑ hϑ0 hϑ1 U hU hbig</span>
+<span class="line" id="L240"><span class="ln">  240</span>        _ ≤ max C (Real.exp E0) * ((N : ℝ) * Real.exp (-(c&#x27; * Real.log (N : ℝ) ^ 3 /</span>
+<span class="line" id="L241"><span class="ln">  241</span>              Real.log Y ^ 2)) + (N : ℝ) ^ 2 / Y) := by</span>
+<span class="line" id="L242"><span class="ln">  242</span>            apply mul_le_mul (le_max_left _ _) _ (by positivity) (by positivity)</span>
+<span class="line" id="L243"><span class="ln">  243</span>            have := mul_le_mul_of_nonneg_left hexpmono (by positivity : (0 : ℝ) ≤ N)</span>
+<span class="line" id="L244"><span class="ln">  244</span>            linarith</span>
+<span class="line" id="L245"><span class="ln">  245</span>    · push_neg at hN4</span>
+<span class="line" id="L246"><span class="ln">  246</span>      -- same as the small case</span>
+<span class="line" id="L247"><span class="ln">  247</span>      have hlN2 : Real.log (N : ℝ) ≤ Real.log 4096 :=</span>
+<span class="line" id="L248"><span class="ln">  248</span>        Real.log_le_log (by positivity) (by exact_mod_cast hN4.le)</span>
+<span class="line" id="L249"><span class="ln">  249</span>      have hE : c&#x27; * Real.log (N : ℝ) ^ 3 / Real.log Y ^ 2 ≤ E0 := by</span>
+<span class="line" id="L250"><span class="ln">  250</span>        simp only [E0]</span>
+<span class="line" id="L251"><span class="ln">  251</span>        have hc&#x27;0 : 0 ≤ c&#x27; := le_min hc.le zero_le_one</span>
+<span class="line" id="L252"><span class="ln">  252</span>        calc c&#x27; * Real.log (N : ℝ) ^ 3 / Real.log Y ^ 2</span>
+<span class="line" id="L253"><span class="ln">  253</span>            ≤ c&#x27; * Real.log 4096 ^ 3 / Real.log Y ^ 2 := by gcongr</span>
+<span class="line" id="L254"><span class="ln">  254</span>          _ ≤ c&#x27; * Real.log 4096 ^ 3 / Real.log 2 ^ 2 := by</span>
+<span class="line" id="L255"><span class="ln">  255</span>              apply div_le_div_of_nonneg_left (by positivity) (by positivity)</span>
+<span class="line" id="L256"><span class="ln">  256</span>              exact pow_le_pow_left₀ hY2.le hlY 2</span>
+<span class="line" id="L257"><span class="ln">  257</span>      have h1 : (1 : ℝ) ≤ Real.exp E0 * Real.exp (-(c&#x27; * Real.log (N : ℝ) ^ 3 / Real.log Y ^ 2)) := by</span>
+<span class="line" id="L258"><span class="ln">  258</span>        rw [← Real.exp_add]; exact Real.one_le_exp (by linarith)</span>
+<span class="line" id="L259"><span class="ln">  259</span>      calc ‖shiftedModeSum 1 Y ϑ 0 N U‖ ≤ N := norm_shiftedModeSum_le Y ϑ N U hU</span>
+<span class="line" id="L260"><span class="ln">  260</span>        _ ≤ Real.exp E0 * ((N : ℝ) * Real.exp (-(c&#x27; * Real.log (N : ℝ) ^ 3 / Real.log Y ^ 2))) := by</span>
+<span class="line" id="L261"><span class="ln">  261</span>            nlinarith</span>
+<span class="line" id="L262"><span class="ln">  262</span>        _ ≤ max C (Real.exp E0) * ((N : ℝ) * Real.exp (-(c&#x27; * Real.log (N : ℝ) ^ 3 /</span>
+<span class="line" id="L263"><span class="ln">  263</span>              Real.log Y ^ 2)) + (N : ℝ) ^ 2 / Y) := by</span>
+<span class="line" id="L264"><span class="ln">  264</span>            apply mul_le_mul (le_max_right _ _) (by linarith) (by positivity) (by positivity)</span>
+<span class="line" id="L265"><span class="ln">  265</span></span>
+<span class="line" id="L266"><span class="ln">  266</span>/-- **join**: the low-`Y` branch is the only remaining input for `ShiftedSuzukiCore`. -/</span>
+<span class="line" id="L267"><span class="ln">  267</span>theorem shiftedSuzukiCore_of_lowY (hLow : ShiftedSuzukiLowY) : ShiftedSuzukiCore := by</span>
+<span class="line" id="L268"><span class="ln">  268</span>  obtain ⟨c1, C1, hc1, hC1, hH⟩ := shifted_suzuki_highY</span>
+<span class="line" id="L269"><span class="ln">  269</span>  obtain ⟨c2, C2, hc2, hC2, hL⟩ := hLow</span>
+<span class="line" id="L270"><span class="ln">  270</span>  refine ⟨min c1 c2, C1 + C2, lt_min hc1 hc2, by positivity, ?_⟩</span>
+<span class="line" id="L271"><span class="ln">  271</span>  intro Y hY N hN ϑ hϑ0 hϑ1 U hU</span>
+<span class="line" id="L272"><span class="ln">  272</span>  have hNr : (1 : ℝ) ≤ N := by exact_mod_cast hN</span>
+<span class="line" id="L273"><span class="ln">  273</span>  have hNY : 0 ≤ (N : ℝ) ^ 2 / Y := by</span>
+<span class="line" id="L274"><span class="ln">  274</span>    have hY0&#x27; : (0 : ℝ) &lt; Y := by linarith</span>
+<span class="line" id="L275"><span class="ln">  275</span>    positivity</span>
+<span class="line" id="L276"><span class="ln">  276</span>  set R := fun c : ℝ =&gt; (N : ℝ) * Real.exp (-(c * Real.log (N : ℝ) ^ 3 / Real.log Y ^ 2)) +</span>
+<span class="line" id="L277"><span class="ln">  277</span>    (N : ℝ) ^ 2 / Y</span>
+<span class="line" id="L278"><span class="ln">  278</span>  have hmono : ∀ c, min c1 c2 ≤ c → R c ≤ R (min c1 c2) := by</span>
+<span class="line" id="L279"><span class="ln">  279</span>    intro c hc</span>
+<span class="line" id="L280"><span class="ln">  280</span>    simp only [R]</span>
+<span class="line" id="L281"><span class="ln">  281</span>    have : Real.exp (-(c * Real.log (N : ℝ) ^ 3 / Real.log Y ^ 2)) ≤</span>
+<span class="line" id="L282"><span class="ln">  282</span>        Real.exp (-(min c1 c2 * Real.log (N : ℝ) ^ 3 / Real.log Y ^ 2)) := by</span>
+<span class="line" id="L283"><span class="ln">  283</span>      apply Real.exp_le_exp.mpr; rw [neg_le_neg_iff]</span>
+<span class="line" id="L284"><span class="ln">  284</span>      apply div_le_div_of_nonneg_right _ (by positivity)</span>
+<span class="line" id="L285"><span class="ln">  285</span>      exact mul_le_mul_of_nonneg_right hc (pow_nonneg (Real.log_nonneg hNr) 3)</span>
+<span class="line" id="L286"><span class="ln">  286</span>    have := mul_le_mul_of_nonneg_left this (by positivity : (0 : ℝ) ≤ N)</span>
+<span class="line" id="L287"><span class="ln">  287</span>    linarith</span>
+<span class="line" id="L288"><span class="ln">  288</span>  have hR0 : ∀ c, 0 ≤ R c := fun c =&gt; by simp only [R]; positivity</span>
+<span class="line" id="L289"><span class="ln">  289</span>  by_cases hcase : N &lt; 4096 ∨ (3 / 2) * (Real.log (N : ℝ) + Real.log 2) ≤ Real.log Y</span>
+<span class="line" id="L290"><span class="ln">  290</span>  · calc ‖shiftedModeSum 1 Y ϑ 0 N U‖ ≤ C1 * R c1 := hH Y hY N hN ϑ hϑ0 hϑ1 U hU hcase</span>
+<span class="line" id="L291"><span class="ln">  291</span>      _ ≤ C1 * R (min c1 c2) := mul_le_mul_of_nonneg_left (hmono c1 (min_le_left _ _)) hC1</span>
+<span class="line" id="L292"><span class="ln">  292</span>      _ ≤ (C1 + C2) * R (min c1 c2) := by</span>
+<span class="line" id="L293"><span class="ln">  293</span>          have := hR0 (min c1 c2); nlinarith</span>
+<span class="line" id="L294"><span class="ln">  294</span>  · push_neg at hcase</span>
+<span class="line" id="L295"><span class="ln">  295</span>    calc ‖shiftedModeSum 1 Y ϑ 0 N U‖ ≤ C2 * R c2 :=</span>
+<span class="line" id="L296"><span class="ln">  296</span>          hL Y hY N hcase.1 ϑ hϑ0 hϑ1 U hU hcase.2</span>
+<span class="line" id="L297"><span class="ln">  297</span>      _ ≤ C2 * R (min c1 c2) := mul_le_mul_of_nonneg_left (hmono c2 (min_le_right _ _)) hC2</span>
+<span class="line" id="L298"><span class="ln">  298</span>      _ ≤ (C1 + C2) * R (min c1 c2) := by</span>
+<span class="line" id="L299"><span class="ln">  299</span>          have := hR0 (min c1 c2); nlinarith</span>
+<span class="line" id="L300"><span class="ln">  300</span></span>
+<span class="line" id="L301"><span class="ln">  301</span>end GoldB</span>
+</pre></div></body></html>

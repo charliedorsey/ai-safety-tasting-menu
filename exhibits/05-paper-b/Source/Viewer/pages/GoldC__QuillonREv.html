@@ -1,0 +1,489 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LEAN/GoldC/QuillonREv.lean</title><style>body{background:#f9f8f4;color:#27332d;font:16px/1.5 Georgia,serif;margin:0}a{color:#2d6255}.wrap{max-width:1160px;margin:0 auto;padding:30px 24px}header{border-bottom:1px solid #d8ded7;margin-bottom:22px}h1{font-size:29px;font-weight:normal;overflow-wrap:anywhere}.meta,nav,th{font:13px/1.5 system-ui,sans-serif;color:#5b6b63}nav a{margin-right:18px}.tblwrap{overflow-x:auto}table{border-collapse:collapse;width:100%}td,th{padding:9px 12px;border-bottom:1px solid #e0e3de;text-align:left;vertical-align:top}td code{overflow-wrap:anywhere}code,pre{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}pre{font-size:12.5px;white-space:pre;overflow-x:auto;line-height:1.6;background:#fff;padding:12px;border:1px solid #e2e4df}.ln{color:#8b968e;padding-right:15px;user-select:none}.line{display:block}.focus{background:#e9f1ec}.line:target{outline:2px solid #276b54;outline-offset:1px;background:#f6f4e7}.legend{padding:12px 15px;background:#fff;border-left:2px solid #629280;margin:24px 0}@media(max-width:640px){.wrap{padding:18px 12px}h1{font-size:21px}td,th{padding:8px}.meta{font-size:11px}pre{font-size:11px}}</style></head><body><div class="wrap"><header><nav><a href="../source_index.html">All source waypoints</a><a href="../../../Docs/companion/reading_room/index.html">Reading room</a></nav><h1>LEAN/GoldC/QuillonREv.lean</h1><p class="meta">Exact archived source · SHA-256 de23b8a175f8b852408b8f9967b4a90fc0f1c606c4fa11cdf61ee0789dd0b27e · Original line numbers · Not a new Lean replay</p></header><p class="meta">Deep source proof text is reproduced verbatim for inspection; this page does not assert a compiler-derived proof-dependency graph.</p><pre><span class="line" id="L1"><span class="ln">    1</span>import GoldC.QuillonCPhysical</span>
+<span class="line" id="L2"><span class="ln">    2</span>import GoldC.QuillonREst</span>
+<span class="line" id="L3"><span class="ln">    3</span></span>
+<span class="line" id="L4"><span class="ln">    4</span>/-!</span>
+<span class="line" id="L5"><span class="ln">    5</span># Quillon CSC3 F8.11: parameters and eventual bounds for the R cell (fixed `r`)</span>
+<span class="line" id="L6"><span class="ln">    6</span></span>
+<span class="line" id="L7"><span class="ln">    7</span>**Parameters**, with `E = e^{Λ^{1/4}}` and `ε = Λ^{−1/200}`:</span>
+<span class="line" id="L8"><span class="ln">    8</span>* `Lw_R(r) = ⌊r^{1+3ε}⌋ − 1`;</span>
+<span class="line" id="L9"><span class="ln">    9</span>* `Kv(r) = log₂⌈r^ε⌉ + 1`, so that `X r^ε ≤ 2^{Kv}X ≤ 4X r^ε`;</span>
+<span class="line" id="L10"><span class="ln">   10</span>* `Nb_R(r) = ⌊H/(E r)⌋`.</span>
+<span class="line" id="L11"><span class="ln">   11</span></span>
+<span class="line" id="L12"><span class="ln">   12</span>**Lemmas.**</span>
+<span class="line" id="L13"><span class="ln">   13</span>* `R_exp_ev`: the VK saving `exp(−c L³/(2 L_max²)) ≤ Λ^{−200}` once `L ≥ 5Λ^{σ−1/200}` and `L_max ≤ 3Λ`.</span>
+<span class="line" id="L14"><span class="ln">   14</span>  This uses `3σ − 2 − 3/200 = 0.015 &gt; 0`.</span>
+<span class="line" id="L15"><span class="ln">   15</span>* `R_diag_ev`: `128C·Sb(1+log Sb)/Ymin ≤ Λ^{−400}` when `Sb/Ymin ≤ M/E`.</span>
+<span class="line" id="L16"><span class="ln">   16</span>* `R_combine`: the final real combination.</span>
+<span class="line" id="L17"><span class="ln">   17</span></span>
+<span class="line" id="L18"><span class="ln">   18</span>No axiom, no `sorry`.</span>
+<span class="line" id="L19"><span class="ln">   19</span>-/</span>
+<span class="line" id="L20"><span class="ln">   20</span></span>
+<span class="line" id="L21"><span class="ln">   21</span>open scoped BigOperators</span>
+<span class="line" id="L22"><span class="ln">   22</span>open Finset</span>
+<span class="line" id="L23"><span class="ln">   23</span></span>
+<span class="line" id="L24"><span class="ln">   24</span>namespace GoldC.QuillonREv</span>
+<span class="line" id="L25"><span class="ln">   25</span></span>
+<span class="line" id="L26"><span class="ln">   26</span>open GoldC.QuillonEv GoldC.QuillonSetup GoldC.QuillonLam GoldC.QuillonCEv GoldC.QuillonCFinal</span>
+<span class="line" id="L27"><span class="ln">   27</span></span>
+<span class="line" id="L28"><span class="ln">   28</span>noncomputable def LwR (h r : ℕ) : ℕ := ⌊(r : ℝ) ^ (1 + 3 * εp h)⌋₊ - 1</span>
+<span class="line" id="L29"><span class="ln">   29</span>noncomputable def Kvp (h r : ℕ) : ℕ := Nat.log 2 ⌈(r : ℝ) ^ (εp h)⌉₊ + 1</span>
+<span class="line" id="L30"><span class="ln">   30</span>noncomputable def Eh (h : ℕ) : ℝ := Real.exp ((Real.log h) ^ (1 / 4 : ℝ))</span>
+<span class="line" id="L31"><span class="ln">   31</span>noncomputable def NbR (h H r : ℕ) : ℕ := ⌊(H : ℝ) / (Eh h * r)⌋₊</span>
+<span class="line" id="L32"><span class="ln">   32</span></span>
+<span class="line" id="L33"><span class="ln">   33</span>/-- the VK saving. -/</span>
+<span class="line" id="L34"><span class="ln">   34</span>theorem R_exp_ev (c : ℝ) (hc : 0 &lt; c) :</span>
+<span class="line" id="L35"><span class="ln">   35</span>    ∃ Λ₀ : ℝ, 2 ≤ Λ₀ ∧ ∀ Λ : ℝ, Λ₀ ≤ Λ → ∀ L Lm : ℝ, 5 * Λ ^ (σ₀ - 1 / 200) ≤ L → 0 &lt; Lm →</span>
+<span class="line" id="L36"><span class="ln">   36</span>      Lm ≤ 3 * Λ → Real.exp (-(c * L ^ 3 / Lm ^ 2) / 2) ≤ Λ ^ (-(200 : ℝ)) := by</span>
+<span class="line" id="L37"><span class="ln">   37</span>  have hτ : 0 &lt; 3 * σ₀ - 3 / 200 - 2 := by unfold σ₀; norm_num</span>
+<span class="line" id="L38"><span class="ln">   38</span>  obtain ⟨Λ₀, hΛ₀, hd⟩ := decay 0 200 (125 * c / 18) (3 * σ₀ - 3 / 200 - 2) (by norm_num) (by positivity) hτ</span>
+<span class="line" id="L39"><span class="ln">   39</span>  refine ⟨max 2 Λ₀, le_max_left _ _, fun Λ hΛ L Lm hL hLm0 hLm =&gt; ?_⟩</span>
+<span class="line" id="L40"><span class="ln">   40</span>  have hΛ2 : 2 ≤ Λ := le_trans (le_max_left _ _) hΛ</span>
+<span class="line" id="L41"><span class="ln">   41</span>  have hΛ0 : 0 &lt; Λ := by linarith</span>
+<span class="line" id="L42"><span class="ln">   42</span>  have h1 := hd Λ (le_trans (le_max_right _ _) hΛ)</span>
+<span class="line" id="L43"><span class="ln">   43</span>  rw [Real.rpow_zero, one_mul] at h1</span>
+<span class="line" id="L44"><span class="ln">   44</span>  refine le_trans (Real.exp_le_exp.2 ?_) h1</span>
+<span class="line" id="L45"><span class="ln">   45</span>  -- `c L³/Lm² ≥ (125c/9) Λ^τ`</span>
+<span class="line" id="L46"><span class="ln">   46</span>  have hL0 : 0 ≤ 5 * Λ ^ (σ₀ - 1 / 200) := by positivity</span>
+<span class="line" id="L47"><span class="ln">   47</span>  have hL3 : (5 * Λ ^ (σ₀ - 1 / 200)) ^ 3 ≤ L ^ 3 := pow_le_pow_left₀ hL0 hL 3</span>
+<span class="line" id="L48"><span class="ln">   48</span>  have hLm2 : Lm ^ 2 ≤ (3 * Λ) ^ 2 := pow_le_pow_left₀ hLm0.le hLm 2</span>
+<span class="line" id="L49"><span class="ln">   49</span>  have e1 : (5 * Λ ^ (σ₀ - 1 / 200)) ^ 3 = 125 * Λ ^ (3 * σ₀ - 3 / 200) := by</span>
+<span class="line" id="L50"><span class="ln">   50</span>    rw [mul_pow, ← Real.rpow_natCast (Λ ^ (σ₀ - 1 / 200)) 3, ← Real.rpow_mul hΛ0.le]; norm_num; ring_nf</span>
+<span class="line" id="L51"><span class="ln">   51</span>  have e2 : Λ ^ (3 * σ₀ - 3 / 200) = Λ ^ (3 * σ₀ - 3 / 200 - 2) * Λ ^ 2 := by</span>
+<span class="line" id="L52"><span class="ln">   52</span>    rw [← Real.rpow_natCast, rp hΛ0]; norm_num</span>
+<span class="line" id="L53"><span class="ln">   53</span>  have hkey : 125 * c / 18 * Λ ^ (3 * σ₀ - 3 / 200 - 2) ≤ c * L ^ 3 / Lm ^ 2 / 2 := by</span>
+<span class="line" id="L54"><span class="ln">   54</span>    rw [le_div_iff₀ (by norm_num), le_div_iff₀ (by positivity)]</span>
+<span class="line" id="L55"><span class="ln">   55</span>    have hp : 0 ≤ Λ ^ (3 * σ₀ - 3 / 200 - 2) := by positivity</span>
+<span class="line" id="L56"><span class="ln">   56</span>    calc 125 * c / 18 * Λ ^ (3 * σ₀ - 3 / 200 - 2) * 2 * Lm ^ 2</span>
+<span class="line" id="L57"><span class="ln">   57</span>        ≤ 125 * c / 18 * Λ ^ (3 * σ₀ - 3 / 200 - 2) * 2 * (3 * Λ) ^ 2 := by gcongr</span>
+<span class="line" id="L58"><span class="ln">   58</span>      _ = c * (125 * (Λ ^ (3 * σ₀ - 3 / 200 - 2) * Λ ^ 2)) := by ring</span>
+<span class="line" id="L59"><span class="ln">   59</span>      _ = c * (5 * Λ ^ (σ₀ - 1 / 200)) ^ 3 := by rw [e1, e2]</span>
+<span class="line" id="L60"><span class="ln">   60</span>      _ ≤ c * L ^ 3 := by gcongr</span>
+<span class="line" id="L61"><span class="ln">   61</span>  have : -(c * L ^ 3 / Lm ^ 2) / 2 = -(c * L ^ 3 / Lm ^ 2 / 2) := by ring</span>
+<span class="line" id="L62"><span class="ln">   62</span>  rw [this]; linarith</span>
+<span class="line" id="L63"><span class="ln">   63</span></span>
+<span class="line" id="L64"><span class="ln">   64</span>/-- the near-diagonal term. -/</span>
+<span class="line" id="L65"><span class="ln">   65</span>theorem R_diag_ev (K : ℝ) (hK : 0 ≤ K) :</span>
+<span class="line" id="L66"><span class="ln">   66</span>    ∃ Λ₀ : ℝ, 2 ≤ Λ₀ ∧ ∀ Λ : ℝ, Λ₀ ≤ Λ → ∀ x : ℝ, 0 ≤ x →</span>
+<span class="line" id="L67"><span class="ln">   67</span>      x ≤ K * Λ * Real.exp (-(Λ ^ (1 / 4 : ℝ))) → x ≤ Λ ^ (-(400 : ℝ)) := by</span>
+<span class="line" id="L68"><span class="ln">   68</span>  obtain ⟨Λ₁, hΛ₁, hd⟩ := decay 1 401 1 (1 / 4) (by norm_num) (by norm_num) (by norm_num)</span>
+<span class="line" id="L69"><span class="ln">   69</span>  obtain ⟨Λ₂, hΛ₂, hc⟩ := const_le_rpow K 1 one_pos</span>
+<span class="line" id="L70"><span class="ln">   70</span>  refine ⟨max 2 (max Λ₁ Λ₂), le_max_left _ _, fun Λ hΛ x hx0 hx =&gt; ?_⟩</span>
+<span class="line" id="L71"><span class="ln">   71</span>  have hΛ2 : 2 ≤ Λ := le_trans (le_max_left _ _) hΛ</span>
+<span class="line" id="L72"><span class="ln">   72</span>  have hΛ0 : 0 &lt; Λ := by linarith</span>
+<span class="line" id="L73"><span class="ln">   73</span>  have h1 := hd Λ (le_trans (le_trans (le_max_left _ _) (le_max_right _ _)) hΛ)</span>
+<span class="line" id="L74"><span class="ln">   74</span>  have h2 := hc Λ (le_trans (le_trans (le_max_right _ _) (le_max_right _ _)) hΛ)</span>
+<span class="line" id="L75"><span class="ln">   75</span>  rw [one_mul] at h1</span>
+<span class="line" id="L76"><span class="ln">   76</span>  rw [Real.rpow_one] at h1 h2</span>
+<span class="line" id="L77"><span class="ln">   77</span>  calc x ≤ K * Λ * Real.exp (-(Λ ^ (1 / 4 : ℝ))) := hx</span>
+<span class="line" id="L78"><span class="ln">   78</span>    _ = K * (Λ * Real.exp (-(Λ ^ (1 / 4 : ℝ)))) := by ring</span>
+<span class="line" id="L79"><span class="ln">   79</span>    _ ≤ Λ * Λ ^ (-(401 : ℝ)) := by</span>
+<span class="line" id="L80"><span class="ln">   80</span>        apply mul_le_mul h2 h1 (by positivity) hΛ0.le</span>
+<span class="line" id="L81"><span class="ln">   81</span>    _ = Λ ^ (-(400 : ℝ)) := by</span>
+<span class="line" id="L82"><span class="ln">   82</span>        rw [show Λ * Λ ^ (-(401 : ℝ)) = Λ ^ (1 : ℝ) * Λ ^ (-(401 : ℝ)) by rw [Real.rpow_one], rp hΛ0]</span>
+<span class="line" id="L83"><span class="ln">   83</span>        norm_num</span>
+<span class="line" id="L84"><span class="ln">   84</span></span>
+<span class="line" id="L85"><span class="ln">   85</span>/-- the final real combination for one `RTerm`. -/</span>
+<span class="line" id="L86"><span class="ln">   86</span>lemma R_combine (Λ Kf Cb F4 Aw Br WU Xi E : ℝ) (hΛ2 : 2 ≤ Λ) (hCb : 0 ≤ Cb) (hKf0 : 0 ≤ Kf)</span>
+<span class="line" id="L87"><span class="ln">   87</span>    (hKf : Kf ≤ 18 * Λ ^ 2) (hF40 : 0 ≤ F4) (hF4 : F4 ≤ 2 * Λ) (hAw0 : 0 ≤ Aw) (hAw : Aw ≤ Λ)</span>
+<span class="line" id="L88"><span class="ln">   88</span>    (hBr0 : 0 ≤ Br) (hBr : Br ≤ 3 * Λ ^ (-(100 : ℝ))) (hWU0 : 0 ≤ WU) (hWU : WU ≤ E * Λ ^ (10 : ℝ))</span>
+<span class="line" id="L89"><span class="ln">   89</span>    (hXi0 : 0 ≤ Xi) (hXi : Xi ≤ 12.5 * Λ ^ (-(200 : ℝ))) (hE : 0 ≤ E)</span>
+<span class="line" id="L90"><span class="ln">   90</span>    (hK : 18 * Cb * 2 * 3 + Cb * 2 * E * 12.5 ≤ Λ) :</span>
+<span class="line" id="L91"><span class="ln">   91</span>    Kf * (Cb * F4) * Aw * Br + Cb * F4 * WU * Xi ≤ Λ ^ (-(90 : ℝ)) := by</span>
+<span class="line" id="L92"><span class="ln">   92</span>  have hΛ1 : 1 ≤ Λ := by linarith</span>
+<span class="line" id="L93"><span class="ln">   93</span>  have hΛ0 : 0 &lt; Λ := by linarith</span>
+<span class="line" id="L94"><span class="ln">   94</span>  have t1 : Kf * (Cb * F4) * Aw * Br ≤ (18 * Cb * 2 * 3) * Λ ^ (-(96 : ℝ)) := by</span>
+<span class="line" id="L95"><span class="ln">   95</span>    calc Kf * (Cb * F4) * Aw * Br ≤ (18 * Λ ^ 2) * (Cb * (2 * Λ)) * Λ * (3 * Λ ^ (-(100 : ℝ))) := by</span>
+<span class="line" id="L96"><span class="ln">   96</span>          gcongr</span>
+<span class="line" id="L97"><span class="ln">   97</span>      _ = (18 * Cb * 2 * 3) * (Λ ^ (4 : ℕ) * Λ ^ (-(100 : ℝ))) := by ring</span>
+<span class="line" id="L98"><span class="ln">   98</span>      _ = (18 * Cb * 2 * 3) * Λ ^ (-(96 : ℝ)) := by</span>
+<span class="line" id="L99"><span class="ln">   99</span>          rw [mul_comm (Λ ^ (4 : ℕ)), GoldC.QuillonWFinal.rpow_shift hΛ0]; norm_num</span>
+<span class="line" id="L100"><span class="ln">  100</span>  have t2 : Cb * F4 * WU * Xi ≤ (Cb * 2 * E * 12.5) * Λ ^ (-(96 : ℝ)) := by</span>
+<span class="line" id="L101"><span class="ln">  101</span>    calc Cb * F4 * WU * Xi ≤ Cb * (2 * Λ) * (E * Λ ^ (10 : ℝ)) * (12.5 * Λ ^ (-(200 : ℝ))) := by gcongr</span>
+<span class="line" id="L102"><span class="ln">  102</span>      _ = (Cb * 2 * E * 12.5) * (Λ ^ (1 : ℝ) * Λ ^ (10 : ℝ) * Λ ^ (-(200 : ℝ))) := by</span>
+<span class="line" id="L103"><span class="ln">  103</span>          rw [Real.rpow_one]; ring</span>
+<span class="line" id="L104"><span class="ln">  104</span>      _ = (Cb * 2 * E * 12.5) * Λ ^ (-(189 : ℝ)) := by rw [rp hΛ0, rp hΛ0]; norm_num</span>
+<span class="line" id="L105"><span class="ln">  105</span>      _ ≤ (Cb * 2 * E * 12.5) * Λ ^ (-(96 : ℝ)) :=</span>
+<span class="line" id="L106"><span class="ln">  106</span>          mul_le_mul_of_nonneg_left (Real.rpow_le_rpow_of_exponent_le hΛ1 (by norm_num)) (by positivity)</span>
+<span class="line" id="L107"><span class="ln">  107</span>  have p96 : 0 ≤ Λ ^ (-(96 : ℝ)) := by positivity</span>
+<span class="line" id="L108"><span class="ln">  108</span>  calc Kf * (Cb * F4) * Aw * Br + Cb * F4 * WU * Xi</span>
+<span class="line" id="L109"><span class="ln">  109</span>      ≤ (18 * Cb * 2 * 3 + Cb * 2 * E * 12.5) * Λ ^ (-(96 : ℝ)) := by linarith</span>
+<span class="line" id="L110"><span class="ln">  110</span>    _ ≤ Λ * Λ ^ (-(96 : ℝ)) := mul_le_mul_of_nonneg_right hK p96</span>
+<span class="line" id="L111"><span class="ln">  111</span>    _ = Λ ^ (-(95 : ℝ)) := by</span>
+<span class="line" id="L112"><span class="ln">  112</span>        rw [show Λ * Λ ^ (-(96 : ℝ)) = Λ ^ (1 : ℝ) * Λ ^ (-(96 : ℝ)) by rw [Real.rpow_one], rp hΛ0]</span>
+<span class="line" id="L113"><span class="ln">  113</span>        norm_num</span>
+<span class="line" id="L114"><span class="ln">  114</span>    _ ≤ Λ ^ (-(90 : ℝ)) := Real.rpow_le_rpow_of_exponent_le hΛ1 (by norm_num)</span>
+<span class="line" id="L115"><span class="ln">  115</span></span>
+<span class="line" id="L116"><span class="ln">  116</span></span>
+<span class="line" id="L117"><span class="ln">  117</span>lemma natsub_ge (a b : ℕ) : (a : ℝ) - b ≤ ((a - b : ℕ) : ℝ) := by</span>
+<span class="line" id="L118"><span class="ln">  118</span>  rcases le_total b a with h | h</span>
+<span class="line" id="L119"><span class="ln">  119</span>  · rw [Nat.cast_sub h]</span>
+<span class="line" id="L120"><span class="ln">  120</span>  · rw [Nat.sub_eq_zero_of_le h]; push_cast; linarith [(Nat.cast_le (α := ℝ)).2 h]</span>
+<span class="line" id="L121"><span class="ln">  121</span></span>
+<span class="line" id="L122"><span class="ln">  122</span>lemma Kv_bounds (ρ : ℝ) (hρ : 1 ≤ ρ) (Kv : ℕ) (hKv : Kv = Nat.log 2 ⌈ρ⌉₊ + 1) :</span>
+<span class="line" id="L123"><span class="ln">  123</span>    ρ ≤ (2 : ℝ) ^ Kv ∧ (2 : ℝ) ^ Kv ≤ 4 * ρ := by</span>
+<span class="line" id="L124"><span class="ln">  124</span>  set n := ⌈ρ⌉₊ with hn</span>
+<span class="line" id="L125"><span class="ln">  125</span>  have hn1 : ρ ≤ n := Nat.le_ceil ρ</span>
+<span class="line" id="L126"><span class="ln">  126</span>  have hn2 : (n : ℝ) &lt; ρ + 1 := Nat.ceil_lt_add_one (by linarith)</span>
+<span class="line" id="L127"><span class="ln">  127</span>  have hn0 : n ≠ 0 := by</span>
+<span class="line" id="L128"><span class="ln">  128</span>    intro h0; rw [h0] at hn1; push_cast at hn1; linarith</span>
+<span class="line" id="L129"><span class="ln">  129</span>  have h1 : n &lt; 2 ^ Kv := by rw [hKv]; exact Nat.lt_pow_succ_log_self (by norm_num) n</span>
+<span class="line" id="L130"><span class="ln">  130</span>  have h2 : 2 ^ (Kv - 1) ≤ n := by rw [hKv]; simpa using Nat.pow_log_le_self 2 hn0</span>
+<span class="line" id="L131"><span class="ln">  131</span>  have hKv1 : 1 ≤ Kv := by omega</span>
+<span class="line" id="L132"><span class="ln">  132</span>  constructor</span>
+<span class="line" id="L133"><span class="ln">  133</span>  · have : (n : ℝ) &lt; (2 : ℝ) ^ Kv := by exact_mod_cast h1</span>
+<span class="line" id="L134"><span class="ln">  134</span>    linarith</span>
+<span class="line" id="L135"><span class="ln">  135</span>  · have h2R : (2 : ℝ) ^ (Kv - 1) ≤ n := by exact_mod_cast h2</span>
+<span class="line" id="L136"><span class="ln">  136</span>    have e : (2 : ℝ) ^ Kv = 2 * (2 : ℝ) ^ (Kv - 1) := by</span>
+<span class="line" id="L137"><span class="ln">  137</span>      rw [← pow_succ&#x27;]; congr 1; omega</span>
+<span class="line" id="L138"><span class="ln">  138</span>    rw [e]; linarith</span>
+<span class="line" id="L139"><span class="ln">  139</span></span>
+<span class="line" id="L140"><span class="ln">  140</span>/-- the VK log lower bound: `ρ ≤ (⌊Lw/(2^{Kv}X)⌋ − Q)/Q`. -/</span>
+<span class="line" id="L141"><span class="ln">  141</span>lemma R_L_lower (r ρ : ℝ) (q X Kv Lw : ℕ) (rn : ℕ) (hrn : (rn : ℝ) = r) (hq : 1 ≤ q) (hX : 1 ≤ X)</span>
+<span class="line" id="L142"><span class="ln">  142</span>    (hr : 1 ≤ r) (hρ : 48 * q * X + 6 ≤ ρ) (hKv : (2 : ℝ) ^ Kv ≤ 4 * ρ)</span>
+<span class="line" id="L143"><span class="ln">  143</span>    (hLw : r * ρ ^ 3 - 2 ≤ (Lw : ℝ)) :</span>
+<span class="line" id="L144"><span class="ln">  144</span>    ρ ≤ (((Lw / (2 ^ Kv * X) - 6 * q * rn) / (6 * q * rn) : ℕ) : ℝ) := by</span>
+<span class="line" id="L145"><span class="ln">  145</span>  have hX1 : (1 : ℝ) ≤ X := by exact_mod_cast hX</span>
+<span class="line" id="L146"><span class="ln">  146</span>  have hq1 : (1 : ℝ) ≤ q := by exact_mod_cast hq</span>
+<span class="line" id="L147"><span class="ln">  147</span>  have hρ1 : 6 ≤ ρ := by</span>
+<span class="line" id="L148"><span class="ln">  148</span>    have : (0 : ℝ) ≤ 48 * q * X := by positivity</span>
+<span class="line" id="L149"><span class="ln">  149</span>    linarith</span>
+<span class="line" id="L150"><span class="ln">  150</span>  have hD : 1 ≤ 2 ^ Kv * X := Nat.one_le_iff_ne_zero.2 (Nat.mul_ne_zero (by positivity) (by omega))</span>
+<span class="line" id="L151"><span class="ln">  151</span>  have hQ : 1 ≤ 6 * q * rn := by</span>
+<span class="line" id="L152"><span class="ln">  152</span>    have : (1 : ℝ) ≤ 6 * q * rn := by rw [hrn]; nlinarith</span>
+<span class="line" id="L153"><span class="ln">  153</span>    exact_mod_cast this</span>
+<span class="line" id="L154"><span class="ln">  154</span>  have hN1 := natdiv_ge Lw (2 ^ Kv * X) hD</span>
+<span class="line" id="L155"><span class="ln">  155</span>  have hDR : ((2 ^ Kv * X : ℕ) : ℝ) ≤ 4 * ρ * X := by</span>
+<span class="line" id="L156"><span class="ln">  156</span>    push_cast; exact mul_le_mul_of_nonneg_right hKv (by positivity)</span>
+<span class="line" id="L157"><span class="ln">  157</span>  have hDpos : (0 : ℝ) &lt; ((2 ^ Kv * X : ℕ) : ℝ) := by exact_mod_cast hD</span>
+<span class="line" id="L158"><span class="ln">  158</span>  -- `N1 ≥ rρ²/(4X) − 2`</span>
+<span class="line" id="L159"><span class="ln">  159</span>  have hN1&#x27; : r * ρ ^ 2 / (4 * X) - 2 ≤ ((Lw / (2 ^ Kv * X) : ℕ) : ℝ) := by</span>
+<span class="line" id="L160"><span class="ln">  160</span>    have h1 : (r * ρ ^ 3 - 2) / (4 * ρ * X) ≤ (Lw : ℝ) / ((2 ^ Kv * X : ℕ) : ℝ) := by</span>
+<span class="line" id="L161"><span class="ln">  161</span>      rcases le_or_gt (r * ρ ^ 3 - 2) 0 with hneg | hpos</span>
+<span class="line" id="L162"><span class="ln">  162</span>      · have : (r * ρ ^ 3 - 2) / (4 * ρ * X) ≤ 0 := div_nonpos_of_nonpos_of_nonneg hneg (by positivity)</span>
+<span class="line" id="L163"><span class="ln">  163</span>        exact le_trans this (by positivity)</span>
+<span class="line" id="L164"><span class="ln">  164</span>      · exact div_le_div₀ (by positivity) hLw hDpos hDR</span>
+<span class="line" id="L165"><span class="ln">  165</span>    have e : (r * ρ ^ 3 - 2) / (4 * ρ * X) = r * ρ ^ 2 / (4 * X) - 1 / (2 * ρ * X) := by</span>
+<span class="line" id="L166"><span class="ln">  166</span>      field_simp; ring</span>
+<span class="line" id="L167"><span class="ln">  167</span>    have h2 : 1 / (2 * ρ * X) ≤ 1 := by</span>
+<span class="line" id="L168"><span class="ln">  168</span>      rw [div_le_one (by positivity)]; nlinarith</span>
+<span class="line" id="L169"><span class="ln">  169</span>    linarith</span>
+<span class="line" id="L170"><span class="ln">  170</span>  set N1 := Lw / (2 ^ Kv * X)</span>
+<span class="line" id="L171"><span class="ln">  171</span>  set Q := 6 * q * rn</span>
+<span class="line" id="L172"><span class="ln">  172</span>  have hQR : (Q : ℝ) = 6 * q * r := by simp [Q, hrn]</span>
+<span class="line" id="L173"><span class="ln">  173</span>  have hsub := natsub_ge N1 Q</span>
+<span class="line" id="L174"><span class="ln">  174</span>  have hdiv := natdiv_ge (N1 - Q) Q hQ</span>
+<span class="line" id="L175"><span class="ln">  175</span>  have hQpos : (0 : ℝ) &lt; Q := by exact_mod_cast hQ</span>
+<span class="line" id="L176"><span class="ln">  176</span>  -- `(N1 − Q)/Q ≥ ρ²/(24qX) − 3`</span>
+<span class="line" id="L177"><span class="ln">  177</span>  have h3 : ρ ^ 2 / (24 * q * X) - 3 ≤ (((N1 - Q) / Q : ℕ) : ℝ) := by</span>
+<span class="line" id="L178"><span class="ln">  178</span>    have h4 : ((N1 - Q : ℕ) : ℝ) / Q ≥ (r * ρ ^ 2 / (4 * X) - 2 - Q) / Q := by</span>
+<span class="line" id="L179"><span class="ln">  179</span>      apply div_le_div_of_nonneg_right _ hQpos.le; linarith</span>
+<span class="line" id="L180"><span class="ln">  180</span>    have e : (r * ρ ^ 2 / (4 * X) - 2 - Q) / Q = ρ ^ 2 / (24 * q * X) - 2 / (6 * q * r) - 1 := by</span>
+<span class="line" id="L181"><span class="ln">  181</span>      rw [hQR]; field_simp; ring</span>
+<span class="line" id="L182"><span class="ln">  182</span>    have h5 : 2 / (6 * q * r) ≤ 1 := by rw [div_le_one (by positivity)]; nlinarith</span>
+<span class="line" id="L183"><span class="ln">  183</span>    linarith</span>
+<span class="line" id="L184"><span class="ln">  184</span>  have h6 : ρ + 3 ≤ ρ ^ 2 / (24 * q * X) := by</span>
+<span class="line" id="L185"><span class="ln">  185</span>    rw [le_div_iff₀ (by positivity)]</span>
+<span class="line" id="L186"><span class="ln">  186</span>    have : 48 * q * X ≤ ρ := by linarith</span>
+<span class="line" id="L187"><span class="ln">  187</span>    nlinarith</span>
+<span class="line" id="L188"><span class="ln">  188</span>  linarith</span>
+<span class="line" id="L189"><span class="ln">  189</span></span>
+<span class="line" id="L190"><span class="ln">  190</span></span>
+<span class="line" id="L191"><span class="ln">  191</span>lemma R_Lw_ge (h r : ℕ) (hr0 : (0 : ℝ) &lt; r) :</span>
+<span class="line" id="L192"><span class="ln">  192</span>    (r : ℝ) * ((r : ℝ) ^ εp h) ^ 3 - 2 ≤ (LwR h r : ℝ) := by</span>
+<span class="line" id="L193"><span class="ln">  193</span>  have e : (r : ℝ) ^ (1 + 3 * εp h) = r * ((r : ℝ) ^ εp h) ^ 3 := by</span>
+<span class="line" id="L194"><span class="ln">  194</span>    rw [← Real.rpow_natCast (_ : ℝ) 3, ← Real.rpow_mul hr0.le,</span>
+<span class="line" id="L195"><span class="ln">  195</span>      show (r : ℝ) * (r : ℝ) ^ (εp h * ((3 : ℕ) : ℝ)) = (r : ℝ) ^ (1 : ℝ) * (r : ℝ) ^ (εp h * ((3 : ℕ) : ℝ))</span>
+<span class="line" id="L196"><span class="ln">  196</span>        by rw [Real.rpow_one], rp hr0]</span>
+<span class="line" id="L197"><span class="ln">  197</span>    push_cast; ring_nf</span>
+<span class="line" id="L198"><span class="ln">  198</span>  unfold LwR</span>
+<span class="line" id="L199"><span class="ln">  199</span>  have hfl := Nat.lt_floor_add_one ((r : ℝ) ^ (1 + 3 * εp h))</span>
+<span class="line" id="L200"><span class="ln">  200</span>  rcases Nat.eq_zero_or_pos ⌊(r : ℝ) ^ (1 + 3 * εp h)⌋₊ with h0 | hpos</span>
+<span class="line" id="L201"><span class="ln">  201</span>  · rw [h0] at hfl ⊢; rw [Nat.zero_sub]; push_cast at hfl ⊢; linarith</span>
+<span class="line" id="L202"><span class="ln">  202</span>  · rw [Nat.cast_sub hpos]; push_cast; linarith</span>
+<span class="line" id="L203"><span class="ln">  203</span></span>
+<span class="line" id="L204"><span class="ln">  204</span>lemma R_Ymax_facts (Λ : ℝ) (h H r q : ℕ) (hΛ : Λ = Real.log h) (hΛ2 : 2 ≤ Λ) (hq : 1 ≤ q) (hr : 1 ≤ r)</span>
+<span class="line" id="L205"><span class="ln">  205</span>    (hrrH : (r : ℝ) * r ≤ H) (hHh : (H : ℝ) ≤ h) :</span>
+<span class="line" id="L206"><span class="ln">  206</span>    0 &lt; Real.log (((6 * q * h : ℕ) : ℝ) * H / r / ((6 * q * r : ℕ) : ℝ)) ∧</span>
+<span class="line" id="L207"><span class="ln">  207</span>      Real.log (((6 * q * h : ℕ) : ℝ) * H / r / ((6 * q * r : ℕ) : ℝ)) ≤ 3 * Λ := by</span>
+<span class="line" id="L208"><span class="ln">  208</span>  have hrR : (1 : ℝ) ≤ r := by exact_mod_cast hr</span>
+<span class="line" id="L209"><span class="ln">  209</span>  have hqR : (1 : ℝ) ≤ q := by exact_mod_cast hq</span>
+<span class="line" id="L210"><span class="ln">  210</span>  have hh2 : (2 : ℝ) ≤ h := by</span>
+<span class="line" id="L211"><span class="ln">  211</span>    by_contra hc&#x27;; push_neg at hc&#x27;</span>
+<span class="line" id="L212"><span class="ln">  212</span>    have hh0 : (0 : ℝ) &lt; h := by</span>
+<span class="line" id="L213"><span class="ln">  213</span>      rcases Nat.eq_zero_or_pos h with h0 | h0</span>
+<span class="line" id="L214"><span class="ln">  214</span>      · rw [hΛ, h0] at hΛ2; simp at hΛ2; linarith</span>
+<span class="line" id="L215"><span class="ln">  215</span>      · exact_mod_cast h0</span>
+<span class="line" id="L216"><span class="ln">  216</span>    have : Real.log h &lt; Real.log 2 := Real.log_lt_log hh0 hc&#x27;</span>
+<span class="line" id="L217"><span class="ln">  217</span>    have : Real.log 2 &lt; 1 := by have := Real.log_two_lt_d9; linarith</span>
+<span class="line" id="L218"><span class="ln">  218</span>    linarith</span>
+<span class="line" id="L219"><span class="ln">  219</span>  have hH1 : (1 : ℝ) ≤ H := le_trans (by nlinarith) hrrH</span>
+<span class="line" id="L220"><span class="ln">  220</span>  have e : ((6 * q * h : ℕ) : ℝ) * H / r / ((6 * q * r : ℕ) : ℝ) = (h : ℝ) * H / (r * r) := by</span>
+<span class="line" id="L221"><span class="ln">  221</span>    push_cast; field_simp</span>
+<span class="line" id="L222"><span class="ln">  222</span>  rw [e]</span>
+<span class="line" id="L223"><span class="ln">  223</span>  constructor</span>
+<span class="line" id="L224"><span class="ln">  224</span>  · apply Real.log_pos</span>
+<span class="line" id="L225"><span class="ln">  225</span>    rw [lt_div_iff₀ (by positivity)]</span>
+<span class="line" id="L226"><span class="ln">  226</span>    nlinarith</span>
+<span class="line" id="L227"><span class="ln">  227</span>  · have hpos : (0 : ℝ) &lt; (h : ℝ) * H / (r * r) := by positivity</span>
+<span class="line" id="L228"><span class="ln">  228</span>    have hle : (h : ℝ) * H / (r * r) ≤ (h : ℝ) ^ 2 := by</span>
+<span class="line" id="L229"><span class="ln">  229</span>      rw [div_le_iff₀ (by positivity)]</span>
+<span class="line" id="L230"><span class="ln">  230</span>      have : (1 : ℝ) ≤ r * r := by nlinarith</span>
+<span class="line" id="L231"><span class="ln">  231</span>      nlinarith</span>
+<span class="line" id="L232"><span class="ln">  232</span>    have := Real.log_le_log hpos hle</span>
+<span class="line" id="L233"><span class="ln">  233</span>    rw [Real.log_pow, ← hΛ] at this; push_cast at this; linarith</span>
+<span class="line" id="L234"><span class="ln">  234</span></span>
+<span class="line" id="L235"><span class="ln">  235</span>lemma R_diag_bound (C : ℝ) (hC : 0 ≤ C) (Λ : ℝ) (hΛ : 0 &lt; Λ) (H Sb r q : ℕ) (hH0 : (0 : ℝ) &lt; H) (hr0 : (0 : ℝ) &lt; r)</span>
+<span class="line" id="L236"><span class="ln">  236</span>    (Eh0 : ℝ) (hEh : Eh0 = Real.exp (Λ ^ (1 / 4 : ℝ)))</span>
+<span class="line" id="L237"><span class="ln">  237</span>    (hSbR : (Sb : ℝ) ≤ (H : ℝ) / (Eh0 * r)) (hlogSb : Real.log Sb ≤ Λ) (hΛ1 : 1 ≤ Λ) :</span>
+<span class="line" id="L238"><span class="ln">  238</span>    128 * C * Sb * (1 + Real.log Sb) / ((H : ℝ) / (6 * q * r)) ≤</span>
+<span class="line" id="L239"><span class="ln">  239</span>      1536 * C * q * Λ * Real.exp (-(Λ ^ (1 / 4 : ℝ))) := by</span>
+<span class="line" id="L240"><span class="ln">  240</span>  have hE0 : 0 &lt; Eh0 := by rw [hEh]; exact Real.exp_pos _</span>
+<span class="line" id="L241"><span class="ln">  241</span>  have hq0 : (0 : ℝ) ≤ q := by positivity</span>
+<span class="line" id="L242"><span class="ln">  242</span>  rcases Nat.eq_zero_or_pos q with hq | hq</span>
+<span class="line" id="L243"><span class="ln">  243</span>  · subst hq; simp</span>
+<span class="line" id="L244"><span class="ln">  244</span>  have hqR : (0 : ℝ) &lt; q := by exact_mod_cast hq</span>
+<span class="line" id="L245"><span class="ln">  245</span>  rw [div_div_eq_mul_div, div_le_iff₀ hH0]</span>
+<span class="line" id="L246"><span class="ln">  246</span>  have hSbH : (Sb : ℝ) * (Eh0 * r) ≤ H := by rwa [le_div_iff₀ (by positivity)] at hSbR</span>
+<span class="line" id="L247"><span class="ln">  247</span>  have hEexp : Real.exp (-(Λ ^ (1 / 4 : ℝ))) * Eh0 = 1 := by</span>
+<span class="line" id="L248"><span class="ln">  248</span>    rw [hEh, ← Real.exp_add]; simp</span>
+<span class="line" id="L249"><span class="ln">  249</span>  have h1 : 1 + Real.log Sb ≤ 2 * Λ := by linarith</span>
+<span class="line" id="L250"><span class="ln">  250</span>  have hlogSb0 : 0 ≤ Real.log (Sb : ℝ) := Real.log_natCast_nonneg _</span>
+<span class="line" id="L251"><span class="ln">  251</span>  have hSb0 : (0 : ℝ) ≤ Sb := by positivity</span>
+<span class="line" id="L252"><span class="ln">  252</span>  have key : 128 * C * Sb * (1 + Real.log Sb) * (6 * q * r) ≤</span>
+<span class="line" id="L253"><span class="ln">  253</span>      1536 * C * q * Λ * Real.exp (-(Λ ^ (1 / 4 : ℝ))) * (Sb * (Eh0 * r)) := by</span>
+<span class="line" id="L254"><span class="ln">  254</span>    have hx : (128 * C * Sb * (1 + Real.log Sb) * (6 * q * r)) =</span>
+<span class="line" id="L255"><span class="ln">  255</span>        768 * C * q * (1 + Real.log Sb) * (Sb * r) := by ring</span>
+<span class="line" id="L256"><span class="ln">  256</span>    have hy : 1536 * C * q * Λ * Real.exp (-(Λ ^ (1 / 4 : ℝ))) * (Sb * (Eh0 * r)) =</span>
+<span class="line" id="L257"><span class="ln">  257</span>        768 * C * q * (2 * Λ) * (Sb * r) * (Real.exp (-(Λ ^ (1 / 4 : ℝ))) * Eh0) := by ring</span>
+<span class="line" id="L258"><span class="ln">  258</span>    rw [hx, hy, hEexp, mul_one]</span>
+<span class="line" id="L259"><span class="ln">  259</span>    gcongr</span>
+<span class="line" id="L260"><span class="ln">  260</span>  calc 128 * C * Sb * (1 + Real.log Sb) * (6 * q * r)</span>
+<span class="line" id="L261"><span class="ln">  261</span>      ≤ 1536 * C * q * Λ * Real.exp (-(Λ ^ (1 / 4 : ℝ))) * (Sb * (Eh0 * r)) := key</span>
+<span class="line" id="L262"><span class="ln">  262</span>    _ ≤ 1536 * C * q * Λ * Real.exp (-(Λ ^ (1 / 4 : ℝ))) * H := by gcongr</span>
+<span class="line" id="L263"><span class="ln">  263</span></span>
+<span class="line" id="L264"><span class="ln">  264</span>lemma R_Kf_bound (Λ : ℝ) (hΛ1 : 3 ≤ Λ) (Sb r : ℕ) (ε : ℝ) (hε0 : 0 ≤ ε) (hε1 : ε ≤ 1) (hr : (1 : ℝ) ≤ r)</span>
+<span class="line" id="L265"><span class="ln">  265</span>    (hlogr : Real.log r ≤ Λ) (hlogSb : Real.log Sb ≤ Λ) :</span>
+<span class="line" id="L266"><span class="ln">  266</span>    ((((Nat.log 2 Sb + 1) * 2) * (Nat.log 2 ⌈(r : ℝ) ^ ε⌉₊ + 1) : ℕ) : ℝ) ≤ 18 * Λ ^ 2 := by</span>
+<span class="line" id="L267"><span class="ln">  267</span>  have hΛ0 : 0 &lt; Λ := by linarith</span>
+<span class="line" id="L268"><span class="ln">  268</span>  set ρ := (r : ℝ) ^ ε</span>
+<span class="line" id="L269"><span class="ln">  269</span>  have hρ1 : 1 ≤ ρ := Real.one_le_rpow hr hε0</span>
+<span class="line" id="L270"><span class="ln">  270</span>  have h1 : (Nat.log 2 Sb : ℝ) + 1 ≤ 3 * Λ := by</span>
+<span class="line" id="L271"><span class="ln">  271</span>    have := natlog_le_of Sb Λ hlogSb</span>
+<span class="line" id="L272"><span class="ln">  272</span>    rw [max_eq_left hΛ0.le] at this; linarith</span>
+<span class="line" id="L273"><span class="ln">  273</span>  have h2 : (Nat.log 2 ⌈ρ⌉₊ : ℝ) + 1 ≤ 3 * Λ := by</span>
+<span class="line" id="L274"><span class="ln">  274</span>    have hc1 : (⌈ρ⌉₊ : ℝ) ≤ 2 * ρ := by</span>
+<span class="line" id="L275"><span class="ln">  275</span>      have := Nat.ceil_lt_add_one (show 0 ≤ ρ by linarith); linarith</span>
+<span class="line" id="L276"><span class="ln">  276</span>    have hlog : Real.log (⌈ρ⌉₊ : ℝ) ≤ 1 + Λ := by</span>
+<span class="line" id="L277"><span class="ln">  277</span>      have hp : (0 : ℝ) &lt; (⌈ρ⌉₊ : ℝ) := by</span>
+<span class="line" id="L278"><span class="ln">  278</span>        have := Nat.le_ceil ρ; linarith</span>
+<span class="line" id="L279"><span class="ln">  279</span>      have h3 : Real.log (⌈ρ⌉₊ : ℝ) ≤ Real.log (2 * ρ) := Real.log_le_log hp hc1</span>
+<span class="line" id="L280"><span class="ln">  280</span>      rw [Real.log_mul (by norm_num) (by linarith), Real.log_rpow (by linarith)] at h3</span>
+<span class="line" id="L281"><span class="ln">  281</span>      have : Real.log 2 &lt; 1 := by have := Real.log_two_lt_d9; linarith</span>
+<span class="line" id="L282"><span class="ln">  282</span>      have : ε * Real.log r ≤ Λ := by</span>
+<span class="line" id="L283"><span class="ln">  283</span>        calc ε * Real.log r ≤ 1 * Real.log r := mul_le_mul_of_nonneg_right hε1 (Real.log_nonneg hr)</span>
+<span class="line" id="L284"><span class="ln">  284</span>          _ ≤ Λ := by linarith</span>
+<span class="line" id="L285"><span class="ln">  285</span>      linarith</span>
+<span class="line" id="L286"><span class="ln">  286</span>    have := natlog_le_of ⌈ρ⌉₊ (1 + Λ) hlog</span>
+<span class="line" id="L287"><span class="ln">  287</span>    rw [max_eq_left (by linarith)] at this</span>
+<span class="line" id="L288"><span class="ln">  288</span>    linarith</span>
+<span class="line" id="L289"><span class="ln">  289</span>  push_cast</span>
+<span class="line" id="L290"><span class="ln">  290</span>  calc ((Nat.log 2 Sb : ℝ) + 1) * 2 * ((Nat.log 2 ⌈ρ⌉₊ : ℝ) + 1) ≤ (3 * Λ) * 2 * (3 * Λ) := by gcongr</span>
+<span class="line" id="L291"><span class="ln">  291</span>    _ = 18 * Λ ^ 2 := by ring</span>
+<span class="line" id="L292"><span class="ln">  292</span></span>
+<span class="line" id="L293"><span class="ln">  293</span>set_option maxHeartbeats 4000000 in</span>
+<span class="line" id="L294"><span class="ln">  294</span>/-- **Each R-cell `RTerm` is `≤ Λ^{−90}`**, eventually in `h`, uniformly in admissible `r`. -/</span>
+<span class="line" id="L295"><span class="ln">  295</span>theorem R_term_ev (q : ℕ) (hq : 0 &lt; q) (c C : ℝ) (hc : 0 &lt; c) (hC : 0 ≤ C) :</span>
+<span class="line" id="L296"><span class="ln">  296</span>    ∃ Λ₀ : ℝ, 2 ≤ Λ₀ ∧ ∀ (h H r : ℕ), Λ₀ ≤ Real.log h → H ≤ h → 1 ≤ r →</span>
+<span class="line" id="L297"><span class="ln">  297</span>      5 * (Real.log h) ^ σ₀ ≤ Real.log (r : ℝ) →</span>
+<span class="line" id="L298"><span class="ln">  298</span>      Eh h * r * (r : ℝ) ^ (1 + 3 * εp h) ≤ H → LwR h r ≤ NbR h H r →</span>
+<span class="line" id="L299"><span class="ln">  299</span>      ∀ (U : Finset ℕ), (∀ p ∈ U, p.Prime ∧ 5 ≤ p ∧ p ≤ H ^ 2) →</span>
+<span class="line" id="L300"><span class="ln">  300</span>      ∀ (coef : ℕ → ℂ) (Ym : ℕ → ℝ), (∀ m, 1 ≤ m → ‖coef m‖ ≤ (600 * (q : ℝ) ^ 2 + 8) / m) →</span>
+<span class="line" id="L301"><span class="ln">  301</span>        (∀ m ∈ Icc 1 (6 * q * h), (H : ℝ) / (6 * q * r) ≤ |Ym m| ∧</span>
+<span class="line" id="L302"><span class="ln">  302</span>          |Ym m| ≤ ((6 * q * h : ℕ) : ℝ) * H / r ∧ ((6 * q * r : ℕ) : ℝ) &lt; |Ym m|) →</span>
+<span class="line" id="L303"><span class="ln">  303</span>        GoldC.QuillonRCellApp.RTerm c C (Icc 1 (6 * q * h)) coef Ym (6 * q * r) U (Xp h) (Kvp h r)</span>
+<span class="line" id="L304"><span class="ln">  304</span>          (LwR h r) (max (NbR h H r) (LwR h r)) ≤ (Real.log h) ^ (-(90 : ℝ)) := by</span>
+<span class="line" id="L305"><span class="ln">  305</span>  set Cb : ℝ := 600 * (q : ℝ) ^ 2 + 8 with hCb</span>
+<span class="line" id="L306"><span class="ln">  306</span>  set E : ℝ := Real.exp 10 * (2 * 2 + 1) ^ 10 with hE</span>
+<span class="line" id="L307"><span class="ln">  307</span>  have hτ : 0 &lt; σ₀ - 1 / 200 := by unfold σ₀; norm_num</span>
+<span class="line" id="L308"><span class="ln">  308</span>  obtain ⟨Λ₁, hΛ₁, hexp⟩ := R_exp_ev c hc</span>
+<span class="line" id="L309"><span class="ln">  309</span>  obtain ⟨Λ₂, hΛ₂, hdiag⟩ := R_diag_ev (1536 * C * q) (by positivity)</span>
+<span class="line" id="L310"><span class="ln">  310</span>  obtain ⟨Λ₃, hΛ₃, hAω⟩ := Aω_le 5 (1 / 2) (by norm_num) (by norm_num)</span>
+<span class="line" id="L311"><span class="ln">  311</span>  obtain ⟨Λ₄, hΛ₄, hρev⟩ := GoldC.QuillonAsymp.rpow_le_exp_rpow 201 5 (σ₀ - 1 / 200) (by norm_num)</span>
+<span class="line" id="L312"><span class="ln">  312</span>    (by norm_num) hτ</span>
+<span class="line" id="L313"><span class="ln">  313</span>  obtain ⟨Λ₅, hΛ₅, hK⟩ := const_le_rpow (18 * Cb * 2 * 3 + Cb * 2 * E * 12.5 + 96 * q + 10) 1 one_pos</span>
+<span class="line" id="L314"><span class="ln">  314</span>  obtain ⟨Λ₆, hΛ₆, hK2⟩ := const_le_rpow (Real.sqrt (8 * C) + 1) 100 (by norm_num)</span>
+<span class="line" id="L315"><span class="ln">  315</span>  refine ⟨max Λ₁ (max Λ₂ (max Λ₃ (max Λ₄ (max Λ₅ (max Λ₆ (1 + Real.log (6 * q))))))),</span>
+<span class="line" id="L316"><span class="ln">  316</span>    le_trans hΛ₁ (le_max_left _ _), ?_⟩</span>
+<span class="line" id="L317"><span class="ln">  317</span>  intro h H r hΛ hHh hr1 hlogr hEH hLwNb U hU coef Ym hcoef hY</span>
+<span class="line" id="L318"><span class="ln">  318</span>  have L1 : Λ₁ ≤ Real.log h := le_trans (by simp) hΛ</span>
+<span class="line" id="L319"><span class="ln">  319</span>  have L2 : Λ₂ ≤ Real.log h := le_trans (by simp) hΛ</span>
+<span class="line" id="L320"><span class="ln">  320</span>  have L3 : Λ₃ ≤ Real.log h := le_trans (by simp) hΛ</span>
+<span class="line" id="L321"><span class="ln">  321</span>  have L4 : Λ₄ ≤ Real.log h := le_trans (by simp) hΛ</span>
+<span class="line" id="L322"><span class="ln">  322</span>  have L5 : Λ₅ ≤ Real.log h := le_trans (by simp) hΛ</span>
+<span class="line" id="L323"><span class="ln">  323</span>  have L6 : Λ₆ ≤ Real.log h := le_trans (by simp) hΛ</span>
+<span class="line" id="L324"><span class="ln">  324</span>  have L7 : 1 + Real.log (6 * q) ≤ Real.log h := le_trans (by simp) hΛ</span>
+<span class="line" id="L325"><span class="ln">  325</span>  clear hΛ</span>
+<span class="line" id="L326"><span class="ln">  326</span>  set Λ := Real.log h with hΛdef</span>
+<span class="line" id="L327"><span class="ln">  327</span>  have hΛ2 : 2 ≤ Λ := le_trans hΛ₁ L1</span>
+<span class="line" id="L328"><span class="ln">  328</span>  have hΛ0 : 0 &lt; Λ := by linarith</span>
+<span class="line" id="L329"><span class="ln">  329</span>  have hΛ1 : 1 ≤ Λ := by linarith</span>
+<span class="line" id="L330"><span class="ln">  330</span>  have hKΛ := hK Λ L5</span>
+<span class="line" id="L331"><span class="ln">  331</span>  rw [Real.rpow_one] at hKΛ</span>
+<span class="line" id="L332"><span class="ln">  332</span>  have hΛq : (96 * q + 10 : ℝ) ≤ Λ := by</span>
+<span class="line" id="L333"><span class="ln">  333</span>    have : 0 ≤ 18 * Cb * 2 * 3 + Cb * 2 * E * 12.5 := by positivity</span>
+<span class="line" id="L334"><span class="ln">  334</span>    linarith</span>
+<span class="line" id="L335"><span class="ln">  335</span>  have hKfin : 18 * Cb * 2 * 3 + Cb * 2 * E * 12.5 ≤ Λ := by</span>
+<span class="line" id="L336"><span class="ln">  336</span>    have : (0 : ℝ) ≤ 96 * q + 10 := by positivity</span>
+<span class="line" id="L337"><span class="ln">  337</span>    linarith</span>
+<span class="line" id="L338"><span class="ln">  338</span>  have hh1n : 1 ≤ h := by</span>
+<span class="line" id="L339"><span class="ln">  339</span>    rcases Nat.eq_zero_or_pos h with h0 | h0</span>
+<span class="line" id="L340"><span class="ln">  340</span>    · exfalso</span>
+<span class="line" id="L341"><span class="ln">  341</span>      have : Real.log (h : ℝ) = 0 := by rw [h0]; simp</span>
+<span class="line" id="L342"><span class="ln">  342</span>      linarith</span>
+<span class="line" id="L343"><span class="ln">  343</span>    · exact h0</span>
+<span class="line" id="L344"><span class="ln">  344</span>  have hh0 : (0 : ℝ) &lt; h := by exact_mod_cast hh1n</span>
+<span class="line" id="L345"><span class="ln">  345</span>  have hrR : (1 : ℝ) ≤ r := by exact_mod_cast hr1</span>
+<span class="line" id="L346"><span class="ln">  346</span>  have hr0 : (0 : ℝ) &lt; r := by linarith</span>
+<span class="line" id="L347"><span class="ln">  347</span>  have hq1 : (1 : ℝ) ≤ q := by exact_mod_cast hq</span>
+<span class="line" id="L348"><span class="ln">  348</span>  have hq0 : (0 : ℝ) &lt; q := by linarith</span>
+<span class="line" id="L349"><span class="ln">  349</span>  obtain ⟨hε0, hε1⟩ := GoldC.QuillonCPhysical.εp_le_one (h := h) hΛ1</span>
+<span class="line" id="L350"><span class="ln">  350</span>  set ε := εp h with hεdef</span>
+<span class="line" id="L351"><span class="ln">  351</span>  have hEh1 : 1 ≤ Eh h := Real.one_le_exp (by positivity)</span>
+<span class="line" id="L352"><span class="ln">  352</span>  have hEh0 : 0 &lt; Eh h := by linarith</span>
+<span class="line" id="L353"><span class="ln">  353</span>  -- `r ≤ h`, `log r ≤ Λ`</span>
+<span class="line" id="L354"><span class="ln">  354</span>  have hρ1 : (1 : ℝ) ≤ (r : ℝ) ^ ε := Real.one_le_rpow hrR hε0</span>
+<span class="line" id="L355"><span class="ln">  355</span>  have hr3 : (r : ℝ) ≤ (r : ℝ) ^ (1 + 3 * ε) :=</span>
+<span class="line" id="L356"><span class="ln">  356</span>    le_trans (le_of_eq (Real.rpow_one _).symm) (Real.rpow_le_rpow_of_exponent_le hrR (by linarith))</span>
+<span class="line" id="L357"><span class="ln">  357</span>  have hHR : (H : ℝ) ≤ h := by exact_mod_cast hHh</span>
+<span class="line" id="L358"><span class="ln">  358</span>  have hrh : (r : ℝ) ≤ h := by</span>
+<span class="line" id="L359"><span class="ln">  359</span>    have : (r : ℝ) ≤ Eh h * r * (r : ℝ) ^ (1 + 3 * ε) := by</span>
+<span class="line" id="L360"><span class="ln">  360</span>      have h1 : (r : ℝ) ≤ Eh h * r := le_mul_of_one_le_left hr0.le hEh1</span>
+<span class="line" id="L361"><span class="ln">  361</span>      have h2 : 1 ≤ (r : ℝ) ^ (1 + 3 * ε) := le_trans hrR hr3</span>
+<span class="line" id="L362"><span class="ln">  362</span>      calc (r : ℝ) ≤ Eh h * r := h1</span>
+<span class="line" id="L363"><span class="ln">  363</span>        _ ≤ Eh h * r * (r : ℝ) ^ (1 + 3 * ε) := le_mul_of_one_le_right (by positivity) h2</span>
+<span class="line" id="L364"><span class="ln">  364</span>    linarith</span>
+<span class="line" id="L365"><span class="ln">  365</span>  have hlogr_le : Real.log r ≤ Λ := Real.log_le_log hr0 hrh</span>
+<span class="line" id="L366"><span class="ln">  366</span>  set ρ := (r : ℝ) ^ ε with hρdef</span>
+<span class="line" id="L367"><span class="ln">  367</span>  -- `ρ` is large</span>
+<span class="line" id="L368"><span class="ln">  368</span>  have hρbig : 48 * q * Xp h + 6 ≤ ρ := by</span>
+<span class="line" id="L369"><span class="ln">  369</span>    have h1 : ρ = Real.exp (ε * Real.log r) := by rw [hρdef, Real.rpow_def_of_pos hr0]; ring_nf</span>
+<span class="line" id="L370"><span class="ln">  370</span>    have h2 : 5 * Λ ^ (σ₀ - 1 / 200) ≤ ε * Real.log r := by</span>
+<span class="line" id="L371"><span class="ln">  371</span>      have e : ε * (5 * Λ ^ σ₀) = 5 * Λ ^ (σ₀ - 1 / 200) := by</span>
+<span class="line" id="L372"><span class="ln">  372</span>        rw [hεdef]; unfold εp; rw [mul_left_comm, rp hΛ0]; ring_nf</span>
+<span class="line" id="L373"><span class="ln">  373</span>      rw [← e]; exact mul_le_mul_of_nonneg_left hlogr hε0</span>
+<span class="line" id="L374"><span class="ln">  374</span>    have h3 : Λ ^ (201 : ℝ) ≤ ρ := by</span>
+<span class="line" id="L375"><span class="ln">  375</span>      rw [h1]; exact le_trans (hρev Λ L4) (Real.exp_le_exp.2 h2)</span>
+<span class="line" id="L376"><span class="ln">  376</span>    have h4 : (48 * q * Xp h + 6 : ℝ) ≤ Λ ^ (201 : ℝ) := by</span>
+<span class="line" id="L377"><span class="ln">  377</span>      have hX := Xp_le (h := h) hΛ1</span>
+<span class="line" id="L378"><span class="ln">  378</span>      have e : Λ ^ (201 : ℝ) = Λ * Λ ^ (200 : ℝ) := by</span>
+<span class="line" id="L379"><span class="ln">  379</span>        rw [show Λ * Λ ^ (200 : ℝ) = Λ ^ (1 : ℝ) * Λ ^ (200 : ℝ) by rw [Real.rpow_one], rp hΛ0]; norm_num</span>
+<span class="line" id="L380"><span class="ln">  380</span>      rw [e]</span>
+<span class="line" id="L381"><span class="ln">  381</span>      have hp : 1 ≤ Λ ^ (200 : ℝ) := Real.one_le_rpow hΛ1 (by norm_num)</span>
+<span class="line" id="L382"><span class="ln">  382</span>      nlinarith</span>
+<span class="line" id="L383"><span class="ln">  383</span>    linarith</span>
+<span class="line" id="L384"><span class="ln">  384</span>  -- `Kv`</span>
+<span class="line" id="L385"><span class="ln">  385</span>  obtain ⟨hKv1, hKv2⟩ := Kv_bounds ρ hρ1 (Kvp h r) rfl</span>
+<span class="line" id="L386"><span class="ln">  386</span>  have hLwge : (r : ℝ) * ρ ^ 3 - 2 ≤ (LwR h r : ℝ) := R_Lw_ge h r hr0</span>
+<span class="line" id="L387"><span class="ln">  387</span>  have hX1 : 1 ≤ Xp h := by have := Xp_two (h := h) hΛ2; omega</span>
+<span class="line" id="L388"><span class="ln">  388</span>  have hL := R_L_lower r ρ q (Xp h) (Kvp h r) (LwR h r) r rfl hq hX1 hrR hρbig hKv2 hLwge</span>
+<span class="line" id="L389"><span class="ln">  389</span>  -- `Sb`</span>
+<span class="line" id="L390"><span class="ln">  390</span>  rw [max_eq_left hLwNb]</span>
+<span class="line" id="L391"><span class="ln">  391</span>  set Sb := NbR h H r with hSb</span>
+<span class="line" id="L392"><span class="ln">  392</span>  have hSbR : (Sb : ℝ) ≤ (H : ℝ) / (Eh h * r) := Nat.floor_le (by positivity)</span>
+<span class="line" id="L393"><span class="ln">  393</span>  have hSbh : (Sb : ℝ) ≤ h := by</span>
+<span class="line" id="L394"><span class="ln">  394</span>    have : (H : ℝ) / (Eh h * r) ≤ H := div_le_self (by positivity) (by nlinarith)</span>
+<span class="line" id="L395"><span class="ln">  395</span>    linarith</span>
+<span class="line" id="L396"><span class="ln">  396</span>  have hlogSb : Real.log Sb ≤ Λ := by</span>
+<span class="line" id="L397"><span class="ln">  397</span>    rcases Nat.eq_zero_or_pos Sb with h0 | hpos</span>
+<span class="line" id="L398"><span class="ln">  398</span>    · rw [h0]; simp; linarith</span>
+<span class="line" id="L399"><span class="ln">  399</span>    · exact Real.log_le_log (by exact_mod_cast hpos) hSbh</span>
+<span class="line" id="L400"><span class="ln">  400</span>  have hlogSb0 : 0 ≤ Real.log (Sb : ℝ) := Real.log_natCast_nonneg _</span>
+<span class="line" id="L401"><span class="ln">  401</span>  -- the closed form</span>
+<span class="line" id="L402"><span class="ln">  402</span>  set Ymin : ℝ := (H : ℝ) / (6 * q * r) with hYmin</span>
+<span class="line" id="L403"><span class="ln">  403</span>  set Ymax : ℝ := ((6 * q * h : ℕ) : ℝ) * H / r with hYmax</span>
+<span class="line" id="L404"><span class="ln">  404</span>  have hH0 : (0 : ℝ) &lt; H := by</span>
+<span class="line" id="L405"><span class="ln">  405</span>    have : 0 &lt; Eh h * r * (r : ℝ) ^ (1 + 3 * ε) := by positivity</span>
+<span class="line" id="L406"><span class="ln">  406</span>    linarith</span>
+<span class="line" id="L407"><span class="ln">  407</span>  have hYmin0 : 0 &lt; Ymin := by positivity</span>
+<span class="line" id="L408"><span class="ln">  408</span>  have hQ1 : 1 ≤ 6 * q * r := by</span>
+<span class="line" id="L409"><span class="ln">  409</span>    have : 1 ≤ 6 * q := by omega</span>
+<span class="line" id="L410"><span class="ln">  410</span>    nlinarith</span>
+<span class="line" id="L411"><span class="ln">  411</span>  have hRT := GoldC.QuillonREst.RTerm_le c C hc hC (6 * q * h) coef Cb (by positivity) hcoef Ym (6 * q * r)</span>
+<span class="line" id="L412"><span class="ln">  412</span>    hQ1 U (fun p hp =&gt; (hU p hp).2.1) (Xp h) (Kvp h r) (LwR h r) Sb hX1 Ymin Ymax hYmin0 hY</span>
+<span class="line" id="L413"><span class="ln">  413</span>  refine le_trans hRT ?_</span>
+<span class="line" id="L414"><span class="ln">  414</span>  have hKf := R_Kf_bound Λ (by linarith) Sb r ε hε0 hε1 hrR hlogr_le hlogSb</span>
+<span class="line" id="L415"><span class="ln">  415</span>  have hF4 : 1 + Real.log ((6 * q * h : ℕ) : ℝ) ≤ 2 * Λ := by</span>
+<span class="line" id="L416"><span class="ln">  416</span>    push_cast; rw [Real.log_mul (by positivity) hh0.ne&#x27;]; linarith</span>
+<span class="line" id="L417"><span class="ln">  417</span>  have hAw : (Real.exp 37.5 * (1 + Nat.log 2 (Nat.log 2 Sb) : ℝ) ^ 30) ^ 2 ≤ Λ := by</span>
+<span class="line" id="L418"><span class="ln">  418</span>    have h1 := hAω Λ L3 Sb (by linarith)</span>
+<span class="line" id="L419"><span class="ln">  419</span>    have h0 : 0 ≤ Real.exp 37.5 * (1 + Nat.log 2 (Nat.log 2 Sb) : ℝ) ^ 30 := by positivity</span>
+<span class="line" id="L420"><span class="ln">  420</span>    calc _ ≤ (Λ ^ (1 / 2 : ℝ)) ^ 2 := pow_le_pow_left₀ h0 h1 2</span>
+<span class="line" id="L421"><span class="ln">  421</span>      _ = Λ := by rw [← Real.rpow_natCast, ← Real.rpow_mul hΛ0.le]; norm_num</span>
+<span class="line" id="L422"><span class="ln">  422</span>  have hXge := Xp_ge (h := h) hΛ1</span>
+<span class="line" id="L423"><span class="ln">  423</span>  have hXpos : (0 : ℝ) &lt; Xp h := lt_of_lt_of_le (by positivity) hXge</span>
+<span class="line" id="L424"><span class="ln">  424</span>  have hsqX : 2 / Real.sqrt (Xp h) ≤ 2 * Λ ^ (-(100 : ℝ)) := by</span>
+<span class="line" id="L425"><span class="ln">  425</span>    have hsq : Λ ^ (100 : ℝ) ≤ Real.sqrt (Xp h) := by</span>
+<span class="line" id="L426"><span class="ln">  426</span>      rw [Real.le_sqrt (by positivity) hXpos.le]</span>
+<span class="line" id="L427"><span class="ln">  427</span>      calc (Λ ^ (100 : ℝ)) ^ 2 = Λ ^ (200 : ℝ) := by</span>
+<span class="line" id="L428"><span class="ln">  428</span>            rw [← Real.rpow_natCast, ← Real.rpow_mul hΛ0.le]; norm_num</span>
+<span class="line" id="L429"><span class="ln">  429</span>        _ ≤ Xp h := hXge</span>
+<span class="line" id="L430"><span class="ln">  430</span>    exact inv_rpow_le hΛ0 100 2 hsq (by norm_num)</span>
+<span class="line" id="L431"><span class="ln">  431</span>  have hrrH : (r : ℝ) * r ≤ H := by</span>
+<span class="line" id="L432"><span class="ln">  432</span>    have h1 : (r : ℝ) * r ≤ Eh h * r * r := by</span>
+<span class="line" id="L433"><span class="ln">  433</span>      calc (r : ℝ) * r = 1 * (r * r) := by ring</span>
+<span class="line" id="L434"><span class="ln">  434</span>        _ ≤ Eh h * (r * r) := mul_le_mul_of_nonneg_right hEh1 (by positivity)</span>
+<span class="line" id="L435"><span class="ln">  435</span>        _ = Eh h * r * r := by ring</span>
+<span class="line" id="L436"><span class="ln">  436</span>    have h2 : Eh h * r * r ≤ Eh h * r * (r : ℝ) ^ (1 + 3 * ε) :=</span>
+<span class="line" id="L437"><span class="ln">  437</span>      mul_le_mul_of_nonneg_left hr3 (by positivity)</span>
+<span class="line" id="L438"><span class="ln">  438</span>    linarith</span>
+<span class="line" id="L439"><span class="ln">  439</span>  obtain ⟨hLm0, hLm⟩ := R_Ymax_facts Λ h H r q hΛdef hΛ2 hq hr1 hrrH hHR</span>
+<span class="line" id="L440"><span class="ln">  440</span>  have hLlow : 5 * Λ ^ (σ₀ - 1 / 200) ≤</span>
+<span class="line" id="L441"><span class="ln">  441</span>      Real.log ((((LwR h r / (2 ^ Kvp h r * Xp h) - 6 * q * r) / (6 * q * r) : ℕ)) : ℝ) := by</span>
+<span class="line" id="L442"><span class="ln">  442</span>    have h1 : 5 * Λ ^ (σ₀ - 1 / 200) ≤ Real.log ρ := by</span>
+<span class="line" id="L443"><span class="ln">  443</span>      rw [hρdef, Real.log_rpow hr0]</span>
+<span class="line" id="L444"><span class="ln">  444</span>      have e : ε * (5 * Λ ^ σ₀) = 5 * Λ ^ (σ₀ - 1 / 200) := by</span>
+<span class="line" id="L445"><span class="ln">  445</span>        rw [hεdef]; unfold εp; rw [mul_left_comm, rp hΛ0]; ring_nf</span>
+<span class="line" id="L446"><span class="ln">  446</span>      rw [← e]; exact mul_le_mul_of_nonneg_left hlogr hε0</span>
+<span class="line" id="L447"><span class="ln">  447</span>    exact le_trans h1 (Real.log_le_log (by linarith) hL)</span>
+<span class="line" id="L448"><span class="ln">  448</span>  have hexpT := hexp Λ L1 _ _ hLlow hLm0 hLm</span>
+<span class="line" id="L449"><span class="ln">  449</span>  have hdiagT : Real.sqrt (128 * C * Sb * (1 + Real.log Sb) / Ymin) ≤ Λ ^ (-(200 : ℝ)) := by</span>
+<span class="line" id="L450"><span class="ln">  450</span>    apply sqrt_le_of (by positivity)</span>
+<span class="line" id="L451"><span class="ln">  451</span>    have e : (Λ ^ (-(200 : ℝ))) ^ 2 = Λ ^ (-(400 : ℝ)) := by</span>
+<span class="line" id="L452"><span class="ln">  452</span>      rw [← Real.rpow_natCast, ← Real.rpow_mul hΛ0.le]; norm_num</span>
+<span class="line" id="L453"><span class="ln">  453</span>    rw [e]</span>
+<span class="line" id="L454"><span class="ln">  454</span>    exact hdiag Λ L2 _ (by positivity)</span>
+<span class="line" id="L455"><span class="ln">  455</span>      (R_diag_bound C hC Λ hΛ0 H Sb r q hH0 hr0 (Eh h) rfl hSbR hlogSb hΛ1)</span>
+<span class="line" id="L456"><span class="ln">  456</span>  have hBr : 2 / Real.sqrt (Xp h) +</span>
+<span class="line" id="L457"><span class="ln">  457</span>      Real.sqrt (8 * C) * Real.exp (-(c * Real.log ((((LwR h r / (2 ^ Kvp h r * Xp h) - 6 * q * r) /</span>
+<span class="line" id="L458"><span class="ln">  458</span>        (6 * q * r) : ℕ)) : ℝ) ^ 3 / Real.log (Ymax / ((6 * q * r : ℕ) : ℝ)) ^ 2) / 2) +</span>
+<span class="line" id="L459"><span class="ln">  459</span>      Real.sqrt (128 * C * Sb * (1 + Real.log Sb) / Ymin) ≤ 3 * Λ ^ (-(100 : ℝ)) := by</span>
+<span class="line" id="L460"><span class="ln">  460</span>    have hk := hK2 Λ L6</span>
+<span class="line" id="L461"><span class="ln">  461</span>    have e : Λ ^ (100 : ℝ) * Λ ^ (-(200 : ℝ)) = Λ ^ (-(100 : ℝ)) := by rw [rp hΛ0]; norm_num</span>
+<span class="line" id="L462"><span class="ln">  462</span>    have hp : 0 ≤ Λ ^ (-(200 : ℝ)) := by positivity</span>
+<span class="line" id="L463"><span class="ln">  463</span>    have h1 : Real.sqrt (8 * C) * Real.exp (-(c * Real.log ((((LwR h r / (2 ^ Kvp h r * Xp h) - 6 * q * r) /</span>
+<span class="line" id="L464"><span class="ln">  464</span>        (6 * q * r) : ℕ)) : ℝ) ^ 3 / Real.log (Ymax / ((6 * q * r : ℕ) : ℝ)) ^ 2) / 2) ≤</span>
+<span class="line" id="L465"><span class="ln">  465</span>        Real.sqrt (8 * C) * Λ ^ (-(200 : ℝ)) := mul_le_mul_of_nonneg_left hexpT (Real.sqrt_nonneg _)</span>
+<span class="line" id="L466"><span class="ln">  466</span>    have h2 : (Real.sqrt (8 * C) + 1) * Λ ^ (-(200 : ℝ)) ≤ Λ ^ (-(100 : ℝ)) := by</span>
+<span class="line" id="L467"><span class="ln">  467</span>      rw [← e]; exact mul_le_mul_of_nonneg_right hk hp</span>
+<span class="line" id="L468"><span class="ln">  468</span>    linarith</span>
+<span class="line" id="L469"><span class="ln">  469</span>  have hWU := prodU_le_pow U (fun p hp =&gt; ⟨(hU p hp).1, (hU p hp).2.1⟩) (h ^ 2)</span>
+<span class="line" id="L470"><span class="ln">  470</span>    (fun p hp =&gt; le_trans (hU p hp).2.2 (Nat.pow_le_pow_left hHh 2)) 2 Λ (by norm_num) hΛ1</span>
+<span class="line" id="L471"><span class="ln">  471</span>    (by push_cast; rw [Real.log_pow]; push_cast; linarith)</span>
+<span class="line" id="L472"><span class="ln">  472</span>  have hXi : (12.5 : ℝ) / Xp h ≤ 12.5 * Λ ^ (-(200 : ℝ)) := inv_rpow_le hΛ0 200 12.5 hXge (by norm_num)</span>
+<span class="line" id="L473"><span class="ln">  473</span>  have hWU0 : 0 ≤ ∏ p ∈ U, (1 + 1 / ((p : ℝ) - 3)) := prod_nonneg fun p hp =&gt; by</span>
+<span class="line" id="L474"><span class="ln">  474</span>    have : (5 : ℝ) ≤ p := by exact_mod_cast (hU p hp).2.1</span>
+<span class="line" id="L475"><span class="ln">  475</span>    have : 0 ≤ 1 / ((p : ℝ) - 3) := div_nonneg zero_le_one (by linarith)</span>
+<span class="line" id="L476"><span class="ln">  476</span>    linarith</span>
+<span class="line" id="L477"><span class="ln">  477</span>  exact R_combine Λ _ Cb _ _ _ _ _ E hΛ2 (by positivity) (by positivity) hKf</span>
+<span class="line" id="L478"><span class="ln">  478</span>    (by have := Real.log_natCast_nonneg (6 * q * h); linarith) hF4 (by positivity) hAw (by positivity) hBr</span>
+<span class="line" id="L479"><span class="ln">  479</span>    hWU0 hWU (by positivity) hXi (by positivity) hKfin</span>
+<span class="line" id="L480"><span class="ln">  480</span></span>
+<span class="line" id="L481"><span class="ln">  481</span>end GoldC.QuillonREv</span>
+<span class="line" id="L482"><span class="ln">  482</span></span>
+<span class="line" id="L483"><span class="ln">  483</span>#print axioms GoldC.QuillonREv.R_exp_ev</span>
+<span class="line" id="L484"><span class="ln">  484</span>#print axioms GoldC.QuillonREv.R_diag_ev</span>
+<span class="line" id="L485"><span class="ln">  485</span>#print axioms GoldC.QuillonREv.R_combine</span>
+<span class="line" id="L486"><span class="ln">  486</span>#print axioms GoldC.QuillonREv.Kv_bounds</span>
+<span class="line" id="L487"><span class="ln">  487</span>#print axioms GoldC.QuillonREv.R_L_lower</span>
+<span class="line" id="L488"><span class="ln">  488</span>#print axioms GoldC.QuillonREv.R_term_ev</span>
+</pre></div></body></html>

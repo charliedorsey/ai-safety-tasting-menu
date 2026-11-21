@@ -1,0 +1,363 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · GoldC/QuillonCopyF.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>GoldC/QuillonCopyF.lean</h1><p class="meta">LEAN/GoldC/QuillonCopyF.lean · 362 lines · SHA-256 4c19ce932279ecde9ad4673462e4cbf63fec7fa1cfcd6f5d92042d1cd3aa39f2</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import GoldC.QuillonClassNormalFormCopyQ0001</span>
+<span class="l" id="L2"><span class="n">2</span>import Mathlib.Data.Nat.GCD.BigOperators</span>
+<span class="l" id="L3"><span class="n">3</span></span>
+<span class="l" id="L4"><span class="n">4</span>/-!</span>
+<span class="l" id="L5"><span class="n">5</span># Quillon CSC3 F8.0: verbatim source copies for the folded row (`GoldC.QuillonCopyF`)</span>
+<span class="l" id="L6"><span class="n">6</span></span>
+<span class="l" id="L7"><span class="n">7</span>These are verbatim copies of the curated source definitions and lemmas needed to identify the source</span>
+<span class="l" id="L8"><span class="n">8</span>summand `foldRow` with the abstract row `rowAbs`. They come from `GoldC/SourceCore.lean`,</span>
+<span class="l" id="L9"><span class="n">9</span>`RowRounding.lean`, `CentralDecomp.lean`, `InvBound.lean`, `DigitSplit.lean` and `C2Fold.lean`.</span>
+<span class="l" id="L10"><span class="n">10</span>`saw`, `invMod` and `crtResidue` are the existing copies in `GoldC.QuillonCopyC`</span>
+<span class="l" id="L11"><span class="n">11</span>(`QuillonClassNormalForm`). The source files themselves `import Mathlib`, and no full Mathlib</span>
+<span class="l" id="L12"><span class="n">12</span>olean is available here, so the declarations are copied instead.</span>
+<span class="l" id="L13"><span class="n">13</span></span>
+<span class="l" id="L14"><span class="n">14</span>To replay in production, delete this file and use the `GoldC` originals. Every body is</span>
+<span class="l" id="L15"><span class="n">15</span>character-identical, so all uses go through by `rfl`.</span>
+<span class="l" id="L16"><span class="n">16</span>-/</span>
+<span class="l" id="L17"><span class="n">17</span></span>
+<span class="l" id="L18"><span class="n">18</span>open scoped BigOperators Classical</span>
+<span class="l" id="L19"><span class="n">19</span>open Finset</span>
+<span class="l" id="L20"><span class="n">20</span></span>
+<span class="l" id="L21"><span class="n">21</span>namespace GoldC.QuillonCopyF</span>
+<span class="l" id="L22"><span class="n">22</span></span>
+<span class="l" id="L23"><span class="n">23</span>open GoldC.QuillonCopyC</span>
+<span class="l" id="L24"><span class="n">24</span></span>
+<span class="l" id="L25"><span class="n">25</span>-- verbatim from GoldC/SourceCore.lean</span>
+<span class="l" id="L26"><span class="n">26</span>def centralGate (h H r s : ℕ) : Prop :=</span>
+<span class="l" id="L27"><span class="n">27</span>  (r * s : ℝ) ≤ (H : ℝ) /</span>
+<span class="l" id="L28"><span class="n">28</span>    Real.exp ((Real.log (h : ℝ)) ^ (1/4 : ℝ)) ∧</span>
+<span class="l" id="L29"><span class="n">29</span>  s ≤ r ^ 2 ∧ r ≤ s ^ 2</span>
+<span class="l" id="L30"><span class="n">30</span></span>
+<span class="l" id="L31"><span class="n">31</span>-- verbatim from GoldC/SourceCore.lean</span>
+<span class="l" id="L32"><span class="n">32</span>noncomputable def reducedAnchor (q a D : ℕ) : ℕ :=</span>
+<span class="l" id="L33"><span class="n">33</span>  if hDq : D.Coprime q then</span>
+<span class="l" id="L34"><span class="n">34</span>    (((((ZMod.unitOfCoprime D hDq)⁻¹ : (ZMod q)ˣ) : ZMod q) *</span>
+<span class="l" id="L35"><span class="n">35</span>      (a : ZMod q)).val)</span>
+<span class="l" id="L36"><span class="n">36</span>  else 0</span>
+<span class="l" id="L37"><span class="n">37</span></span>
+<span class="l" id="L38"><span class="n">38</span>-- verbatim from GoldC/SourceCore.lean</span>
+<span class="l" id="L39"><span class="n">39</span>def lowPrimeSet : Finset ℕ := {2, 3}</span>
+<span class="l" id="L40"><span class="n">40</span></span>
+<span class="l" id="L41"><span class="n">41</span>-- verbatim from GoldC/SourceCore.lean</span>
+<span class="l" id="L42"><span class="n">42</span>def endpointOccupiedCount (p H : ℕ) : ℕ :=</span>
+<span class="l" id="L43"><span class="n">43</span>  ({0 % p, H % p} : Finset ℕ).card</span>
+<span class="l" id="L44"><span class="n">44</span></span>
+<span class="l" id="L45"><span class="n">45</span>-- verbatim from GoldC/SourceCore.lean</span>
+<span class="l" id="L46"><span class="n">46</span>def tripleOccupiedCount (p H y : ℕ) : ℕ :=</span>
+<span class="l" id="L47"><span class="n">47</span>  ({0 % p, y % p, H % p} : Finset ℕ).card</span>
+<span class="l" id="L48"><span class="n">48</span></span>
+<span class="l" id="L49"><span class="n">49</span>-- verbatim from GoldC/SourceCore.lean</span>
+<span class="l" id="L50"><span class="n">50</span>noncomputable def occupiedLocalRatio (p H y : ℕ) : ℝ :=</span>
+<span class="l" id="L51"><span class="n">51</span>  ((1 - (tripleOccupiedCount p H y : ℝ) / (p : ℝ)) /</span>
+<span class="l" id="L52"><span class="n">52</span>      (1 - (endpointOccupiedCount p H : ℝ) / (p : ℝ))) /</span>
+<span class="l" id="L53"><span class="n">53</span>    (1 - 1 / (p : ℝ))</span>
+<span class="l" id="L54"><span class="n">54</span></span>
+<span class="l" id="L55"><span class="n">55</span>-- verbatim from GoldC/SourceCore.lean</span>
+<span class="l" id="L56"><span class="n">56</span>noncomputable def occupiedWeight (q a H y : ℕ) : ℝ :=</span>
+<span class="l" id="L57"><span class="n">57</span>  (if q.Coprime (a + y) then 1 else 0) *</span>
+<span class="l" id="L58"><span class="n">58</span>    ∏ p ∈ lowPrimeSet,</span>
+<span class="l" id="L59"><span class="n">59</span>      if p ∣ q then 1 else occupiedLocalRatio p H y</span>
+<span class="l" id="L60"><span class="n">60</span></span>
+<span class="l" id="L61"><span class="n">61</span>-- verbatim from GoldC/RowRounding.lean</span>
+<span class="l" id="L62"><span class="n">62</span>lemma tripleOccupiedCount_add (p H y k : ℕ) (hp : p ∣ k) :</span>
+<span class="l" id="L63"><span class="n">63</span>    tripleOccupiedCount p H (y + k) = tripleOccupiedCount p H y := by</span>
+<span class="l" id="L64"><span class="n">64</span>  unfold tripleOccupiedCount</span>
+<span class="l" id="L65"><span class="n">65</span>  have : (y + k) % p = y % p := by</span>
+<span class="l" id="L66"><span class="n">66</span>    obtain ⟨m, rfl⟩ := hp; simp [Nat.add_mul_mod_self_left]</span>
+<span class="l" id="L67"><span class="n">67</span>  rw [this]</span>
+<span class="l" id="L68"><span class="n">68</span></span>
+<span class="l" id="L69"><span class="n">69</span>-- verbatim from GoldC/RowRounding.lean</span>
+<span class="l" id="L70"><span class="n">70</span>/-- **The source weight is `6q`-periodic.** -/</span>
+<span class="l" id="L71"><span class="n">71</span>theorem occupiedWeight_periodic (q a H y : ℕ) :</span>
+<span class="l" id="L72"><span class="n">72</span>    occupiedWeight q a H (y + 6 * q) = occupiedWeight q a H y := by</span>
+<span class="l" id="L73"><span class="n">73</span>  unfold occupiedWeight</span>
+<span class="l" id="L74"><span class="n">74</span>  congr 1</span>
+<span class="l" id="L75"><span class="n">75</span>  · congr 1</span>
+<span class="l" id="L76"><span class="n">76</span>    have : a + (y + 6 * q) = a + y + q * 6 := by ring</span>
+<span class="l" id="L77"><span class="n">77</span>    rw [this]</span>
+<span class="l" id="L78"><span class="n">78</span>    exact propext (Nat.coprime_add_mul_left_right _ _ _)</span>
+<span class="l" id="L79"><span class="n">79</span>  · refine Finset.prod_congr rfl fun p hp =&gt; ?_</span>
+<span class="l" id="L80"><span class="n">80</span>    have hp&#x27; : p = 2 ∨ p = 3 := by simpa [lowPrimeSet] using hp</span>
+<span class="l" id="L81"><span class="n">81</span>    have hdvd : p ∣ 6 * q := by</span>
+<span class="l" id="L82"><span class="n">82</span>      rcases hp&#x27; with rfl | rfl</span>
+<span class="l" id="L83"><span class="n">83</span>      · exact Dvd.dvd.mul_right (by norm_num) _</span>
+<span class="l" id="L84"><span class="n">84</span>      · exact Dvd.dvd.mul_right (by norm_num) _</span>
+<span class="l" id="L85"><span class="n">85</span>    unfold occupiedLocalRatio</span>
+<span class="l" id="L86"><span class="n">86</span>    rw [tripleOccupiedCount_add p H y _ hdvd]</span>
+<span class="l" id="L87"><span class="n">87</span></span>
+<span class="l" id="L88"><span class="n">88</span>-- verbatim from GoldC/CentralDecomp.lean</span>
+<span class="l" id="L89"><span class="n">89</span>/-- The period-`6q` mean `μ` of the source weight `y ↦ occupiedWeight q a&#x27; H y`. -/</span>
+<span class="l" id="L90"><span class="n">90</span>noncomputable def meanWeight (q a&#x27; H : ℕ) : ℝ :=</span>
+<span class="l" id="L91"><span class="n">91</span>  (∑ y ∈ Finset.range (6 * q), occupiedWeight q a&#x27; H y) / (6 * q : ℝ)</span>
+<span class="l" id="L92"><span class="n">92</span></span>
+<span class="l" id="L93"><span class="n">93</span>-- verbatim from GoldC/InvBound.lean</span>
+<span class="l" id="L94"><span class="n">94</span>lemma triple_le (p H y : ℕ) (hp : 0 &lt; p) : tripleOccupiedCount p H y ≤ p := by</span>
+<span class="l" id="L95"><span class="n">95</span>  unfold tripleOccupiedCount</span>
+<span class="l" id="L96"><span class="n">96</span>  calc ({0 % p, y % p, H % p} : Finset ℕ).card ≤ (Finset.range p).card := by</span>
+<span class="l" id="L97"><span class="n">97</span>        apply Finset.card_le_card</span>
+<span class="l" id="L98"><span class="n">98</span>        intro x hx</span>
+<span class="l" id="L99"><span class="n">99</span>        simp only [Finset.mem_insert, Finset.mem_singleton] at hx</span>
+<span class="l" id="L100"><span class="n">100</span>        rw [Finset.mem_range]</span>
+<span class="l" id="L101"><span class="n">101</span>        rcases hx with rfl | rfl | rfl &lt;;&gt; exact Nat.mod_lt _ hp</span>
+<span class="l" id="L102"><span class="n">102</span>    _ = p := Finset.card_range p</span>
+<span class="l" id="L103"><span class="n">103</span></span>
+<span class="l" id="L104"><span class="n">104</span>-- verbatim from GoldC/InvBound.lean</span>
+<span class="l" id="L105"><span class="n">105</span>lemma endpoint_le_triple (p H y : ℕ) : endpointOccupiedCount p H ≤ tripleOccupiedCount p H y := by</span>
+<span class="l" id="L106"><span class="n">106</span>  unfold endpointOccupiedCount tripleOccupiedCount</span>
+<span class="l" id="L107"><span class="n">107</span>  apply Finset.card_le_card</span>
+<span class="l" id="L108"><span class="n">108</span>  intro x hx</span>
+<span class="l" id="L109"><span class="n">109</span>  simp only [Finset.mem_insert, Finset.mem_singleton] at hx ⊢</span>
+<span class="l" id="L110"><span class="n">110</span>  tauto</span>
+<span class="l" id="L111"><span class="n">111</span></span>
+<span class="l" id="L112"><span class="n">112</span>-- verbatim from GoldC/InvBound.lean</span>
+<span class="l" id="L113"><span class="n">113</span>lemma occupiedLocalRatio_bounds {p : ℕ} (hp : 2 ≤ p) (H y : ℕ) :</span>
+<span class="l" id="L114"><span class="n">114</span>    0 ≤ occupiedLocalRatio p H y ∧ occupiedLocalRatio p H y ≤ 2 := by</span>
+<span class="l" id="L115"><span class="n">115</span>  unfold occupiedLocalRatio</span>
+<span class="l" id="L116"><span class="n">116</span>  have hpR : (2 : ℝ) ≤ p := by exact_mod_cast hp</span>
+<span class="l" id="L117"><span class="n">117</span>  have ht := triple_le p H y (by omega)</span>
+<span class="l" id="L118"><span class="n">118</span>  have het := endpoint_le_triple p H y</span>
+<span class="l" id="L119"><span class="n">119</span>  set t := tripleOccupiedCount p H y</span>
+<span class="l" id="L120"><span class="n">120</span>  set e := endpointOccupiedCount p H</span>
+<span class="l" id="L121"><span class="n">121</span>  have htR : (t : ℝ) ≤ p := by exact_mod_cast ht</span>
+<span class="l" id="L122"><span class="n">122</span>  have hetR : (e : ℝ) ≤ t := by exact_mod_cast het</span>
+<span class="l" id="L123"><span class="n">123</span>  have hp0 : (0 : ℝ) &lt; p := by linarith</span>
+<span class="l" id="L124"><span class="n">124</span>  have h1p : (1 / 2 : ℝ) ≤ 1 - 1 / (p : ℝ) := by</span>
+<span class="l" id="L125"><span class="n">125</span>    have : (1 : ℝ) / p ≤ 1 / 2 := by</span>
+<span class="l" id="L126"><span class="n">126</span>      rw [div_le_div_iff₀ hp0 (by norm_num)]; linarith</span>
+<span class="l" id="L127"><span class="n">127</span>    linarith</span>
+<span class="l" id="L128"><span class="n">128</span>  have hnum0 : 0 ≤ 1 - (t : ℝ) / p := by</span>
+<span class="l" id="L129"><span class="n">129</span>    rw [sub_nonneg, div_le_one hp0]; exact htR</span>
+<span class="l" id="L130"><span class="n">130</span>  by_cases hden : 1 - (e : ℝ) / p = 0</span>
+<span class="l" id="L131"><span class="n">131</span>  · rw [hden, div_zero, zero_div]; norm_num</span>
+<span class="l" id="L132"><span class="n">132</span>  · have hden_pos : 0 &lt; 1 - (e : ℝ) / p := by</span>
+<span class="l" id="L133"><span class="n">133</span>      rcases lt_or_gt_of_ne hden with h | h</span>
+<span class="l" id="L134"><span class="n">134</span>      · exfalso</span>
+<span class="l" id="L135"><span class="n">135</span>        have : (p : ℝ) &lt; e := by</span>
+<span class="l" id="L136"><span class="n">136</span>          rw [sub_neg, one_lt_div hp0] at h; exact h</span>
+<span class="l" id="L137"><span class="n">137</span>        linarith</span>
+<span class="l" id="L138"><span class="n">138</span>      · exact h</span>
+<span class="l" id="L139"><span class="n">139</span>    have hle : 1 - (t : ℝ) / p ≤ 1 - (e : ℝ) / p := by</span>
+<span class="l" id="L140"><span class="n">140</span>      have : (e : ℝ) / p ≤ t / p := div_le_div_of_nonneg_right hetR hp0.le</span>
+<span class="l" id="L141"><span class="n">141</span>      linarith</span>
+<span class="l" id="L142"><span class="n">142</span>    have hq : (1 - (t : ℝ) / p) / (1 - (e : ℝ) / p) ≤ 1 := (div_le_one hden_pos).2 hle</span>
+<span class="l" id="L143"><span class="n">143</span>    have hq0 : 0 ≤ (1 - (t : ℝ) / p) / (1 - (e : ℝ) / p) := div_nonneg hnum0 hden_pos.le</span>
+<span class="l" id="L144"><span class="n">144</span>    refine ⟨div_nonneg hq0 (by linarith), ?_⟩</span>
+<span class="l" id="L145"><span class="n">145</span>    rw [div_le_iff₀ (by linarith)]</span>
+<span class="l" id="L146"><span class="n">146</span>    nlinarith</span>
+<span class="l" id="L147"><span class="n">147</span></span>
+<span class="l" id="L148"><span class="n">148</span>-- verbatim from GoldC/InvBound.lean</span>
+<span class="l" id="L149"><span class="n">149</span>lemma occupiedWeight_bounds (q a H y : ℕ) :</span>
+<span class="l" id="L150"><span class="n">150</span>    0 ≤ occupiedWeight q a H y ∧ occupiedWeight q a H y ≤ 4 := by</span>
+<span class="l" id="L151"><span class="n">151</span>  unfold occupiedWeight</span>
+<span class="l" id="L152"><span class="n">152</span>  have hprod : 0 ≤ (∏ p ∈ lowPrimeSet, if p ∣ q then (1 : ℝ) else occupiedLocalRatio p H y) ∧</span>
+<span class="l" id="L153"><span class="n">153</span>      (∏ p ∈ lowPrimeSet, if p ∣ q then (1 : ℝ) else occupiedLocalRatio p H y) ≤ 4 := by</span>
+<span class="l" id="L154"><span class="n">154</span>    have hb : ∀ p ∈ lowPrimeSet, 0 ≤ (if p ∣ q then (1 : ℝ) else occupiedLocalRatio p H y) ∧</span>
+<span class="l" id="L155"><span class="n">155</span>        (if p ∣ q then (1 : ℝ) else occupiedLocalRatio p H y) ≤ 2 := by</span>
+<span class="l" id="L156"><span class="n">156</span>      intro p hp</span>
+<span class="l" id="L157"><span class="n">157</span>      have hp2 : 2 ≤ p := by</span>
+<span class="l" id="L158"><span class="n">158</span>        simp only [lowPrimeSet, Finset.mem_insert, Finset.mem_singleton] at hp</span>
+<span class="l" id="L159"><span class="n">159</span>        rcases hp with rfl | rfl &lt;;&gt; norm_num</span>
+<span class="l" id="L160"><span class="n">160</span>      split_ifs</span>
+<span class="l" id="L161"><span class="n">161</span>      · norm_num</span>
+<span class="l" id="L162"><span class="n">162</span>      · exact occupiedLocalRatio_bounds hp2 H y</span>
+<span class="l" id="L163"><span class="n">163</span>    unfold lowPrimeSet at hb ⊢</span>
+<span class="l" id="L164"><span class="n">164</span>    rw [Finset.prod_insert (by norm_num), Finset.prod_singleton]</span>
+<span class="l" id="L165"><span class="n">165</span>    obtain ⟨h1, h2⟩ := hb 2 (by simp)</span>
+<span class="l" id="L166"><span class="n">166</span>    obtain ⟨h3, h4⟩ := hb 3 (by simp)</span>
+<span class="l" id="L167"><span class="n">167</span>    exact ⟨mul_nonneg h1 h3, by nlinarith⟩</span>
+<span class="l" id="L168"><span class="n">168</span>  split_ifs</span>
+<span class="l" id="L169"><span class="n">169</span>  · rw [one_mul]; exact hprod</span>
+<span class="l" id="L170"><span class="n">170</span>  · rw [zero_mul]; norm_num</span>
+<span class="l" id="L171"><span class="n">171</span></span>
+<span class="l" id="L172"><span class="n">172</span>-- verbatim from GoldC/InvBound.lean</span>
+<span class="l" id="L173"><span class="n">173</span>lemma meanWeight_bounds (q a&#x27; H : ℕ) : 0 ≤ meanWeight q a&#x27; H ∧ meanWeight q a&#x27; H ≤ 4 := by</span>
+<span class="l" id="L174"><span class="n">174</span>  unfold meanWeight</span>
+<span class="l" id="L175"><span class="n">175</span>  rcases Nat.eq_zero_or_pos q with rfl | hq</span>
+<span class="l" id="L176"><span class="n">176</span>  · simp</span>
+<span class="l" id="L177"><span class="n">177</span>  have hq&#x27; : (0 : ℝ) &lt; 6 * q := by positivity</span>
+<span class="l" id="L178"><span class="n">178</span>  constructor</span>
+<span class="l" id="L179"><span class="n">179</span>  · exact div_nonneg (Finset.sum_nonneg fun y _ =&gt; (occupiedWeight_bounds q a&#x27; H y).1) hq&#x27;.le</span>
+<span class="l" id="L180"><span class="n">180</span>  · rw [div_le_iff₀ hq&#x27;]</span>
+<span class="l" id="L181"><span class="n">181</span>    calc (∑ y ∈ Finset.range (6 * q), occupiedWeight q a&#x27; H y)</span>
+<span class="l" id="L182"><span class="n">182</span>        ≤ ∑ y ∈ Finset.range (6 * q), (4 : ℝ) :=</span>
+<span class="l" id="L183"><span class="n">183</span>          Finset.sum_le_sum fun y _ =&gt; (occupiedWeight_bounds q a&#x27; H y).2</span>
+<span class="l" id="L184"><span class="n">184</span>      _ = 4 * (6 * q) := by rw [Finset.sum_const, Finset.card_range, nsmul_eq_mul]; push_cast; ring</span>
+<span class="l" id="L185"><span class="n">185</span></span>
+<span class="l" id="L186"><span class="n">186</span>-- verbatim from GoldC/DigitSplit.lean</span>
+<span class="l" id="L187"><span class="n">187</span>lemma sum_shift_period (f : ℕ → ℝ) (M : ℕ) (hper : ∀ y, f (y + M) = f y) (K : ℕ) :</span>
+<span class="l" id="L188"><span class="n">188</span>    ∑ i ∈ Finset.range M, f (K + i) = ∑ i ∈ Finset.range M, f i := by</span>
+<span class="l" id="L189"><span class="n">189</span>  induction K with</span>
+<span class="l" id="L190"><span class="n">190</span>  | zero =&gt; simp</span>
+<span class="l" id="L191"><span class="n">191</span>  | succ K ih =&gt;</span>
+<span class="l" id="L192"><span class="n">192</span>    rw [← ih]</span>
+<span class="l" id="L193"><span class="n">193</span>    rcases Nat.eq_zero_or_pos M with rfl | hM</span>
+<span class="l" id="L194"><span class="n">194</span>    · simp</span>
+<span class="l" id="L195"><span class="n">195</span>    obtain ⟨m, rfl⟩ : ∃ m, M = m + 1 := ⟨M - 1, by omega⟩</span>
+<span class="l" id="L196"><span class="n">196</span>    rw [Finset.sum_range_succ, Finset.sum_range_succ&#x27; (fun i =&gt; f (K + i))]</span>
+<span class="l" id="L197"><span class="n">197</span>    have h3 : f (K + 1 + m) = f (K + 0) := by</span>
+<span class="l" id="L198"><span class="n">198</span>      rw [show K + 1 + m = K + (m + 1) by ring, hper, add_zero]</span>
+<span class="l" id="L199"><span class="n">199</span>    rw [h3]</span>
+<span class="l" id="L200"><span class="n">200</span>    have h4 : ∑ i ∈ Finset.range m, f (K + 1 + i) = ∑ i ∈ Finset.range m, f (K + (i + 1)) :=</span>
+<span class="l" id="L201"><span class="n">201</span>      Finset.sum_congr rfl fun i _ =&gt; by ring_nf</span>
+<span class="l" id="L202"><span class="n">202</span>    rw [h4]</span>
+<span class="l" id="L203"><span class="n">203</span></span>
+<span class="l" id="L204"><span class="n">204</span>-- verbatim from GoldC/C2Fold.lean</span>
+<span class="l" id="L205"><span class="n">205</span>lemma periodic_mod (g : ℕ → ℝ) (M : ℕ) (hper : ∀ y, g (y + M) = g y) (y : ℕ) :</span>
+<span class="l" id="L206"><span class="n">206</span>    g y = g (y % M) := by</span>
+<span class="l" id="L207"><span class="n">207</span>  have key : ∀ k x, g (x + M * k) = g x := by</span>
+<span class="l" id="L208"><span class="n">208</span>    intro k; induction k with</span>
+<span class="l" id="L209"><span class="n">209</span>    | zero =&gt; intro x; simp</span>
+<span class="l" id="L210"><span class="n">210</span>    | succ k ih =&gt; intro x; rw [Nat.mul_succ, ← add_assoc, hper, ih]</span>
+<span class="l" id="L211"><span class="n">211</span>  conv_lhs =&gt; rw [← Nat.mod_add_div y M]</span>
+<span class="l" id="L212"><span class="n">212</span>  exact key _ _</span>
+<span class="l" id="L213"><span class="n">213</span></span>
+<span class="l" id="L214"><span class="n">214</span>-- verbatim from GoldC/C2Fold.lean</span>
+<span class="l" id="L215"><span class="n">215</span>lemma periodic_modEq (g : ℕ → ℝ) (M : ℕ) (hper : ∀ y, g (y + M) = g y) {x y : ℕ}</span>
+<span class="l" id="L216"><span class="n">216</span>    (h : x ≡ y [MOD M]) : g x = g y := by</span>
+<span class="l" id="L217"><span class="n">217</span>  rw [periodic_mod g M hper x, periodic_mod g M hper y, h]</span>
+<span class="l" id="L218"><span class="n">218</span></span>
+<span class="l" id="L219"><span class="n">219</span>-- verbatim from GoldC/C2Fold.lean</span>
+<span class="l" id="L220"><span class="n">220</span>/-- The potential of `g` along steps of size `n`, modulo `M`. -/</span>
+<span class="l" id="L221"><span class="n">221</span>noncomputable def pot (g : ℕ → ℝ) (M n y : ℕ) : ℝ :=</span>
+<span class="l" id="L222"><span class="n">222</span>  ∑ t ∈ Finset.range ((y * invMod n M) % M), g (t * n)</span>
+<span class="l" id="L223"><span class="n">223</span></span>
+<span class="l" id="L224"><span class="n">224</span>-- verbatim from GoldC/C2Fold.lean</span>
+<span class="l" id="L225"><span class="n">225</span>lemma pot_congr (g : ℕ → ℝ) (M n : ℕ) {x y : ℕ} (h : x ≡ y [MOD M]) :</span>
+<span class="l" id="L226"><span class="n">226</span>    pot g M n x = pot g M n y := by</span>
+<span class="l" id="L227"><span class="n">227</span>  unfold pot</span>
+<span class="l" id="L228"><span class="n">228</span>  have : (x * invMod n M) % M = (y * invMod n M) % M := Nat.ModEq.mul_right _ h</span>
+<span class="l" id="L229"><span class="n">229</span>  rw [this]</span>
+<span class="l" id="L230"><span class="n">230</span></span>
+<span class="l" id="L231"><span class="n">231</span>-- verbatim from GoldC/C2Fold.lean</span>
+<span class="l" id="L232"><span class="n">232</span>/-- The centred source weight `g = λ - μ`. -/</span>
+<span class="l" id="L233"><span class="n">233</span>noncomputable def srcG (q a&#x27; H : ℕ) (y : ℕ) : ℝ :=</span>
+<span class="l" id="L234"><span class="n">234</span>  occupiedWeight q a&#x27; H y - meanWeight q a&#x27; H</span>
+<span class="l" id="L235"><span class="n">235</span></span>
+<span class="l" id="L236"><span class="n">236</span>-- verbatim from GoldC/C2Fold.lean</span>
+<span class="l" id="L237"><span class="n">237</span>lemma srcG_periodic (q a&#x27; H y : ℕ) : srcG q a&#x27; H (y + 6 * q) = srcG q a&#x27; H y := by</span>
+<span class="l" id="L238"><span class="n">238</span>  unfold srcG; rw [occupiedWeight_periodic]</span>
+<span class="l" id="L239"><span class="n">239</span></span>
+<span class="l" id="L240"><span class="n">240</span>-- verbatim from GoldC/C2Fold.lean</span>
+<span class="l" id="L241"><span class="n">241</span>lemma srcG_bound (q a&#x27; H y : ℕ) : |srcG q a&#x27; H y| ≤ 4 := by</span>
+<span class="l" id="L242"><span class="n">242</span>  unfold srcG</span>
+<span class="l" id="L243"><span class="n">243</span>  have h1 := occupiedWeight_bounds q a&#x27; H y</span>
+<span class="l" id="L244"><span class="n">244</span>  have h2 := meanWeight_bounds q a&#x27; H</span>
+<span class="l" id="L245"><span class="n">245</span>  rw [abs_le]; constructor &lt;;&gt; linarith</span>
+<span class="l" id="L246"><span class="n">246</span></span>
+<span class="l" id="L247"><span class="n">247</span>-- verbatim from GoldC/C2Fold.lean</span>
+<span class="l" id="L248"><span class="n">248</span>/-- `|pot| ≤ 4M` for the source potential. -/</span>
+<span class="l" id="L249"><span class="n">249</span>lemma pot_srcG_bound (q a&#x27; H n y : ℕ) (hq : 0 &lt; q) :</span>
+<span class="l" id="L250"><span class="n">250</span>    |pot (srcG q a&#x27; H) (6 * q) n y| ≤ 4 * (6 * q) := by</span>
+<span class="l" id="L251"><span class="n">251</span>  unfold pot</span>
+<span class="l" id="L252"><span class="n">252</span>  calc |∑ t ∈ Finset.range ((y * invMod n (6 * q)) % (6 * q)), srcG q a&#x27; H (t * n)|</span>
+<span class="l" id="L253"><span class="n">253</span>      ≤ ∑ t ∈ Finset.range ((y * invMod n (6 * q)) % (6 * q)), |srcG q a&#x27; H (t * n)| :=</span>
+<span class="l" id="L254"><span class="n">254</span>        Finset.abs_sum_le_sum_abs _ _</span>
+<span class="l" id="L255"><span class="n">255</span>    _ ≤ ∑ t ∈ Finset.range ((y * invMod n (6 * q)) % (6 * q)), (4 : ℝ) :=</span>
+<span class="l" id="L256"><span class="n">256</span>        Finset.sum_le_sum fun t _ =&gt; srcG_bound _ _ _ _</span>
+<span class="l" id="L257"><span class="n">257</span>    _ = ((y * invMod n (6 * q)) % (6 * q) : ℕ) * 4 := by</span>
+<span class="l" id="L258"><span class="n">258</span>        rw [Finset.sum_const, Finset.card_range, nsmul_eq_mul]</span>
+<span class="l" id="L259"><span class="n">259</span>    _ ≤ ((6 * q : ℕ) : ℝ) * 4 := by</span>
+<span class="l" id="L260"><span class="n">260</span>        gcongr; exact_mod_cast (Nat.mod_lt _ (by omega)).le</span>
+<span class="l" id="L261"><span class="n">261</span>    _ = 4 * (6 * q) := by push_cast; ring</span>
+<span class="l" id="L262"><span class="n">262</span></span>
+<span class="l" id="L263"><span class="n">263</span>-- verbatim from GoldC/C2Fold.lean</span>
+<span class="l" id="L264"><span class="n">264</span>lemma pot_mod_n (g : ℕ → ℝ) (M n y : ℕ) (hper : ∀ y, g (y + M) = g y) :</span>
+<span class="l" id="L265"><span class="n">265</span>    pot g M n y = pot g M (n % M) y := by</span>
+<span class="l" id="L266"><span class="n">266</span>  unfold pot</span>
+<span class="l" id="L267"><span class="n">267</span>  have hinv : invMod n M = invMod (n % M) M := by</span>
+<span class="l" id="L268"><span class="n">268</span>    unfold invMod; rw [ZMod.natCast_mod]</span>
+<span class="l" id="L269"><span class="n">269</span>  rw [hinv]</span>
+<span class="l" id="L270"><span class="n">270</span>  refine Finset.sum_congr rfl fun t _ =&gt; periodic_modEq g M hper ?_</span>
+<span class="l" id="L271"><span class="n">271</span>  exact Nat.ModEq.mul_left t (Nat.mod_modEq n M).symm</span>
+<span class="l" id="L272"><span class="n">272</span></span>
+<span class="l" id="L273"><span class="n">273</span>-- verbatim from GoldC/C2Fold.lean</span>
+<span class="l" id="L274"><span class="n">274</span>/-- The class value of the entry/exit potential difference: `c ≡ b`, `rs ≡ ν (mod 6q)`. -/</span>
+<span class="l" id="L275"><span class="n">275</span>noncomputable def gammaClass (q a D H b ν : ℕ) : ℝ :=</span>
+<span class="l" id="L276"><span class="n">276</span>  pot (srcG q (reducedAnchor q a D) H) (6 * q) ν (H + ν + 6 * q - b) -</span>
+<span class="l" id="L277"><span class="n">277</span>    pot (srcG q (reducedAnchor q a D) H) (6 * q) ν b</span>
+<span class="l" id="L278"><span class="n">278</span></span>
+<span class="l" id="L279"><span class="n">279</span>-- verbatim from GoldC/C2Fold.lean</span>
+<span class="l" id="L280"><span class="n">280</span>lemma pot_diff_eq_gammaClass (q a D H n c : ℕ) (hq : 0 &lt; q) (hc : c &lt; n) :</span>
+<span class="l" id="L281"><span class="n">281</span>    pot (srcG q (reducedAnchor q a D) H) (6 * q) n (H + n - c) -</span>
+<span class="l" id="L282"><span class="n">282</span>      pot (srcG q (reducedAnchor q a D) H) (6 * q) n c =</span>
+<span class="l" id="L283"><span class="n">283</span>    gammaClass q a D H (c % (6 * q)) (n % (6 * q)) := by</span>
+<span class="l" id="L284"><span class="n">284</span>  unfold gammaClass</span>
+<span class="l" id="L285"><span class="n">285</span>  have hper := srcG_periodic q (reducedAnchor q a D) H</span>
+<span class="l" id="L286"><span class="n">286</span>  rw [pot_mod_n _ _ n _ hper, pot_mod_n _ _ n c hper]</span>
+<span class="l" id="L287"><span class="n">287</span>  congr 1</span>
+<span class="l" id="L288"><span class="n">288</span>  · apply pot_congr</span>
+<span class="l" id="L289"><span class="n">289</span>    rw [Nat.modEq_iff_dvd]</span>
+<span class="l" id="L290"><span class="n">290</span>    have hb : c % (6 * q) ≤ 6 * q := (Nat.mod_lt _ (by omega)).le</span>
+<span class="l" id="L291"><span class="n">291</span>    have e1 := Nat.mod_add_div n (6 * q)</span>
+<span class="l" id="L292"><span class="n">292</span>    have e2 := Nat.mod_add_div c (6 * q)</span>
+<span class="l" id="L293"><span class="n">293</span>    push_cast [Nat.cast_sub (show c ≤ H + n by omega),</span>
+<span class="l" id="L294"><span class="n">294</span>      Nat.cast_sub (show c % (6 * q) ≤ H + n % (6 * q) + 6 * q by omega)]</span>
+<span class="l" id="L295"><span class="n">295</span>    have e1&#x27; : ((n % (6 * q) : ℕ) : ℤ) = n - 6 * q * (n / (6 * q) : ℕ) := by</span>
+<span class="l" id="L296"><span class="n">296</span>      have := congrArg (fun t : ℕ =&gt; (t : ℤ)) e1; push_cast at this ⊢; linarith</span>
+<span class="l" id="L297"><span class="n">297</span>    have e2&#x27; : ((c % (6 * q) : ℕ) : ℤ) = c - 6 * q * (c / (6 * q) : ℕ) := by</span>
+<span class="l" id="L298"><span class="n">298</span>      have := congrArg (fun t : ℕ =&gt; (t : ℤ)) e2; push_cast at this ⊢; linarith</span>
+<span class="l" id="L299"><span class="n">299</span>    push_cast at e1&#x27; e2&#x27;</span>
+<span class="l" id="L300"><span class="n">300</span>    rw [e1&#x27;, e2&#x27;]</span>
+<span class="l" id="L301"><span class="n">301</span>    exact ⟨1 - (n / (6 * q) : ℕ) + (c / (6 * q) : ℕ), by push_cast; ring⟩</span>
+<span class="l" id="L302"><span class="n">302</span>  · exact pot_congr _ _ _ (Nat.mod_modEq c (6 * q)).symm</span>
+<span class="l" id="L303"><span class="n">303</span></span>
+<span class="l" id="L304"><span class="n">304</span>-- verbatim from GoldC/C2Fold.lean</span>
+<span class="l" id="L305"><span class="n">305</span>lemma sum_sum_ite_eq (M x y : ℕ) (hx : x &lt; M) (hy : y &lt; M) (f : ℕ → ℕ → ℝ) :</span>
+<span class="l" id="L306"><span class="n">306</span>    ∑ b ∈ Finset.range M, ∑ ν ∈ Finset.range M, f b ν * (if x = b ∧ y = ν then 1 else 0) =</span>
+<span class="l" id="L307"><span class="n">307</span>      f x y := by</span>
+<span class="l" id="L308"><span class="n">308</span>  rw [Finset.sum_eq_single x]</span>
+<span class="l" id="L309"><span class="n">309</span>  · rw [Finset.sum_eq_single y]</span>
+<span class="l" id="L310"><span class="n">310</span>    · simp</span>
+<span class="l" id="L311"><span class="n">311</span>    · intro ν _ hν; simp [Ne.symm hν]</span>
+<span class="l" id="L312"><span class="n">312</span>    · intro h; exact absurd (Finset.mem_range.2 hy) h</span>
+<span class="l" id="L313"><span class="n">313</span>  · intro b _ hb</span>
+<span class="l" id="L314"><span class="n">314</span>    exact Finset.sum_eq_zero fun ν _ =&gt; by simp [Ne.symm hb]</span>
+<span class="l" id="L315"><span class="n">315</span>  · intro h; exact absurd (Finset.mem_range.2 hx) h</span>
+<span class="l" id="L316"><span class="n">316</span></span>
+<span class="l" id="L317"><span class="n">317</span>-- verbatim from GoldC/C2Fold.lean</span>
+<span class="l" id="L318"><span class="n">318</span>/-- The folded row: twice the oriented sawtooth plus the entry/exit potential difference.</span>
+<span class="l" id="L319"><span class="n">319</span>It depends on the pair only through the CRT residue `c(r,s)` and `n = rs`. -/</span>
+<span class="l" id="L320"><span class="n">320</span>noncomputable def foldRow (q a : ℕ) (D H r s : ℕ) : ℝ :=</span>
+<span class="l" id="L321"><span class="n">321</span>  -(2 * meanWeight q (reducedAnchor q a D) H) * saw ((H : ℝ) * invMod r s / s) +</span>
+<span class="l" id="L322"><span class="n">322</span>    (pot (srcG q (reducedAnchor q a D) H) (6 * q) (r * s) (H + r * s - crtResidue H r s) -</span>
+<span class="l" id="L323"><span class="n">323</span>      pot (srcG q (reducedAnchor q a D) H) (6 * q) (r * s) (crtResidue H r s))</span>
+<span class="l" id="L324"><span class="n">324</span></span>
+<span class="l" id="L325"><span class="n">325</span>-- verbatim from GoldC/C2Fold.lean</span>
+<span class="l" id="L326"><span class="n">326</span>lemma sum_gammaClass_zero (q a D H ν : ℕ) :</span>
+<span class="l" id="L327"><span class="n">327</span>    ∑ b ∈ Finset.range (6 * q), gammaClass q a D H b ν = 0 := by</span>
+<span class="l" id="L328"><span class="n">328</span>  unfold gammaClass</span>
+<span class="l" id="L329"><span class="n">329</span>  rw [Finset.sum_sub_distrib, sub_eq_zero]</span>
+<span class="l" id="L330"><span class="n">330</span>  set f := pot (srcG q (reducedAnchor q a D) H) (6 * q) ν with hf</span>
+<span class="l" id="L331"><span class="n">331</span>  have hfper : ∀ y, f (y + 6 * q) = f y := fun y =&gt;</span>
+<span class="l" id="L332"><span class="n">332</span>    pot_congr _ _ _ (Nat.add_modEq_right)</span>
+<span class="l" id="L333"><span class="n">333</span>  rw [← Finset.sum_range_reflect (fun b =&gt; f (H + ν + 6 * q - b))]</span>
+<span class="l" id="L334"><span class="n">334</span>  have : ∀ j ∈ Finset.range (6 * q), f (H + ν + 6 * q - (6 * q - 1 - j)) = f ((H + ν + 1) + j) := by</span>
+<span class="l" id="L335"><span class="n">335</span>    intro j hj</span>
+<span class="l" id="L336"><span class="n">336</span>    rw [Finset.mem_range] at hj</span>
+<span class="l" id="L337"><span class="n">337</span>    congr 1; omega</span>
+<span class="l" id="L338"><span class="n">338</span>  rw [Finset.sum_congr rfl this]</span>
+<span class="l" id="L339"><span class="n">339</span>  exact sum_shift_period f (6 * q) hfper (H + ν + 1)</span>
+<span class="l" id="L340"><span class="n">340</span></span>
+<span class="l" id="L341"><span class="n">341</span>-- verbatim from GoldC/C2Fold.lean</span>
+<span class="l" id="L342"><span class="n">342</span>lemma abs_gammaClass_le (q a D H b ν : ℕ) (hq : 0 &lt; q) :</span>
+<span class="l" id="L343"><span class="n">343</span>    |gammaClass q a D H b ν| ≤ 8 * (6 * q) := by</span>
+<span class="l" id="L344"><span class="n">344</span>  unfold gammaClass</span>
+<span class="l" id="L345"><span class="n">345</span>  have h1 := pot_srcG_bound q (reducedAnchor q a D) H ν (H + ν + 6 * q - b) hq</span>
+<span class="l" id="L346"><span class="n">346</span>  have h2 := pot_srcG_bound q (reducedAnchor q a D) H ν b hq</span>
+<span class="l" id="L347"><span class="n">347</span>  calc _ ≤ |pot (srcG q (reducedAnchor q a D) H) (6 * q) ν (H + ν + 6 * q - b)| +</span>
+<span class="l" id="L348"><span class="n">348</span>        |pot (srcG q (reducedAnchor q a D) H) (6 * q) ν b| := abs_sub _ _</span>
+<span class="l" id="L349"><span class="n">349</span>    _ ≤ 4 * (6 * q) + 4 * (6 * q) := add_le_add h1 h2</span>
+<span class="l" id="L350"><span class="n">350</span>    _ = 8 * (6 * q) := by ring</span>
+<span class="l" id="L351"><span class="n">351</span></span>
+<span class="l" id="L352"><span class="n">352</span>-- verbatim from GoldC/RowRounding.lean</span>
+<span class="l" id="L353"><span class="n">353</span>lemma crtResidue_lt {H r s : ℕ} (hs : 2 ≤ s) (hr : 1 ≤ r) : crtResidue H r s &lt; r * s := by</span>
+<span class="l" id="L354"><span class="n">354</span>  unfold crtResidue</span>
+<span class="l" id="L355"><span class="n">355</span>  exact Nat.mul_lt_mul_of_pos_left (Nat.mod_lt _ (by omega)) (by omega)</span>
+<span class="l" id="L356"><span class="n">356</span></span>
+<span class="l" id="L357"><span class="n">357</span>end GoldC.QuillonCopyF</span>
+<span class="l" id="L358"><span class="n">358</span></span>
+<span class="l" id="L359"><span class="n">359</span>#print axioms GoldC.QuillonCopyF.pot_diff_eq_gammaClass</span>
+<span class="l" id="L360"><span class="n">360</span>#print axioms GoldC.QuillonCopyF.sum_gammaClass_zero</span>
+<span class="l" id="L361"><span class="n">361</span>#print axioms GoldC.QuillonCopyF.abs_gammaClass_le</span>
+<span class="l" id="L362"><span class="n">362</span>#print axioms GoldC.QuillonCopyF.meanWeight_bounds</span></pre></div></body></html>

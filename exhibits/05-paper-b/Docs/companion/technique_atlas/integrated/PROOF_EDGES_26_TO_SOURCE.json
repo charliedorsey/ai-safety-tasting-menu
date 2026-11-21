@@ -1,0 +1,158 @@
+[
+  {
+    "consumer": "T00",
+    "supplier": "T01",
+    "standing": "direct",
+    "explanation": "rw [printedA_sub_printedB_eq_manuscriptKernels]"
+  },
+  {
+    "consumer": "T00",
+    "supplier": "T04",
+    "standing": "direct",
+    "explanation": "obtain h0 from paperB_terminal_via_empty_low"
+  },
+  {
+    "consumer": "T01",
+    "supplier": "T02",
+    "standing": "direct",
+    "explanation": "exact A equality in the printed-difference rewrite"
+  },
+  {
+    "consumer": "T01",
+    "supplier": "T03",
+    "standing": "direct",
+    "explanation": "exact B equality in the printed-difference rewrite"
+  },
+  {
+    "consumer": "T04",
+    "supplier": "T05",
+    "standing": "direct",
+    "explanation": "source specialization at Jlow=0 and delta=1/4"
+  },
+  {
+    "consumer": "T05",
+    "supplier": "T06",
+    "standing": "direct",
+    "explanation": "LONG source rate given at physical high cutoff"
+  },
+  {
+    "consumer": "T05",
+    "supplier": "T10",
+    "standing": "direct",
+    "explanation": "LOW/LONG conditional native terminal"
+  },
+  {
+    "consumer": "T06",
+    "supplier": "T07",
+    "standing": "direct",
+    "explanation": "Quillon long_sublog with quillon_weilHyp"
+  },
+  {
+    "consumer": "T06",
+    "supplier": "T13",
+    "standing": "via",
+    "explanation": "WeilHyp discharged through norm_quillon_K_weil"
+  },
+  {
+    "consumer": "T09",
+    "supplier": "T08",
+    "standing": "direct",
+    "explanation": "native CORE source rate via copied-rate equality"
+  },
+  {
+    "consumer": "T10",
+    "supplier": "T09",
+    "standing": "via",
+    "explanation": "native CORE supplied through CorePaidTerminalConsumer"
+  },
+  {
+    "consumer": "T10",
+    "supplier": "T14",
+    "standing": "direct",
+    "explanation": "native HIGH sector rate"
+  },
+  {
+    "consumer": "T10",
+    "supplier": "T12",
+    "standing": "via",
+    "explanation": "Middle LONG+CORE assembly in native conditional consumer"
+  },
+  {
+    "consumer": "T10",
+    "supplier": "T11",
+    "standing": "via",
+    "explanation": "three-sector source identity in eventual terminal assembly"
+  },
+  {
+    "consumer": "T07",
+    "supplier": "CELL-WL",
+    "standing": "method",
+    "explanation": "physical LONG cell assembled in long_pair_le"
+  },
+  {
+    "consumer": "T07",
+    "supplier": "CELL-CL",
+    "standing": "method",
+    "explanation": "physical LONG cell assembled in long_pair_le"
+  },
+  {
+    "consumer": "T07",
+    "supplier": "CELL-RL",
+    "standing": "method",
+    "explanation": "physical LONG cell assembled in long_pair_le"
+  },
+  {
+    "consumer": "T07",
+    "supplier": "CELL-ManyL",
+    "standing": "method",
+    "explanation": "physical LONG cell assembled in long_pair_le"
+  },
+  {
+    "consumer": "T07",
+    "supplier": "CELL-EdgeL",
+    "standing": "method",
+    "explanation": "physical LONG cell assembled in long_pair_le"
+  },
+  {
+    "consumer": "T07",
+    "supplier": "CELL-ResL",
+    "standing": "method",
+    "explanation": "physical LONG cell assembled in long_pair_le"
+  },
+  {
+    "consumer": "T07",
+    "supplier": "CELL-WRL",
+    "standing": "method",
+    "explanation": "physical LONG cell assembled in long_pair_le"
+  },
+  {
+    "consumer": "T08",
+    "supplier": "CELL-W",
+    "standing": "method",
+    "explanation": "physical CORE cell assembled in core_pair_le"
+  },
+  {
+    "consumer": "T08",
+    "supplier": "CELL-C",
+    "standing": "method",
+    "explanation": "physical CORE cell assembled in core_pair_le"
+  },
+  {
+    "consumer": "T08",
+    "supplier": "CELL-R",
+    "standing": "method",
+    "explanation": "physical CORE cell assembled in core_pair_le"
+  },
+  {
+    "consumer": "T08",
+    "supplier": "CELL-ResA",
+    "standing": "method",
+    "explanation": "physical CORE cell assembled in core_pair_le"
+  },
+  {
+    "consumer": "T08",
+    "supplier": "CELL-Band",
+    "standing": "method",
+    "explanation": "physical CORE cell assembled in core_pair_le"
+  }
+]

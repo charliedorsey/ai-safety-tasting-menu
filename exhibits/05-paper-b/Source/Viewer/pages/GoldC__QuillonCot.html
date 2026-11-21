@@ -1,0 +1,425 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LEAN/GoldC/QuillonCot.lean</title><style>body{background:#f9f8f4;color:#27332d;font:16px/1.5 Georgia,serif;margin:0}a{color:#2d6255}.wrap{max-width:1160px;margin:0 auto;padding:30px 24px}header{border-bottom:1px solid #d8ded7;margin-bottom:22px}h1{font-size:29px;font-weight:normal;overflow-wrap:anywhere}.meta,nav,th{font:13px/1.5 system-ui,sans-serif;color:#5b6b63}nav a{margin-right:18px}.tblwrap{overflow-x:auto}table{border-collapse:collapse;width:100%}td,th{padding:9px 12px;border-bottom:1px solid #e0e3de;text-align:left;vertical-align:top}td code{overflow-wrap:anywhere}code,pre{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}pre{font-size:12.5px;white-space:pre;overflow-x:auto;line-height:1.6;background:#fff;padding:12px;border:1px solid #e2e4df}.ln{color:#8b968e;padding-right:15px;user-select:none}.line{display:block}.focus{background:#e9f1ec}.line:target{outline:2px solid #276b54;outline-offset:1px;background:#f6f4e7}.legend{padding:12px 15px;background:#fff;border-left:2px solid #629280;margin:24px 0}@media(max-width:640px){.wrap{padding:18px 12px}h1{font-size:21px}td,th{padding:8px}.meta{font-size:11px}pre{font-size:11px}}</style></head><body><div class="wrap"><header><nav><a href="../source_index.html">All source waypoints</a><a href="../../../Docs/companion/reading_room/index.html">Reading room</a></nav><h1>LEAN/GoldC/QuillonCot.lean</h1><p class="meta">Exact archived source · SHA-256 dc3714f4c1fbde8c9158d77b4c9ef9d845da77217fb7acc2754d164e21317cf3 · Original line numbers · Not a new Lean replay</p></header><p class="meta">Deep source proof text is reproduced verbatim for inspection; this page does not assert a compiler-derived proof-dependency graph.</p><pre><span class="line" id="L1"><span class="ln">    1</span>import GoldC.QuillonSawDFT</span>
+<span class="line" id="L2"><span class="ln">    2</span>import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv</span>
+<span class="line" id="L3"><span class="ln">    3</span>import Mathlib.Analysis.Calculus.MeanValue</span>
+<span class="line" id="L4"><span class="ln">    4</span>import GoldC.QuillonAbel</span>
+<span class="line" id="L5"><span class="ln">    5</span></span>
+<span class="line" id="L6"><span class="ln">    6</span>/-!</span>
+<span class="line" id="L7"><span class="ln">    7</span># Quillon CSC3: the cotangent form of the saw DFT coefficients, and monotonicity</span>
+<span class="line" id="L8"><span class="ln">    8</span></span>
+<span class="line" id="L9"><span class="ln">    9</span>* `phi_strictAnti`: `φ(y) = y·cos y/sin y` is strictly decreasing on `(0, π/2]`.</span>
+<span class="line" id="L10"><span class="ln">   10</span>* `sawCoeff_cot`: for `0 &lt; k &lt; m`, `a_m(k) = (i/(2m))·cot(πk/m)`, i.e. `(i/2k)·φ(πk/m)/π`.</span>
+<span class="line" id="L11"><span class="ln">   11</span></span>
+<span class="line" id="L12"><span class="ln">   12</span>For a fixed frequency `j`, the R-route amplitude `a_{vu}(j)·conj(a_{v&#x27;u}(j))` is therefore a product of</span>
+<span class="line" id="L13"><span class="ln">   13</span>two positive increasing functions of `u` (when `j ≤ vu/2`, `j ≤ v&#x27;u/2`). Its variation telescopes.</span>
+<span class="line" id="L14"><span class="ln">   14</span></span>
+<span class="line" id="L15"><span class="ln">   15</span>No axiom, no `sorry`.</span>
+<span class="line" id="L16"><span class="ln">   16</span>-/</span>
+<span class="line" id="L17"><span class="ln">   17</span></span>
+<span class="line" id="L18"><span class="ln">   18</span>open Real</span>
+<span class="line" id="L19"><span class="ln">   19</span></span>
+<span class="line" id="L20"><span class="ln">   20</span>namespace GoldC.QuillonCot</span>
+<span class="line" id="L21"><span class="ln">   21</span></span>
+<span class="line" id="L22"><span class="ln">   22</span>noncomputable def phi (y : ℝ) : ℝ := y * Real.cos y / Real.sin y</span>
+<span class="line" id="L23"><span class="ln">   23</span></span>
+<span class="line" id="L24"><span class="ln">   24</span>lemma hasDerivAt_phi {y : ℝ} (hy : Real.sin y ≠ 0) :</span>
+<span class="line" id="L25"><span class="ln">   25</span>    HasDerivAt phi ((Real.cos y * Real.sin y - y) / Real.sin y ^ 2) y := by</span>
+<span class="line" id="L26"><span class="ln">   26</span>  have h1 : HasDerivAt (fun y =&gt; y * Real.cos y) (Real.cos y - y * Real.sin y) y := by</span>
+<span class="line" id="L27"><span class="ln">   27</span>    have := (hasDerivAt_id&#x27; y).mul (Real.hasDerivAt_cos y)</span>
+<span class="line" id="L28"><span class="ln">   28</span>    convert this using 1; ring</span>
+<span class="line" id="L29"><span class="ln">   29</span>  have h2 := h1.div (Real.hasDerivAt_sin y) hy</span>
+<span class="line" id="L30"><span class="ln">   30</span>  convert h2 using 1</span>
+<span class="line" id="L31"><span class="ln">   31</span>  · ext x; simp [phi, Pi.div_apply]</span>
+<span class="line" id="L32"><span class="ln">   32</span>  · have := Real.sin_sq_add_cos_sq y</span>
+<span class="line" id="L33"><span class="ln">   33</span>    rw [show (Real.cos y - y * Real.sin y) * Real.sin y - y * Real.cos y * Real.cos y =</span>
+<span class="line" id="L34"><span class="ln">   34</span>      Real.cos y * Real.sin y - y by linear_combination (-y) * this]</span>
+<span class="line" id="L35"><span class="ln">   35</span></span>
+<span class="line" id="L36"><span class="ln">   36</span>lemma phi_strictAnti : StrictAntiOn phi (Set.Ioc 0 (π / 2)) := by</span>
+<span class="line" id="L37"><span class="ln">   37</span>  have hconv : Convex ℝ (Set.Ioc 0 (π / 2)) := convex_Ioc 0 (π / 2)</span>
+<span class="line" id="L38"><span class="ln">   38</span>  have hsin : ∀ y ∈ Set.Ioc 0 (π / 2), Real.sin y ≠ 0 := by</span>
+<span class="line" id="L39"><span class="ln">   39</span>    intro y hy</span>
+<span class="line" id="L40"><span class="ln">   40</span>    exact (Real.sin_pos_of_pos_of_lt_pi hy.1 (by linarith [hy.2, Real.pi_pos])).ne&#x27;</span>
+<span class="line" id="L41"><span class="ln">   41</span>  refine strictAntiOn_of_deriv_neg hconv ?_ ?_</span>
+<span class="line" id="L42"><span class="ln">   42</span>  · intro y hy</span>
+<span class="line" id="L43"><span class="ln">   43</span>    exact (hasDerivAt_phi (hsin y hy)).continuousAt.continuousWithinAt</span>
+<span class="line" id="L44"><span class="ln">   44</span>  · intro y hy</span>
+<span class="line" id="L45"><span class="ln">   45</span>    rw [interior_Ioc] at hy</span>
+<span class="line" id="L46"><span class="ln">   46</span>    have hs := hsin y ⟨hy.1, hy.2.le⟩</span>
+<span class="line" id="L47"><span class="ln">   47</span>    rw [(hasDerivAt_phi hs).deriv]</span>
+<span class="line" id="L48"><span class="ln">   48</span>    apply div_neg_of_neg_of_pos</span>
+<span class="line" id="L49"><span class="ln">   49</span>    · -- cos y sin y = sin(2y)/2 &lt; y</span>
+<span class="line" id="L50"><span class="ln">   50</span>      have h2 : Real.cos y * Real.sin y = Real.sin (2 * y) / 2 := by</span>
+<span class="line" id="L51"><span class="ln">   51</span>        rw [Real.sin_two_mul]; ring</span>
+<span class="line" id="L52"><span class="ln">   52</span>      have h3 := Real.sin_lt (show 0 &lt; 2 * y by linarith [hy.1])</span>
+<span class="line" id="L53"><span class="ln">   53</span>      rw [h2]; linarith</span>
+<span class="line" id="L54"><span class="ln">   54</span>    · positivity</span>
+<span class="line" id="L55"><span class="ln">   55</span></span>
+<span class="line" id="L56"><span class="ln">   56</span>/-- `a_m(k) = (i/(2m))·cot(πk/m)`. -/</span>
+<span class="line" id="L57"><span class="ln">   57</span>theorem sawCoeff_cot (m k : ℕ) (hm : 2 ≤ m) (hk : k ∈ Finset.Ioo 0 m) :</span>
+<span class="line" id="L58"><span class="ln">   58</span>    GoldC.QuillonSawDFT.sawCoeff m k =</span>
+<span class="line" id="L59"><span class="ln">   59</span>      Complex.I * ((Real.cos (π * k / m) / Real.sin (π * k / m) : ℝ) : ℂ) / (2 * m) := by</span>
+<span class="line" id="L60"><span class="ln">   60</span>  rw [GoldC.QuillonSawDFT.sawCoeff_closed m k hm hk]</span>
+<span class="line" id="L61"><span class="ln">   61</span>  have hk1 := Finset.mem_Ioo.1 hk</span>
+<span class="line" id="L62"><span class="ln">   62</span>  have hmR : (0 : ℝ) &lt; m := by exact_mod_cast (show 0 &lt; m by omega)</span>
+<span class="line" id="L63"><span class="ln">   63</span>  set θ : ℝ := π * k / m with hθ</span>
+<span class="line" id="L64"><span class="ln">   64</span>  have hθ0 : 0 &lt; θ := by rw [hθ]; have : (0:ℝ) &lt; k := by exact_mod_cast hk1.1</span>
+<span class="line" id="L65"><span class="ln">   65</span>                         positivity</span>
+<span class="line" id="L66"><span class="ln">   66</span>  have hθπ : θ &lt; π := by</span>
+<span class="line" id="L67"><span class="ln">   67</span>    rw [hθ, div_lt_iff₀ hmR]</span>
+<span class="line" id="L68"><span class="ln">   68</span>    have : (k : ℝ) &lt; m := by exact_mod_cast hk1.2</span>
+<span class="line" id="L69"><span class="ln">   69</span>    nlinarith [Real.pi_pos]</span>
+<span class="line" id="L70"><span class="ln">   70</span>  have hsθ : Real.sin θ ≠ 0 := (Real.sin_pos_of_pos_of_lt_pi hθ0 hθπ).ne&#x27;</span>
+<span class="line" id="L71"><span class="ln">   71</span>  -- ζ^{-k} = exp(-2iθ) = (cos θ − i sin θ)²</span>
+<span class="line" id="L72"><span class="ln">   72</span>  have hz : GoldC.QuillonSawDFT.zeta m ^ (-(k : ℤ)) =</span>
+<span class="line" id="L73"><span class="ln">   73</span>      (Complex.cos (θ : ℂ) - Complex.sin (θ : ℂ) * Complex.I) ^ 2 := by</span>
+<span class="line" id="L74"><span class="ln">   74</span>    unfold GoldC.QuillonSawDFT.zeta</span>
+<span class="line" id="L75"><span class="ln">   75</span>    rw [← Complex.exp_int_mul]</span>
+<span class="line" id="L76"><span class="ln">   76</span>    have e1 : ((-(k : ℤ) : ℤ) : ℂ) * (2 * (π : ℂ) * Complex.I / (m : ℂ)) =</span>
+<span class="line" id="L77"><span class="ln">   77</span>        2 * ((-(θ : ℂ)) * Complex.I) := by</span>
+<span class="line" id="L78"><span class="ln">   78</span>      rw [hθ]; push_cast; field_simp</span>
+<span class="line" id="L79"><span class="ln">   79</span>    rw [e1, show (2 : ℂ) * (-(θ : ℂ) * Complex.I) = (-(θ : ℂ) * Complex.I) + (-(θ : ℂ) * Complex.I) by ring,</span>
+<span class="line" id="L80"><span class="ln">   80</span>      Complex.exp_add, Complex.exp_mul_I, Complex.cos_neg, Complex.sin_neg]</span>
+<span class="line" id="L81"><span class="ln">   81</span>    ring</span>
+<span class="line" id="L82"><span class="ln">   82</span>  rw [hz]</span>
+<span class="line" id="L83"><span class="ln">   83</span>  have hmC : (m : ℂ) ≠ 0 := by exact_mod_cast (show m ≠ 0 by omega)</span>
+<span class="line" id="L84"><span class="ln">   84</span>  have hsC : Complex.sin (θ : ℂ) ≠ 0 := by</span>
+<span class="line" id="L85"><span class="ln">   85</span>    rw [← Complex.ofReal_sin]; exact_mod_cast hsθ</span>
+<span class="line" id="L86"><span class="ln">   86</span>  have hC := Complex.sin_sq_add_cos_sq (θ : ℂ)</span>
+<span class="line" id="L87"><span class="ln">   87</span>  set c := Complex.cos (θ : ℂ)</span>
+<span class="line" id="L88"><span class="ln">   88</span>  set sn := Complex.sin (θ : ℂ)</span>
+<span class="line" id="L89"><span class="ln">   89</span>  have hD : (c - sn * Complex.I) ^ 2 - 1 = -2 * sn * (sn + c * Complex.I) := by</span>
+<span class="line" id="L90"><span class="ln">   90</span>    linear_combination hC + sn ^ 2 * Complex.I_sq</span>
+<span class="line" id="L91"><span class="ln">   91</span>  have hprod : (sn - c * Complex.I) * (sn + c * Complex.I) = 1 := by</span>
+<span class="line" id="L92"><span class="ln">   92</span>    linear_combination hC - c ^ 2 * Complex.I_sq</span>
+<span class="line" id="L93"><span class="ln">   93</span>  have hne : sn + c * Complex.I ≠ 0 := by</span>
+<span class="line" id="L94"><span class="ln">   94</span>    intro h; rw [h, mul_zero] at hprod; exact zero_ne_one hprod</span>
+<span class="line" id="L95"><span class="ln">   95</span>  have hinv : (sn + c * Complex.I)⁻¹ = sn - c * Complex.I :=</span>
+<span class="line" id="L96"><span class="ln">   96</span>    (eq_inv_of_mul_eq_one_left hprod).symm</span>
+<span class="line" id="L97"><span class="ln">   97</span>  have hR : (((Real.cos (π * k / m) / Real.sin (π * k / m) : ℝ)) : ℂ) = c / sn := by</span>
+<span class="line" id="L98"><span class="ln">   98</span>    rw [← hθ]; push_cast; rfl</span>
+<span class="line" id="L99"><span class="ln">   99</span>  rw [hR, hD]</span>
+<span class="line" id="L100"><span class="ln">  100</span>  have h2 : (1 : ℂ) / ((m : ℂ) * (-2 * sn * (sn + c * Complex.I))) =</span>
+<span class="line" id="L101"><span class="ln">  101</span>      -(1 / (2 * (m : ℂ) * sn)) * (sn + c * Complex.I)⁻¹ := by</span>
+<span class="line" id="L102"><span class="ln">  102</span>    field_simp</span>
+<span class="line" id="L103"><span class="ln">  103</span>  rw [h2, hinv]</span>
+<span class="line" id="L104"><span class="ln">  104</span>  field_simp</span>
+<span class="line" id="L105"><span class="ln">  105</span>  ring</span>
+<span class="line" id="L106"><span class="ln">  106</span></span>
+<span class="line" id="L107"><span class="ln">  107</span>/-! ## Bounds on `φ` and the R-route amplitude variation -/</span>
+<span class="line" id="L108"><span class="ln">  108</span></span>
+<span class="line" id="L109"><span class="ln">  109</span>lemma phi_nonneg {y : ℝ} (h0 : 0 &lt; y) (h1 : y ≤ π / 2) : 0 ≤ phi y := by</span>
+<span class="line" id="L110"><span class="ln">  110</span>  unfold phi</span>
+<span class="line" id="L111"><span class="ln">  111</span>  have hs : 0 &lt; Real.sin y := Real.sin_pos_of_pos_of_lt_pi h0 (by linarith [Real.pi_pos])</span>
+<span class="line" id="L112"><span class="ln">  112</span>  have hc : 0 ≤ Real.cos y := Real.cos_nonneg_of_neg_pi_div_two_le_of_le (by linarith) h1</span>
+<span class="line" id="L113"><span class="ln">  113</span>  positivity</span>
+<span class="line" id="L114"><span class="ln">  114</span></span>
+<span class="line" id="L115"><span class="ln">  115</span>lemma phi_le_one {y : ℝ} (h0 : 0 &lt; y) (h1 : y ≤ π / 2) : phi y ≤ 1 := by</span>
+<span class="line" id="L116"><span class="ln">  116</span>  unfold phi</span>
+<span class="line" id="L117"><span class="ln">  117</span>  have hs : 0 &lt; Real.sin y := Real.sin_pos_of_pos_of_lt_pi h0 (by linarith [Real.pi_pos])</span>
+<span class="line" id="L118"><span class="ln">  118</span>  rw [div_le_one hs]</span>
+<span class="line" id="L119"><span class="ln">  119</span>  rcases lt_or_eq_of_le h1 with h | h</span>
+<span class="line" id="L120"><span class="ln">  120</span>  · have hc : 0 &lt; Real.cos y := Real.cos_pos_of_mem_Ioo ⟨by linarith, h⟩</span>
+<span class="line" id="L121"><span class="ln">  121</span>    have := Real.le_tan h0.le h</span>
+<span class="line" id="L122"><span class="ln">  122</span>    rw [Real.tan_eq_sin_div_cos, le_div_iff₀ hc] at this</span>
+<span class="line" id="L123"><span class="ln">  123</span>    linarith</span>
+<span class="line" id="L124"><span class="ln">  124</span>  · rw [h, Real.cos_pi_div_two, mul_zero]; rw [h] at hs; exact hs.le</span>
+<span class="line" id="L125"><span class="ln">  125</span></span>
+<span class="line" id="L126"><span class="ln">  126</span>/-- Real amplitude for frequency `j` at modulus `m`: `φ(πj/m)` (with `0 &lt; πj/m ≤ π/2`). -/</span>
+<span class="line" id="L127"><span class="ln">  127</span>noncomputable def amp (j m : ℕ) : ℝ := phi (π * j / m)</span>
+<span class="line" id="L128"><span class="ln">  128</span></span>
+<span class="line" id="L129"><span class="ln">  129</span>lemma amp_mono {j m m&#x27; : ℕ} (hj : 1 ≤ j) (hm : 2 * j ≤ m) (hmm : m ≤ m&#x27;) :</span>
+<span class="line" id="L130"><span class="ln">  130</span>    amp j m ≤ amp j m&#x27; := by</span>
+<span class="line" id="L131"><span class="ln">  131</span>  unfold amp</span>
+<span class="line" id="L132"><span class="ln">  132</span>  have hmR : (0 : ℝ) &lt; m := by exact_mod_cast (show 0 &lt; m by omega)</span>
+<span class="line" id="L133"><span class="ln">  133</span>  have hm&#x27;R : (0 : ℝ) &lt; m&#x27; := by exact_mod_cast (show 0 &lt; m&#x27; by omega)</span>
+<span class="line" id="L134"><span class="ln">  134</span>  have hjR : (0 : ℝ) &lt; j := by exact_mod_cast hj</span>
+<span class="line" id="L135"><span class="ln">  135</span>  have hle : π * j / m&#x27; ≤ π * j / m := by</span>
+<span class="line" id="L136"><span class="ln">  136</span>    apply div_le_div_of_nonneg_left (by positivity) hmR (by exact_mod_cast hmm)</span>
+<span class="line" id="L137"><span class="ln">  137</span>  have hin : ∀ x : ℕ, 2 * j ≤ x → π * j / x ∈ Set.Ioc 0 (π / 2) := by</span>
+<span class="line" id="L138"><span class="ln">  138</span>    intro x hx</span>
+<span class="line" id="L139"><span class="ln">  139</span>    have hxR : (0 : ℝ) &lt; x := by exact_mod_cast (show 0 &lt; x by omega)</span>
+<span class="line" id="L140"><span class="ln">  140</span>    refine ⟨by positivity, ?_⟩</span>
+<span class="line" id="L141"><span class="ln">  141</span>    rw [div_le_div_iff₀ hxR (by norm_num)]</span>
+<span class="line" id="L142"><span class="ln">  142</span>    have : (2 * j : ℝ) ≤ x := by exact_mod_cast hx</span>
+<span class="line" id="L143"><span class="ln">  143</span>    nlinarith [Real.pi_pos]</span>
+<span class="line" id="L144"><span class="ln">  144</span>  exact phi_strictAnti.antitoneOn (hin m&#x27; (le_trans hm hmm)) (hin m hm) hle</span>
+<span class="line" id="L145"><span class="ln">  145</span></span>
+<span class="line" id="L146"><span class="ln">  146</span>/-- **Amplitude variation along an increasing progression.** If `x_t` is increasing with</span>
+<span class="line" id="L147"><span class="ln">  147</span>`2j ≤ v·x_t` and `2j ≤ v&#x27;·x_t`, then the real amplitude `amp j (v x_t) · amp j (v&#x27; x_t)` is</span>
+<span class="line" id="L148"><span class="ln">  148</span>increasing, nonnegative and `≤ 1`. Its Abel factor is `≤ 2`. -/</span>
+<span class="line" id="L149"><span class="ln">  149</span>theorem amp_abel_factor (j v v&#x27; : ℕ) (hj : 1 ≤ j) (x : ℕ → ℕ) (N M : ℕ) (hNM : N + 1 ≤ M)</span>
+<span class="line" id="L150"><span class="ln">  150</span>    (hx : ∀ t, N + 1 ≤ t → t &lt; M → x t ≤ x (t + 1))</span>
+<span class="line" id="L151"><span class="ln">  151</span>    (hpos : ∀ t, N + 1 ≤ t → t ≤ M → 2 * j ≤ v * x t ∧ 2 * j ≤ v&#x27; * x t) :</span>
+<span class="line" id="L152"><span class="ln">  152</span>    ‖((amp j (v * x M) * amp j (v&#x27; * x M) : ℝ) : ℂ)‖ +</span>
+<span class="line" id="L153"><span class="ln">  153</span>      ∑ t ∈ Finset.Ico (N + 1) M, ‖((amp j (v * x (t + 1)) * amp j (v&#x27; * x (t + 1)) : ℝ) : ℂ) -</span>
+<span class="line" id="L154"><span class="ln">  154</span>        ((amp j (v * x t) * amp j (v&#x27; * x t) : ℝ) : ℂ)‖ ≤ 2 := by</span>
+<span class="line" id="L155"><span class="ln">  155</span>  set f : ℕ → ℝ := fun t =&gt; amp j (v * x t) * amp j (v&#x27; * x t) with hf</span>
+<span class="line" id="L156"><span class="ln">  156</span>  have hbounds : ∀ t, N + 1 ≤ t → t ≤ M → 0 ≤ f t ∧ f t ≤ 1 := by</span>
+<span class="line" id="L157"><span class="ln">  157</span>    intro t h1 h2</span>
+<span class="line" id="L158"><span class="ln">  158</span>    obtain ⟨ha, hb⟩ := hpos t h1 h2</span>
+<span class="line" id="L159"><span class="ln">  159</span>    have hin : ∀ m : ℕ, 2 * j ≤ m → 0 &lt; π * j / m ∧ π * j / m ≤ π / 2 := by</span>
+<span class="line" id="L160"><span class="ln">  160</span>      intro m hm</span>
+<span class="line" id="L161"><span class="ln">  161</span>      have hmR : (0 : ℝ) &lt; m := by exact_mod_cast (show 0 &lt; m by omega)</span>
+<span class="line" id="L162"><span class="ln">  162</span>      have hjR : (0 : ℝ) &lt; j := by exact_mod_cast hj</span>
+<span class="line" id="L163"><span class="ln">  163</span>      refine ⟨by positivity, ?_⟩</span>
+<span class="line" id="L164"><span class="ln">  164</span>      rw [div_le_div_iff₀ hmR (by norm_num)]</span>
+<span class="line" id="L165"><span class="ln">  165</span>      have : (2 * j : ℝ) ≤ m := by exact_mod_cast hm</span>
+<span class="line" id="L166"><span class="ln">  166</span>      nlinarith [Real.pi_pos]</span>
+<span class="line" id="L167"><span class="ln">  167</span>    have e1 := hin _ ha; have e2 := hin _ hb</span>
+<span class="line" id="L168"><span class="ln">  168</span>    have p1 := phi_nonneg e1.1 e1.2; have p2 := phi_nonneg e2.1 e2.2</span>
+<span class="line" id="L169"><span class="ln">  169</span>    have q1 := phi_le_one e1.1 e1.2; have q2 := phi_le_one e2.1 e2.2</span>
+<span class="line" id="L170"><span class="ln">  170</span>    simp only [hf, amp]</span>
+<span class="line" id="L171"><span class="ln">  171</span>    exact ⟨mul_nonneg p1 p2, by nlinarith⟩</span>
+<span class="line" id="L172"><span class="ln">  172</span>  have hmono : ∀ t, N + 1 ≤ t → t &lt; M → f t ≤ f (t + 1) := by</span>
+<span class="line" id="L173"><span class="ln">  173</span>    intro t h1 h2</span>
+<span class="line" id="L174"><span class="ln">  174</span>    obtain ⟨ha, hb⟩ := hpos t h1 h2.le</span>
+<span class="line" id="L175"><span class="ln">  175</span>    obtain ⟨ha&#x27;, hb&#x27;⟩ := hpos (t + 1) (by omega) (by omega)</span>
+<span class="line" id="L176"><span class="ln">  176</span>    have hxt := hx t h1 h2</span>
+<span class="line" id="L177"><span class="ln">  177</span>    have m1 := amp_mono hj ha (Nat.mul_le_mul_left v hxt)</span>
+<span class="line" id="L178"><span class="ln">  178</span>    have m2 := amp_mono hj hb (Nat.mul_le_mul_left v&#x27; hxt)</span>
+<span class="line" id="L179"><span class="ln">  179</span>    have n1 := (hbounds t h1 h2.le)</span>
+<span class="line" id="L180"><span class="ln">  180</span>    -- both factors nonnegative</span>
+<span class="line" id="L181"><span class="ln">  181</span>    have hin : ∀ m : ℕ, 2 * j ≤ m → 0 ≤ amp j m := by</span>
+<span class="line" id="L182"><span class="ln">  182</span>      intro m hm</span>
+<span class="line" id="L183"><span class="ln">  183</span>      have hmR : (0 : ℝ) &lt; m := by exact_mod_cast (show 0 &lt; m by omega)</span>
+<span class="line" id="L184"><span class="ln">  184</span>      have hjR : (0 : ℝ) &lt; j := by exact_mod_cast hj</span>
+<span class="line" id="L185"><span class="ln">  185</span>      refine phi_nonneg (by positivity) ?_</span>
+<span class="line" id="L186"><span class="ln">  186</span>      rw [div_le_div_iff₀ hmR (by norm_num)]</span>
+<span class="line" id="L187"><span class="ln">  187</span>      have : (2 * j : ℝ) ≤ m := by exact_mod_cast hm</span>
+<span class="line" id="L188"><span class="ln">  188</span>      nlinarith [Real.pi_pos]</span>
+<span class="line" id="L189"><span class="ln">  189</span>    simp only [hf]</span>
+<span class="line" id="L190"><span class="ln">  190</span>    exact mul_le_mul m1 m2 (hin _ hb) (le_trans (hin _ ha) m1)</span>
+<span class="line" id="L191"><span class="ln">  191</span>  have hvar := GoldC.QuillonAbel.variation_monotone f N M hNM hmono</span>
+<span class="line" id="L192"><span class="ln">  192</span>  have hM := hbounds M (by omega) le_rfl</span>
+<span class="line" id="L193"><span class="ln">  193</span>  have hN := hbounds (N + 1) le_rfl hNM</span>
+<span class="line" id="L194"><span class="ln">  194</span>  rw [Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg hM.1]</span>
+<span class="line" id="L195"><span class="ln">  195</span>  have : ∑ t ∈ Finset.Ico (N + 1) M, ‖((f (t + 1) : ℝ) : ℂ) - ((f t : ℝ) : ℂ)‖ = f M - f (N + 1) :=</span>
+<span class="line" id="L196"><span class="ln">  196</span>    hvar</span>
+<span class="line" id="L197"><span class="ln">  197</span>  simp only [hf] at this ⊢</span>
+<span class="line" id="L198"><span class="ln">  198</span>  rw [this]</span>
+<span class="line" id="L199"><span class="ln">  199</span>  linarith [hM.2, hN.1]</span>
+<span class="line" id="L200"><span class="ln">  200</span></span>
+<span class="line" id="L201"><span class="ln">  201</span>/-! ## Clipped amplitude: one formula for all moduli -/</span>
+<span class="line" id="L202"><span class="ln">  202</span></span>
+<span class="line" id="L203"><span class="ln">  203</span>/-- `ampC j m = φ(min(πj/m, π/2))`. It vanishes once `2j ≥ m`, and is increasing in `m`. -/</span>
+<span class="line" id="L204"><span class="ln">  204</span>noncomputable def ampC (j m : ℕ) : ℝ := phi (min (π * j / m) (π / 2))</span>
+<span class="line" id="L205"><span class="ln">  205</span></span>
+<span class="line" id="L206"><span class="ln">  206</span>lemma ampC_mem (j m : ℕ) (hj : 1 ≤ j) (hm : 1 ≤ m) :</span>
+<span class="line" id="L207"><span class="ln">  207</span>    0 &lt; min (π * j / m) (π / 2) ∧ min (π * j / m) (π / 2) ≤ π / 2 := by</span>
+<span class="line" id="L208"><span class="ln">  208</span>  have hmR : (0 : ℝ) &lt; m := by exact_mod_cast hm</span>
+<span class="line" id="L209"><span class="ln">  209</span>  have hjR : (0 : ℝ) &lt; j := by exact_mod_cast hj</span>
+<span class="line" id="L210"><span class="ln">  210</span>  exact ⟨lt_min (by positivity) (by linarith [Real.pi_pos]), min_le_right _ _⟩</span>
+<span class="line" id="L211"><span class="ln">  211</span></span>
+<span class="line" id="L212"><span class="ln">  212</span>lemma ampC_bounds (j m : ℕ) (hj : 1 ≤ j) (hm : 1 ≤ m) : 0 ≤ ampC j m ∧ ampC j m ≤ 1 := by</span>
+<span class="line" id="L213"><span class="ln">  213</span>  obtain ⟨h0, h1⟩ := ampC_mem j m hj hm</span>
+<span class="line" id="L214"><span class="ln">  214</span>  exact ⟨phi_nonneg h0 h1, phi_le_one h0 h1⟩</span>
+<span class="line" id="L215"><span class="ln">  215</span></span>
+<span class="line" id="L216"><span class="ln">  216</span>lemma ampC_mono {j m m&#x27; : ℕ} (hj : 1 ≤ j) (hm : 1 ≤ m) (hmm : m ≤ m&#x27;) : ampC j m ≤ ampC j m&#x27; := by</span>
+<span class="line" id="L217"><span class="ln">  217</span>  unfold ampC</span>
+<span class="line" id="L218"><span class="ln">  218</span>  have hmR : (0 : ℝ) &lt; m := by exact_mod_cast hm</span>
+<span class="line" id="L219"><span class="ln">  219</span>  have hle : min (π * j / m&#x27;) (π / 2) ≤ min (π * j / m) (π / 2) := by</span>
+<span class="line" id="L220"><span class="ln">  220</span>    apply min_le_min_right</span>
+<span class="line" id="L221"><span class="ln">  221</span>    have hjR : (0 : ℝ) ≤ j := by positivity</span>
+<span class="line" id="L222"><span class="ln">  222</span>    exact div_le_div_of_nonneg_left (by positivity) hmR (by exact_mod_cast hmm)</span>
+<span class="line" id="L223"><span class="ln">  223</span>  exact phi_strictAnti.antitoneOn (ampC_mem j m&#x27; hj (le_trans hm hmm))</span>
+<span class="line" id="L224"><span class="ln">  224</span>    (ampC_mem j m hj hm) hle</span>
+<span class="line" id="L225"><span class="ln">  225</span></span>
+<span class="line" id="L226"><span class="ln">  226</span>/-- Abel factor of the clipped R amplitude along an increasing progression (no range hypothesis). -/</span>
+<span class="line" id="L227"><span class="ln">  227</span>theorem ampC_abel_factor (j v v&#x27; : ℕ) (hj : 1 ≤ j) (x : ℕ → ℕ) (N M : ℕ) (hNM : N + 1 ≤ M)</span>
+<span class="line" id="L228"><span class="ln">  228</span>    (hx : ∀ t, N + 1 ≤ t → t &lt; M → x t ≤ x (t + 1))</span>
+<span class="line" id="L229"><span class="ln">  229</span>    (hpos : ∀ t, N + 1 ≤ t → t ≤ M → 1 ≤ v * x t ∧ 1 ≤ v&#x27; * x t) :</span>
+<span class="line" id="L230"><span class="ln">  230</span>    ‖((ampC j (v * x M) * ampC j (v&#x27; * x M) : ℝ) : ℂ)‖ +</span>
+<span class="line" id="L231"><span class="ln">  231</span>      ∑ t ∈ Finset.Ico (N + 1) M, ‖((ampC j (v * x (t + 1)) * ampC j (v&#x27; * x (t + 1)) : ℝ) : ℂ) -</span>
+<span class="line" id="L232"><span class="ln">  232</span>        ((ampC j (v * x t) * ampC j (v&#x27; * x t) : ℝ) : ℂ)‖ ≤ 2 := by</span>
+<span class="line" id="L233"><span class="ln">  233</span>  set f : ℕ → ℝ := fun t =&gt; ampC j (v * x t) * ampC j (v&#x27; * x t) with hf</span>
+<span class="line" id="L234"><span class="ln">  234</span>  have hbounds : ∀ t, N + 1 ≤ t → t ≤ M → 0 ≤ f t ∧ f t ≤ 1 := by</span>
+<span class="line" id="L235"><span class="ln">  235</span>    intro t h1 h2</span>
+<span class="line" id="L236"><span class="ln">  236</span>    obtain ⟨ha, hb⟩ := hpos t h1 h2</span>
+<span class="line" id="L237"><span class="ln">  237</span>    have p1 := ampC_bounds j _ hj ha; have p2 := ampC_bounds j _ hj hb</span>
+<span class="line" id="L238"><span class="ln">  238</span>    simp only [hf]; exact ⟨mul_nonneg p1.1 p2.1, by nlinarith [p1.1, p1.2, p2.1, p2.2]⟩</span>
+<span class="line" id="L239"><span class="ln">  239</span>  have hmono : ∀ t, N + 1 ≤ t → t &lt; M → f t ≤ f (t + 1) := by</span>
+<span class="line" id="L240"><span class="ln">  240</span>    intro t h1 h2</span>
+<span class="line" id="L241"><span class="ln">  241</span>    obtain ⟨ha, hb⟩ := hpos t h1 h2.le</span>
+<span class="line" id="L242"><span class="ln">  242</span>    have hxt := hx t h1 h2</span>
+<span class="line" id="L243"><span class="ln">  243</span>    have m1 := ampC_mono hj ha (Nat.mul_le_mul_left v hxt)</span>
+<span class="line" id="L244"><span class="ln">  244</span>    have m2 := ampC_mono hj hb (Nat.mul_le_mul_left v&#x27; hxt)</span>
+<span class="line" id="L245"><span class="ln">  245</span>    simp only [hf]</span>
+<span class="line" id="L246"><span class="ln">  246</span>    exact mul_le_mul m1 m2 (ampC_bounds j _ hj hb).1 (le_trans (ampC_bounds j _ hj ha).1 m1)</span>
+<span class="line" id="L247"><span class="ln">  247</span>  have hvar := GoldC.QuillonAbel.variation_monotone f N M hNM hmono</span>
+<span class="line" id="L248"><span class="ln">  248</span>  have hM := hbounds M (by omega) le_rfl</span>
+<span class="line" id="L249"><span class="ln">  249</span>  have hN := hbounds (N + 1) le_rfl hNM</span>
+<span class="line" id="L250"><span class="ln">  250</span>  rw [Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg hM.1]</span>
+<span class="line" id="L251"><span class="ln">  251</span>  have : ∑ t ∈ Finset.Ico (N + 1) M, ‖((f (t + 1) : ℝ) : ℂ) - ((f t : ℝ) : ℂ)‖ = f M - f (N + 1) :=</span>
+<span class="line" id="L252"><span class="ln">  252</span>    hvar</span>
+<span class="line" id="L253"><span class="ln">  253</span>  simp only [hf] at this ⊢</span>
+<span class="line" id="L254"><span class="ln">  254</span>  rw [this]</span>
+<span class="line" id="L255"><span class="ln">  255</span>  linarith [hM.2, hN.1]</span>
+<span class="line" id="L256"><span class="ln">  256</span></span>
+<span class="line" id="L257"><span class="ln">  257</span>/-- For `0 &lt; k &lt; m`: `a_m(k) = i·ampC(k,m)/(2πk)` when `2k &lt; m`, and `a_m(k) = −a_m(m−k)`. -/</span>
+<span class="line" id="L258"><span class="ln">  258</span>lemma sawCoeff_eq_ampC (m k : ℕ) (hm : 2 ≤ m) (hk : 0 &lt; k) (h2k : 2 * k &lt; m) :</span>
+<span class="line" id="L259"><span class="ln">  259</span>    GoldC.QuillonSawDFT.sawCoeff m k =</span>
+<span class="line" id="L260"><span class="ln">  260</span>      Complex.I * ((ampC k m : ℝ) : ℂ) / (2 * π * k) := by</span>
+<span class="line" id="L261"><span class="ln">  261</span>  rw [sawCoeff_cot m k hm (Finset.mem_Ioo.2 ⟨hk, by omega⟩)]</span>
+<span class="line" id="L262"><span class="ln">  262</span>  have hmR : (0 : ℝ) &lt; m := by exact_mod_cast (show 0 &lt; m by omega)</span>
+<span class="line" id="L263"><span class="ln">  263</span>  have hkR : (0 : ℝ) &lt; k := by exact_mod_cast hk</span>
+<span class="line" id="L264"><span class="ln">  264</span>  have hlt : π * k / m &lt; π / 2 := by</span>
+<span class="line" id="L265"><span class="ln">  265</span>    rw [div_lt_div_iff₀ hmR (by norm_num)]</span>
+<span class="line" id="L266"><span class="ln">  266</span>    have : (2 * k : ℝ) &lt; m := by exact_mod_cast h2k</span>
+<span class="line" id="L267"><span class="ln">  267</span>    nlinarith [Real.pi_pos]</span>
+<span class="line" id="L268"><span class="ln">  268</span>  unfold ampC phi</span>
+<span class="line" id="L269"><span class="ln">  269</span>  rw [min_eq_left hlt.le]</span>
+<span class="line" id="L270"><span class="ln">  270</span>  have hs : Real.sin (π * k / m) ≠ 0 :=</span>
+<span class="line" id="L271"><span class="ln">  271</span>    (Real.sin_pos_of_pos_of_lt_pi (by positivity) (by linarith [Real.pi_pos])).ne&#x27;</span>
+<span class="line" id="L272"><span class="ln">  272</span>  have hpiC : (π : ℂ) ≠ 0 := by exact_mod_cast Real.pi_ne_zero</span>
+<span class="line" id="L273"><span class="ln">  273</span>  have hkC : (k : ℂ) ≠ 0 := by exact_mod_cast hk.ne&#x27;</span>
+<span class="line" id="L274"><span class="ln">  274</span>  have hmC : (m : ℂ) ≠ 0 := by exact_mod_cast (show m ≠ 0 by omega)</span>
+<span class="line" id="L275"><span class="ln">  275</span>  have hsC : ((Real.sin (π * k / m) : ℝ) : ℂ) ≠ 0 := by exact_mod_cast hs</span>
+<span class="line" id="L276"><span class="ln">  276</span>  push_cast</span>
+<span class="line" id="L277"><span class="ln">  277</span>  field_simp</span>
+<span class="line" id="L278"><span class="ln">  278</span></span>
+<span class="line" id="L279"><span class="ln">  279</span>lemma ampC_eq_zero (k m : ℕ) (hm : 1 ≤ m) (h2k : m ≤ 2 * k) : ampC k m = 0 := by</span>
+<span class="line" id="L280"><span class="ln">  280</span>  unfold ampC phi</span>
+<span class="line" id="L281"><span class="ln">  281</span>  have hmR : (0 : ℝ) &lt; m := by exact_mod_cast hm</span>
+<span class="line" id="L282"><span class="ln">  282</span>  have hge : π / 2 ≤ π * k / m := by</span>
+<span class="line" id="L283"><span class="ln">  283</span>    rw [div_le_div_iff₀ (by norm_num) hmR]</span>
+<span class="line" id="L284"><span class="ln">  284</span>    have : (m : ℝ) ≤ 2 * k := by exact_mod_cast h2k</span>
+<span class="line" id="L285"><span class="ln">  285</span>    nlinarith [Real.pi_pos]</span>
+<span class="line" id="L286"><span class="ln">  286</span>  rw [min_eq_right hge, Real.cos_pi_div_two]; simp</span>
+<span class="line" id="L287"><span class="ln">  287</span></span>
+<span class="line" id="L288"><span class="ln">  288</span>lemma sawCoeff_reflect (m k : ℕ) (hm : 2 ≤ m) (hk : k ∈ Finset.Ioo 0 m) :</span>
+<span class="line" id="L289"><span class="ln">  289</span>    GoldC.QuillonSawDFT.sawCoeff m (m - k) = -GoldC.QuillonSawDFT.sawCoeff m k := by</span>
+<span class="line" id="L290"><span class="ln">  290</span>  have hk1 := Finset.mem_Ioo.1 hk</span>
+<span class="line" id="L291"><span class="ln">  291</span>  rw [sawCoeff_cot m (m - k) hm (Finset.mem_Ioo.2 ⟨by omega, by omega⟩), sawCoeff_cot m k hm hk]</span>
+<span class="line" id="L292"><span class="ln">  292</span>  have hmR : (0 : ℝ) &lt; m := by exact_mod_cast (show 0 &lt; m by omega)</span>
+<span class="line" id="L293"><span class="ln">  293</span>  have : π * ((m - k : ℕ) : ℝ) / m = π - π * k / m := by</span>
+<span class="line" id="L294"><span class="ln">  294</span>    rw [Nat.cast_sub hk1.2.le]; field_simp</span>
+<span class="line" id="L295"><span class="ln">  295</span>  rw [this, Real.cos_pi_sub, Real.sin_pi_sub]</span>
+<span class="line" id="L296"><span class="ln">  296</span>  push_cast; ring</span>
+<span class="line" id="L297"><span class="ln">  297</span></span>
+<span class="line" id="L298"><span class="ln">  298</span>/-- **Signed expansion with uniform clipped coefficients.** For `2 ≤ m`, `0 &lt; c &lt; m` and any</span>
+<span class="line" id="L299"><span class="ln">  299</span>`J` with `m ≤ 2J`:</span>
+<span class="line" id="L300"><span class="ln">  300</span>`c/m − 1/2 = Σ_{k=1}^{J} (i·ampC(k,m)/(2πk))·(ζ^{kc} − ζ^{−kc})`.</span>
+<span class="line" id="L301"><span class="ln">  301</span>The coefficients depend on `m` only through `ampC(k,m)`, which is monotone and in `[0,1]`. -/</span>
+<span class="line" id="L302"><span class="ln">  302</span>theorem prof_signed (m c J : ℕ) (hm : 2 ≤ m) (hc : c ∈ Finset.Ioo 0 m) (hJ : m ≤ 2 * J) :</span>
+<span class="line" id="L303"><span class="ln">  303</span>    GoldC.QuillonSawDFT.prof m c =</span>
+<span class="line" id="L304"><span class="ln">  304</span>      ∑ k ∈ Finset.Icc 1 J, (Complex.I * ((ampC k m : ℝ) : ℂ) / (2 * π * k)) *</span>
+<span class="line" id="L305"><span class="ln">  305</span>        (GoldC.QuillonSawDFT.zeta m ^ ((k : ℤ) * c) - GoldC.QuillonSawDFT.zeta m ^ (-((k : ℤ) * c))) := by</span>
+<span class="line" id="L306"><span class="ln">  306</span>  rw [GoldC.QuillonSawDFT.prof_expansion m c hm hc]</span>
+<span class="line" id="L307"><span class="ln">  307</span>  set a := GoldC.QuillonSawDFT.sawCoeff m</span>
+<span class="line" id="L308"><span class="ln">  308</span>  set ζ := GoldC.QuillonSawDFT.zeta m</span>
+<span class="line" id="L309"><span class="ln">  309</span>  have hζ := GoldC.QuillonSawDFT.zeta_prim m (by omega)</span>
+<span class="line" id="L310"><span class="ln">  310</span>  have hζ0 := GoldC.QuillonSawDFT.zeta_ne_zero m</span>
+<span class="line" id="L311"><span class="ln">  311</span>  -- a 0 = 0</span>
+<span class="line" id="L312"><span class="ln">  312</span>  have ha0 : a 0 = 0 := by</span>
+<span class="line" id="L313"><span class="ln">  313</span>    simp only [a, GoldC.QuillonSawDFT.sawCoeff, Nat.cast_zero, zero_mul, neg_zero, zpow_zero,</span>
+<span class="line" id="L314"><span class="ln">  314</span>      mul_one, GoldC.QuillonSawDFT.prof]</span>
+<span class="line" id="L315"><span class="ln">  315</span>    rw [← Complex.ofReal_sum, Finset.sum_sub_distrib]</span>
+<span class="line" id="L316"><span class="ln">  316</span>    have hs : ∑ x ∈ Finset.Ioo 0 m, ((x : ℝ) / m) = ((m : ℝ) - 1) / 2 := by</span>
+<span class="line" id="L317"><span class="ln">  317</span>      rw [← Finset.sum_div]</span>
+<span class="line" id="L318"><span class="ln">  318</span>      have h := Finset.sum_range_id_mul_two m</span>
+<span class="line" id="L319"><span class="ln">  319</span>      have hsplit : ∑ x ∈ Finset.Ioo 0 m, (x : ℝ) = ∑ x ∈ Finset.range m, (x : ℝ) := by</span>
+<span class="line" id="L320"><span class="ln">  320</span>        rw [Finset.range_eq_Ico, ← Finset.sum_Ioo_add_eq_sum_Ico (by omega)]; simp</span>
+<span class="line" id="L321"><span class="ln">  321</span>      rw [hsplit]</span>
+<span class="line" id="L322"><span class="ln">  322</span>      have : (∑ x ∈ Finset.range m, (x : ℝ)) * 2 = (m : ℝ) * ((m : ℝ) - 1) := by</span>
+<span class="line" id="L323"><span class="ln">  323</span>        have h&#x27; : ((∑ i ∈ Finset.range m, i : ℕ) : ℝ) * 2 = ((m * (m - 1) : ℕ) : ℝ) := by</span>
+<span class="line" id="L324"><span class="ln">  324</span>          exact_mod_cast h</span>
+<span class="line" id="L325"><span class="ln">  325</span>        push_cast [Nat.cast_sub (show 1 ≤ m by omega)] at h&#x27;</span>
+<span class="line" id="L326"><span class="ln">  326</span>        exact h&#x27;</span>
+<span class="line" id="L327"><span class="ln">  327</span>      have hmR : (m : ℝ) ≠ 0 := by exact_mod_cast (show m ≠ 0 by omega)</span>
+<span class="line" id="L328"><span class="ln">  328</span>      field_simp; linarith</span>
+<span class="line" id="L329"><span class="ln">  329</span>    rw [hs, Finset.sum_const, Nat.card_Ioo, nsmul_eq_mul, Nat.sub_zero]</span>
+<span class="line" id="L330"><span class="ln">  330</span>    have hmR : (m : ℝ) ≠ 0 := by exact_mod_cast (show m ≠ 0 by omega)</span>
+<span class="line" id="L331"><span class="ln">  331</span>    push_cast [Nat.cast_sub (show 1 ≤ m by omega)]</span>
+<span class="line" id="L332"><span class="ln">  332</span>    field_simp</span>
+<span class="line" id="L333"><span class="ln">  333</span>    ring</span>
+<span class="line" id="L334"><span class="ln">  334</span>  -- reindex the full sum</span>
+<span class="line" id="L335"><span class="ln">  335</span>  have hsum : ∑ k ∈ Finset.range m, a k * ζ ^ ((k : ℤ) * c) =</span>
+<span class="line" id="L336"><span class="ln">  336</span>      ∑ k ∈ Finset.Ioo 0 m, a k * ζ ^ ((k : ℤ) * c) := by</span>
+<span class="line" id="L337"><span class="ln">  337</span>    rw [Finset.range_eq_Ico, ← Finset.sum_Ioo_add_eq_sum_Ico (by omega), ha0, zero_mul, add_zero]</span>
+<span class="line" id="L338"><span class="ln">  338</span>  rw [hsum]</span>
+<span class="line" id="L339"><span class="ln">  339</span>  -- split Ioo 0 m by 2k &lt; m, 2k = m, 2k &gt; m</span>
+<span class="line" id="L340"><span class="ln">  340</span>  have hpart : ∑ k ∈ Finset.Ioo 0 m, a k * ζ ^ ((k : ℤ) * c) =</span>
+<span class="line" id="L341"><span class="ln">  341</span>      ∑ k ∈ (Finset.Ioo 0 m).filter (fun k =&gt; 2 * k &lt; m), a k * ζ ^ ((k : ℤ) * c) +</span>
+<span class="line" id="L342"><span class="ln">  342</span>      ∑ k ∈ (Finset.Ioo 0 m).filter (fun k =&gt; ¬ 2 * k &lt; m), a k * ζ ^ ((k : ℤ) * c) :=</span>
+<span class="line" id="L343"><span class="ln">  343</span>    (Finset.sum_filter_add_sum_filter_not _ _ _).symm</span>
+<span class="line" id="L344"><span class="ln">  344</span>  rw [hpart]</span>
+<span class="line" id="L345"><span class="ln">  345</span>  -- the upper half reflects onto the lower half (the middle term has a = 0)</span>
+<span class="line" id="L346"><span class="ln">  346</span>  have hupper : ∑ k ∈ (Finset.Ioo 0 m).filter (fun k =&gt; ¬ 2 * k &lt; m), a k * ζ ^ ((k : ℤ) * c) =</span>
+<span class="line" id="L347"><span class="ln">  347</span>      ∑ k ∈ (Finset.Ioo 0 m).filter (fun k =&gt; 2 * k &lt; m), (-a k) * ζ ^ (-((k : ℤ) * c)) := by</span>
+<span class="line" id="L348"><span class="ln">  348</span>    -- drop the possible middle term k = m/2 (a = 0 there)</span>
+<span class="line" id="L349"><span class="ln">  349</span>    have hmid : ∀ k ∈ (Finset.Ioo 0 m).filter (fun k =&gt; ¬ 2 * k &lt; m), 2 * k = m →</span>
+<span class="line" id="L350"><span class="ln">  350</span>        a k * ζ ^ ((k : ℤ) * c) = 0 := by</span>
+<span class="line" id="L351"><span class="ln">  351</span>      intro k hk h2</span>
+<span class="line" id="L352"><span class="ln">  352</span>      have hk&#x27; := Finset.mem_filter.1 hk</span>
+<span class="line" id="L353"><span class="ln">  353</span>      have hkI := Finset.mem_Ioo.1 hk&#x27;.1</span>
+<span class="line" id="L354"><span class="ln">  354</span>      have : a k = 0 := by</span>
+<span class="line" id="L355"><span class="ln">  355</span>        simp only [a]</span>
+<span class="line" id="L356"><span class="ln">  356</span>        rw [sawCoeff_cot m k hm hk&#x27;.1]</span>
+<span class="line" id="L357"><span class="ln">  357</span>        have hmR : (m : ℝ) ≠ 0 := by exact_mod_cast (show m ≠ 0 by omega)</span>
+<span class="line" id="L358"><span class="ln">  358</span>        have : π * (k : ℝ) / m = π / 2 := by</span>
+<span class="line" id="L359"><span class="ln">  359</span>          have : (m : ℝ) = 2 * k := by exact_mod_cast h2.symm</span>
+<span class="line" id="L360"><span class="ln">  360</span>          have hkR : (k : ℝ) ≠ 0 := by exact_mod_cast (show k ≠ 0 by omega)</span>
+<span class="line" id="L361"><span class="ln">  361</span>          rw [this]; field_simp</span>
+<span class="line" id="L362"><span class="ln">  362</span>        rw [this, Real.cos_pi_div_two]; simp</span>
+<span class="line" id="L363"><span class="ln">  363</span>      rw [this, zero_mul]</span>
+<span class="line" id="L364"><span class="ln">  364</span>    rw [← Finset.sum_filter_add_sum_filter_not _ (fun k =&gt; 2 * k = m)]</span>
+<span class="line" id="L365"><span class="ln">  365</span>    rw [Finset.sum_eq_zero (fun k hk =&gt; hmid k (Finset.mem_filter.1 hk).1 (Finset.mem_filter.1 hk).2),</span>
+<span class="line" id="L366"><span class="ln">  366</span>      zero_add]</span>
+<span class="line" id="L367"><span class="ln">  367</span>    rw [Finset.filter_filter]</span>
+<span class="line" id="L368"><span class="ln">  368</span>    refine Finset.sum_nbij&#x27; (fun k =&gt; m - k) (fun k =&gt; m - k) ?_ ?_ ?_ ?_ ?_</span>
+<span class="line" id="L369"><span class="ln">  369</span>    · intro k hk</span>
+<span class="line" id="L370"><span class="ln">  370</span>      simp only [Finset.mem_filter, Finset.mem_Ioo] at hk ⊢</span>
+<span class="line" id="L371"><span class="ln">  371</span>      omega</span>
+<span class="line" id="L372"><span class="ln">  372</span>    · intro k hk</span>
+<span class="line" id="L373"><span class="ln">  373</span>      simp only [Finset.mem_filter, Finset.mem_Ioo] at hk ⊢</span>
+<span class="line" id="L374"><span class="ln">  374</span>      omega</span>
+<span class="line" id="L375"><span class="ln">  375</span>    · intro k hk</span>
+<span class="line" id="L376"><span class="ln">  376</span>      simp only [Finset.mem_filter, Finset.mem_Ioo] at hk</span>
+<span class="line" id="L377"><span class="ln">  377</span>      omega</span>
+<span class="line" id="L378"><span class="ln">  378</span>    · intro k hk</span>
+<span class="line" id="L379"><span class="ln">  379</span>      simp only [Finset.mem_filter, Finset.mem_Ioo] at hk</span>
+<span class="line" id="L380"><span class="ln">  380</span>      omega</span>
+<span class="line" id="L381"><span class="ln">  381</span>    · intro k hk</span>
+<span class="line" id="L382"><span class="ln">  382</span>      rw [Finset.mem_filter, Finset.mem_Ioo] at hk</span>
+<span class="line" id="L383"><span class="ln">  383</span>      have hkI : k ∈ Finset.Ioo 0 m := Finset.mem_Ioo.2 ⟨hk.1.1, hk.1.2⟩</span>
+<span class="line" id="L384"><span class="ln">  384</span>      have hrefl := sawCoeff_reflect m k hm hkI</span>
+<span class="line" id="L385"><span class="ln">  385</span>      show a k * ζ ^ ((k : ℤ) * c) = (-a (m - k)) * ζ ^ (-(((m - k : ℕ) : ℤ) * c))</span>
+<span class="line" id="L386"><span class="ln">  386</span>      rw [show a (m - k) = -a k from hrefl, neg_neg]</span>
+<span class="line" id="L387"><span class="ln">  387</span>      congr 1</span>
+<span class="line" id="L388"><span class="ln">  388</span>      rw [show -(((m - k : ℕ) : ℤ) * c) = (k : ℤ) * c + (m : ℤ) * (-(c : ℤ)) by</span>
+<span class="line" id="L389"><span class="ln">  389</span>        push_cast [Nat.cast_sub hk.1.2.le]; ring]</span>
+<span class="line" id="L390"><span class="ln">  390</span>      have h1 : ζ ^ ((m : ℤ) * (-(c : ℤ))) = 1 := by</span>
+<span class="line" id="L391"><span class="ln">  391</span>        rw [zpow_mul, zpow_natCast, hζ.pow_eq_one, one_zpow]</span>
+<span class="line" id="L392"><span class="ln">  392</span>      rw [zpow_add₀ hζ0, h1, mul_one]</span>
+<span class="line" id="L393"><span class="ln">  393</span>  rw [hupper, ← Finset.sum_add_distrib]</span>
+<span class="line" id="L394"><span class="ln">  394</span>  -- extend from {2k &lt; m} to Icc 1 J using ampC = 0 for 2k ≥ m</span>
+<span class="line" id="L395"><span class="ln">  395</span>  have hlow : ∀ k ∈ (Finset.Ioo 0 m).filter (fun k =&gt; 2 * k &lt; m),</span>
+<span class="line" id="L396"><span class="ln">  396</span>      a k * ζ ^ ((k : ℤ) * c) + (-a k) * ζ ^ (-((k : ℤ) * c)) =</span>
+<span class="line" id="L397"><span class="ln">  397</span>        (Complex.I * ((ampC k m : ℝ) : ℂ) / (2 * π * k)) *</span>
+<span class="line" id="L398"><span class="ln">  398</span>          (ζ ^ ((k : ℤ) * c) - ζ ^ (-((k : ℤ) * c))) := by</span>
+<span class="line" id="L399"><span class="ln">  399</span>    intro k hk</span>
+<span class="line" id="L400"><span class="ln">  400</span>    have hk&#x27; := Finset.mem_filter.1 hk</span>
+<span class="line" id="L401"><span class="ln">  401</span>    rw [show a k = _ from sawCoeff_eq_ampC m k hm (Finset.mem_Ioo.1 hk&#x27;.1).1 hk&#x27;.2]</span>
+<span class="line" id="L402"><span class="ln">  402</span>    ring</span>
+<span class="line" id="L403"><span class="ln">  403</span>  rw [Finset.sum_congr rfl hlow]</span>
+<span class="line" id="L404"><span class="ln">  404</span>  apply Finset.sum_subset</span>
+<span class="line" id="L405"><span class="ln">  405</span>  · intro k hk</span>
+<span class="line" id="L406"><span class="ln">  406</span>    rw [Finset.mem_filter, Finset.mem_Ioo] at hk</span>
+<span class="line" id="L407"><span class="ln">  407</span>    rw [Finset.mem_Icc]; omega</span>
+<span class="line" id="L408"><span class="ln">  408</span>  · intro k hk hnot</span>
+<span class="line" id="L409"><span class="ln">  409</span>    rw [Finset.mem_filter, Finset.mem_Ioo] at hnot</span>
+<span class="line" id="L410"><span class="ln">  410</span>    rw [Finset.mem_Icc] at hk</span>
+<span class="line" id="L411"><span class="ln">  411</span>    have h2k : m ≤ 2 * k := by</span>
+<span class="line" id="L412"><span class="ln">  412</span>      by_contra hc&#x27;</span>
+<span class="line" id="L413"><span class="ln">  413</span>      exact hnot ⟨⟨by omega, by omega⟩, by omega⟩</span>
+<span class="line" id="L414"><span class="ln">  414</span>    rw [ampC_eq_zero k m (by omega) h2k]</span>
+<span class="line" id="L415"><span class="ln">  415</span>    simp</span>
+<span class="line" id="L416"><span class="ln">  416</span></span>
+<span class="line" id="L417"><span class="ln">  417</span>end GoldC.QuillonCot</span>
+<span class="line" id="L418"><span class="ln">  418</span></span>
+<span class="line" id="L419"><span class="ln">  419</span>#print axioms GoldC.QuillonCot.phi_strictAnti</span>
+<span class="line" id="L420"><span class="ln">  420</span>#print axioms GoldC.QuillonCot.sawCoeff_cot</span>
+<span class="line" id="L421"><span class="ln">  421</span>#print axioms GoldC.QuillonCot.amp_abel_factor</span>
+<span class="line" id="L422"><span class="ln">  422</span>#print axioms GoldC.QuillonCot.ampC_abel_factor</span>
+<span class="line" id="L423"><span class="ln">  423</span>#print axioms GoldC.QuillonCot.sawCoeff_eq_ampC</span>
+<span class="line" id="L424"><span class="ln">  424</span>#print axioms GoldC.QuillonCot.prof_signed</span>
+</pre></div></body></html>

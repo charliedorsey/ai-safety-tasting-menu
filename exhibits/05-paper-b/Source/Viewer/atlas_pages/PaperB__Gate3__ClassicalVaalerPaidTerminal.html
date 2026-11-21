@@ -1,0 +1,31 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · PaperB/Gate3/ClassicalVaalerPaidTerminal.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>PaperB/Gate3/ClassicalVaalerPaidTerminal.lean</h1><p class="meta">LEAN/PaperB/Gate3/ClassicalVaalerPaidTerminal.lean · 30 lines · SHA-256 5628f5f589f8b2dace94c311e90f8d3af997ed60a64cfcddec200de222dc4f46</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import PaperB.Gate3.ClassicalSuzukiTerminal</span>
+<span class="l" id="L2"><span class="n">2</span>import PaperB.Gate3.VaalerFullPointwise</span>
+<span class="l" id="L3"><span class="n">3</span></span>
+<span class="l" id="L4"><span class="n">4</span>/-!</span>
+<span class="l" id="L5"><span class="n">5</span>Gold A discharge: the literal RealPositiveVaalerPointwise classical premise</span>
+<span class="l" id="L6"><span class="n">6</span>is proved, so the groomed terminal now requires only Suzuki core and Central.</span>
+<span class="l" id="L7"><span class="n">7</span>No analytic claim is made for either remaining premise.</span>
+<span class="l" id="L8"><span class="n">8</span>-/</span>
+<span class="l" id="L9"><span class="n">9</span>namespace OrielUpper</span>
+<span class="l" id="L10"><span class="n">10</span></span>
+<span class="l" id="L11"><span class="n">11</span>theorem yevorin_realShiftedVaalerTransfer :</span>
+<span class="l" id="L12"><span class="n">12</span>    RealShiftedVaalerTransfer :=</span>
+<span class="l" id="L13"><span class="n">13</span>  realShiftedVaalerTransfer_of_pointwise yevorin_realPositiveVaalerPointwise</span>
+<span class="l" id="L14"><span class="n">14</span></span>
+<span class="l" id="L15"><span class="n">15</span>#print axioms yevorin_realShiftedVaalerTransfer</span>
+<span class="l" id="L16"><span class="n">16</span></span>
+<span class="l" id="L17"><span class="n">17</span>end OrielUpper</span>
+<span class="l" id="L18"><span class="n">18</span></span>
+<span class="l" id="L19"><span class="n">19</span>namespace PaperB.FixedQ</span>
+<span class="l" id="L20"><span class="n">20</span></span>
+<span class="l" id="L21"><span class="n">21</span>theorem paperB_terminal_of_suzukiCore_and_central</span>
+<span class="l" id="L22"><span class="n">22</span>    (hSuzuki : OrielUpper.ShiftedSuzukiCore)</span>
+<span class="l" id="L23"><span class="n">23</span>    (hCentral : virelleR0061CompleteRegionSublog virelleR0037Central) :</span>
+<span class="l" id="L24"><span class="n">24</span>    PaperB.Closure.PaperBTerminalStatement :=</span>
+<span class="l" id="L25"><span class="n">25</span>  paperB_terminal_of_suzukiCore_pointwise_central</span>
+<span class="l" id="L26"><span class="n">26</span>    hSuzuki OrielUpper.yevorin_realPositiveVaalerPointwise hCentral</span>
+<span class="l" id="L27"><span class="n">27</span></span>
+<span class="l" id="L28"><span class="n">28</span>#print axioms paperB_terminal_of_suzukiCore_and_central</span>
+<span class="l" id="L29"><span class="n">29</span></span>
+<span class="l" id="L30"><span class="n">30</span>end PaperB.FixedQ</span></pre></div></body></html>

@@ -1,0 +1,155 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · GoldB/QuillonSelectedOrders.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>GoldB/QuillonSelectedOrders.lean</h1><p class="meta">LEAN/GoldB/QuillonSelectedOrders.lean · 154 lines · SHA-256 41a14c94a97bf777ff24da086d92f779f7735453d3597b037c8ca1e67e5b446a</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import Mathlib.Analysis.Calculus.Deriv.ZPow</span>
+<span class="l" id="L2"><span class="n">2</span>import Mathlib.Analysis.Calculus.IteratedDeriv.Lemmas</span>
+<span class="l" id="L3"><span class="n">3</span>import Mathlib.Analysis.SpecialFunctions.Pow.Real</span>
+<span class="l" id="L4"><span class="n">4</span>import Mathlib.Tactic</span>
+<span class="l" id="L5"><span class="n">5</span></span>
+<span class="l" id="L6"><span class="n">6</span>/-!</span>
+<span class="l" id="L7"><span class="n">7</span># Interface reconstruction (Quillon, Hunt B R0001) for the missing module</span>
+<span class="l" id="L8"><span class="n">8</span># `GoldB.QuillonSelectedOrders`</span>
+<span class="l" id="L9"><span class="n">9</span></span>
+<span class="l" id="L10"><span class="n">10</span>**Provenance.** The archived `GoldB/Suzuki.lean` imports this module, but the module was not in</span>
+<span class="l" id="L11"><span class="n">11</span>the packet. This file is a **from-scratch reconstruction by Quillon** of the interface facts that</span>
+<span class="l" id="L12"><span class="n">12</span>`GoldB/Suzuki.lean` uses. It is not the original scratch source. The names are kept only so that the</span>
+<span class="l" id="L13"><span class="n">13</span>unmodified `GoldB/Suzuki.lean` source text elaborates against them. The selected-order set and its</span>
+<span class="l" id="L14"><span class="n">14</span>window constants are Quillon&#x27;s own choices, written out below.</span>
+<span class="l" id="L15"><span class="n">15</span></span>
+<span class="l" id="L16"><span class="n">16</span>No axiom, no `sorry`.</span>
+<span class="l" id="L17"><span class="n">17</span></span>
+<span class="l" id="L18"><span class="n">18</span>## Construction</span>
+<span class="l" id="L19"><span class="n">19</span>* `t = log Y / log P`, and the Karatsuba order is `k = ⌊26 t⌋`, as in Suzuki §3 with</span>
+<span class="l" id="L20"><span class="n">20</span>  `c1 = 25/26`.</span>
+<span class="l" id="L21"><span class="n">21</span>* The selected orders are the integers `j` with `4(t-1)/3 ≤ j ≤ (t - 157/144)·468/61`.</span>
+<span class="l" id="L22"><span class="n">22</span>  - The **upper** window `|f^{(j)}|/j! ≤ P^{-j/4}` needs only `x + ϑ ≥ P` and `j ≥ 4(t-1)/3`.</span>
+<span class="l" id="L23"><span class="n">23</span>  - The **lower** window `P^{-(599/624) j} ≤ |f^{(j)}|/j!` uses `x + ϑ ≤ 2P + 1 ≤ P^{157/144}`</span>
+<span class="l" id="L24"><span class="n">24</span>    (valid for `P ≥ 4096`) and `j ≤ (t - 157/144)·468/61`, because `157/144 - 599/624 = 61/468`.</span>
+<span class="l" id="L25"><span class="n">25</span>  - The count is `≥ (2/3) t ≥ k/39` for every `t ≥ 3/2`.</span>
+<span class="l" id="L26"><span class="n">26</span>-/</span>
+<span class="l" id="L27"><span class="n">27</span></span>
+<span class="l" id="L28"><span class="n">28</span>open Finset</span>
+<span class="l" id="L29"><span class="n">29</span></span>
+<span class="l" id="L30"><span class="n">30</span>namespace OrielUpper</span>
+<span class="l" id="L31"><span class="n">31</span></span>
+<span class="l" id="L32"><span class="n">32</span>/-- Karatsuba order `k = ⌊26 t⌋`. -/</span>
+<span class="l" id="L33"><span class="n">33</span>noncomputable def veylanSuzukiOrder (t : ℝ) : ℕ := ⌊26 * t⌋₊</span>
+<span class="l" id="L34"><span class="n">34</span></span>
+<span class="l" id="L35"><span class="n">35</span>/-- Lower end of the selected orders. -/</span>
+<span class="l" id="L36"><span class="n">36</span>noncomputable def quillonSelLo (t : ℝ) : ℕ := ⌈4 * (t - 1) / 3⌉₊</span>
+<span class="l" id="L37"><span class="n">37</span></span>
+<span class="l" id="L38"><span class="n">38</span>/-- Upper end of the selected orders. -/</span>
+<span class="l" id="L39"><span class="n">39</span>noncomputable def quillonSelHi (t : ℝ) : ℕ := ⌊(t - 157 / 144) * (468 / 61)⌋₊</span>
+<span class="l" id="L40"><span class="n">40</span></span>
+<span class="l" id="L41"><span class="n">41</span>/-- The selected orders. -/</span>
+<span class="l" id="L42"><span class="n">42</span>noncomputable def veylanSuzukiSelected (t : ℝ) : Finset ℕ :=</span>
+<span class="l" id="L43"><span class="n">43</span>  Finset.Icc (quillonSelLo t) (quillonSelHi t)</span>
+<span class="l" id="L44"><span class="n">44</span></span>
+<span class="l" id="L45"><span class="n">45</span>lemma quillon_sel_lo_pos (t : ℝ) (ht : 3 / 2 ≤ t) : 1 ≤ quillonSelLo t := by</span>
+<span class="l" id="L46"><span class="n">46</span>  unfold quillonSelLo</span>
+<span class="l" id="L47"><span class="n">47</span>  rw [Nat.one_le_ceil_iff]; linarith</span>
+<span class="l" id="L48"><span class="n">48</span></span>
+<span class="l" id="L49"><span class="n">49</span>lemma quillon_sel_lo_lt (t : ℝ) (ht : 3 / 2 ≤ t) : (quillonSelLo t : ℝ) &lt; 4 * (t - 1) / 3 + 1 := by</span>
+<span class="l" id="L50"><span class="n">50</span>  unfold quillonSelLo</span>
+<span class="l" id="L51"><span class="n">51</span>  exact Nat.ceil_lt_add_one (by linarith)</span>
+<span class="l" id="L52"><span class="n">52</span></span>
+<span class="l" id="L53"><span class="n">53</span>lemma quillon_sel_hi_gt (t : ℝ) (ht : 3 / 2 ≤ t) :</span>
+<span class="l" id="L54"><span class="n">54</span>    (t - 157 / 144) * (468 / 61) - 1 &lt; (quillonSelHi t : ℝ) := by</span>
+<span class="l" id="L55"><span class="n">55</span>  unfold quillonSelHi</span>
+<span class="l" id="L56"><span class="n">56</span>  have := Nat.lt_floor_add_one ((t - 157 / 144) * (468 / 61))</span>
+<span class="l" id="L57"><span class="n">57</span>  linarith</span>
+<span class="l" id="L58"><span class="n">58</span></span>
+<span class="l" id="L59"><span class="n">59</span>/-- Order facts for every selected `j`. -/</span>
+<span class="l" id="L60"><span class="n">60</span>theorem veylan_suzuki_selected_order (t : ℝ) (ht : 3 / 2 ≤ t) (j : ℕ)</span>
+<span class="l" id="L61"><span class="n">61</span>    (hj : j ∈ veylanSuzukiSelected t) :</span>
+<span class="l" id="L62"><span class="n">62</span>    1 ≤ j ∧ 4 * (t - 1) / 3 ≤ (j : ℝ) ∧ (j : ℝ) ≤ (t - 157 / 144) * (468 / 61) ∧</span>
+<span class="l" id="L63"><span class="n">63</span>      j ≤ veylanSuzukiOrder t := by</span>
+<span class="l" id="L64"><span class="n">64</span>  unfold veylanSuzukiSelected at hj</span>
+<span class="l" id="L65"><span class="n">65</span>  obtain ⟨hlo, hhi⟩ := Finset.mem_Icc.mp hj</span>
+<span class="l" id="L66"><span class="n">66</span>  have hpos : 0 ≤ (t - 157 / 144) * (468 / 61) := by</span>
+<span class="l" id="L67"><span class="n">67</span>    apply mul_nonneg _ (by norm_num); linarith</span>
+<span class="l" id="L68"><span class="n">68</span>  refine ⟨(quillon_sel_lo_pos t ht).trans hlo, ?_, ?_, ?_⟩</span>
+<span class="l" id="L69"><span class="n">69</span>  · have : 4 * (t - 1) / 3 ≤ (quillonSelLo t : ℝ) := by unfold quillonSelLo; exact Nat.le_ceil _</span>
+<span class="l" id="L70"><span class="n">70</span>    exact this.trans (by exact_mod_cast hlo)</span>
+<span class="l" id="L71"><span class="n">71</span>  · have : (quillonSelHi t : ℝ) ≤ (t - 157 / 144) * (468 / 61) := by</span>
+<span class="l" id="L72"><span class="n">72</span>      unfold quillonSelHi; exact Nat.floor_le hpos</span>
+<span class="l" id="L73"><span class="n">73</span>    exact (by exact_mod_cast hhi : (j : ℝ) ≤ quillonSelHi t).trans this</span>
+<span class="l" id="L74"><span class="n">74</span>  · refine hhi.trans ?_</span>
+<span class="l" id="L75"><span class="n">75</span>    unfold quillonSelHi veylanSuzukiOrder</span>
+<span class="l" id="L76"><span class="n">76</span>    apply Nat.floor_le_floor</span>
+<span class="l" id="L77"><span class="n">77</span>    nlinarith</span>
+<span class="l" id="L78"><span class="n">78</span></span>
+<span class="l" id="L79"><span class="n">79</span>/-- Count of the selected orders: `≥ k/39`. -/</span>
+<span class="l" id="L80"><span class="n">80</span>theorem veylan_suzuki_selected_count (t : ℝ) (ht : 3 / 2 ≤ t) :</span>
+<span class="l" id="L81"><span class="n">81</span>    1 ≤ (veylanSuzukiSelected t).card ∧</span>
+<span class="l" id="L82"><span class="n">82</span>      (1 / 39 : ℝ) * (veylanSuzukiOrder t : ℝ) ≤ ((veylanSuzukiSelected t).card : ℝ) ∧</span>
+<span class="l" id="L83"><span class="n">83</span>      (veylanSuzukiSelected t).card ≤ veylanSuzukiOrder t := by</span>
+<span class="l" id="L84"><span class="n">84</span>  have hlo := quillon_sel_lo_lt t ht</span>
+<span class="l" id="L85"><span class="n">85</span>  have hhi := quillon_sel_hi_gt t ht</span>
+<span class="l" id="L86"><span class="n">86</span>  have hlohi : quillonSelLo t ≤ quillonSelHi t := by</span>
+<span class="l" id="L87"><span class="n">87</span>    have : (quillonSelLo t : ℝ) &lt; (quillonSelHi t : ℝ) + 1 := by nlinarith</span>
+<span class="l" id="L88"><span class="n">88</span>    exact Nat.lt_add_one_iff.mp (by exact_mod_cast this)</span>
+<span class="l" id="L89"><span class="n">89</span>  have hcard : (veylanSuzukiSelected t).card = quillonSelHi t + 1 - quillonSelLo t := by</span>
+<span class="l" id="L90"><span class="n">90</span>    unfold veylanSuzukiSelected; exact Nat.card_Icc _ _</span>
+<span class="l" id="L91"><span class="n">91</span>  have hcardr : ((veylanSuzukiSelected t).card : ℝ) =</span>
+<span class="l" id="L92"><span class="n">92</span>      (quillonSelHi t : ℝ) + 1 - (quillonSelLo t : ℝ) := by</span>
+<span class="l" id="L93"><span class="n">93</span>    rw [hcard, Nat.cast_sub (by omega)]; push_cast; ring</span>
+<span class="l" id="L94"><span class="n">94</span>  have hk : (veylanSuzukiOrder t : ℝ) ≤ 26 * t := by</span>
+<span class="l" id="L95"><span class="n">95</span>    unfold veylanSuzukiOrder; exact Nat.floor_le (by linarith)</span>
+<span class="l" id="L96"><span class="n">96</span>  refine ⟨by rw [hcard]; omega, ?_, ?_⟩</span>
+<span class="l" id="L97"><span class="n">97</span>  · rw [hcardr]; nlinarith</span>
+<span class="l" id="L98"><span class="n">98</span>  · have hsub : veylanSuzukiSelected t ⊆ Finset.Icc 1 (veylanSuzukiOrder t) := by</span>
+<span class="l" id="L99"><span class="n">99</span>      intro j hj</span>
+<span class="l" id="L100"><span class="n">100</span>      obtain ⟨h1, _, _, h4⟩ := veylan_suzuki_selected_order t ht j hj</span>
+<span class="l" id="L101"><span class="n">101</span>      exact Finset.mem_Icc.mpr ⟨h1, h4⟩</span>
+<span class="l" id="L102"><span class="n">102</span>    have := Finset.card_le_card hsub</span>
+<span class="l" id="L103"><span class="n">103</span>    simpa using this</span>
+<span class="l" id="L104"><span class="n">104</span></span>
+<span class="l" id="L105"><span class="n">105</span>/-- Normalized derivatives of the shifted reciprocal phase. -/</span>
+<span class="l" id="L106"><span class="n">106</span>theorem veylan_suzuki_normalized_derivative (Y ϑ x : ℝ) (j : ℕ) (hY : 0 ≤ Y)</span>
+<span class="l" id="L107"><span class="n">107</span>    (hx : 0 &lt; x + ϑ) :</span>
+<span class="l" id="L108"><span class="n">108</span>    ‖iteratedDeriv j (fun z : ℝ =&gt; Y / (z + ϑ)) x / (j.factorial : ℝ)‖ =</span>
+<span class="l" id="L109"><span class="n">109</span>      Y / (x + ϑ) ^ (j + 1) := by</span>
+<span class="l" id="L110"><span class="n">110</span>  have h : (fun z : ℝ =&gt; Y / (z + ϑ)) = fun z =&gt; Y * (1 * z + ϑ)⁻¹ := by</span>
+<span class="l" id="L111"><span class="n">111</span>    funext z; rw [one_mul, div_eq_mul_inv]</span>
+<span class="l" id="L112"><span class="n">112</span>  rw [h, iteratedDeriv_const_mul_field, iteratedDeriv_eq_iterate, iter_deriv_inv_linear]</span>
+<span class="l" id="L113"><span class="n">113</span>  have hz : ((x + ϑ) ^ (-1 - (j : ℤ)) : ℝ) = ((x + ϑ) ^ (j + 1))⁻¹ := by</span>
+<span class="l" id="L114"><span class="n">114</span>    rw [show (-1 - (j : ℤ)) = -((j + 1 : ℕ) : ℤ) by push_cast; ring, zpow_neg, zpow_natCast]</span>
+<span class="l" id="L115"><span class="n">115</span>  simp only [one_mul, one_pow, mul_one]</span>
+<span class="l" id="L116"><span class="n">116</span>  rw [hz]</span>
+<span class="l" id="L117"><span class="n">117</span>  have hf : (0 : ℝ) &lt; j.factorial := by exact_mod_cast Nat.factorial_pos j</span>
+<span class="l" id="L118"><span class="n">118</span>  have hp : (0 : ℝ) &lt; (x + ϑ) ^ (j + 1) := by positivity</span>
+<span class="l" id="L119"><span class="n">119</span>  rw [Real.norm_eq_abs]</span>
+<span class="l" id="L120"><span class="n">120</span>  have e : Y * ((-1) ^ j * (j.factorial : ℝ) * ((x + ϑ) ^ (j + 1))⁻¹) / (j.factorial : ℝ) =</span>
+<span class="l" id="L121"><span class="n">121</span>      (-1) ^ j * (Y / (x + ϑ) ^ (j + 1)) := by</span>
+<span class="l" id="L122"><span class="n">122</span>    field_simp</span>
+<span class="l" id="L123"><span class="n">123</span>  rw [e, abs_mul, abs_pow, abs_neg, abs_one, one_pow, one_mul,</span>
+<span class="l" id="L124"><span class="n">124</span>    abs_of_nonneg (div_nonneg hY hp.le)]</span>
+<span class="l" id="L125"><span class="n">125</span></span>
+<span class="l" id="L126"><span class="n">126</span>/-- Top-derivative upper bound: `Y/(x+ϑ)^{k+2} ≤ P^{-(25/26)(k+1)}` for `k = ⌊26 log Y/log P⌋`. -/</span>
+<span class="l" id="L127"><span class="n">127</span>theorem veylan_suzuki_top_derivative_upper (P x ϑ Y : ℝ) (k : ℕ) (hP1 : 1 &lt; P) (hx : P ≤ x)</span>
+<span class="l" id="L128"><span class="n">128</span>    (hϑ : 0 ≤ ϑ) (hY : 0 &lt; Y) (hk : k = veylanSuzukiOrder (Real.log Y / Real.log P)) :</span>
+<span class="l" id="L129"><span class="n">129</span>    Y / (x + ϑ) ^ (k + 1 + 1) ≤ P ^ (-((25 / 26 : ℝ) * ((k : ℝ) + 1))) := by</span>
+<span class="l" id="L130"><span class="n">130</span>  have hP0 : 0 &lt; P := by linarith</span>
+<span class="l" id="L131"><span class="n">131</span>  have hL : 0 &lt; Real.log P := Real.log_pos hP1</span>
+<span class="l" id="L132"><span class="n">132</span>  have hxϑ : P ≤ x + ϑ := by linarith</span>
+<span class="l" id="L133"><span class="n">133</span>  set t := Real.log Y / Real.log P</span>
+<span class="l" id="L134"><span class="n">134</span>  have hkt : 26 * t &lt; (k : ℝ) + 1 := by</span>
+<span class="l" id="L135"><span class="n">135</span>    rw [hk]; unfold veylanSuzukiOrder; exact Nat.lt_floor_add_one _</span>
+<span class="l" id="L136"><span class="n">136</span>  have hY&#x27; : Real.log Y = t * Real.log P := by simp only [t]; field_simp</span>
+<span class="l" id="L137"><span class="n">137</span>  calc Y / (x + ϑ) ^ (k + 1 + 1) ≤ Y / P ^ (k + 1 + 1) := by</span>
+<span class="l" id="L138"><span class="n">138</span>        apply div_le_div_of_nonneg_left hY.le (by positivity)</span>
+<span class="l" id="L139"><span class="n">139</span>        exact pow_le_pow_left₀ hP0.le hxϑ _</span>
+<span class="l" id="L140"><span class="n">140</span>    _ = Real.exp (Real.log Y - ((k : ℝ) + 2) * Real.log P) := by</span>
+<span class="l" id="L141"><span class="n">141</span>        rw [Real.exp_sub, Real.exp_log hY, ← Real.rpow_natCast, Real.rpow_def_of_pos hP0]</span>
+<span class="l" id="L142"><span class="n">142</span>        push_cast; ring_nf</span>
+<span class="l" id="L143"><span class="n">143</span>    _ ≤ Real.exp (Real.log P * (-((25 / 26 : ℝ) * ((k : ℝ) + 1)))) := by</span>
+<span class="l" id="L144"><span class="n">144</span>        apply Real.exp_le_exp.mpr</span>
+<span class="l" id="L145"><span class="n">145</span>        rw [hY&#x27;]</span>
+<span class="l" id="L146"><span class="n">146</span>        nlinarith</span>
+<span class="l" id="L147"><span class="n">147</span>    _ = P ^ (-((25 / 26 : ℝ) * ((k : ℝ) + 1))) := (Real.rpow_def_of_pos hP0 _).symm</span>
+<span class="l" id="L148"><span class="n">148</span></span>
+<span class="l" id="L149"><span class="n">149</span>end OrielUpper</span>
+<span class="l" id="L150"><span class="n">150</span></span>
+<span class="l" id="L151"><span class="n">151</span>#print axioms OrielUpper.veylan_suzuki_selected_order</span>
+<span class="l" id="L152"><span class="n">152</span>#print axioms OrielUpper.veylan_suzuki_selected_count</span>
+<span class="l" id="L153"><span class="n">153</span>#print axioms OrielUpper.veylan_suzuki_normalized_derivative</span>
+<span class="l" id="L154"><span class="n">154</span>#print axioms OrielUpper.veylan_suzuki_top_derivative_upper</span></pre></div></body></html>

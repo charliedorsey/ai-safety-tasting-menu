@@ -1,0 +1,328 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · GoldB/VinoMain.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>GoldB/VinoMain.lean</h1><p class="meta">LEAN/GoldB/VinoMain.lean · 327 lines · SHA-256 915782f635b80bf7d1fe816078d5692c9b5ecadff4645e207b62babf97ad66d7</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import GoldB.Vino</span>
+<span class="l" id="L2"><span class="n">2</span></span>
+<span class="l" id="L3"><span class="n">3</span>/-!</span>
+<span class="l" id="L4"><span class="n">4</span># GoldB.VinoMain — the induction proving the mean value theorem</span>
+<span class="l" id="L5"><span class="n">5</span>-/</span>
+<span class="l" id="L6"><span class="n">6</span></span>
+<span class="l" id="L7"><span class="n">7</span>open Finset</span>
+<span class="l" id="L8"><span class="n">8</span></span>
+<span class="l" id="L9"><span class="n">9</span>namespace GoldB</span>
+<span class="l" id="L10"><span class="n">10</span></span>
+<span class="l" id="L11"><span class="n">11</span>/-- real bookkeeping for the ill-conditioned branch -/</span>
+<span class="l" id="L12"><span class="n">12</span>lemma B_part (k τ : ℕ) (hk : 2 ≤ k) (N p N1 D J1 : ℝ) (hN : (N0 k : ℝ) ≤ N)</span>
+<span class="l" id="L13"><span class="n">13</span>    (hrp : N ^ ((k : ℝ)⁻¹) ≤ p) (hN1 : 0 &lt; N1) (hN1le : N1 ≤ 2 * N / p)</span>
+<span class="l" id="L14"><span class="n">14</span>    (hD : 0 ≤ D) (hJ1 : J1 ≤ D * N1 ^ (Eexp k (τ + 1))) :</span>
+<span class="l" id="L15"><span class="n">15</span>    (4 * ((k : ℝ) ^ 4 * p * p)) ^ (((k * τ + k : ℕ) : ℝ) / 2) * J1 ≤</span>
+<span class="l" id="L16"><span class="n">16</span>      D / 2 * N ^ (Eexp k (τ + 1)) := by</span>
+<span class="l" id="L17"><span class="n">17</span>  set E := Eexp k (τ + 1)</span>
+<span class="l" id="L18"><span class="n">18</span>  set T : ℝ := ((k * τ + k : ℕ) : ℝ)</span>
+<span class="l" id="L19"><span class="n">19</span>  have hk&#x27; : (2 : ℝ) ≤ k := by exact_mod_cast hk</span>
+<span class="l" id="L20"><span class="n">20</span>  have hN0pos : (1 : ℝ) ≤ N0 k := by</span>
+<span class="l" id="L21"><span class="n">21</span>    unfold N0; push_cast</span>
+<span class="l" id="L22"><span class="n">22</span>    have : (1 : ℝ) ≤ (8 * (k : ℝ) ^ 2) ^ (4 * k) := one_le_pow₀ (by nlinarith)</span>
+<span class="l" id="L23"><span class="n">23</span>    nlinarith</span>
+<span class="l" id="L24"><span class="n">24</span>  have hNpos : 0 &lt; N := by linarith</span>
+<span class="l" id="L25"><span class="n">25</span>  have hN1&#x27; : 1 ≤ N := by linarith</span>
+<span class="l" id="L26"><span class="n">26</span>  have hr0 : 0 &lt; N ^ ((k : ℝ)⁻¹) := Real.rpow_pos_of_pos hNpos _</span>
+<span class="l" id="L27"><span class="n">27</span>  have hp0 : 0 &lt; p := lt_of_lt_of_le hr0 hrp</span>
+<span class="l" id="L28"><span class="n">28</span>  have hT : T = (k : ℝ) * (τ + 1) := by simp only [T]; push_cast; ring</span>
+<span class="l" id="L29"><span class="n">29</span>  have hE0 : 0 ≤ E := Eexp_nonneg k (τ + 1) (by omega)</span>
+<span class="l" id="L30"><span class="n">30</span>  have hET : (k : ℝ) * (τ + 1) / 4 ≤ E - T := by rw [hT]; exact_mod_cast Eexp_succ_sub k τ hk</span>
+<span class="l" id="L31"><span class="n">31</span>  have hE2T : E ≤ 2 * T := by</span>
+<span class="l" id="L32"><span class="n">32</span>    have := Eexp_le_twoT k (τ + 1) (by omega); rw [hT]; push_cast at this; linarith</span>
+<span class="l" id="L33"><span class="n">33</span>  -- (4 k^4 p^2)^{T/2} = (2 k^2 p)^T</span>
+<span class="l" id="L34"><span class="n">34</span>  have hsq : (4 * ((k : ℝ) ^ 4 * p * p)) ^ (T / 2) = (2 * (k : ℝ) ^ 2 * p) ^ T := by</span>
+<span class="l" id="L35"><span class="n">35</span>    have : (4 * ((k : ℝ) ^ 4 * p * p)) = (2 * (k : ℝ) ^ 2 * p) ^ (2 : ℝ) := by</span>
+<span class="l" id="L36"><span class="n">36</span>      rw [Real.rpow_two]; ring</span>
+<span class="l" id="L37"><span class="n">37</span>    rw [this, ← Real.rpow_mul (by positivity)]; congr 1; ring</span>
+<span class="l" id="L38"><span class="n">38</span>  -- N1^E ≤ (2N/p)^E</span>
+<span class="l" id="L39"><span class="n">39</span>  have hN1E : N1 ^ E ≤ (2 * N / p) ^ E := Real.rpow_le_rpow hN1.le hN1le hE0</span>
+<span class="l" id="L40"><span class="n">40</span>  have hsplit : (2 * N / p) ^ E = 2 ^ E * N ^ E * p ^ (-E) := by</span>
+<span class="l" id="L41"><span class="n">41</span>    rw [Real.div_rpow (by positivity) hp0.le, Real.mul_rpow (by norm_num) hNpos.le,</span>
+<span class="l" id="L42"><span class="n">42</span>      Real.rpow_neg hp0.le]</span>
+<span class="l" id="L43"><span class="n">43</span>    ring</span>
+<span class="l" id="L44"><span class="n">44</span>  -- p^{T-E} ≤ N^{(T-E)/k}</span>
+<span class="l" id="L45"><span class="n">45</span>  have hpTE : p ^ (T - E) ≤ N ^ ((T - E) / k) := by</span>
+<span class="l" id="L46"><span class="n">46</span>    have h1 : p ^ (T - E) ≤ (N ^ ((k : ℝ)⁻¹)) ^ (T - E) :=</span>
+<span class="l" id="L47"><span class="n">47</span>      Real.rpow_le_rpow_of_nonpos hr0 hrp (by linarith)</span>
+<span class="l" id="L48"><span class="n">48</span>    rw [← Real.rpow_mul hNpos.le] at h1</span>
+<span class="l" id="L49"><span class="n">49</span>    convert h1 using 2; field_simp</span>
+<span class="l" id="L50"><span class="n">50</span>  have hNexp : N ^ ((T - E) / k) ≤ N ^ (-((τ + 1 : ℝ) / 4)) := by</span>
+<span class="l" id="L51"><span class="n">51</span>    apply Real.rpow_le_rpow_of_exponent_le hN1&#x27;</span>
+<span class="l" id="L52"><span class="n">52</span>    have hkpos : (0 : ℝ) &lt; k := by linarith</span>
+<span class="l" id="L53"><span class="n">53</span>    rw [div_le_iff₀ hkpos]</span>
+<span class="l" id="L54"><span class="n">54</span>    nlinarith</span>
+<span class="l" id="L55"><span class="n">55</span>  -- N^{(τ+1)/4} ≥ 2 (8k²)^T</span>
+<span class="l" id="L56"><span class="n">56</span>  have hbig : 2 * (8 * (k : ℝ) ^ 2) ^ T ≤ N ^ ((τ + 1 : ℝ) / 4) := by</span>
+<span class="l" id="L57"><span class="n">57</span>    have h1 : (N0 k : ℝ) ^ ((τ + 1 : ℝ) / 4) ≤ N ^ ((τ + 1 : ℝ) / 4) :=</span>
+<span class="l" id="L58"><span class="n">58</span>      Real.rpow_le_rpow (by positivity) hN (by positivity)</span>
+<span class="l" id="L59"><span class="n">59</span>    refine le_trans ?_ h1</span>
+<span class="l" id="L60"><span class="n">60</span>    have e : (N0 k : ℝ) = (2 : ℝ) ^ (4 : ℝ) * ((8 * (k : ℝ) ^ 2) ^ (4 * (k : ℝ))) := by</span>
+<span class="l" id="L61"><span class="n">61</span>      unfold N0; push_cast</span>
+<span class="l" id="L62"><span class="n">62</span>      rw [show (2 : ℝ) ^ (4 : ℝ) = 16 by norm_num, ← Real.rpow_natCast]; push_cast; ring_nf</span>
+<span class="l" id="L63"><span class="n">63</span>    rw [e, Real.mul_rpow (by positivity : (0 : ℝ) ≤ (2 : ℝ) ^ (4 : ℝ))</span>
+<span class="l" id="L64"><span class="n">64</span>        (by positivity : (0 : ℝ) ≤ (8 * (k : ℝ) ^ 2) ^ (4 * (k : ℝ))),</span>
+<span class="l" id="L65"><span class="n">65</span>      ← Real.rpow_mul (by norm_num : (0 : ℝ) ≤ 2),</span>
+<span class="l" id="L66"><span class="n">66</span>      ← Real.rpow_mul (by positivity : (0 : ℝ) ≤ 8 * (k : ℝ) ^ 2)]</span>
+<span class="l" id="L67"><span class="n">67</span>    have e2 : (4 : ℝ) * ((τ + 1 : ℝ) / 4) = τ + 1 := by ring</span>
+<span class="l" id="L68"><span class="n">68</span>    have e3 : 4 * (k : ℝ) * ((τ + 1 : ℝ) / 4) = T := by rw [hT]; ring</span>
+<span class="l" id="L69"><span class="n">69</span>    rw [e2, e3]</span>
+<span class="l" id="L70"><span class="n">70</span>    have : (2 : ℝ) ≤ 2 ^ ((τ : ℝ) + 1) := by</span>
+<span class="l" id="L71"><span class="n">71</span>      calc (2 : ℝ) = 2 ^ (1 : ℝ) := by norm_num</span>
+<span class="l" id="L72"><span class="n">72</span>        _ ≤ 2 ^ ((τ : ℝ) + 1) := Real.rpow_le_rpow_of_exponent_le (by norm_num) (by</span>
+<span class="l" id="L73"><span class="n">73</span>            have : (0 : ℝ) ≤ τ := by positivity</span>
+<span class="l" id="L74"><span class="n">74</span>            linarith)</span>
+<span class="l" id="L75"><span class="n">75</span>    have hpos : 0 ≤ (8 * (k : ℝ) ^ 2) ^ T := by positivity</span>
+<span class="l" id="L76"><span class="n">76</span>    nlinarith</span>
+<span class="l" id="L77"><span class="n">77</span>  -- assemble</span>
+<span class="l" id="L78"><span class="n">78</span>  have hJ1&#x27; : J1 ≤ D * (2 ^ E * N ^ E * p ^ (-E)) := by</span>
+<span class="l" id="L79"><span class="n">79</span>    rw [← hsplit]; exact hJ1.trans (mul_le_mul_of_nonneg_left hN1E hD)</span>
+<span class="l" id="L80"><span class="n">80</span>  rw [hsq]</span>
+<span class="l" id="L81"><span class="n">81</span>  have h2E : (2 : ℝ) ^ E ≤ (2 : ℝ) ^ (2 * T) :=</span>
+<span class="l" id="L82"><span class="n">82</span>    Real.rpow_le_rpow_of_exponent_le (by norm_num) hE2T</span>
+<span class="l" id="L83"><span class="n">83</span>  have hfac : (2 * (k : ℝ) ^ 2 * p) ^ T * (2 ^ E * p ^ (-E)) ≤</span>
+<span class="l" id="L84"><span class="n">84</span>      (8 * (k : ℝ) ^ 2) ^ T * N ^ (-((τ + 1 : ℝ) / 4)) := by</span>
+<span class="l" id="L85"><span class="n">85</span>    rw [Real.mul_rpow (by positivity) hp0.le]</span>
+<span class="l" id="L86"><span class="n">86</span>    have : p ^ T * p ^ (-E) = p ^ (T - E) := by</span>
+<span class="l" id="L87"><span class="n">87</span>      rw [← Real.rpow_add hp0]; ring_nf</span>
+<span class="l" id="L88"><span class="n">88</span>    calc (2 * (k : ℝ) ^ 2) ^ T * p ^ T * (2 ^ E * p ^ (-E))</span>
+<span class="l" id="L89"><span class="n">89</span>        = (2 * (k : ℝ) ^ 2) ^ T * 2 ^ E * (p ^ T * p ^ (-E)) := by ring</span>
+<span class="l" id="L90"><span class="n">90</span>      _ ≤ (2 * (k : ℝ) ^ 2) ^ T * 2 ^ (2 * T) * N ^ (-((τ + 1 : ℝ) / 4)) := by</span>
+<span class="l" id="L91"><span class="n">91</span>          rw [this]</span>
+<span class="l" id="L92"><span class="n">92</span>          apply mul_le_mul (mul_le_mul_of_nonneg_left h2E (by positivity))</span>
+<span class="l" id="L93"><span class="n">93</span>            (hpTE.trans hNexp) (by positivity) (by positivity)</span>
+<span class="l" id="L94"><span class="n">94</span>      _ = (8 * (k : ℝ) ^ 2) ^ T * N ^ (-((τ + 1 : ℝ) / 4)) := by</span>
+<span class="l" id="L95"><span class="n">95</span>          rw [Real.rpow_mul (by norm_num), show ((2 : ℝ) ^ (2 : ℝ)) = 4 by norm_num,</span>
+<span class="l" id="L96"><span class="n">96</span>            ← Real.mul_rpow (by positivity) (by norm_num)]</span>
+<span class="l" id="L97"><span class="n">97</span>          ring_nf</span>
+<span class="l" id="L98"><span class="n">98</span>  have hhalf : (8 * (k : ℝ) ^ 2) ^ T * N ^ (-((τ + 1 : ℝ) / 4)) ≤ 1 / 2 := by</span>
+<span class="l" id="L99"><span class="n">99</span>    rw [Real.rpow_neg hNpos.le]</span>
+<span class="l" id="L100"><span class="n">100</span>    have hpos : 0 &lt; N ^ ((τ + 1 : ℝ) / 4) := Real.rpow_pos_of_pos hNpos _</span>
+<span class="l" id="L101"><span class="n">101</span>    rw [← div_eq_mul_inv, div_le_iff₀ hpos]</span>
+<span class="l" id="L102"><span class="n">102</span>    linarith</span>
+<span class="l" id="L103"><span class="n">103</span>  calc (2 * (k : ℝ) ^ 2 * p) ^ T * J1</span>
+<span class="l" id="L104"><span class="n">104</span>      ≤ (2 * (k : ℝ) ^ 2 * p) ^ T * (D * (2 ^ E * N ^ E * p ^ (-E))) :=</span>
+<span class="l" id="L105"><span class="n">105</span>        mul_le_mul_of_nonneg_left hJ1&#x27; (by positivity)</span>
+<span class="l" id="L106"><span class="n">106</span>    _ = D * N ^ E * ((2 * (k : ℝ) ^ 2 * p) ^ T * (2 ^ E * p ^ (-E))) := by ring</span>
+<span class="l" id="L107"><span class="n">107</span>    _ ≤ D * N ^ E * (1 / 2) := by</span>
+<span class="l" id="L108"><span class="n">108</span>        apply mul_le_mul_of_nonneg_left (hfac.trans hhalf) (by positivity)</span>
+<span class="l" id="L109"><span class="n">109</span>    _ = D / 2 * N ^ E := by ring</span>
+<span class="l" id="L110"><span class="n">110</span>/-- real bookkeeping for the well-conditioned branch -/</span>
+<span class="l" id="L111"><span class="n">111</span>lemma A_part (k τ : ℕ) (hk : 2 ≤ k) (N p N1 Js : ℝ) (hN : 1 ≤ N)</span>
+<span class="l" id="L112"><span class="n">112</span>    (hp2r : p ≤ 2 * N ^ ((k : ℝ)⁻¹)) (hp0 : 0 &lt; p) (hN1 : 0 &lt; N1) (hN1le : N1 ≤ 2 * N / p)</span>
+<span class="l" id="L113"><span class="n">113</span>    (hJs : Js ≤ Dv k τ * N1 ^ (Eexp k τ)) :</span>
+<span class="l" id="L114"><span class="n">114</span>    4 * (p ^ (2 * (k * τ)) * (N ^ k * ((k.factorial : ℝ) * p ^ (k * (k - 1) / 2)) * Js)) ≤</span>
+<span class="l" id="L115"><span class="n">115</span>      Dv k (τ + 1) / 2 * N ^ (Eexp k (τ + 1)) := by</span>
+<span class="l" id="L116"><span class="n">116</span>  set e1 := Eexp k τ</span>
+<span class="l" id="L117"><span class="n">117</span>  set E := Eexp k (τ + 1)</span>
+<span class="l" id="L118"><span class="n">118</span>  have hNpos : 0 &lt; N := by linarith</span>
+<span class="l" id="L119"><span class="n">119</span>  have hk1 : 1 ≤ k := by omega</span>
+<span class="l" id="L120"><span class="n">120</span>  have hk&#x27; : (2 : ℝ) ≤ k := by exact_mod_cast hk</span>
+<span class="l" id="L121"><span class="n">121</span>  have he1 : 0 ≤ e1 := Eexp_nonneg k τ hk1</span>
+<span class="l" id="L122"><span class="n">122</span>  have he1le : e1 ≤ 2 * (k * τ : ℝ) := Eexp_le_twoT k τ hk1</span>
+<span class="l" id="L123"><span class="n">123</span>  have hDel0 := Del_nonneg k τ hk1</span>
+<span class="l" id="L124"><span class="n">124</span>  have hDelk := Del_le_kap k τ hk1</span>
+<span class="l" id="L125"><span class="n">125</span>  have hkapk := kap_le_sq k hk1</span>
+<span class="l" id="L126"><span class="n">126</span>  -- the exponent of p</span>
+<span class="l" id="L127"><span class="n">127</span>  have hq : ((k * (k - 1) / 2 : ℕ) : ℝ) = (k : ℝ) * (k - 1) / 2 := by</span>
+<span class="l" id="L128"><span class="n">128</span>    rw [Nat.cast_div (Nat.even_mul_pred_self k).two_dvd (by norm_num)]</span>
+<span class="l" id="L129"><span class="n">129</span>    rw [Nat.cast_mul, Nat.cast_sub hk1]; push_cast; ring</span>
+<span class="l" id="L130"><span class="n">130</span>  set X : ℝ := (k : ℝ) ^ 2 - Del k τ</span>
+<span class="l" id="L131"><span class="n">131</span>  have hX0 : 0 ≤ X := by simp only [X]; linarith</span>
+<span class="l" id="L132"><span class="n">132</span>  have hXk : X ≤ (k : ℝ) ^ 2 := by simp only [X]; linarith</span>
+<span class="l" id="L133"><span class="n">133</span>  have hpX : p ^ (2 * (k * τ)) * p ^ (k * (k - 1) / 2) * p ^ (-e1) = p ^ X := by</span>
+<span class="l" id="L134"><span class="n">134</span>    rw [← Real.rpow_natCast, ← Real.rpow_natCast p (k * (k - 1) / 2), ← Real.rpow_add hp0,</span>
+<span class="l" id="L135"><span class="n">135</span>      ← Real.rpow_add hp0, hq]</span>
+<span class="l" id="L136"><span class="n">136</span>    congr 1</span>
+<span class="l" id="L137"><span class="n">137</span>    simp only [X, e1, Eexp, kap]; push_cast; ring</span>
+<span class="l" id="L138"><span class="n">138</span>  have hpXle : p ^ X ≤ 2 ^ ((k : ℝ) ^ 2) * N ^ (X / k) := by</span>
+<span class="l" id="L139"><span class="n">139</span>    calc p ^ X ≤ (2 * N ^ ((k : ℝ)⁻¹)) ^ X := Real.rpow_le_rpow hp0.le hp2r hX0</span>
+<span class="l" id="L140"><span class="n">140</span>      _ = 2 ^ X * N ^ (X / k) := by</span>
+<span class="l" id="L141"><span class="n">141</span>          rw [Real.mul_rpow (by norm_num) (by positivity), ← Real.rpow_mul hNpos.le]</span>
+<span class="l" id="L142"><span class="n">142</span>          congr 2; field_simp</span>
+<span class="l" id="L143"><span class="n">143</span>      _ ≤ 2 ^ ((k : ℝ) ^ 2) * N ^ (X / k) := by</span>
+<span class="l" id="L144"><span class="n">144</span>          apply mul_le_mul_of_nonneg_right _ (by positivity)</span>
+<span class="l" id="L145"><span class="n">145</span>          exact Real.rpow_le_rpow_of_exponent_le (by norm_num) hXk</span>
+<span class="l" id="L146"><span class="n">146</span>  have hNexp : (k : ℝ) + e1 + X / k = E := by</span>
+<span class="l" id="L147"><span class="n">147</span>    simp only [X, e1, E, Eexp]</span>
+<span class="l" id="L148"><span class="n">148</span>    rw [Del_succ]</span>
+<span class="l" id="L149"><span class="n">149</span>    field_simp</span>
+<span class="l" id="L150"><span class="n">150</span>    push_cast</span>
+<span class="l" id="L151"><span class="n">151</span>    ring</span>
+<span class="l" id="L152"><span class="n">152</span>  have hJs&#x27; : Js ≤ Dv k τ * (2 ^ e1 * N ^ e1 * p ^ (-e1)) := by</span>
+<span class="l" id="L153"><span class="n">153</span>    calc Js ≤ Dv k τ * N1 ^ e1 := hJs</span>
+<span class="l" id="L154"><span class="n">154</span>      _ ≤ Dv k τ * (2 * N / p) ^ e1 := by</span>
+<span class="l" id="L155"><span class="n">155</span>          apply mul_le_mul_of_nonneg_left (Real.rpow_le_rpow hN1.le hN1le he1)</span>
+<span class="l" id="L156"><span class="n">156</span>          unfold Dv; positivity</span>
+<span class="l" id="L157"><span class="n">157</span>      _ = Dv k τ * (2 ^ e1 * N ^ e1 * p ^ (-e1)) := by</span>
+<span class="l" id="L158"><span class="n">158</span>          rw [Real.div_rpow (by positivity) hp0.le, Real.mul_rpow (by norm_num) hNpos.le,</span>
+<span class="l" id="L159"><span class="n">159</span>            Real.rpow_neg hp0.le]; ring</span>
+<span class="l" id="L160"><span class="n">160</span>  have hfact := factorial_le_two_pow_sq k</span>
+<span class="l" id="L161"><span class="n">161</span>  have h2e1 : (2 : ℝ) ^ e1 ≤ 2 ^ (2 * (k * τ : ℝ)) :=</span>
+<span class="l" id="L162"><span class="n">162</span>    Real.rpow_le_rpow_of_exponent_le (by norm_num) he1le</span>
+<span class="l" id="L163"><span class="n">163</span>  have hDv0 : 0 ≤ Dv k τ := by unfold Dv; positivity</span>
+<span class="l" id="L164"><span class="n">164</span>  have hconst : 4 * (k.factorial : ℝ) * Dv k τ * 2 ^ e1 * 2 ^ ((k : ℝ) ^ 2) ≤ Dv k (τ + 1) / 2 := by</span>
+<span class="l" id="L165"><span class="n">165</span>    have h1 : 4 * (k.factorial : ℝ) * Dv k τ * 2 ^ e1 * 2 ^ ((k : ℝ) ^ 2) ≤</span>
+<span class="l" id="L166"><span class="n">166</span>        4 * (2 : ℝ) ^ (k ^ 2) * Dv k τ * 2 ^ (2 * (k * τ : ℝ)) * 2 ^ ((k : ℝ) ^ 2) := by</span>
+<span class="l" id="L167"><span class="n">167</span>      gcongr</span>
+<span class="l" id="L168"><span class="n">168</span>    refine h1.trans (le_of_eq_of_le (b := (2 : ℝ) ^ (2 + 2 * k ^ 2 + 2 * k * τ + Dexp k τ)) ?_ ?_)</span>
+<span class="l" id="L169"><span class="n">169</span>    · rw [show (2 : ℝ) ^ (2 * (k * τ : ℝ)) = (2 : ℝ) ^ (2 * k * τ) by</span>
+<span class="l" id="L170"><span class="n">170</span>            rw [show (2 * (k * τ : ℝ)) = ((2 * k * τ : ℕ) : ℝ) by push_cast; ring,</span>
+<span class="l" id="L171"><span class="n">171</span>              Real.rpow_natCast],</span>
+<span class="l" id="L172"><span class="n">172</span>          show (2 : ℝ) ^ ((k : ℝ) ^ 2) = (2 : ℝ) ^ (k ^ 2) by</span>
+<span class="l" id="L173"><span class="n">173</span>            rw [show ((k : ℝ)) ^ 2 = ((k ^ 2 : ℕ) : ℝ) by push_cast; ring, Real.rpow_natCast]]</span>
+<span class="l" id="L174"><span class="n">174</span>      unfold Dv</span>
+<span class="l" id="L175"><span class="n">175</span>      rw [show (4 : ℝ) = 2 ^ 2 by norm_num]</span>
+<span class="l" id="L176"><span class="n">176</span>      rw [← pow_add, ← pow_add, ← pow_add, ← pow_add]</span>
+<span class="l" id="L177"><span class="n">177</span>      ring_nf</span>
+<span class="l" id="L178"><span class="n">178</span>    · unfold Dv Dexp</span>
+<span class="l" id="L179"><span class="n">179</span>      rw [div_eq_mul_inv, show ((2 : ℝ))⁻¹ = 2 ^ (-1 : ℤ) by norm_num, ← zpow_natCast,</span>
+<span class="l" id="L180"><span class="n">180</span>        ← zpow_natCast, ← zpow_add₀ (by norm_num)]</span>
+<span class="l" id="L181"><span class="n">181</span>      apply zpow_le_zpow_right₀ (by norm_num)</span>
+<span class="l" id="L182"><span class="n">182</span>      push_cast</span>
+<span class="l" id="L183"><span class="n">183</span>      nlinarith</span>
+<span class="l" id="L184"><span class="n">184</span>  calc 4 * (p ^ (2 * (k * τ)) * (N ^ k * ((k.factorial : ℝ) * p ^ (k * (k - 1) / 2)) * Js))</span>
+<span class="l" id="L185"><span class="n">185</span>      ≤ 4 * (p ^ (2 * (k * τ)) * (N ^ k * ((k.factorial : ℝ) * p ^ (k * (k - 1) / 2)) *</span>
+<span class="l" id="L186"><span class="n">186</span>          (Dv k τ * (2 ^ e1 * N ^ e1 * p ^ (-e1))))) := by gcongr</span>
+<span class="l" id="L187"><span class="n">187</span>    _ = 4 * (k.factorial : ℝ) * Dv k τ * 2 ^ e1 * (N ^ k * N ^ e1) *</span>
+<span class="l" id="L188"><span class="n">188</span>          (p ^ (2 * (k * τ)) * p ^ (k * (k - 1) / 2) * p ^ (-e1)) := by ring</span>
+<span class="l" id="L189"><span class="n">189</span>    _ = 4 * (k.factorial : ℝ) * Dv k τ * 2 ^ e1 * (N ^ k * N ^ e1) * p ^ X := by rw [hpX]</span>
+<span class="l" id="L190"><span class="n">190</span>    _ ≤ 4 * (k.factorial : ℝ) * Dv k τ * 2 ^ e1 * (N ^ k * N ^ e1) *</span>
+<span class="l" id="L191"><span class="n">191</span>          (2 ^ ((k : ℝ) ^ 2) * N ^ (X / k)) := by</span>
+<span class="l" id="L192"><span class="n">192</span>        apply mul_le_mul_of_nonneg_left hpXle (by positivity)</span>
+<span class="l" id="L193"><span class="n">193</span>    _ = (4 * (k.factorial : ℝ) * Dv k τ * 2 ^ e1 * 2 ^ ((k : ℝ) ^ 2)) *</span>
+<span class="l" id="L194"><span class="n">194</span>          (N ^ (k : ℝ) * N ^ e1 * N ^ (X / k)) := by rw [Real.rpow_natCast]; ring</span>
+<span class="l" id="L195"><span class="n">195</span>    _ = (4 * (k.factorial : ℝ) * Dv k τ * 2 ^ e1 * 2 ^ ((k : ℝ) ^ 2)) * N ^ E := by</span>
+<span class="l" id="L196"><span class="n">196</span>        rw [← Real.rpow_add hNpos, ← Real.rpow_add hNpos, hNexp]</span>
+<span class="l" id="L197"><span class="n">197</span>    _ ≤ Dv k (τ + 1) / 2 * N ^ E :=</span>
+<span class="l" id="L198"><span class="n">198</span>        mul_le_mul_of_nonneg_right hconst (by positivity)</span>
+<span class="l" id="L199"><span class="n">199</span></span>
+<span class="l" id="L200"><span class="n">200</span>/-- **Vinogradov&#x27;s mean value theorem** with explicit `k`-uniform constant. -/</span>
+<span class="l" id="L201"><span class="n">201</span>theorem vmvt (k : ℕ) (hk : 1 ≤ k) (τ N : ℕ) (hN : 1 ≤ N) :</span>
+<span class="l" id="L202"><span class="n">202</span>    (Jc k (k * τ) (Icc (1 : ℤ) N) : ℝ) ≤ Dv k τ * (N : ℝ) ^ (Eexp k τ) := by</span>
+<span class="l" id="L203"><span class="n">203</span>  rcases eq_or_lt_of_le hk with h1 | hk2</span>
+<span class="l" id="L204"><span class="n">204</span>  · subst h1; exact vmvt_one τ N hN</span>
+<span class="l" id="L205"><span class="n">205</span>  replace hk2 : 2 ≤ k := hk2</span>
+<span class="l" id="L206"><span class="n">206</span>  induction τ generalizing N with</span>
+<span class="l" id="L207"><span class="n">207</span>  | zero =&gt;</span>
+<span class="l" id="L208"><span class="n">208</span>    simp only [mul_zero, Jc_zero, Nat.cast_one]</span>
+<span class="l" id="L209"><span class="n">209</span>    have : Eexp k 0 = 0 := by unfold Eexp Del; simp</span>
+<span class="l" id="L210"><span class="n">210</span>    rw [this, Real.rpow_zero, mul_one]</span>
+<span class="l" id="L211"><span class="n">211</span>    unfold Dv; exact one_le_pow₀ (by norm_num)</span>
+<span class="l" id="L212"><span class="n">212</span>  | succ τ ih =&gt;</span>
+<span class="l" id="L213"><span class="n">213</span>    induction N using Nat.strong_induction_on with</span>
+<span class="l" id="L214"><span class="n">214</span>    | _ N ihN =&gt;</span>
+<span class="l" id="L215"><span class="n">215</span>    have hNr : (1 : ℝ) ≤ N := by exact_mod_cast hN</span>
+<span class="l" id="L216"><span class="n">216</span>    have hNpos : (0 : ℝ) &lt; N := by linarith</span>
+<span class="l" id="L217"><span class="n">217</span>    set E := Eexp k (τ + 1)</span>
+<span class="l" id="L218"><span class="n">218</span>    have hE0 : 0 ≤ E := Eexp_nonneg k (τ + 1) hk</span>
+<span class="l" id="L219"><span class="n">219</span>    have hDv1 : (2 : ℝ) ^ (24 * k ^ 4) ≤ Dv k (τ + 1) := by</span>
+<span class="l" id="L220"><span class="n">220</span>      unfold Dv Dexp; exact pow_le_pow_right₀ (by norm_num) (by omega)</span>
+<span class="l" id="L221"><span class="n">221</span>    by_cases hsmall : N &lt; N0 k</span>
+<span class="l" id="L222"><span class="n">222</span>    · -- trivial bound</span>
+<span class="l" id="L223"><span class="n">223</span>      have htriv : (Jc k (k * (τ + 1)) (Icc (1 : ℤ) N) : ℝ) ≤ (N : ℝ) ^ (2 * (k * (τ + 1))) := by</span>
+<span class="l" id="L224"><span class="n">224</span>        have := Jc_le_card_pow (k := k) (k * (τ + 1)) (Icc (1 : ℤ) N)</span>
+<span class="l" id="L225"><span class="n">225</span>        rw [Int.card_Icc, show ((N : ℤ) + 1 - 1).toNat = N by omega] at this</span>
+<span class="l" id="L226"><span class="n">226</span>        exact_mod_cast this</span>
+<span class="l" id="L227"><span class="n">227</span>      have hsplit : (N : ℝ) ^ (2 * (k * (τ + 1))) = (N : ℝ) ^ E * (N : ℝ) ^ (kap k - Del k (τ + 1)) := by</span>
+<span class="l" id="L228"><span class="n">228</span>        rw [← Real.rpow_add hNpos, ← Real.rpow_natCast]</span>
+<span class="l" id="L229"><span class="n">229</span>        congr 1; simp only [E, Eexp]; push_cast; ring</span>
+<span class="l" id="L230"><span class="n">230</span>      have hx0 : 0 ≤ kap k - Del k (τ + 1) := by linarith [Del_le_kap k (τ + 1) hk]</span>
+<span class="l" id="L231"><span class="n">231</span>      have hxk : kap k - Del k (τ + 1) ≤ (k : ℝ) ^ 2 := by</span>
+<span class="l" id="L232"><span class="n">232</span>        linarith [kap_le_sq k hk, Del_nonneg k (τ + 1) hk]</span>
+<span class="l" id="L233"><span class="n">233</span>      have hN0 : (N : ℝ) ≤ N0 k := by exact_mod_cast hsmall.le</span>
+<span class="l" id="L234"><span class="n">234</span>      have hN01 : (1 : ℝ) ≤ N0 k := le_trans hNr hN0</span>
+<span class="l" id="L235"><span class="n">235</span>      have hbound : (N : ℝ) ^ (kap k - Del k (τ + 1)) ≤ 2 ^ (24 * k ^ 4) := by</span>
+<span class="l" id="L236"><span class="n">236</span>        calc (N : ℝ) ^ (kap k - Del k (τ + 1)) ≤ (N0 k : ℝ) ^ (kap k - Del k (τ + 1)) :=</span>
+<span class="l" id="L237"><span class="n">237</span>              Real.rpow_le_rpow hNpos.le hN0 hx0</span>
+<span class="l" id="L238"><span class="n">238</span>          _ ≤ (N0 k : ℝ) ^ ((k : ℝ) ^ 2) := Real.rpow_le_rpow_of_exponent_le hN01 hxk</span>
+<span class="l" id="L239"><span class="n">239</span>          _ = (N0 k : ℝ) ^ (k ^ 2) := by</span>
+<span class="l" id="L240"><span class="n">240</span>              rw [show ((k : ℝ)) ^ 2 = ((k ^ 2 : ℕ) : ℝ) by push_cast; ring, Real.rpow_natCast]</span>
+<span class="l" id="L241"><span class="n">241</span>          _ ≤ 2 ^ (24 * k ^ 4) := N0_pow_le k hk</span>
+<span class="l" id="L242"><span class="n">242</span>      calc (Jc k (k * (τ + 1)) (Icc (1 : ℤ) N) : ℝ) ≤ (N : ℝ) ^ (2 * (k * (τ + 1))) := htriv</span>
+<span class="l" id="L243"><span class="n">243</span>        _ = (N : ℝ) ^ (kap k - Del k (τ + 1)) * (N : ℝ) ^ E := by rw [hsplit, mul_comm]</span>
+<span class="l" id="L244"><span class="n">244</span>        _ ≤ Dv k (τ + 1) * (N : ℝ) ^ E :=</span>
+<span class="l" id="L245"><span class="n">245</span>            mul_le_mul_of_nonneg_right (hbound.trans hDv1) (by positivity)</span>
+<span class="l" id="L246"><span class="n">246</span>    · push_neg at hsmall</span>
+<span class="l" id="L247"><span class="n">247</span>      have hN0r : (N0 k : ℝ) ≤ N := by exact_mod_cast hsmall</span>
+<span class="l" id="L248"><span class="n">248</span>      set r : ℝ := (N : ℝ) ^ ((k : ℝ)⁻¹)</span>
+<span class="l" id="L249"><span class="n">249</span>      have hr0 : 0 &lt; r := Real.rpow_pos_of_pos hNpos _</span>
+<span class="l" id="L250"><span class="n">250</span>      have hrk : r ^ k = N := Real.rpow_inv_natCast_pow hNpos.le (by omega)</span>
+<span class="l" id="L251"><span class="n">251</span>      have hkkN0 : (k : ℝ) ^ k ≤ N0 k := by</span>
+<span class="l" id="L252"><span class="n">252</span>        have : k ^ k ≤ N0 k := by</span>
+<span class="l" id="L253"><span class="n">253</span>          unfold N0</span>
+<span class="l" id="L254"><span class="n">254</span>          calc k ^ k ≤ (8 * k ^ 2) ^ k := Nat.pow_le_pow_left (by nlinarith) k</span>
+<span class="l" id="L255"><span class="n">255</span>            _ ≤ (8 * k ^ 2) ^ (4 * k) := Nat.pow_le_pow_right (by positivity) (by omega)</span>
+<span class="l" id="L256"><span class="n">256</span>            _ ≤ 16 * (8 * k ^ 2) ^ (4 * k) := Nat.le_mul_of_pos_left _ (by norm_num)</span>
+<span class="l" id="L257"><span class="n">257</span>        exact_mod_cast this</span>
+<span class="l" id="L258"><span class="n">258</span>      have hkr : (k : ℝ) ≤ r := by</span>
+<span class="l" id="L259"><span class="n">259</span>        by_contra hlt; push_neg at hlt</span>
+<span class="l" id="L260"><span class="n">260</span>        have : r ^ k &lt; (k : ℝ) ^ k := pow_lt_pow_left₀ hlt hr0.le (by omega)</span>
+<span class="l" id="L261"><span class="n">261</span>        rw [hrk] at this; linarith</span>
+<span class="l" id="L262"><span class="n">262</span>      set m := ⌊r⌋₊</span>
+<span class="l" id="L263"><span class="n">263</span>      have hkm : k ≤ m := Nat.le_floor hkr</span>
+<span class="l" id="L264"><span class="n">264</span>      have hmr : (m : ℝ) ≤ r := Nat.floor_le hr0.le</span>
+<span class="l" id="L265"><span class="n">265</span>      have hrm : r &lt; m + 1 := Nat.lt_floor_add_one r</span>
+<span class="l" id="L266"><span class="n">266</span>      obtain ⟨p, hpp, hmp, hp2m⟩ := Nat.exists_prime_lt_and_le_two_mul m (by omega)</span>
+<span class="l" id="L267"><span class="n">267</span>      haveI : Fact p.Prime := ⟨hpp⟩</span>
+<span class="l" id="L268"><span class="n">268</span>      have hkp : k &lt; p := lt_of_le_of_lt hkm hmp</span>
+<span class="l" id="L269"><span class="n">269</span>      have hrp : r ≤ p := by</span>
+<span class="l" id="L270"><span class="n">270</span>        have : (m : ℝ) + 1 ≤ p := by exact_mod_cast hmp</span>
+<span class="l" id="L271"><span class="n">271</span>        linarith</span>
+<span class="l" id="L272"><span class="n">272</span>      have hp2r : (p : ℝ) ≤ 2 * r := by</span>
+<span class="l" id="L273"><span class="n">273</span>        have : (p : ℝ) ≤ 2 * m := by exact_mod_cast hp2m</span>
+<span class="l" id="L274"><span class="n">274</span>        linarith</span>
+<span class="l" id="L275"><span class="n">275</span>      have hp0 : (0 : ℝ) &lt; p := by exact_mod_cast hpp.pos</span>
+<span class="l" id="L276"><span class="n">276</span>      have hNp : N &lt; p ^ k := by</span>
+<span class="l" id="L277"><span class="n">277</span>        have : (N : ℝ) &lt; (p : ℝ) ^ k := by</span>
+<span class="l" id="L278"><span class="n">278</span>          rw [← hrk]</span>
+<span class="l" id="L279"><span class="n">279</span>          have hm1 : (m : ℝ) + 1 ≤ p := by exact_mod_cast hmp</span>
+<span class="l" id="L280"><span class="n">280</span>          exact pow_lt_pow_left₀ (by linarith : r &lt; (p : ℝ)) hr0.le (by omega)</span>
+<span class="l" id="L281"><span class="n">281</span>        exact_mod_cast this</span>
+<span class="l" id="L282"><span class="n">282</span>      have hr2 : (2 : ℝ) ≤ r := by</span>
+<span class="l" id="L283"><span class="n">283</span>        have : (2 : ℝ) ≤ k := by exact_mod_cast hk2</span>
+<span class="l" id="L284"><span class="n">284</span>        linarith</span>
+<span class="l" id="L285"><span class="n">285</span>      have hpN : (p : ℝ) ≤ N := by</span>
+<span class="l" id="L286"><span class="n">286</span>        rw [← hrk]</span>
+<span class="l" id="L287"><span class="n">287</span>        calc (p : ℝ) ≤ 2 * r := hp2r</span>
+<span class="l" id="L288"><span class="n">288</span>          _ ≤ r * r := by nlinarith</span>
+<span class="l" id="L289"><span class="n">289</span>          _ = r ^ 2 := by ring</span>
+<span class="l" id="L290"><span class="n">290</span>          _ ≤ r ^ k := pow_le_pow_right₀ (by linarith) hk2</span>
+<span class="l" id="L291"><span class="n">291</span>      have hpNn : p ≤ N := by exact_mod_cast hpN</span>
+<span class="l" id="L292"><span class="n">292</span>      have hp2 : 2 ≤ p := hpp.two_le</span>
+<span class="l" id="L293"><span class="n">293</span>      set N1 := N / p + 1</span>
+<span class="l" id="L294"><span class="n">294</span>      have hN1 : 1 ≤ N1 := Nat.le_add_left 1 _</span>
+<span class="l" id="L295"><span class="n">295</span>      have hN1N : N1 &lt; N := by</span>
+<span class="l" id="L296"><span class="n">296</span>        have h1 : N / p ≤ N / 2 := Nat.div_le_div_left hp2 (by norm_num)</span>
+<span class="l" id="L297"><span class="n">297</span>        have h2 : (16 : ℕ) ≤ N := by</span>
+<span class="l" id="L298"><span class="n">298</span>          have : 16 ≤ N0 k := by</span>
+<span class="l" id="L299"><span class="n">299</span>            unfold N0; apply Nat.le_mul_of_pos_right; positivity</span>
+<span class="l" id="L300"><span class="n">300</span>          omega</span>
+<span class="l" id="L301"><span class="n">301</span>        omega</span>
+<span class="l" id="L302"><span class="n">302</span>      have hN1r : (N1 : ℝ) ≤ 2 * N / p := by</span>
+<span class="l" id="L303"><span class="n">303</span>        have h1 : ((N / p : ℕ) : ℝ) ≤ (N : ℝ) / p := Nat.cast_div_le</span>
+<span class="l" id="L304"><span class="n">304</span>        have h2 : (1 : ℝ) ≤ (N : ℝ) / p := by rw [le_div_iff₀ hp0]; linarith</span>
+<span class="l" id="L305"><span class="n">305</span>        simp only [N1]; push_cast</span>
+<span class="l" id="L306"><span class="n">306</span>        rw [show 2 * (N : ℝ) / p = (N : ℝ) / p + (N : ℝ) / p by ring]</span>
+<span class="l" id="L307"><span class="n">307</span>        linarith</span>
+<span class="l" id="L308"><span class="n">308</span>      have hN1pos : (0 : ℝ) &lt; N1 := by exact_mod_cast hN1</span>
+<span class="l" id="L309"><span class="n">309</span>      -- the step</span>
+<span class="l" id="L310"><span class="n">310</span>      have hstep := vstep k p N (k * τ) hk2 hkp hN hNp</span>
+<span class="l" id="L311"><span class="n">311</span>      rw [show k * τ + k = k * (τ + 1) by ring] at hstep</span>
+<span class="l" id="L312"><span class="n">312</span>      -- bound both branches</span>
+<span class="l" id="L313"><span class="n">313</span>      have hA := A_part k τ hk2 N p N1 _ hNr hp2r hp0 hN1pos hN1r (ih N1 hN1)</span>
+<span class="l" id="L314"><span class="n">314</span>      have hB := B_part k τ hk2 N p N1 (Dv k (τ + 1)) _ hN0r hrp hN1pos hN1r</span>
+<span class="l" id="L315"><span class="n">315</span>        (by unfold Dv; positivity) (ihN N1 hN1N hN1)</span>
+<span class="l" id="L316"><span class="n">316</span>      rw [show k * τ + k = k * (τ + 1) by ring] at hB</span>
+<span class="l" id="L317"><span class="n">317</span>      calc (Jc k (k * (τ + 1)) (Icc (1 : ℤ) N) : ℝ) ≤ _ := hstep</span>
+<span class="l" id="L318"><span class="n">318</span>        _ ≤ max (Dv k (τ + 1) / 2 * (N : ℝ) ^ E) (Dv k (τ + 1) / 2 * (N : ℝ) ^ E) := by</span>
+<span class="l" id="L319"><span class="n">319</span>            apply max_le_max</span>
+<span class="l" id="L320"><span class="n">320</span>            · simpa [N1] using hA</span>
+<span class="l" id="L321"><span class="n">321</span>            · simpa [N1] using hB</span>
+<span class="l" id="L322"><span class="n">322</span>        _ ≤ Dv k (τ + 1) * (N : ℝ) ^ E := by</span>
+<span class="l" id="L323"><span class="n">323</span>            rw [max_self]</span>
+<span class="l" id="L324"><span class="n">324</span>            have : 0 ≤ Dv k (τ + 1) * (N : ℝ) ^ E := by unfold Dv; positivity</span>
+<span class="l" id="L325"><span class="n">325</span>            linarith</span>
+<span class="l" id="L326"><span class="n">326</span></span>
+<span class="l" id="L327"><span class="n">327</span>end GoldB</span></pre></div></body></html>

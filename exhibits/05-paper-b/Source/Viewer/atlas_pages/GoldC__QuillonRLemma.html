@@ -1,0 +1,217 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · GoldC/QuillonRLemma.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>GoldC/QuillonRLemma.lean</h1><p class="meta">LEAN/GoldC/QuillonRLemma.lean · 216 lines · SHA-256 09c5f60043117316ebea5124aaeba692d1c4ca24fffb18eb821640f92f109d7a</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import GoldB.QuillonLowY</span>
+<span class="l" id="L2"><span class="n">2</span></span>
+<span class="l" id="L3"><span class="n">3</span>/-!</span>
+<span class="l" id="L4"><span class="n">4</span># Quillon CSC3 F5a: the R-route engine (VK along a residue class, plus Cauchy with a class split)</span>
+<span class="l" id="L5"><span class="n">5</span></span>
+<span class="l" id="L6"><span class="n">6</span>Inputs: `GoldB.shiftedSuzukiCore_unconditional` (Hunt B, GREEN). No other analytic input.</span>
+<span class="l" id="L7"><span class="n">7</span></span>
+<span class="l" id="L8"><span class="n">8</span>* `suzuki_AP`: for `Q ≥ 1`, `ρ &lt; Q`, `1 ≤ N`, `M ≤ 2N`, `|Y| ≥ 2Q`,</span>
+<span class="l" id="L9"><span class="n">9</span></span>
+<span class="l" id="L10"><span class="n">10</span>      ‖Σ_{t∈(N,M]} e(Y/(ρ + Q t))‖ ≤ C·(N·exp(-c log³N / log²(|Y|/Q)) + N²·Q/|Y|).</span>
+<span class="l" id="L11"><span class="n">11</span></span>
+<span class="l" id="L12"><span class="n">12</span>  This holds for either sign of `Y`.</span>
+<span class="l" id="L13"><span class="n">13</span>* `cauchy_class_split`: for any finite `𝒰, 𝒱`, any coefficients `a, b` and phases</span>
+<span class="l" id="L14"><span class="n">14</span>  `F(v,u) = e(φ v u)·G v (u % Q)` with `‖G‖ ≤ 1`,</span>
+<span class="l" id="L15"><span class="n">15</span></span>
+<span class="l" id="L16"><span class="n">16</span>      ‖Σ_u b_u Σ_v a_v F(v,u)‖² ≤ (Σ_u ‖b_u‖²) · Σ_{v,v&#x27;} ‖a_v‖‖a_v&#x27;‖ · Σ_{ρ&lt;Q} ‖Σ_{u∈I, u%Q=ρ} e(φ v u − φ v&#x27; u)‖,</span>
+<span class="l" id="L17"><span class="n">17</span></span>
+<span class="l" id="L18"><span class="n">18</span>  where the extended `u`-range is any `I ⊇ 𝒰`. This is the R0003 &quot;absolute&quot; Cauchy step: the</span>
+<span class="l" id="L19"><span class="n">19</span>  mask on `u` is dropped by positivity, and the class phase is removed exactly per residue.</span>
+<span class="l" id="L20"><span class="n">20</span></span>
+<span class="l" id="L21"><span class="n">21</span>No axiom, no `sorry`.</span>
+<span class="l" id="L22"><span class="n">22</span>-/</span>
+<span class="l" id="L23"><span class="n">23</span></span>
+<span class="l" id="L24"><span class="n">24</span>open scoped BigOperators</span>
+<span class="l" id="L25"><span class="n">25</span>open Finset</span>
+<span class="l" id="L26"><span class="n">26</span></span>
+<span class="l" id="L27"><span class="n">27</span>namespace GoldC.QuillonR</span>
+<span class="l" id="L28"><span class="n">28</span></span>
+<span class="l" id="L29"><span class="n">29</span>/-- `e(x) = exp(2πi x)`. -/</span>
+<span class="l" id="L30"><span class="n">30</span>noncomputable def eR (x : ℝ) : ℂ := Complex.exp (2 * Real.pi * Complex.I * (x : ℂ))</span>
+<span class="l" id="L31"><span class="n">31</span></span>
+<span class="l" id="L32"><span class="n">32</span>lemma norm_eR (x : ℝ) : ‖eR x‖ = 1 := by</span>
+<span class="l" id="L33"><span class="n">33</span>  unfold eR</span>
+<span class="l" id="L34"><span class="n">34</span>  rw [show 2 * Real.pi * Complex.I * (x : ℂ) = ((2 * Real.pi * x : ℝ) : ℂ) * Complex.I by</span>
+<span class="l" id="L35"><span class="n">35</span>    push_cast; ring]</span>
+<span class="l" id="L36"><span class="n">36</span>  exact Complex.norm_exp_ofReal_mul_I _</span>
+<span class="l" id="L37"><span class="n">37</span></span>
+<span class="l" id="L38"><span class="n">38</span>lemma eR_eq (x : ℝ) : eR x = Complex.exp (((2 * Real.pi * x : ℝ) : ℂ) * Complex.I) := by</span>
+<span class="l" id="L39"><span class="n">39</span>  unfold eR; congr 1; push_cast; ring</span>
+<span class="l" id="L40"><span class="n">40</span></span>
+<span class="l" id="L41"><span class="n">41</span>lemma eR_neg (x : ℝ) : eR (-x) = (starRingEnd ℂ) (eR x) := by</span>
+<span class="l" id="L42"><span class="n">42</span>  rw [eR_eq, eR_eq, ← Complex.exp_conj, map_mul, Complex.conj_ofReal, Complex.conj_I]</span>
+<span class="l" id="L43"><span class="n">43</span>  congr 1; push_cast; ring</span>
+<span class="l" id="L44"><span class="n">44</span></span>
+<span class="l" id="L45"><span class="n">45</span>lemma eR_add (x y : ℝ) : eR (x + y) = eR x * eR y := by</span>
+<span class="l" id="L46"><span class="n">46</span>  unfold eR; rw [← Complex.exp_add]; congr 1; push_cast; ring</span>
+<span class="l" id="L47"><span class="n">47</span></span>
+<span class="l" id="L48"><span class="n">48</span>lemma eR_sub (x y : ℝ) : eR (x - y) = eR x * (starRingEnd ℂ) (eR y) := by</span>
+<span class="l" id="L49"><span class="n">49</span>  rw [sub_eq_add_neg, eR_add, eR_neg]</span>
+<span class="l" id="L50"><span class="n">50</span></span>
+<span class="l" id="L51"><span class="n">51</span>/-- **VK along a residue class.** -/</span>
+<span class="l" id="L52"><span class="n">52</span>theorem suzuki_AP : ∃ c C : ℝ, 0 &lt; c ∧ 0 ≤ C ∧</span>
+<span class="l" id="L53"><span class="n">53</span>    ∀ (Q ρ N M : ℕ) (Y : ℝ), 1 ≤ Q → ρ &lt; Q → 1 ≤ N → M ≤ 2 * N → 2 * (Q : ℝ) ≤ |Y| →</span>
+<span class="l" id="L54"><span class="n">54</span>      ‖∑ t ∈ Ioc N M, eR (Y / ((ρ : ℝ) + Q * t))‖ ≤</span>
+<span class="l" id="L55"><span class="n">55</span>        C * ((N : ℝ) * Real.exp (-(c * Real.log (N : ℝ) ^ 3 / Real.log (|Y| / Q) ^ 2)) +</span>
+<span class="l" id="L56"><span class="n">56</span>          (N : ℝ) ^ 2 / (|Y| / Q)) := by</span>
+<span class="l" id="L57"><span class="n">57</span>  obtain ⟨c, C, hc, hC, hS⟩ := GoldB.shiftedSuzukiCore_unconditional</span>
+<span class="l" id="L58"><span class="n">58</span>  refine ⟨c, C, hc, hC, fun Q ρ N M Y hQ hρ hN hM hY =&gt; ?_⟩</span>
+<span class="l" id="L59"><span class="n">59</span>  have hQR : (0 : ℝ) &lt; Q := by exact_mod_cast hQ</span>
+<span class="l" id="L60"><span class="n">60</span>  set ϑ : ℝ := (ρ : ℝ) / Q with hϑ</span>
+<span class="l" id="L61"><span class="n">61</span>  have hϑ0 : 0 ≤ ϑ := by positivity</span>
+<span class="l" id="L62"><span class="n">62</span>  have hϑ1 : ϑ ≤ 1 := by</span>
+<span class="l" id="L63"><span class="n">63</span>    rw [hϑ, div_le_one hQR]; exact_mod_cast hρ.le</span>
+<span class="l" id="L64"><span class="n">64</span>  have hY2 : 2 ≤ |Y| / Q := by rw [le_div_iff₀ hQR]; linarith</span>
+<span class="l" id="L65"><span class="n">65</span>  have key := hS (|Y| / Q) hY2 N hN ϑ hϑ0 hϑ1 M hM</span>
+<span class="l" id="L66"><span class="n">66</span>  -- termwise identity: Y/(ρ + Q t) = (Y/Q)/(t + ϑ)</span>
+<span class="l" id="L67"><span class="n">67</span>  have hterm : ∀ t ∈ Ioc N M, eR (Y / ((ρ : ℝ) + Q * t)) =</span>
+<span class="l" id="L68"><span class="n">68</span>      eR ((Y / Q) / ((t : ℝ) + ϑ)) := by</span>
+<span class="l" id="L69"><span class="n">69</span>    intro t _</span>
+<span class="l" id="L70"><span class="n">70</span>    congr 1</span>
+<span class="l" id="L71"><span class="n">71</span>    rw [hϑ]; field_simp; ring</span>
+<span class="l" id="L72"><span class="n">72</span>  rw [Finset.sum_congr rfl hterm]</span>
+<span class="l" id="L73"><span class="n">73</span>  rcases le_or_gt 0 Y with hY0 | hY0</span>
+<span class="l" id="L74"><span class="n">74</span>  · have habs : |Y| = Y := abs_of_nonneg hY0</span>
+<span class="l" id="L75"><span class="n">75</span>    have : ∑ t ∈ Ioc N M, eR ((Y / Q) / ((t : ℝ) + ϑ)) =</span>
+<span class="l" id="L76"><span class="n">76</span>        GoldB.Iface.shiftedModeSum 1 (|Y| / Q) ϑ 0 N M := by</span>
+<span class="l" id="L77"><span class="n">77</span>      unfold GoldB.Iface.shiftedModeSum GoldB.Iface.shiftedExpMode</span>
+<span class="l" id="L78"><span class="n">78</span>      refine Finset.sum_congr rfl fun t _ =&gt; ?_</span>
+<span class="l" id="L79"><span class="n">79</span>      unfold eR; rw [habs]; push_cast; ring_nf</span>
+<span class="l" id="L80"><span class="n">80</span>    rw [this]; exact key</span>
+<span class="l" id="L81"><span class="n">81</span>  · have habs : |Y| = -Y := abs_of_neg hY0</span>
+<span class="l" id="L82"><span class="n">82</span>    have : ∑ t ∈ Ioc N M, eR ((Y / Q) / ((t : ℝ) + ϑ)) =</span>
+<span class="l" id="L83"><span class="n">83</span>        (starRingEnd ℂ) (GoldB.Iface.shiftedModeSum 1 (|Y| / Q) ϑ 0 N M) := by</span>
+<span class="l" id="L84"><span class="n">84</span>      unfold GoldB.Iface.shiftedModeSum</span>
+<span class="l" id="L85"><span class="n">85</span>      rw [map_sum]</span>
+<span class="l" id="L86"><span class="n">86</span>      refine Finset.sum_congr rfl fun t _ =&gt; ?_</span>
+<span class="l" id="L87"><span class="n">87</span>      have : GoldB.Iface.shiftedExpMode 1 (|Y| / Q) ϑ 0 t = eR (-((Y / Q) / ((t : ℝ) + ϑ))) := by</span>
+<span class="l" id="L88"><span class="n">88</span>        unfold GoldB.Iface.shiftedExpMode eR; rw [habs]; push_cast; ring_nf</span>
+<span class="l" id="L89"><span class="n">89</span>      rw [this, eR_neg, Complex.conj_conj]</span>
+<span class="l" id="L90"><span class="n">90</span>    rw [this, Complex.norm_conj]; exact key</span>
+<span class="l" id="L91"><span class="n">91</span></span>
+<span class="l" id="L92"><span class="n">92</span>/-! ## Cauchy with the `u`-mask dropped and the class phase split exactly -/</span>
+<span class="l" id="L93"><span class="n">93</span></span>
+<span class="l" id="L94"><span class="n">94</span>theorem cauchy_class_split {Q : ℕ} (hQ : 1 ≤ Q) (𝒰 I 𝒱 : Finset ℕ) (h𝒰 : 𝒰 ⊆ I)</span>
+<span class="l" id="L95"><span class="n">95</span>    (a b : ℕ → ℂ) (φ : ℕ → ℕ → ℝ) (G : ℕ → ℕ → ℂ) (hG : ∀ v ρ, ‖G v ρ‖ ≤ 1) :</span>
+<span class="l" id="L96"><span class="n">96</span>    ‖∑ u ∈ 𝒰, b u * ∑ v ∈ 𝒱, a v * (eR (φ v u) * G v (u % Q))‖ ^ 2 ≤</span>
+<span class="l" id="L97"><span class="n">97</span>      (∑ u ∈ 𝒰, ‖b u‖ ^ 2) *</span>
+<span class="l" id="L98"><span class="n">98</span>        ∑ v ∈ 𝒱, ∑ v&#x27; ∈ 𝒱, ‖a v‖ * ‖a v&#x27;‖ *</span>
+<span class="l" id="L99"><span class="n">99</span>          ∑ ρ ∈ range Q, ‖∑ u ∈ I.filter (fun u =&gt; u % Q = ρ), eR (φ v u - φ v&#x27; u)‖ := by</span>
+<span class="l" id="L100"><span class="n">100</span>  set F : ℕ → ℂ := fun u =&gt; ∑ v ∈ 𝒱, a v * (eR (φ v u) * G v (u % Q)) with hF</span>
+<span class="l" id="L101"><span class="n">101</span>  -- Cauchy–Schwarz</span>
+<span class="l" id="L102"><span class="n">102</span>  have hCS : ‖∑ u ∈ 𝒰, b u * F u‖ ^ 2 ≤ (∑ u ∈ 𝒰, ‖b u‖ ^ 2) * ∑ u ∈ 𝒰, ‖F u‖ ^ 2 := by</span>
+<span class="l" id="L103"><span class="n">103</span>    have h1 : ‖∑ u ∈ 𝒰, b u * F u‖ ≤ ∑ u ∈ 𝒰, ‖b u‖ * ‖F u‖ :=</span>
+<span class="l" id="L104"><span class="n">104</span>      (norm_sum_le _ _).trans (le_of_eq (Finset.sum_congr rfl fun u _ =&gt; norm_mul _ _))</span>
+<span class="l" id="L105"><span class="n">105</span>    have h3 : (∑ u ∈ 𝒰, ‖b u‖ * ‖F u‖) ^ 2 ≤</span>
+<span class="l" id="L106"><span class="n">106</span>        (∑ u ∈ 𝒰, ‖b u‖ ^ 2) * ∑ u ∈ 𝒰, ‖F u‖ ^ 2 :=</span>
+<span class="l" id="L107"><span class="n">107</span>      Finset.sum_mul_sq_le_sq_mul_sq 𝒰 (fun u =&gt; ‖b u‖) (fun u =&gt; ‖F u‖)</span>
+<span class="l" id="L108"><span class="n">108</span>    calc ‖∑ u ∈ 𝒰, b u * F u‖ ^ 2 ≤ (∑ u ∈ 𝒰, ‖b u‖ * ‖F u‖) ^ 2 := by</span>
+<span class="l" id="L109"><span class="n">109</span>          gcongr</span>
+<span class="l" id="L110"><span class="n">110</span>      _ ≤ _ := h3</span>
+<span class="l" id="L111"><span class="n">111</span>  refine hCS.trans (mul_le_mul_of_nonneg_left ?_ (Finset.sum_nonneg fun u _ =&gt; by positivity))</span>
+<span class="l" id="L112"><span class="n">112</span>  -- drop the mask: Σ_{𝒰} ‖F‖² ≤ Σ_I ‖F‖²</span>
+<span class="l" id="L113"><span class="n">113</span>  have hdrop : ∑ u ∈ 𝒰, ‖F u‖ ^ 2 ≤ ∑ u ∈ I, ‖F u‖ ^ 2 :=</span>
+<span class="l" id="L114"><span class="n">114</span>    Finset.sum_le_sum_of_subset_of_nonneg h𝒰 fun u _ _ =&gt; by positivity</span>
+<span class="l" id="L115"><span class="n">115</span>  refine hdrop.trans ?_</span>
+<span class="l" id="L116"><span class="n">116</span>  -- expand ‖F u‖² = Σ_{v,v&#x27;} a_v conj(a_v&#x27;) e(φ v u - φ v&#x27; u) G v ρ conj(G v&#x27; ρ)</span>
+<span class="l" id="L117"><span class="n">117</span>  have hexp : ∀ u, ((‖F u‖ ^ 2 : ℝ) : ℂ) = ∑ v ∈ 𝒱, ∑ v&#x27; ∈ 𝒱,</span>
+<span class="l" id="L118"><span class="n">118</span>      a v * (starRingEnd ℂ) (a v&#x27;) * (eR (φ v u - φ v&#x27; u) *</span>
+<span class="l" id="L119"><span class="n">119</span>        (G v (u % Q) * (starRingEnd ℂ) (G v&#x27; (u % Q)))) := by</span>
+<span class="l" id="L120"><span class="n">120</span>    intro u</span>
+<span class="l" id="L121"><span class="n">121</span>    rw [Complex.ofReal_pow, ← Complex.mul_conj&#x27;, hF]</span>
+<span class="l" id="L122"><span class="n">122</span>    simp only [map_sum, map_mul]</span>
+<span class="l" id="L123"><span class="n">123</span>    rw [Finset.sum_mul_sum]</span>
+<span class="l" id="L124"><span class="n">124</span>    refine Finset.sum_congr rfl fun v _ =&gt; Finset.sum_congr rfl fun v&#x27; _ =&gt; ?_</span>
+<span class="l" id="L125"><span class="n">125</span>    rw [eR_sub]; ring</span>
+<span class="l" id="L126"><span class="n">126</span>  -- regroup by classes</span>
+<span class="l" id="L127"><span class="n">127</span>  have hreal : ∑ u ∈ I, ‖F u‖ ^ 2 = ‖∑ u ∈ I, ((‖F u‖ ^ 2 : ℝ) : ℂ)‖ := by</span>
+<span class="l" id="L128"><span class="n">128</span>    rw [← Complex.ofReal_sum, Complex.norm_real, Real.norm_eq_abs,</span>
+<span class="l" id="L129"><span class="n">129</span>      abs_of_nonneg (Finset.sum_nonneg fun u _ =&gt; by positivity)]</span>
+<span class="l" id="L130"><span class="n">130</span>  rw [hreal]</span>
+<span class="l" id="L131"><span class="n">131</span>  simp_rw [hexp]</span>
+<span class="l" id="L132"><span class="n">132</span>  rw [Finset.sum_comm]</span>
+<span class="l" id="L133"><span class="n">133</span>  refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun v _ =&gt; ?_)</span>
+<span class="l" id="L134"><span class="n">134</span>  rw [Finset.sum_comm]</span>
+<span class="l" id="L135"><span class="n">135</span>  refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun v&#x27; _ =&gt; ?_)</span>
+<span class="l" id="L136"><span class="n">136</span>  -- split I by residue classes</span>
+<span class="l" id="L137"><span class="n">137</span>  have hsplit : ∑ u ∈ I, a v * (starRingEnd ℂ) (a v&#x27;) * (eR (φ v u - φ v&#x27; u) *</span>
+<span class="l" id="L138"><span class="n">138</span>        (G v (u % Q) * (starRingEnd ℂ) (G v&#x27; (u % Q)))) =</span>
+<span class="l" id="L139"><span class="n">139</span>      a v * (starRingEnd ℂ) (a v&#x27;) * ∑ ρ ∈ range Q, (G v ρ * (starRingEnd ℂ) (G v&#x27; ρ)) *</span>
+<span class="l" id="L140"><span class="n">140</span>        ∑ u ∈ I.filter (fun u =&gt; u % Q = ρ), eR (φ v u - φ v&#x27; u) := by</span>
+<span class="l" id="L141"><span class="n">141</span>    rw [← Finset.mul_sum]</span>
+<span class="l" id="L142"><span class="n">142</span>    congr 1</span>
+<span class="l" id="L143"><span class="n">143</span>    rw [← Finset.sum_fiberwise_of_maps_to (g := fun u =&gt; u % Q) (t := range Q)</span>
+<span class="l" id="L144"><span class="n">144</span>      (fun u _ =&gt; Finset.mem_range.2 (Nat.mod_lt _ (by omega)))]</span>
+<span class="l" id="L145"><span class="n">145</span>    refine Finset.sum_congr rfl fun ρ _ =&gt; ?_</span>
+<span class="l" id="L146"><span class="n">146</span>    rw [Finset.mul_sum]</span>
+<span class="l" id="L147"><span class="n">147</span>    refine Finset.sum_congr rfl fun u hu =&gt; ?_</span>
+<span class="l" id="L148"><span class="n">148</span>    rw [(Finset.mem_filter.1 hu).2]; ring</span>
+<span class="l" id="L149"><span class="n">149</span>  rw [hsplit, norm_mul, norm_mul, Complex.norm_conj]</span>
+<span class="l" id="L150"><span class="n">150</span>  gcongr</span>
+<span class="l" id="L151"><span class="n">151</span>  refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun ρ _ =&gt; ?_)</span>
+<span class="l" id="L152"><span class="n">152</span>  rw [norm_mul, norm_mul, Complex.norm_conj]</span>
+<span class="l" id="L153"><span class="n">153</span>  have h1 := hG v ρ</span>
+<span class="l" id="L154"><span class="n">154</span>  have h2 := hG v&#x27; ρ</span>
+<span class="l" id="L155"><span class="n">155</span>  calc ‖G v ρ‖ * ‖G v&#x27; ρ‖ * ‖∑ u ∈ I.filter (fun u =&gt; u % Q = ρ), eR (φ v u - φ v&#x27; u)‖</span>
+<span class="l" id="L156"><span class="n">156</span>      ≤ 1 * 1 * ‖∑ u ∈ I.filter (fun u =&gt; u % Q = ρ), eR (φ v u - φ v&#x27; u)‖ := by gcongr</span>
+<span class="l" id="L157"><span class="n">157</span>    _ = _ := by ring</span>
+<span class="l" id="L158"><span class="n">158</span></span>
+<span class="l" id="L159"><span class="n">159</span>/-! ## Residue-class reindexing and the assembled R bound -/</span>
+<span class="l" id="L160"><span class="n">160</span></span>
+<span class="l" id="L161"><span class="n">161</span>lemma classFilter_eq_image (Q ρ U₀ U₁ : ℕ) (hQ : 1 ≤ Q) (hρ : ρ &lt; Q) (hρU : ρ ≤ U₀) :</span>
+<span class="l" id="L162"><span class="n">162</span>    (Ioc U₀ U₁).filter (fun u =&gt; u % Q = ρ) =</span>
+<span class="l" id="L163"><span class="n">163</span>      (Ioc ((U₀ - ρ) / Q) ((U₁ - ρ) / Q)).image (fun t =&gt; ρ + Q * t) := by</span>
+<span class="l" id="L164"><span class="n">164</span>  have hQ0 : 0 &lt; Q := by omega</span>
+<span class="l" id="L165"><span class="n">165</span>  ext u</span>
+<span class="l" id="L166"><span class="n">166</span>  simp only [Finset.mem_filter, Finset.mem_Ioc, Finset.mem_image]</span>
+<span class="l" id="L167"><span class="n">167</span>  constructor</span>
+<span class="l" id="L168"><span class="n">168</span>  · rintro ⟨⟨h1, h2⟩, h3⟩</span>
+<span class="l" id="L169"><span class="n">169</span>    have hdm : Q * (u / Q) + ρ = u := by</span>
+<span class="l" id="L170"><span class="n">170</span>      have := Nat.div_add_mod u Q; rw [h3] at this; exact this</span>
+<span class="l" id="L171"><span class="n">171</span>    have hq : u / Q * Q = u - ρ := by rw [Nat.mul_comm]; omega</span>
+<span class="l" id="L172"><span class="n">172</span>    refine ⟨u / Q, ⟨?_, ?_⟩, by omega⟩</span>
+<span class="l" id="L173"><span class="n">173</span>    · rw [Nat.div_lt_iff_lt_mul hQ0]; omega</span>
+<span class="l" id="L174"><span class="n">174</span>    · rw [Nat.le_div_iff_mul_le hQ0]; omega</span>
+<span class="l" id="L175"><span class="n">175</span>  · rintro ⟨t, ⟨h1, h2⟩, rfl⟩</span>
+<span class="l" id="L176"><span class="n">176</span>    have ht : t * Q = Q * t := Nat.mul_comm _ _</span>
+<span class="l" id="L177"><span class="n">177</span>    have h1&#x27; : U₀ - ρ &lt; t * Q := (Nat.div_lt_iff_lt_mul hQ0).1 h1</span>
+<span class="l" id="L178"><span class="n">178</span>    have h2&#x27; : t * Q ≤ U₁ - ρ := (Nat.le_div_iff_mul_le hQ0).1 h2</span>
+<span class="l" id="L179"><span class="n">179</span>    refine ⟨⟨by omega, by omega⟩, ?_⟩</span>
+<span class="l" id="L180"><span class="n">180</span>    rw [Nat.add_mul_mod_self_left, Nat.mod_eq_of_lt hρ]</span>
+<span class="l" id="L181"><span class="n">181</span></span>
+<span class="l" id="L182"><span class="n">182</span>/-- One class, one off-diagonal pair: VK along the class. -/</span>
+<span class="l" id="L183"><span class="n">183</span>theorem class_offdiag :</span>
+<span class="l" id="L184"><span class="n">184</span>    ∃ c C : ℝ, 0 &lt; c ∧ 0 ≤ C ∧</span>
+<span class="l" id="L185"><span class="n">185</span>      ∀ (Q ρ U₀ U₁ : ℕ) (Y : ℝ), 1 ≤ Q → ρ &lt; Q → 2 * Q ≤ U₀ → U₁ + 2 * Q ≤ 2 * U₀ →</span>
+<span class="l" id="L186"><span class="n">186</span>        2 * (Q : ℝ) ≤ |Y| →</span>
+<span class="l" id="L187"><span class="n">187</span>        ‖∑ u ∈ (Ioc U₀ U₁).filter (fun u =&gt; u % Q = ρ), eR (Y / u)‖ ≤</span>
+<span class="l" id="L188"><span class="n">188</span>          C * ((((U₀ - ρ) / Q : ℕ) : ℝ) * Real.exp (-(c * Real.log (((U₀ - ρ) / Q : ℕ) : ℝ) ^ 3 /</span>
+<span class="l" id="L189"><span class="n">189</span>              Real.log (|Y| / Q) ^ 2)) + (((U₀ - ρ) / Q : ℕ) : ℝ) ^ 2 / (|Y| / Q)) := by</span>
+<span class="l" id="L190"><span class="n">190</span>  obtain ⟨c, C, hc, hC, hS⟩ := suzuki_AP</span>
+<span class="l" id="L191"><span class="n">191</span>  refine ⟨c, C, hc, hC, fun Q ρ U₀ U₁ Y hQ hρ hU₀ hU₁ hY =&gt; ?_⟩</span>
+<span class="l" id="L192"><span class="n">192</span>  rw [classFilter_eq_image Q ρ U₀ U₁ hQ hρ (by omega)]</span>
+<span class="l" id="L193"><span class="n">193</span>  have hinj : Set.InjOn (fun t =&gt; ρ + Q * t) (Ioc ((U₀ - ρ) / Q) ((U₁ - ρ) / Q) : Set ℕ) := by</span>
+<span class="l" id="L194"><span class="n">194</span>    intro x _ y _ h</span>
+<span class="l" id="L195"><span class="n">195</span>    exact Nat.eq_of_mul_eq_mul_left (show 0 &lt; Q by omega) (Nat.add_left_cancel h)</span>
+<span class="l" id="L196"><span class="n">196</span>  rw [Finset.sum_image hinj]</span>
+<span class="l" id="L197"><span class="n">197</span>  have hN : 1 ≤ (U₀ - ρ) / Q := by</span>
+<span class="l" id="L198"><span class="n">198</span>    rw [Nat.le_div_iff_mul_le (by omega)]; omega</span>
+<span class="l" id="L199"><span class="n">199</span>  have hM : (U₁ - ρ) / Q ≤ 2 * ((U₀ - ρ) / Q) := by</span>
+<span class="l" id="L200"><span class="n">200</span>    set N := (U₀ - ρ) / Q</span>
+<span class="l" id="L201"><span class="n">201</span>    have h1 : Q * N + (U₀ - ρ) % Q = U₀ - ρ := Nat.div_add_mod (U₀ - ρ) Q</span>
+<span class="l" id="L202"><span class="n">202</span>    have h2 := Nat.mod_lt (U₀ - ρ) (show 0 &lt; Q by omega)</span>
+<span class="l" id="L203"><span class="n">203</span>    have h3 : (U₁ - ρ) / Q &lt; 2 * N + 1 := by</span>
+<span class="l" id="L204"><span class="n">204</span>      rw [Nat.div_lt_iff_lt_mul (by omega), show (2 * N + 1) * Q = 2 * (Q * N) + Q by ring]</span>
+<span class="l" id="L205"><span class="n">205</span>      omega</span>
+<span class="l" id="L206"><span class="n">206</span>    omega</span>
+<span class="l" id="L207"><span class="n">207</span>  have := hS Q ρ ((U₀ - ρ) / Q) ((U₁ - ρ) / Q) Y hQ hρ hN hM hY</span>
+<span class="l" id="L208"><span class="n">208</span>  simp only [Nat.cast_add, Nat.cast_mul]</span>
+<span class="l" id="L209"><span class="n">209</span>  exact this</span>
+<span class="l" id="L210"><span class="n">210</span></span>
+<span class="l" id="L211"><span class="n">211</span>end GoldC.QuillonR</span>
+<span class="l" id="L212"><span class="n">212</span></span>
+<span class="l" id="L213"><span class="n">213</span>#print axioms GoldC.QuillonR.classFilter_eq_image</span>
+<span class="l" id="L214"><span class="n">214</span>#print axioms GoldC.QuillonR.class_offdiag</span>
+<span class="l" id="L215"><span class="n">215</span>#print axioms GoldC.QuillonR.suzuki_AP</span>
+<span class="l" id="L216"><span class="n">216</span>#print axioms GoldC.QuillonR.cauchy_class_split</span></pre></div></body></html>

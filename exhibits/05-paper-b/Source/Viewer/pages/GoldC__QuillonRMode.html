@@ -1,0 +1,106 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LEAN/GoldC/QuillonRMode.lean</title><style>body{background:#f9f8f4;color:#27332d;font:16px/1.5 Georgia,serif;margin:0}a{color:#2d6255}.wrap{max-width:1160px;margin:0 auto;padding:30px 24px}header{border-bottom:1px solid #d8ded7;margin-bottom:22px}h1{font-size:29px;font-weight:normal;overflow-wrap:anywhere}.meta,nav,th{font:13px/1.5 system-ui,sans-serif;color:#5b6b63}nav a{margin-right:18px}.tblwrap{overflow-x:auto}table{border-collapse:collapse;width:100%}td,th{padding:9px 12px;border-bottom:1px solid #e0e3de;text-align:left;vertical-align:top}td code{overflow-wrap:anywhere}code,pre{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}pre{font-size:12.5px;white-space:pre;overflow-x:auto;line-height:1.6;background:#fff;padding:12px;border:1px solid #e2e4df}.ln{color:#8b968e;padding-right:15px;user-select:none}.line{display:block}.focus{background:#e9f1ec}.line:target{outline:2px solid #276b54;outline-offset:1px;background:#f6f4e7}.legend{padding:12px 15px;background:#fff;border-left:2px solid #629280;margin:24px 0}@media(max-width:640px){.wrap{padding:18px 12px}h1{font-size:21px}td,th{padding:8px}.meta{font-size:11px}pre{font-size:11px}}</style></head><body><div class="wrap"><header><nav><a href="../source_index.html">All source waypoints</a><a href="../../../Docs/companion/reading_room/index.html">Reading room</a></nav><h1>LEAN/GoldC/QuillonRMode.lean</h1><p class="meta">Exact archived source · SHA-256 083de34230e8b4cb21b3424e736b5a8444e1cb03f7b13bc3236f4d4da1cbd5e1 · Original line numbers · Not a new Lean replay</p></header><p class="meta">Deep source proof text is reproduced verbatim for inspection; this page does not assert a compiler-derived proof-dependency graph.</p><pre><span class="line" id="L1"><span class="ln">    1</span>import GoldC.QuillonRLemma</span>
+<span class="line" id="L2"><span class="ln">    2</span>import GoldC.QuillonAbel</span>
+<span class="line" id="L3"><span class="ln">    3</span></span>
+<span class="line" id="L4"><span class="ln">    4</span>/-!</span>
+<span class="line" id="L5"><span class="ln">    5</span># Quillon CSC3 F5d: the R route with a `u`-dependent amplitude (exact-DFT coefficients)</span>
+<span class="line" id="L6"><span class="ln">    6</span></span>
+<span class="line" id="L7"><span class="ln">    7</span>* `cauchy_class_split_amp`: as `cauchy_class_split`, but the inner coefficient is `a v · c v u`.</span>
+<span class="line" id="L8"><span class="ln">    8</span>  After Cauchy, each class sum carries the amplitude `A_{vv&#x27;}(u) = c v u · conj(c v&#x27; u)`.</span>
+<span class="line" id="L9"><span class="ln">    9</span>* `class_amp_bound`: VK along `ρ + Q t` with a bounded-variation amplitude (Abel summation):</span>
+<span class="line" id="L10"><span class="ln">   10</span></span>
+<span class="line" id="L11"><span class="ln">   11</span>      ‖Σ_{t∈(N,M]} A t · e(Y/(ρ+Qt))‖ ≤ (‖A M‖ + Σ‖ΔA‖) · C·(N e^{−c log³N/log²(|Y|/Q)} + N²/(|Y|/Q)).</span>
+<span class="line" id="L12"><span class="ln">   12</span></span>
+<span class="line" id="L13"><span class="ln">   13</span>  This removes the need for any Fourier truncation in R. The coefficients</span>
+<span class="line" id="L14"><span class="ln">   14</span>  `a_{vu}(k) = (i/2vu)cot(πk/vu)` are handled exactly.</span>
+<span class="line" id="L15"><span class="ln">   15</span></span>
+<span class="line" id="L16"><span class="ln">   16</span>No axiom, no `sorry`.</span>
+<span class="line" id="L17"><span class="ln">   17</span>-/</span>
+<span class="line" id="L18"><span class="ln">   18</span></span>
+<span class="line" id="L19"><span class="ln">   19</span>open scoped BigOperators</span>
+<span class="line" id="L20"><span class="ln">   20</span>open Finset</span>
+<span class="line" id="L21"><span class="ln">   21</span></span>
+<span class="line" id="L22"><span class="ln">   22</span>namespace GoldC.QuillonR</span>
+<span class="line" id="L23"><span class="ln">   23</span></span>
+<span class="line" id="L24"><span class="ln">   24</span>open GoldC.QuillonAbel</span>
+<span class="line" id="L25"><span class="ln">   25</span></span>
+<span class="line" id="L26"><span class="ln">   26</span>theorem cauchy_class_split_amp {Q : ℕ} (hQ : 1 ≤ Q) (𝒰 I 𝒱 : Finset ℕ) (h𝒰 : 𝒰 ⊆ I)</span>
+<span class="line" id="L27"><span class="ln">   27</span>    (a b : ℕ → ℂ) (c : ℕ → ℕ → ℂ) (φ : ℕ → ℕ → ℝ) (G : ℕ → ℕ → ℂ)</span>
+<span class="line" id="L28"><span class="ln">   28</span>    (hG : ∀ v ρ, ‖G v ρ‖ ≤ 1) :</span>
+<span class="line" id="L29"><span class="ln">   29</span>    ‖∑ u ∈ 𝒰, b u * ∑ v ∈ 𝒱, a v * (c v u * (eR (φ v u) * G v (u % Q)))‖ ^ 2 ≤</span>
+<span class="line" id="L30"><span class="ln">   30</span>      (∑ u ∈ 𝒰, ‖b u‖ ^ 2) *</span>
+<span class="line" id="L31"><span class="ln">   31</span>        ∑ v ∈ 𝒱, ∑ v&#x27; ∈ 𝒱, ‖a v‖ * ‖a v&#x27;‖ *</span>
+<span class="line" id="L32"><span class="ln">   32</span>          ∑ ρ ∈ range Q, ‖∑ u ∈ I.filter (fun u =&gt; u % Q = ρ),</span>
+<span class="line" id="L33"><span class="ln">   33</span>            (c v u * (starRingEnd ℂ) (c v&#x27; u)) * eR (φ v u - φ v&#x27; u)‖ := by</span>
+<span class="line" id="L34"><span class="ln">   34</span>  set F : ℕ → ℂ := fun u =&gt; ∑ v ∈ 𝒱, a v * (c v u * (eR (φ v u) * G v (u % Q))) with hF</span>
+<span class="line" id="L35"><span class="ln">   35</span>  have hCS : ‖∑ u ∈ 𝒰, b u * F u‖ ^ 2 ≤ (∑ u ∈ 𝒰, ‖b u‖ ^ 2) * ∑ u ∈ 𝒰, ‖F u‖ ^ 2 := by</span>
+<span class="line" id="L36"><span class="ln">   36</span>    calc ‖∑ u ∈ 𝒰, b u * F u‖ ^ 2 ≤ (∑ u ∈ 𝒰, ‖b u‖ * ‖F u‖) ^ 2 := by</span>
+<span class="line" id="L37"><span class="ln">   37</span>          refine pow_le_pow_left₀ (norm_nonneg _) ?_ 2</span>
+<span class="line" id="L38"><span class="ln">   38</span>          exact (norm_sum_le _ _).trans (le_of_eq (Finset.sum_congr rfl fun u _ =&gt; norm_mul _ _))</span>
+<span class="line" id="L39"><span class="ln">   39</span>      _ ≤ _ := Finset.sum_mul_sq_le_sq_mul_sq _ _ _</span>
+<span class="line" id="L40"><span class="ln">   40</span>  refine hCS.trans (mul_le_mul_of_nonneg_left ?_ (Finset.sum_nonneg fun u _ =&gt; by positivity))</span>
+<span class="line" id="L41"><span class="ln">   41</span>  have hdrop : ∑ u ∈ 𝒰, ‖F u‖ ^ 2 ≤ ∑ u ∈ I, ‖F u‖ ^ 2 :=</span>
+<span class="line" id="L42"><span class="ln">   42</span>    Finset.sum_le_sum_of_subset_of_nonneg h𝒰 fun u _ _ =&gt; by positivity</span>
+<span class="line" id="L43"><span class="ln">   43</span>  refine hdrop.trans ?_</span>
+<span class="line" id="L44"><span class="ln">   44</span>  have hexp : ∀ u, ((‖F u‖ ^ 2 : ℝ) : ℂ) = ∑ v ∈ 𝒱, ∑ v&#x27; ∈ 𝒱,</span>
+<span class="line" id="L45"><span class="ln">   45</span>      a v * (starRingEnd ℂ) (a v&#x27;) * ((c v u * (starRingEnd ℂ) (c v&#x27; u)) *</span>
+<span class="line" id="L46"><span class="ln">   46</span>        eR (φ v u - φ v&#x27; u) * (G v (u % Q) * (starRingEnd ℂ) (G v&#x27; (u % Q)))) := by</span>
+<span class="line" id="L47"><span class="ln">   47</span>    intro u</span>
+<span class="line" id="L48"><span class="ln">   48</span>    rw [Complex.ofReal_pow, ← Complex.mul_conj&#x27;]</span>
+<span class="line" id="L49"><span class="ln">   49</span>    simp only [hF, map_sum, map_mul]</span>
+<span class="line" id="L50"><span class="ln">   50</span>    rw [Finset.sum_mul_sum]</span>
+<span class="line" id="L51"><span class="ln">   51</span>    refine Finset.sum_congr rfl fun v _ =&gt; Finset.sum_congr rfl fun v&#x27; _ =&gt; ?_</span>
+<span class="line" id="L52"><span class="ln">   52</span>    rw [eR_sub]; ring</span>
+<span class="line" id="L53"><span class="ln">   53</span>  have hreal : ∑ u ∈ I, ‖F u‖ ^ 2 = ‖∑ u ∈ I, ((‖F u‖ ^ 2 : ℝ) : ℂ)‖ := by</span>
+<span class="line" id="L54"><span class="ln">   54</span>    rw [← Complex.ofReal_sum, Complex.norm_real, Real.norm_eq_abs,</span>
+<span class="line" id="L55"><span class="ln">   55</span>      abs_of_nonneg (Finset.sum_nonneg fun u _ =&gt; by positivity)]</span>
+<span class="line" id="L56"><span class="ln">   56</span>  rw [hreal]</span>
+<span class="line" id="L57"><span class="ln">   57</span>  simp_rw [hexp]</span>
+<span class="line" id="L58"><span class="ln">   58</span>  rw [Finset.sum_comm]</span>
+<span class="line" id="L59"><span class="ln">   59</span>  refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun v _ =&gt; ?_)</span>
+<span class="line" id="L60"><span class="ln">   60</span>  rw [Finset.sum_comm]</span>
+<span class="line" id="L61"><span class="ln">   61</span>  refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun v&#x27; _ =&gt; ?_)</span>
+<span class="line" id="L62"><span class="ln">   62</span>  have hsplit : ∑ u ∈ I, a v * (starRingEnd ℂ) (a v&#x27;) * ((c v u * (starRingEnd ℂ) (c v&#x27; u)) *</span>
+<span class="line" id="L63"><span class="ln">   63</span>        eR (φ v u - φ v&#x27; u) * (G v (u % Q) * (starRingEnd ℂ) (G v&#x27; (u % Q)))) =</span>
+<span class="line" id="L64"><span class="ln">   64</span>      a v * (starRingEnd ℂ) (a v&#x27;) * ∑ ρ ∈ range Q, (G v ρ * (starRingEnd ℂ) (G v&#x27; ρ)) *</span>
+<span class="line" id="L65"><span class="ln">   65</span>        ∑ u ∈ I.filter (fun u =&gt; u % Q = ρ),</span>
+<span class="line" id="L66"><span class="ln">   66</span>          (c v u * (starRingEnd ℂ) (c v&#x27; u)) * eR (φ v u - φ v&#x27; u) := by</span>
+<span class="line" id="L67"><span class="ln">   67</span>    rw [← Finset.mul_sum]</span>
+<span class="line" id="L68"><span class="ln">   68</span>    congr 1</span>
+<span class="line" id="L69"><span class="ln">   69</span>    rw [← Finset.sum_fiberwise_of_maps_to (g := fun u =&gt; u % Q) (t := range Q)</span>
+<span class="line" id="L70"><span class="ln">   70</span>      (fun u _ =&gt; Finset.mem_range.2 (Nat.mod_lt _ (by omega)))]</span>
+<span class="line" id="L71"><span class="ln">   71</span>    refine Finset.sum_congr rfl fun ρ _ =&gt; ?_</span>
+<span class="line" id="L72"><span class="ln">   72</span>    rw [Finset.mul_sum]</span>
+<span class="line" id="L73"><span class="ln">   73</span>    refine Finset.sum_congr rfl fun u hu =&gt; ?_</span>
+<span class="line" id="L74"><span class="ln">   74</span>    rw [(Finset.mem_filter.1 hu).2]; ring</span>
+<span class="line" id="L75"><span class="ln">   75</span>  rw [hsplit, norm_mul, norm_mul, Complex.norm_conj]</span>
+<span class="line" id="L76"><span class="ln">   76</span>  gcongr</span>
+<span class="line" id="L77"><span class="ln">   77</span>  refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun ρ _ =&gt; ?_)</span>
+<span class="line" id="L78"><span class="ln">   78</span>  rw [norm_mul, norm_mul, Complex.norm_conj]</span>
+<span class="line" id="L79"><span class="ln">   79</span>  have h1 := hG v ρ</span>
+<span class="line" id="L80"><span class="ln">   80</span>  have h2 := hG v&#x27; ρ</span>
+<span class="line" id="L81"><span class="ln">   81</span>  calc ‖G v ρ‖ * ‖G v&#x27; ρ‖ * ‖∑ u ∈ I.filter (fun u =&gt; u % Q = ρ),</span>
+<span class="line" id="L82"><span class="ln">   82</span>        (c v u * (starRingEnd ℂ) (c v&#x27; u)) * eR (φ v u - φ v&#x27; u)‖</span>
+<span class="line" id="L83"><span class="ln">   83</span>      ≤ 1 * 1 * ‖∑ u ∈ I.filter (fun u =&gt; u % Q = ρ),</span>
+<span class="line" id="L84"><span class="ln">   84</span>        (c v u * (starRingEnd ℂ) (c v&#x27; u)) * eR (φ v u - φ v&#x27; u)‖ := by gcongr</span>
+<span class="line" id="L85"><span class="ln">   85</span>    _ = _ := by ring</span>
+<span class="line" id="L86"><span class="ln">   86</span></span>
+<span class="line" id="L87"><span class="ln">   87</span>/-- **VK along a class with a bounded-variation amplitude.** -/</span>
+<span class="line" id="L88"><span class="ln">   88</span>theorem class_amp_bound :</span>
+<span class="line" id="L89"><span class="ln">   89</span>    ∃ c C : ℝ, 0 &lt; c ∧ 0 ≤ C ∧</span>
+<span class="line" id="L90"><span class="ln">   90</span>      ∀ (Q ρ N M : ℕ) (Y : ℝ) (A : ℕ → ℂ), 1 ≤ Q → ρ &lt; Q → 1 ≤ N → N ≤ M → M ≤ 2 * N →</span>
+<span class="line" id="L91"><span class="ln">   91</span>        2 * (Q : ℝ) ≤ |Y| →</span>
+<span class="line" id="L92"><span class="ln">   92</span>        ‖∑ t ∈ Ioc N M, A t * eR (Y / ((ρ : ℝ) + Q * t))‖ ≤</span>
+<span class="line" id="L93"><span class="ln">   93</span>          (‖A M‖ + ∑ n ∈ Ico (N + 1) M, ‖A (n + 1) - A n‖) *</span>
+<span class="line" id="L94"><span class="ln">   94</span>            (C * ((N : ℝ) * Real.exp (-(c * Real.log (N : ℝ) ^ 3 / Real.log (|Y| / Q) ^ 2)) +</span>
+<span class="line" id="L95"><span class="ln">   95</span>              (N : ℝ) ^ 2 / (|Y| / Q))) := by</span>
+<span class="line" id="L96"><span class="ln">   96</span>  obtain ⟨c, C, hc, hC, hS⟩ := suzuki_AP</span>
+<span class="line" id="L97"><span class="ln">   97</span>  refine ⟨c, C, hc, hC, fun Q ρ N M Y A hQ hρ hN hNM hM hY =&gt; ?_⟩</span>
+<span class="line" id="L98"><span class="ln">   98</span>  refine abel_bound A (fun t =&gt; eR (Y / ((ρ : ℝ) + Q * t))) N M hNM _ fun j hj1 hj2 =&gt; ?_</span>
+<span class="line" id="L99"><span class="ln">   99</span>  unfold psum</span>
+<span class="line" id="L100"><span class="ln">  100</span>  exact hS Q ρ N j Y hQ hρ hN (by omega) hY</span>
+<span class="line" id="L101"><span class="ln">  101</span></span>
+<span class="line" id="L102"><span class="ln">  102</span>end GoldC.QuillonR</span>
+<span class="line" id="L103"><span class="ln">  103</span></span>
+<span class="line" id="L104"><span class="ln">  104</span>#print axioms GoldC.QuillonR.cauchy_class_split_amp</span>
+<span class="line" id="L105"><span class="ln">  105</span>#print axioms GoldC.QuillonR.class_amp_bound</span>
+</pre></div></body></html>

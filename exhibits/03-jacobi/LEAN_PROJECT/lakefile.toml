@@ -1,0 +1,65 @@
+name = "DiscreteSturm"
+version = "0.1.0"
+defaultTargets = ["DiscreteSturm"]
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4.git"
+rev = "v4.34.0"
+
+[[lean_lib]]
+name = "JacobiSpectral"
+
+[[lean_lib]]
+name = "DiscreteSturm"
+
+[[lean_lib]]
+name = "JacobiDioph"
+
+[[lean_lib]]
+name = "JacobiBridge"
+
+[[lean_lib]]
+name = "JacobiUnconditional"
+
+[[lean_lib]]
+name = "JacobiPhysical"
+
+[[lean_lib]]
+name = "JacobiMatrixFinal"
+
+[[lean_lib]]
+name = "PeriodicJacobi"
+
+[[lean_lib]]
+name = "AsterCertificate"
+
+[[lean_lib]]
+name = "AsterNearest"
+
+[[lean_lib]]
+name = "AsterToyKernel"
+
+[[lean_lib]]
+name = "AsterSingularity"
+
+[[lean_lib]]
+name = "AsterFiniteEndpointEscape"
+
+[[lean_lib]]
+name = "AsterPublicProducer"
+
+[[lean_lib]]
+name = "AsterAccuracyCheckR0001"
+
+[[lean_lib]]
+name = "AsterLogFuelR0001"
+
+[[lean_lib]]
+name = "AsterFastProducerR0001"
+
+[[lean_lib]]
+name = "AsterEmitted3x3R0001"
+
+[[lean_lib]]
+name = "AsterLiteralIndependentCheckR0001"

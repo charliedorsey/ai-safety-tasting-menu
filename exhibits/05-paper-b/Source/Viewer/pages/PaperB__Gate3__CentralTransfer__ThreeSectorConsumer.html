@@ -1,0 +1,195 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LEAN/PaperB/Gate3/CentralTransfer/ThreeSectorConsumer.lean</title><style>body{background:#f9f8f4;color:#27332d;font:16px/1.5 Georgia,serif;margin:0}a{color:#2d6255}.wrap{max-width:1160px;margin:0 auto;padding:30px 24px}header{border-bottom:1px solid #d8ded7;margin-bottom:22px}h1{font-size:29px;font-weight:normal;overflow-wrap:anywhere}.meta,nav,th{font:13px/1.5 system-ui,sans-serif;color:#5b6b63}nav a{margin-right:18px}.tblwrap{overflow-x:auto}table{border-collapse:collapse;width:100%}td,th{padding:9px 12px;border-bottom:1px solid #e0e3de;text-align:left;vertical-align:top}td code{overflow-wrap:anywhere}code,pre{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}pre{font-size:12.5px;white-space:pre;overflow-x:auto;line-height:1.6;background:#fff;padding:12px;border:1px solid #e2e4df}.ln{color:#8b968e;padding-right:15px;user-select:none}.line{display:block}.focus{background:#e9f1ec}.line:target{outline:2px solid #276b54;outline-offset:1px;background:#f6f4e7}.legend{padding:12px 15px;background:#fff;border-left:2px solid #629280;margin:24px 0}@media(max-width:640px){.wrap{padding:18px 12px}h1{font-size:21px}td,th{padding:8px}.meta{font-size:11px}pre{font-size:11px}}</style></head><body><div class="wrap"><header><nav><a href="../source_index.html">All source waypoints</a><a href="../../../Docs/companion/reading_room/index.html">Reading room</a></nav><h1>LEAN/PaperB/Gate3/CentralTransfer/ThreeSectorConsumer.lean</h1><p class="meta">Exact archived source · SHA-256 e8502d4a400b3ef371e41b61140dc1480cadb3b934ecb55ea5c84d8df89a9ab9 · Original line numbers · Not a new Lean replay</p></header><p class="meta">Deep source proof text is reproduced verbatim for inspection; this page does not assert a compiler-derived proof-dependency graph.</p><pre><span class="line" id="L1"><span class="ln">    1</span>import PaperB.MirrorDance.VaelisFoldHighCardDissection</span>
+<span class="line" id="L2"><span class="ln">    2</span></span>
+<span class="line" id="L3"><span class="ln">    3</span>/-!</span>
+<span class="line" id="L4"><span class="ln">    4</span># Three-cardinality Central source assembly — Merivelle R0001</span>
+<span class="line" id="L5"><span class="ln">    5</span></span>
+<span class="line" id="L6"><span class="ln">    6</span>The original GoldC quarter-parent, strict cutoff, full decoration weights,</span>
+<span class="line" id="L7"><span class="ln">    7</span>ordered proper B partitions, central gate, and signed foldRow are not</span>
+<span class="line" id="L8"><span class="ln">    8</span>altered. The two cutoffs are arbitrary functions of h; no analytic estimate</span>
+<span class="line" id="L9"><span class="ln">    9</span>is imported and neither the middle signed estimate nor the literal R0056</span>
+<span class="line" id="L10"><span class="ln">   10</span>adapter is assumed.</span>
+<span class="line" id="L11"><span class="ln">   11</span></span>
+<span class="line" id="L12"><span class="ln">   12</span>Supplier obligation: each sector must be shown o(log h) with uniform-in-a</span>
+<span class="line" id="L13"><span class="ln">   13</span>quantifiers, after cutoffs are chosen with L &lt;= U.</span>
+<span class="line" id="L14"><span class="ln">   14</span>-/</span>
+<span class="line" id="L15"><span class="ln">   15</span></span>
+<span class="line" id="L16"><span class="ln">   16</span>open scoped BigOperators Classical</span>
+<span class="line" id="L17"><span class="ln">   17</span></span>
+<span class="line" id="L18"><span class="ln">   18</span>namespace Merivelle.Central</span>
+<span class="line" id="L19"><span class="ln">   19</span>open GoldC Finset</span>
+<span class="line" id="L20"><span class="ln">   20</span></span>
+<span class="line" id="L21"><span class="ln">   21</span>/-- The original source parents selected by the middle cardinality window.</span>
+<span class="line" id="L22"><span class="ln">   22</span>The filters are applied to actual quarterParents, before oriented summation. -/</span>
+<span class="line" id="L23"><span class="ln">   23</span>noncomputable def regionPairSumMiddle</span>
+<span class="line" id="L24"><span class="ln">   24</span>    (Jlow Jhigh q h : ℕ)</span>
+<span class="line" id="L25"><span class="ln">   25</span>    (gate : ℕ → ℕ → ℕ → Prop)</span>
+<span class="line" id="L26"><span class="ln">   26</span>    (d : Finset ℕ) (G : ℕ → ℕ → ℕ → ℝ) : ℝ :=</span>
+<span class="line" id="L27"><span class="ln">   27</span>  ∑ e ∈ (quarterParents q h (h / primeSetProduct d) d</span>
+<span class="line" id="L28"><span class="ln">   28</span>    ((h / primeSetProduct d) ^ 2 + 1)).filter</span>
+<span class="line" id="L29"><span class="ln">   29</span>      (fun e =&gt; Jlow ≤ e.card ∧ e.card &lt; Jhigh),</span>
+<span class="line" id="L30"><span class="ln">   30</span>    ∑ B ∈ ((e.powerset.erase e).erase ∅),</span>
+<span class="line" id="L31"><span class="ln">   31</span>      if gate (h / primeSetProduct d)</span>
+<span class="line" id="L32"><span class="ln">   32</span>          (primeSetProduct B) (primeSetProduct (e \ B)) then</span>
+<span class="line" id="L33"><span class="ln">   33</span>        omegaWeight e * G (h / primeSetProduct d)</span>
+<span class="line" id="L34"><span class="ln">   34</span>          (primeSetProduct B) (primeSetProduct (e \ B))</span>
+<span class="line" id="L35"><span class="ln">   35</span>      else 0</span>
+<span class="line" id="L36"><span class="ln">   36</span></span>
+<span class="line" id="L37"><span class="ln">   37</span>/-- Decorated, source-exact middle-cardinality sector. -/</span>
+<span class="line" id="L38"><span class="ln">   38</span>noncomputable def regionSumMiddle</span>
+<span class="line" id="L39"><span class="ln">   39</span>    (Jlow Jhigh q h : ℕ)</span>
+<span class="line" id="L40"><span class="ln">   40</span>    (gate : ℕ → ℕ → ℕ → Prop)</span>
+<span class="line" id="L41"><span class="ln">   41</span>    (F : ℕ → ℕ → ℕ → ℕ → ℝ) : ℝ :=</span>
+<span class="line" id="L42"><span class="ln">   42</span>  ∑ d ∈ regionDecorations q h,</span>
+<span class="line" id="L43"><span class="ln">   43</span>    decorationWeight h d *</span>
+<span class="line" id="L44"><span class="ln">   44</span>      regionPairSumMiddle Jlow Jhigh q h gate d (F (primeSetProduct d))</span>
+<span class="line" id="L45"><span class="ln">   45</span></span>
+<span class="line" id="L46"><span class="ln">   46</span>/-- Source-exact low-to-middle identity; no source support is enlarged. -/</span>
+<span class="line" id="L47"><span class="ln">   47</span>theorem regionPairSumCard_low_middle</span>
+<span class="line" id="L48"><span class="ln">   48</span>    (Jlow Jhigh q h : ℕ) (hord : Jlow ≤ Jhigh)</span>
+<span class="line" id="L49"><span class="ln">   49</span>    (gate : ℕ → ℕ → ℕ → Prop)</span>
+<span class="line" id="L50"><span class="ln">   50</span>    (d : Finset ℕ) (G : ℕ → ℕ → ℕ → ℝ) :</span>
+<span class="line" id="L51"><span class="ln">   51</span>    regionPairSumCard Jhigh false q h gate d G =</span>
+<span class="line" id="L52"><span class="ln">   52</span>      regionPairSumCard Jlow false q h gate d G +</span>
+<span class="line" id="L53"><span class="ln">   53</span>      regionPairSumMiddle Jlow Jhigh q h gate d G := by</span>
+<span class="line" id="L54"><span class="ln">   54</span>  classical</span>
+<span class="line" id="L55"><span class="ln">   55</span>  unfold regionPairSumCard regionPairSumMiddle</span>
+<span class="line" id="L56"><span class="ln">   56</span>  simp only [Bool.false_eq_true, ↓reduceIte, Finset.sum_filter]</span>
+<span class="line" id="L57"><span class="ln">   57</span>  rw [← Finset.sum_add_distrib]</span>
+<span class="line" id="L58"><span class="ln">   58</span>  apply Finset.sum_congr rfl</span>
+<span class="line" id="L59"><span class="ln">   59</span>  intro e he</span>
+<span class="line" id="L60"><span class="ln">   60</span>  by_cases hlo : e.card &lt; Jlow</span>
+<span class="line" id="L61"><span class="ln">   61</span>  · have hhi : e.card &lt; Jhigh := lt_of_lt_of_le hlo hord</span>
+<span class="line" id="L62"><span class="ln">   62</span>    simp [hlo, hhi, Nat.not_le_of_gt hlo]</span>
+<span class="line" id="L63"><span class="ln">   63</span>  · by_cases hhi : e.card &lt; Jhigh</span>
+<span class="line" id="L64"><span class="ln">   64</span>    · have hge : Jlow ≤ e.card := Nat.le_of_not_gt hlo</span>
+<span class="line" id="L65"><span class="ln">   65</span>      simp [hlo, hhi, hge]</span>
+<span class="line" id="L66"><span class="ln">   66</span>    · simp [hlo, hhi]</span>
+<span class="line" id="L67"><span class="ln">   67</span></span>
+<span class="line" id="L68"><span class="ln">   68</span>theorem regionSumCard_low_middle</span>
+<span class="line" id="L69"><span class="ln">   69</span>    (Jlow Jhigh q h : ℕ) (hord : Jlow ≤ Jhigh)</span>
+<span class="line" id="L70"><span class="ln">   70</span>    (gate : ℕ → ℕ → ℕ → Prop)</span>
+<span class="line" id="L71"><span class="ln">   71</span>    (F : ℕ → ℕ → ℕ → ℕ → ℝ) :</span>
+<span class="line" id="L72"><span class="ln">   72</span>    regionSumCard Jhigh false q h gate F =</span>
+<span class="line" id="L73"><span class="ln">   73</span>      regionSumCard Jlow false q h gate F +</span>
+<span class="line" id="L74"><span class="ln">   74</span>      regionSumMiddle Jlow Jhigh q h gate F := by</span>
+<span class="line" id="L75"><span class="ln">   75</span>  unfold regionSumCard regionSumMiddle</span>
+<span class="line" id="L76"><span class="ln">   76</span>  rw [← Finset.sum_add_distrib]</span>
+<span class="line" id="L77"><span class="ln">   77</span>  apply Finset.sum_congr rfl</span>
+<span class="line" id="L78"><span class="ln">   78</span>  intro d hd</span>
+<span class="line" id="L79"><span class="ln">   79</span>  rw [← mul_add]</span>
+<span class="line" id="L80"><span class="ln">   80</span>  rw [regionPairSumCard_low_middle Jlow Jhigh q h hord gate d</span>
+<span class="line" id="L81"><span class="ln">   81</span>    (F (primeSetProduct d))]</span>
+<span class="line" id="L82"><span class="ln">   82</span></span>
+<span class="line" id="L83"><span class="ln">   83</span>/-- All source parents, no cardinality omitted or double-counted. -/</span>
+<span class="line" id="L84"><span class="ln">   84</span>theorem regionSum_three_sectors</span>
+<span class="line" id="L85"><span class="ln">   85</span>    (Jlow Jhigh q h : ℕ) (hord : Jlow ≤ Jhigh)</span>
+<span class="line" id="L86"><span class="ln">   86</span>    (gate : ℕ → ℕ → ℕ → Prop)</span>
+<span class="line" id="L87"><span class="ln">   87</span>    (F : ℕ → ℕ → ℕ → ℕ → ℝ) :</span>
+<span class="line" id="L88"><span class="ln">   88</span>    regionSum q h gate F =</span>
+<span class="line" id="L89"><span class="ln">   89</span>      regionSumCard Jlow false q h gate F +</span>
+<span class="line" id="L90"><span class="ln">   90</span>      regionSumMiddle Jlow Jhigh q h gate F +</span>
+<span class="line" id="L91"><span class="ln">   91</span>      regionSumCard Jhigh true q h gate F := by</span>
+<span class="line" id="L92"><span class="ln">   92</span>  rw [regionSum_eq_low_add_high Jhigh q h gate F]</span>
+<span class="line" id="L93"><span class="ln">   93</span>  rw [regionSumCard_low_middle Jlow Jhigh q h hord gate F]</span>
+<span class="line" id="L94"><span class="ln">   94</span></span>
+<span class="line" id="L95"><span class="ln">   95</span>/-- THE physical signed combined saw-plus-potential row. Neither orientation</span>
+<span class="line" id="L96"><span class="ln">   96</span>nor any decoration is symmetrized or discarded. -/</span>
+<span class="line" id="L97"><span class="ln">   97</span>theorem foldedCentral_three_sectors</span>
+<span class="line" id="L98"><span class="ln">   98</span>    (Jlow Jhigh q a h : ℕ) (hord : Jlow ≤ Jhigh) :</span>
+<span class="line" id="L99"><span class="ln">   99</span>    regionSum q h (centralGate h) (foldRow q a) =</span>
+<span class="line" id="L100"><span class="ln">  100</span>      regionSumCard Jlow false q h (centralGate h) (foldRow q a) +</span>
+<span class="line" id="L101"><span class="ln">  101</span>      regionSumMiddle Jlow Jhigh q h (centralGate h) (foldRow q a) +</span>
+<span class="line" id="L102"><span class="ln">  102</span>      regionSumCard Jhigh true q h (centralGate h) (foldRow q a) :=</span>
+<span class="line" id="L103"><span class="ln">  103</span>  regionSum_three_sectors Jlow Jhigh q h hord</span>
+<span class="line" id="L104"><span class="ln">  104</span>    (centralGate h) (foldRow q a)</span>
+<span class="line" id="L105"><span class="ln">  105</span></span>
+<span class="line" id="L106"><span class="ln">  106</span>/-- Supplier-quantifier contract: fixed positive squarefree q, every</span>
+<span class="line" id="L107"><span class="ln">  107</span>admissible anchor a, original parity condition, and eventually in h. -/</span>
+<span class="line" id="L108"><span class="ln">  108</span>def SourceUniformSublog (S : ℕ → ℕ → ℕ → ℝ) : Prop :=</span>
+<span class="line" id="L109"><span class="ln">  109</span>  ∀ q : ℕ, 0 &lt; q → Squarefree q →</span>
+<span class="line" id="L110"><span class="ln">  110</span>    ∀ eps : ℝ, 0 &lt; eps →</span>
+<span class="line" id="L111"><span class="ln">  111</span>      ∃ H0 : ℕ, ∀ a h : ℕ,</span>
+<span class="line" id="L112"><span class="ln">  112</span>        q.Coprime a → 0 &lt; h → (¬ 2 ∣ q → 2 ∣ h) →</span>
+<span class="line" id="L113"><span class="ln">  113</span>        H0 ≤ h →</span>
+<span class="line" id="L114"><span class="ln">  114</span>        |S q a h| ≤ eps * Real.log (h : ℝ)</span>
+<span class="line" id="L115"><span class="ln">  115</span></span>
+<span class="line" id="L116"><span class="ln">  116</span>noncomputable def lowSector (Jlow : ℕ → ℕ) (q a h : ℕ) : ℝ :=</span>
+<span class="line" id="L117"><span class="ln">  117</span>  regionSumCard (Jlow h) false q h (centralGate h) (foldRow q a)</span>
+<span class="line" id="L118"><span class="ln">  118</span></span>
+<span class="line" id="L119"><span class="ln">  119</span>noncomputable def middleSector</span>
+<span class="line" id="L120"><span class="ln">  120</span>    (Jlow Jhigh : ℕ → ℕ) (q a h : ℕ) : ℝ :=</span>
+<span class="line" id="L121"><span class="ln">  121</span>  regionSumMiddle (Jlow h) (Jhigh h) q h (centralGate h) (foldRow q a)</span>
+<span class="line" id="L122"><span class="ln">  122</span></span>
+<span class="line" id="L123"><span class="ln">  123</span>noncomputable def highSector (Jhigh : ℕ → ℕ) (q a h : ℕ) : ℝ :=</span>
+<span class="line" id="L124"><span class="ln">  124</span>  regionSumCard (Jhigh h) true q h (centralGate h) (foldRow q a)</span>
+<span class="line" id="L125"><span class="ln">  125</span></span>
+<span class="line" id="L126"><span class="ln">  126</span>/-- Conditional consumer. LOW and HIGH may use positive estimates;</span>
+<span class="line" id="L127"><span class="ln">  127</span>MIDDLE must be a source-weighted signed o(log h) result. The conclusion</span>
+<span class="line" id="L128"><span class="ln">  128</span>is for the folded physical GoldC source, NOT YET the literal R0056 terminal.</span>
+<span class="line" id="L129"><span class="ln">  129</span>-/</span>
+<span class="line" id="L130"><span class="ln">  130</span>theorem foldedCentral_sublog_of_three</span>
+<span class="line" id="L131"><span class="ln">  131</span>    (Jlow Jhigh : ℕ → ℕ) (hord : ∀ h, Jlow h ≤ Jhigh h)</span>
+<span class="line" id="L132"><span class="ln">  132</span>    (hLow : SourceUniformSublog (lowSector Jlow))</span>
+<span class="line" id="L133"><span class="ln">  133</span>    (hMiddle : SourceUniformSublog (middleSector Jlow Jhigh))</span>
+<span class="line" id="L134"><span class="ln">  134</span>    (hHigh : SourceUniformSublog (highSector Jhigh)) :</span>
+<span class="line" id="L135"><span class="ln">  135</span>    SourceUniformSublog</span>
+<span class="line" id="L136"><span class="ln">  136</span>      (fun q a h =&gt; regionSum q h (centralGate h) (foldRow q a)) := by</span>
+<span class="line" id="L137"><span class="ln">  137</span>  intro q hq hsq eps heps</span>
+<span class="line" id="L138"><span class="ln">  138</span>  let delta : ℝ := eps / 3</span>
+<span class="line" id="L139"><span class="ln">  139</span>  have hdelta : 0 &lt; delta := by dsimp [delta]; positivity</span>
+<span class="line" id="L140"><span class="ln">  140</span>  obtain ⟨Hlow, hlow⟩ := hLow q hq hsq delta hdelta</span>
+<span class="line" id="L141"><span class="ln">  141</span>  obtain ⟨Hmid, hmid⟩ := hMiddle q hq hsq delta hdelta</span>
+<span class="line" id="L142"><span class="ln">  142</span>  obtain ⟨Hhigh, hhigh⟩ := hHigh q hq hsq delta hdelta</span>
+<span class="line" id="L143"><span class="ln">  143</span>  refine ⟨max (max Hlow Hmid) Hhigh, ?_⟩</span>
+<span class="line" id="L144"><span class="ln">  144</span>  intro a h hqa hh hpar hH</span>
+<span class="line" id="L145"><span class="ln">  145</span>  have hHlow : Hlow ≤ h :=</span>
+<span class="line" id="L146"><span class="ln">  146</span>    le_trans (le_max_left Hlow Hmid)</span>
+<span class="line" id="L147"><span class="ln">  147</span>      (le_trans (le_max_left (max Hlow Hmid) Hhigh) hH)</span>
+<span class="line" id="L148"><span class="ln">  148</span>  have hHmid : Hmid ≤ h :=</span>
+<span class="line" id="L149"><span class="ln">  149</span>    le_trans (le_max_right Hlow Hmid)</span>
+<span class="line" id="L150"><span class="ln">  150</span>      (le_trans (le_max_left (max Hlow Hmid) Hhigh) hH)</span>
+<span class="line" id="L151"><span class="ln">  151</span>  have hHhigh : Hhigh ≤ h :=</span>
+<span class="line" id="L152"><span class="ln">  152</span>    le_trans (le_max_right (max Hlow Hmid) Hhigh) hH</span>
+<span class="line" id="L153"><span class="ln">  153</span>  have hl := hlow a h hqa hh hpar hHlow</span>
+<span class="line" id="L154"><span class="ln">  154</span>  have hm := hmid a h hqa hh hpar hHmid</span>
+<span class="line" id="L155"><span class="ln">  155</span>  have hu := hhigh a h hqa hh hpar hHhigh</span>
+<span class="line" id="L156"><span class="ln">  156</span>  change</span>
+<span class="line" id="L157"><span class="ln">  157</span>    |regionSumCard (Jlow h) false q h (centralGate h) (foldRow q a)| ≤</span>
+<span class="line" id="L158"><span class="ln">  158</span>      delta * Real.log (h : ℝ) at hl</span>
+<span class="line" id="L159"><span class="ln">  159</span>  change</span>
+<span class="line" id="L160"><span class="ln">  160</span>    |regionSumMiddle (Jlow h) (Jhigh h) q h (centralGate h)</span>
+<span class="line" id="L161"><span class="ln">  161</span>      (foldRow q a)| ≤ delta * Real.log (h : ℝ) at hm</span>
+<span class="line" id="L162"><span class="ln">  162</span>  change</span>
+<span class="line" id="L163"><span class="ln">  163</span>    |regionSumCard (Jhigh h) true q h (centralGate h) (foldRow q a)| ≤</span>
+<span class="line" id="L164"><span class="ln">  164</span>      delta * Real.log (h : ℝ) at hu</span>
+<span class="line" id="L165"><span class="ln">  165</span>  change |regionSum q h (centralGate h) (foldRow q a)| ≤</span>
+<span class="line" id="L166"><span class="ln">  166</span>    eps * Real.log (h : ℝ)</span>
+<span class="line" id="L167"><span class="ln">  167</span>  rw [foldedCentral_three_sectors (Jlow h) (Jhigh h) q a h (hord h)]</span>
+<span class="line" id="L168"><span class="ln">  168</span>  calc</span>
+<span class="line" id="L169"><span class="ln">  169</span>    _ ≤</span>
+<span class="line" id="L170"><span class="ln">  170</span>      |regionSumCard (Jlow h) false q h (centralGate h) (foldRow q a)| +</span>
+<span class="line" id="L171"><span class="ln">  171</span>      |regionSumMiddle (Jlow h) (Jhigh h) q h</span>
+<span class="line" id="L172"><span class="ln">  172</span>         (centralGate h) (foldRow q a)| +</span>
+<span class="line" id="L173"><span class="ln">  173</span>      |regionSumCard (Jhigh h) true q h (centralGate h) (foldRow q a)| := by</span>
+<span class="line" id="L174"><span class="ln">  174</span>        have h1 := abs_add_le</span>
+<span class="line" id="L175"><span class="ln">  175</span>          (regionSumCard (Jlow h) false q h (centralGate h) (foldRow q a) +</span>
+<span class="line" id="L176"><span class="ln">  176</span>           regionSumMiddle (Jlow h) (Jhigh h) q h</span>
+<span class="line" id="L177"><span class="ln">  177</span>             (centralGate h) (foldRow q a))</span>
+<span class="line" id="L178"><span class="ln">  178</span>          (regionSumCard (Jhigh h) true q h</span>
+<span class="line" id="L179"><span class="ln">  179</span>            (centralGate h) (foldRow q a))</span>
+<span class="line" id="L180"><span class="ln">  180</span>        have h2 := abs_add_le</span>
+<span class="line" id="L181"><span class="ln">  181</span>          (regionSumCard (Jlow h) false q h (centralGate h) (foldRow q a))</span>
+<span class="line" id="L182"><span class="ln">  182</span>          (regionSumMiddle (Jlow h) (Jhigh h) q h</span>
+<span class="line" id="L183"><span class="ln">  183</span>            (centralGate h) (foldRow q a))</span>
+<span class="line" id="L184"><span class="ln">  184</span>        linarith</span>
+<span class="line" id="L185"><span class="ln">  185</span>    _ ≤ delta * Real.log (h : ℝ) +</span>
+<span class="line" id="L186"><span class="ln">  186</span>        delta * Real.log (h : ℝ) +</span>
+<span class="line" id="L187"><span class="ln">  187</span>        delta * Real.log (h : ℝ) := by</span>
+<span class="line" id="L188"><span class="ln">  188</span>          gcongr</span>
+<span class="line" id="L189"><span class="ln">  189</span>    _ = eps * Real.log (h : ℝ) := by dsimp [delta]; ring</span>
+<span class="line" id="L190"><span class="ln">  190</span></span>
+<span class="line" id="L191"><span class="ln">  191</span>#print axioms regionSum_three_sectors</span>
+<span class="line" id="L192"><span class="ln">  192</span>#print axioms foldedCentral_three_sectors</span>
+<span class="line" id="L193"><span class="ln">  193</span>#print axioms foldedCentral_sublog_of_three</span>
+<span class="line" id="L194"><span class="ln">  194</span>end Merivelle.Central</span>
+</pre></div></body></html>

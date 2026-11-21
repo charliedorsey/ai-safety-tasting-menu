@@ -1,0 +1,1599 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1.08in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{aliascnt}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage[hidelinks]{hyperref}
+\usepackage[nameinlink,noabbrev]{cleveref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newaliascnt{proposition}{theorem}
+\newtheorem{proposition}[proposition]{Proposition}
+\aliascntresetthe{proposition}
+\newaliascnt{lemma}{theorem}
+\newtheorem{lemma}[lemma]{Lemma}
+\aliascntresetthe{lemma}
+\newaliascnt{corollary}{theorem}
+\newtheorem{corollary}[corollary]{Corollary}
+\aliascntresetthe{corollary}
+\theoremstyle{definition}
+\newaliascnt{definition}{theorem}
+\newtheorem{definition}[definition]{Definition}
+\aliascntresetthe{definition}
+\theoremstyle{remark}
+\newaliascnt{remark}{theorem}
+\newtheorem{remark}[remark]{Remark}
+\aliascntresetthe{remark}
+
+\newcommand{\SSer}{\mathfrak S}
+\newcommand{\Dcal}{\mathcal D}
+\newcommand{\Bcal}{\mathcal B}
+\newcommand{\Xcal}{\mathcal X}
+\newcommand{\Rcal}{\mathcal R}
+\newcommand{\Ecal}{\mathcal E}
+\newcommand{\rad}{\operatorname{rad}}
+\newcommand{\e}{\mathrm e}
+\newcommand{\ep}{\varepsilon}
+\newcommand{\1}{\mathbf 1}
+\newcommand{\Om}{\Omega}
+\newcommand{\om}{\omega}
+\newcommand{\ph}{\varphi}
+\newcommand{\llog}{\log\log}
+\newcommand{\supp}{\mathrm{supp}}
+\newcommand{\free}{\mathrm{free}}
+\newcommand{\modthree}{\chi_3}
+
+\title{Boolean CRT Fibers in an Anchored Singular-Series Sum}
+\author{Charlie Dorsey}
+\date{September 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+For even $h$, we compare the singular series of the anchored triple $\{0,y,h\}$ with that of the anchor pair $\{0,h\}$ and subtract the corresponding free pair fluctuation.  We prove that the resulting quantity $M(h)$ satisfies
+\[
+M(h)=o(\log h)
+\]
+pointwise as $h\to\infty$.  The central step is a Boolean--CRT organization of the two-dimensional divisor sum.  After fixing a squarefree product $m=e_1e_2$, all coprime factorizations are assembled before estimation and identified, by the Chinese remainder theorem, with the Boolean cube of idempotents modulo $m$.  A complete-unit second moment of this fiber, combined with Shiu's theorem for multiplicative functions, yields the height exponent $0.9617240306\ldots<1$.  The complementary range is treated by weighted completion and reciprocal exponential-sum estimates, with van der Corput and Karatsuba controlling the fast regime.  An exact reflection identity reduces the remaining one-dimensional boundary to a Walfisz--P\'etermann estimate.  The argument is asymptotic and does not yield a useful finite-height estimate; the strict exponent margin becomes dominant only at astronomically large heights.
+\end{abstract}
+
+\section{Introduction}\label{sec:introduction}
+
+For a finite set $\mathcal H\subset\mathbb Z$, its Hardy--Littlewood singular series is
+\[
+\SSer(\mathcal H)
+ =\prod_p\left(1-\frac{\nu_p(\mathcal H)}p\right)
+       \left(1-\frac1p\right)^{-|\mathcal H|},
+\]
+where $\nu_p(\mathcal H)$ is the number of residue classes occupied by $\mathcal H$ modulo $p$; as usual the product is zero when $\mathcal H$ is inadmissible.  Fix an even integer $h$.  For $0<y<h$ define the anchored ratio
+\begin{equation}\label{eq:R-def}
+R_h(y):=\frac{\SSer(\{0,y,h\})}{\SSer(\{0,h\})},
+\end{equation}
+and set
+\begin{equation}\label{eq:S-M-def}
+S(h):=\sum_{0<y<h}\bigl(\SSer(\{0,y\})-1\bigr),
+\qquad
+T(h):=\sum_{0<y<h}\bigl(R_h(y)-1\bigr),
+\qquad
+M(h):=T(h)-2S(h).
+\end{equation}
+The ratio $R_h(y)$ measures the singular-series change produced by inserting the point $y$ between the fixed anchors $0$ and $h$, normalized by the anchor pair itself.  The sum $S(h)$ is the corresponding unanchored pair fluctuation.  Thus $M(h)$ is the residual after subtracting twice this pair fluctuation from the anchored fluctuation $T(h)$.  The question is whether that residual can still carry a logarithmic main term for a single even height $h$.  The theorem below shows that it cannot.
+
+\begin{theorem}\label{thm:main}
+As $h\to\infty$ through even integers,
+\[
+M(h)=o(\log h).
+\]
+\end{theorem}
+
+The difficulty is pointwise.  At a fixed height, expansion of the Euler product in \cref{eq:R-def} produces a two-dimensional family of progression discrepancies indexed by coprime divisors $(e_1,e_2)$.  Estimating those rows independently loses too much: the near-critical logarithmic contribution comes from the region in which both divisor variables are small, precisely where neither variable supplies enough oscillation on its own.
+
+The main observation is to postpone estimation.  Fix the squarefree product
+\[
+m=e_1e_2=p_1\cdots p_r.
+\]
+Because $(e_1,e_2)=1$, choosing the ordered factorization $m=e_1e_2$ is exactly the choice, for each prime $p_i$, of whether $p_i$ belongs to $e_1$ or to $e_2$.  The $2^r$ factorizations therefore form the Boolean cube $\{0,1\}^r$.  The Chinese remainder theorem sends this cube to the idempotents
+\[
+\mathcal U(m)=\{u\bmod m:u^2\equiv u\pmod m\}.
+\]
+After all factorizations with fixed product $m$ are assembled, the original progression roots become a discrepancy of this finite CRT fiber.  A complete-unit second moment of its Fourier transform can then be computed prime by prime.  Combined with Shiu's Brun--Titchmarsh theorem for multiplicative functions and a weighted Cauchy argument, this gives the logarithmic saving that row-by-row estimation misses.
+
+That Boolean argument handles the small two-dimensional range.  Its complement has a different geometry.  When one modulus is sufficiently long we use weighted completion.  Otherwise reciprocity transfers the oscillation to the shorter modulus.  Slowly varying reciprocal phases are completed after separating an exceptional region that contains every fully resonant slow row; rapidly varying phases are opened by an exact divisor convolution and treated by van der Corput below the transition $A_D=N_D^2$ and by Karatsuba above it.  Finally, reflection converts the genuinely one-dimensional boundary into the same floor-error problem that governs $S(h)$, where a Walfisz--P\'etermann estimate supplies the required cancellation.
+
+The proof therefore has four structural stages:
+\begin{enumerate}
+\item an exact divisor expansion and reduction to centered two-dimensional discrepancies;
+\item fixed-product Boolean--CRT aggregation in the small range;
+\item completion and reciprocal cancellation in the complementary range;
+\item reflection and P\'etermann's estimate on the one-dimensional boundary.
+\end{enumerate}
+Every definition needed for \cref{thm:main} is given here.  The quantity $M(h)$ is the fixed $k=1$ anchored term in the completed hierarchy considered in the predecessor manuscript~\cite{DorseySecondLayer2026}, but no result from that hierarchy is used as a substitute for the arguments below.  The scope of the theorem is limited: it does not prove a growing-rank statement or an all-orders diagonal-tail estimate.
+
+We write
+\begin{equation}\label{eq:e-psi}
+\e(t):=\exp(2\pi i t),
+\qquad
+\psi(t):=t-\lfloor t\rfloor-\frac12.
+\end{equation}
+The notation $L:=\log h$ will be used throughout.  The remaining global scales are introduced in \cref{sec:shiu-small-box}, when they first acquire a role in the proof.
+
+\section{From the singular series to divisor discrepancies}\label{sec:exact-expansion}
+
+The first step is algebraic.  We expand the Euler factors at primes $p\ge5$ while leaving the primes $2$ and $3$ intact.  A selected high prime is attached either to the condition $p\mid y$ or to $p\mid h-y$, and the surviving terms are therefore indexed by a coprime pair $(e_1,e_2)$.  The error from replacing each progression by its density is the centered two-dimensional discrepancy on which the analytic part of the proof acts.
+
+\subsection{High-prime weights}
+For $p\ge5$ set
+\[
+c_0(p)=\frac{p(p-3)}{(p-1)(p-2)},\qquad
+c_1(p)=\frac{p(p-2)}{(p-1)^2},
+\]
+and
+\begin{equation}\label{eq:Cstar}
+C^*(h)=\prod_{\substack{p\ge5\\p\nmid h}}c_0(p)
+       \prod_{\substack{p\ge5\\p\mid h}}c_1(p).
+\end{equation}
+Since $c_0(p)=1+O(p^{-2})$, $c_1(p)=1+O(p^{-2})$, and
+$c_1(p)/c_0(p)=1+O(p^{-2})$, the product in \cref{eq:Cstar} is
+bounded above and below by positive absolute constants, uniformly in $h$.
+On squarefree integers supported on primes at least $5$, put
+\begin{equation}\label{eq:weights}
+\om(e)=\prod_{p\mid e}\frac1{p-3},\qquad
+v_h(e)=\om_{1,h}(e)
+ =\prod_{\substack{p\mid e\\p\nmid h}}\frac1{p-3}
+  \prod_{\substack{p\mid e\\p\mid h}}\frac1{p-2},
+\end{equation}
+and set these functions to zero off that support.
+
+The primes $2$ and $3$ are not expanded.  For even $h$ their exact local
+factor is
+\begin{equation}\label{eq:w23}
+w_{23,h}(y)=
+\begin{cases}
+0,&2\nmid y,\\
+3,&2\mid y,\ 3\mid h,\ 3\mid y,\\
+\frac32,&2\mid y,\ 3\mid h,\ 3\nmid y,\\
+3,&2\mid y,\ 3\nmid h,\ 3\mid y(h-y),\\
+0,&2\mid y,\ 3\nmid h,\ 3\nmid y(h-y).
+\end{cases}
+\end{equation}
+It is periodic modulo $6$, symmetric under $y\mapsto h-y$, has exact mean
+one on complete periods, and is invariant under multiplication of both $h$
+and $y$ by a unit modulo $6$.  Define
+\begin{equation}\label{eq:Delta-def}
+N_w(h;e_1,e_2)
+ :=\sum_{\substack{0<y<h\\e_1\mid y\\e_2\mid h-y}}w_{23,h}(y),
+\qquad
+\Delta_w(h;e_1,e_2)
+ :=N_w(h;e_1,e_2)-\frac{h-1}{e_1e_2}.
+\end{equation}
+The Euler expansion of the local factors gives the exact identity
+\begin{equation}\label{eq:T-pair-expansion}
+T(h):=\sum_{0<y<h}(R_h(y)-1)
+ =C^*(h)
+ \sum_{\substack{e_1,e_2\ge1\\(e_1,e_2)=1\\(e_2,h)=1}}
+ v_h(e_1)\om(e_2)\Delta_w(h;e_1,e_2).
+\end{equation}
+All sums in \cref{eq:T-pair-expansion} are over the support just specified.  We write
+\[
+\rad_{\ge5}(h):=\prod_{\substack{p\mid h\\p\ge5}}p.
+\]
+The identity \cref{eq:T-pair-expansion} follows by expanding the local ratio prime by prime: for $p\ge5$, a prime not dividing $h$ contributes the baseline $c_0(p)$ and the selector $1+(p-3)^{-1}$ when it divides $y(h-y)$; a prime dividing $h$ contributes the baseline $c_1(p)$ and the selector $1+(p-2)^{-1}$ when it divides $y$.  The two selectors cannot choose the same prime when $p\nmid h$, and the second coordinate is therefore coprime to $h$.  The primes $2,3$ are left unexpanded in $w_{23,h}$.
+
+\subsection{The divisor families and height-prime rows}\label{sec:family-decomposition}
+Write $C,P_1,P_2,G,D$ for the contributions to \cref{eq:T-pair-expansion} with, respectively,
+\[
+(e_1,e_2)=(1,1),\quad e_2=1<e_1,\quad e_1=1<e_2,
+\]
+\[
+e_1,e_2>1,\ (e_1,h)=1,\qquad
+ e_1,e_2>1,\ (e_1,h)>1.
+\]
+The family $D$ contains the rows in which the first divisor meets the fixed height.  For such a row write uniquely
+\[
+e_1=da,\qquad d=(e_1,h)>1,\qquad (a,h)=1.
+\]
+This separates the height-supported part $d$ from the remaining free divisor $a$.  We then split
+\begin{equation}\label{eq:degenerate-split}
+D(h)=D_1(h)+D_{2D}(h),
+\end{equation}
+according as $a=1$ or $a>1$.  The distinction is structural: $D_1$ has only one free divisor and will join the one-dimensional boundary in \cref{sec:one-dimensional}, whereas $D_{2D}$ still contains the free pair $(a,e_2)$ and remains a two-dimensional family after its height is rescaled.
+
+The corner family satisfies
+\begin{equation}\label{eq:corner-bound}
+C(h)=C^*(h)\Delta_w(h;1,1)=O(1),
+\end{equation}
+because \cref{eq:w23} has period $6$ and mean one.
+
+\begin{lemma}[Exact decorated-height reduction]\label{lem:decorated-reduction}
+Let $e_1=da$ with $d=(e_1,h)$, and put $H^\sharp=h/d$.  Then
+\begin{equation}\label{eq:decorated-root}
+N_w(h;da,e_2)=N_w(H^\sharp;a,e_2),
+\end{equation}
+\begin{equation}\label{eq:decorated-discrepancy}
+\Delta_w(h;da,e_2)
+ =\Delta_w(H^\sharp;a,e_2)-\frac{d-1}{dae_2},
+\end{equation}
+and
+\begin{equation}\label{eq:decorated-weight}
+v_h(da)=\kappa(d)\om(a),\qquad
+\kappa(d):=\prod_{p\mid d}\frac1{p-2}.
+\end{equation}
+Moreover
+\begin{equation}\label{eq:decoration-norm}
+\sum_{d\mid\rad_{\ge5}(h)}\kappa(d)\ll\llog h.
+\end{equation}
+\end{lemma}
+
+The reduction changes the centered density by the explicit second term in \cref{eq:decorated-discrepancy}.  Its total contribution over the two-dimensional decorated family is already negligible.  Indeed, using
+$(d-1)/d\le1$ and dropping coprimality restrictions,
+\begin{equation}\label{eq:decorated-density-correction}
+\sum_{d\mid\rad_{\ge5}(h)}\kappa(d)
+ \sum_{a,e_2\ge1}\frac{\om(a)\om(e_2)}{ae_2}
+ \ll \llog h,
+\end{equation}
+because $\sum_m\om(m)/m<\infty$.  Thus only the reduced centered kernel in
+\cref{eq:decorated-discrepancy} enters the oscillatory analysis.
+
+\subsection{Parity reduction and the deterministic term}\label{sec:parity}
+For odd $a,b$ define the centered progression discrepancy
+\begin{equation}\label{eq:D-def}
+D(a,b;n)=\#\{0<y<n:a\mid y,\ b\mid n-y\}-\frac{n}{ab}.
+\end{equation}
+For $(e_1e_2,6)=1$ define
+\begin{equation}\label{eq:B-def}
+\Bcal(e_1,e_2;n)=
+\begin{cases}
+\frac34D(e_1,e_2;n)+\frac34D(3e_1,e_2;n),&3\mid n,\\[1mm]
+\frac32D(3e_1,e_2;n)+\frac32D(e_1,3e_2;n),&3\nmid n.
+\end{cases}
+\end{equation}
+
+\begin{lemma}[Exact parity reduction]\label{lem:parity-reduction}
+For $h=2n$ and every admissible high-prime pair,
+\begin{equation}\label{eq:parity-reduction}
+\boxed{\Delta_w(2n;e_1,e_2)
+ =2\Bcal(e_1,e_2;n)+\frac1{e_1e_2}.}
+\end{equation}
+The contribution of the last term is $O(1)$ on the ordinary generic family and $O(\llog h)$ after the outer decorated-row sum.
+\end{lemma}
+
+The rest of the two-dimensional analysis concerns the centered kernel $\Bcal$.  Two height variables will coexist from this point on.  The ambient height $h$ determines $L=\log h$, the global cutoffs introduced later, and the set of height primes.  The symbol $H$ denotes the row height of the centered progression discrepancy: $H=h/2$ for an ordinary row, while a decorated row has pre-parity height $H^\sharp=h/d$ and row height
+\[
+H=H^\sharp/2=\frac{h}{2d}.
+\]
+All root counts and oscillatory phases use this row height $H$.
+
+\section{Boolean CRT fibers}\label{sec:boolean}
+
+\subsection{Fixed-product completion}
+Let $m$ be squarefree, supported on primes $p\ge5$, and coprime to the row height $H$.  Write $m=p_1\cdots p_r$.  An ordered coprime factorization $m=e_1e_2$ is determined by deciding, independently at every $p_i$, whether $p_i\mid e_1$ or $p_i\mid e_2$.  Thus the factorizations form a Boolean cube with $2^{\Om(m)}$ vertices.  CRT realizes the same cube as
+\[
+\mathcal U(m)=\{u\bmod m:u^2\equiv u\pmod m\},
+\]
+where the vertex corresponding to $m=e_1e_2$ is the idempotent satisfying $u\equiv0\pmod{e_1}$ and $u\equiv1\pmod{e_2}$.  Put
+\[
+P(m):=2^{\Om(m)},\qquad r:=H\bmod m\in\{1,\ldots,m-1\}.
+\]
+Define the fixed-product discrepancy
+\begin{equation}\label{eq:boolean-discrepancy}
+\Dcal_m(H)
+ :=\frac1{P(m)}\#\{u\in\mathcal U(m):(Hu\bmod m)<r\}-\frac rm.
+\end{equation}
+
+\begin{lemma}[Boolean fixed-product normalization]\label{lem:boolean-normalization}
+For the centered discrepancy \cref{eq:D-def},
+\begin{equation}\label{eq:boolean-normalization}
+\boxed{\sum_{e_1e_2=m}D(e_1,e_2;H)
+      =P(m)\Dcal_m(H)-1.}
+\end{equation}
+Consequently the restriction to proper ordered partitions $e_1,e_2>1$ changes $P(m)\Dcal_m(H)$ by $O(1)$ for each $m$.  After the arithmetic weight and summation over $m\le Z$, these endpoint terms contribute $O(\log Z)=o(L)$.
+\end{lemma}
+
+The term $-1$ in \cref{eq:boolean-normalization} is the contribution of the zero idempotent to the least-positive-representative convention.  It is an identity-level endpoint term; after summation over products it remains below logarithmic scale.
+
+\subsection{Fourier transform and the unit second moment}
+Set $x=2u-1$.  Then $u^2\equiv u\pmod m$ is equivalent to $x^2\equiv1\pmod m$.  With
+\begin{equation}\label{eq:V-def}
+V(t;m):=\frac1{2^{\Om(m)}}\sum_{x^2\equiv1\ (m)}\e\!\left(\frac{tx}{m}\right),
+\end{equation}
+the idempotent Fourier transform has the same absolute value after the invertible change $t\mapsto 2^{-1}t$.
+
+\begin{lemma}[Complete-unit Boolean second moment]\label{lem:boolean-second-moment}
+Let $s$ be squarefree, supported on primes at least $5$, and suppose $(H,s)=1$.  Then for every integer $j$,
+\begin{equation}\label{eq:boolean-second-moment}
+\frac1{\ph(s)}\sum_{a\in(\mathbb Z/s\mathbb Z)^\times}
+ |V(Hja;s)|^2
+ =\prod_{\substack{p\mid s\\p\nmid j}}
+ \frac{p-2}{2(p-1)}.
+\end{equation}
+\end{lemma}
+
+For a prime $p\mid s$ with $p\nmid j$, the local factor in \cref{eq:boolean-second-moment} is
+\[
+\frac{p-2}{2(p-1)}=\frac12+O(p^{-1}).
+\]
+Thus every nonresonant prime contributes essentially one factor $1/2$ to the squared Fourier mass.  This primewise contraction is the gain that becomes available only after the divisor factorizations have been assembled into the fixed-product fiber.
+
+\section{The Boolean range and the logarithmic margin}\label{sec:shiu-small-box}
+
+The Boolean fiber estimate is the only part of the proof whose logarithmic exponent comes close to $1$.  It combines the complete-unit second moment from \cref{lem:boolean-second-moment} with a short-interval distribution estimate for multiplicative weights.  We therefore introduce the global scales at the point where they enter that balance:
+\begin{equation}
+\begin{gathered}
+\sigma:=\frac23+0.01,
+\qquad
+\rho:=0.60,\\
+W:=\exp(L^\sigma),
+\qquad
+T_{\rm comp}:=\exp(L^\rho).
+\end{gathered}
+\label{eq:global-parameters}
+\end{equation}
+We take
+\begin{equation}
+X:=T_{\rm comp}^{3}W^2,\qquad Z:=X^2.
+\label{eq:XZ}
+\end{equation}
+Here $W$ is the Walfisz-scale cutoff governing the Boolean range, $T_{\rm comp}$ is the buffer required by the completion argument in \cref{sec:exterior}, $X$ bounds each divisor variable in the small box, and $Z=X^2$ is the product scale after fixed-product aggregation.  These quantities depend on the ambient height $h$; a reduced row height $H$ never changes them.
+
+\begin{lemma}[Shiu in the required range]\label{lem:shiu-required}
+Let $f$ be a nonnegative multiplicative function such that, for some fixed
+$A_1>0$,
+\[
+f(p^\ell)\le A_1^\ell\qquad(p\text{ prime},\ \ell\ge1),
+\]
+and for every $\varepsilon>0$ there is $A_2(\varepsilon)$ with
+$f(n)\le A_2(\varepsilon)n^\varepsilon$.  Shiu's theorem~\cite{Shiu1980}
+is stated for fixed $0<\alpha,\beta<1/2$; we use it only with
+\[
+\alpha=\beta=\frac14,
+\]
+so that for $x^\beta<y\le x$, $q<y^{1-\alpha}$ and $(a,q)=1$,
+\begin{equation}\label{eq:shiu}
+\sum_{\substack{x-y<n\le x\\n\equiv a\ (q)}}f(n)
+ \ll
+ \frac{y}{\ph(q)\log x}
+ \exp\!\left(\sum_{\substack{p\le x\\p\nmid q}}\frac{f(p)}p\right).
+\end{equation}
+The implied constant is uniform for the moving rough functions used below.  When $q=1$ we use the modulus-one corollary obtained by the same proof after deleting the congruence restriction.  We set $f(1)=1$ and, when needed, $P^-(1)=\infty$.
+\end{lemma}
+
+The dyadic argument splits a product $m$ into a smooth part and a rough part.  The smooth primes are handled by the complete-unit second moment, while the rough factor is counted in residue classes by \cref{lem:shiu-required}.  Set
+\[
+\theta=0.99,\qquad a:=1-\frac\theta2=0.505,
+\qquad Y=\exp((\log M)^\theta).
+\]
+The weighted first moment on a dyadic interval is
+\begin{equation}\label{eq:Ax}
+A_x(M):=\sum_{m\asymp M}\om(m)x^{\Om(m)}
+ \ll (\log M)^{x-1}.
+\end{equation}
+For the unit-class transform split $m=sr$, where all primes of $s$ are at most $Y$ and all primes of $r$ exceed $Y$.  The good range $s\le M^{0.01}$ is treated in progressions modulo $s$ by \cref{lem:shiu-required}, and the bad range by Rankin's trick.  The two moments enter a weighted Cauchy inequality with reciprocal tilts $x$ and $v$ constrained by $xv=4$.  Optimizing the resulting logarithmic exponent gives
+\[
+x_0=2\sqrt a,
+\qquad
+v_0=\frac{2}{\sqrt a},
+\qquad
+x_0v_0=4.
+\]
+For a row height $H$, write
+\[
+B_v(M):=\sum_{m\asymp M}\om(m)v^{\Om(m)}|\Dcal_m(H)|^2.
+\]
+With the optimizing choice above,
+\begin{equation}\label{eq:Bv}
+B_{v_0}(M)\ll (\llog M)^C(\log M)^{v_0a-1}.
+\end{equation}
+Erd\H{o}s--Tur\'an is truncated at $(\log M)^2$; primes dividing its Fourier frequency produce only an additional power of $\llog M$ through \cref{eq:boolean-second-moment}.  Weighted Cauchy, with the reciprocal tilts $x_0$ and $v_0$, therefore yields, for
+\[
+T_B(M):=\sum_{m\asymp M}\om(m)2^{\Om(m)}|\Dcal_m(H)|,
+\]
+\begin{equation}\label{eq:boolean-dyadic}
+T_B(M)\ll (\llog M)^C(\log M)^{2\sqrt a-1}.
+\end{equation}
+
+\begin{proposition}[Boolean hyperbolic bound]\label{prop:boolean-hyperbolic}
+Uniformly for row heights $H\le h$ and squarefree products $R$ of forbidden high primes,
+\begin{equation}\label{eq:boolean-hyperbolic}
+\sum_{\substack{1<m\le Z\\(m,HR)=1}}\om(m)2^{\Om(m)}|\Dcal_m(H)|
+ \ll (\llog Z)^C(\log Z)^{2\sqrt a}+O(\log Z).
+\end{equation}
+Summing the dyadic product blocks introduces one further power of $\log Z$, so the dyadic exponent $2\sqrt a-1$ becomes the global product exponent $2\sqrt a$.  Since $\log Z=4L^\sigma+6L^\rho$ and $\rho<\sigma$, \cref{eq:XZ} gives
+\begin{equation}\label{eq:boolean-exponent}
+(\llog Z)^C(\log Z)^{2\sqrt a}
+ =L^{\sigma 2\sqrt a+o(1)}.
+\end{equation}
+Numerically,
+\begin{equation}\label{eq:boolean-numerics}
+a=0.505,
+\qquad
+2\sqrt a=1.421267040\ldots,
+\qquad
+\sigma 2\sqrt a=0.9617240306403449\ldots<1.
+\end{equation}
+\end{proposition}
+
+The square $e_1,e_2\le X$ is filled to $e_1e_2\le Z=X^2$ before fixed-product aggregation.  The added hyperbolic region has $\max(e_1,e_2)>X$ and is part of the exterior treated next.  Thus \cref{prop:boolean-hyperbolic} gives $o(L)$ for the original small box, modulo that exterior subtraction and the finitely many $p=3$ linear combinations in \cref{eq:B-def}; the latter alter only fixed constants.
+
+\section{Beyond the Boolean range}\label{sec:exterior}
+
+\subsection{Heights, weights, and direct completion}\label{sec:exterior-parameters}
+The hyperbolic complement of the Boolean box is controlled according to the amount and location of its oscillation.  On a dyadic block, order the divisor variables so that the shorter one is $u\asymp U$ and the longer one is $q\asymp V$, with $U\le V$ and $V>X$.  If $U$ is long enough relative to $V$, weighted completion is immediate.  If not, reciprocity moves the principal oscillation to modulus $u$; the resulting phase is then treated according to its speed.
+
+Set
+\[
+K:=L^{10}.
+\]
+This is the Fourier cutoff used when the progression discrepancy is expanded by Vaaler's approximation; it also bounds the frequency $k$ in the reciprocal analysis.
+
+Throughout this section $h$ continues to denote the ambient height entering $L$, $K$, $W$, $T_{\rm comp}$ and $X$, while $H$ denotes the row height, with $1\le H\le h$.  A squarefree integer $R\mid\rad_{\ge5}(h)$ records forbidden height primes.  Root counts, reciprocal phases, and derivative parameters depend on $H$; the global cutoffs and the forbidden-prime bookkeeping depend on $h$.
+
+For weighted squarefree removal we use the convolution
+\begin{equation}\label{eq:omega-convolution}
+\om(m)=\frac{\mu^2(m)\1_{(m,6)=1}}{m}
+ \sum_{d\mid m}\gamma(d),
+\qquad
+\gamma(d)=\mu^2(d)\1_{P^-(d)\ge5}
+ \prod_{p\mid d}\frac3{p-3}.
+\end{equation}
+
+The following lemma is the direct-completion input.  Its point is not merely square-root cancellation in a Kloosterman phase: it also keeps the squarefree support, an arbitrary incomplete interval, and the primes forbidden by the height reduction visible in the bound.
+
+\begin{lemma}[Weighted completion]\label{lem:weighted-completion}
+Let $q$ and $R$ be squarefree on primes at least $5$, with $(q,R)=1$, and let $I\subset(U,2U]$ be an arbitrary interval.  Put
+\[
+\Sigma_q(I;A,R)
+ =\sum_{\substack{m\in I\\(m,qR)=1}}
+ \om(m)\e\!\left(\frac{A\bar m}{q}\right).
+\]
+If $r=q/(A,q)>1$, then
+\begin{equation}\label{eq:weighted-completion}
+|\Sigma_q(I;A,R)|
+ \ll \Ecal(R)2^{\Om(q)/2}r^{1/4}U^{-1/2}(\log 2q)^{1/2},
+\end{equation}
+where
+\begin{equation}\label{eq:forbidden-surcharge}
+\Ecal(R):=\prod_{p\mid R}(1+p^{-1/2})
+ \le \exp\!\left(O\!\left(\sqrt{L/\log L}\right)\right).
+\end{equation}
+Consequently, for $q\asymp V$,
+\begin{equation}\label{eq:completion-block}
+\sum_{q\asymp V}\om(q)|\Sigma_q(I;A,R)|
+ \ll \Ecal(R)(\log V)^{C_{\rm comp}}
+       \left(\frac{V^{1/2}}U\right)^{1/2}.
+\end{equation}
+The bound is uniform in incomplete interval endpoints.  Fully resonant small moduli are handled by the exact zero mean of the complete sawtooth period rather than by \cref{eq:weighted-completion} with $r=1$.
+\end{lemma}
+
+In particular, when
+\[
+U\ge V^{1/2}T_{\rm comp},
+\]
+\cref{eq:completion-block,eq:forbidden-surcharge} gives
+\[
+\Ecal(R)L^CT_{\rm comp}^{-1/2}=O_A(L^{-A})
+\]
+for every fixed $A>0$.  These are the direct-completion blocks.
+
+\subsection{Reciprocity: resonant, slow, and fast rows}\label{sec:reciprocal}
+Suppose now that direct completion fails, so $U<V^{1/2}T_{\rm comp}$.  Reciprocity separates the phase into a smooth factor in $q$ and a reciprocal factor of modulus $u$:
+\begin{equation}\label{eq:reciprocity}
+\e\!\left(\frac{kH\bar u}{q}\right)
+ =\e\!\left(\frac{kH}{uq}\right)
+  \e\!\left(-\frac{kH\bar q}{u}\right).
+\end{equation}
+For $u\asymp U$, $q\asymp V$, define the dimensionless speed
+\begin{equation}\label{eq:lambda}
+\lambda=\frac{|k|H}{uV}.
+\end{equation}
+The parameter $\lambda$ measures how much the smooth reciprocal factor changes across the $q$-interval.  Small $\lambda$ leads back to completion after an exceptional region containing every fully resonant slow row is separated.  Large $\lambda$ is handled after opening the weight by a divisor convolution; the ratio $A_D/N_D=\lambda$ then persists across every divisor channel.  Fix $\xi=0.1$ and $\delta_R=0.1$.
+
+\begin{lemma}[Reciprocal exterior block]\label{lem:reciprocal}
+Let $1\le |k|\le K$. Let $u\asymp U$ and $q\asymp V$ range over squarefree high-prime moduli satisfying
+\[
+(H,u)=1,\qquad (u,R)=1,\qquad (q,uR)=1,
+\qquad R\mid\rad_{\ge5}(h).
+\]
+Suppose $U\le V$, $V>X$, and the direct completion inequality $U\ge V^{1/2}T_{\rm comp}$ fails.  Every fully resonant slow row is contained in the geometric region
+\begin{equation}\label{eq:slow-resonant-region}
+\boxed{u\le K,\qquad q\ge H/W^\xi.}
+\end{equation}
+We remove this exceptional region before slow completion.  Its band $H/W^\xi\le q\le H$ contributes
+\begin{equation}\label{eq:slow-resonant-band}
+O(L^\sigma\log L)=o(L),
+\end{equation}
+and its tail $q>H$ contributes $O(1)$.  Outside this separated region, every slow/moderate row has nontrivial reduced reciprocal modulus, and weighted completion followed by partial summation gives an arbitrary fixed logarithmic saving.
+
+In the fast range write
+\[
+F_R(q):=q\om(q)\1_{(q,R)=1}=b_6*a_R.
+\]
+For a divisor channel $D$ the phase and length parameters are
+\begin{equation}\label{eq:ADND}
+A_D=\frac{|k|H}{6Du^2},\qquad
+N_D=\frac{V}{6Du},\qquad
+\frac{A_D}{N_D}=\lambda.
+\end{equation}
+For $D\le W^{\delta_R}$ these channels are long.  If $A_D<N_D^2$, van der Corput gives
+\begin{equation}\label{eq:vdc-saving}
+\frac{|S_D|}{N_D}
+ \ll W^{-(1-\delta_R)/2}T_{\rm comp}^{-1/4}+W^{-\xi/2}.
+\end{equation}
+If $A_D\ge N_D^2$, Karatsuba's reciprocal exponential-sum theorem~\cite{Karatsuba1971} gives
+\begin{equation}\label{eq:karatsuba-saving}
+\frac{|S_D|}{N_D}
+ \ll \exp(-cL^{3\sigma-2}),
+\qquad 3\sigma-2=0.03.
+\end{equation}
+The tail $D>W^{\delta_R}$ is removed by Rankin's trick, with weighted channel moment
+\begin{equation}\label{eq:channel-moment}
+\sum_D|a_R(D)|D^{-3/4}
+ \le \exp\!\left(O((L/\log L)^{1/4})\right).
+\end{equation}
+A fully resonant row outside \cref{eq:slow-resonant-region} lies in the fast regime; there the smooth factor $\e(kH/(uq))$ is itself oscillatory enough for the estimates in \cref{eq:vdc-saving,eq:karatsuba-saving}.
+\end{lemma}
+
+\subsection{From block estimates to the full exterior}\label{sec:vaaler}
+The preceding block estimates must now be summed over the full complement of the Boolean box.  First truncate each divisor variable at $h^2$.  The contribution from $\max(a,b)>h^2$ has vanishing positive root count in the long variable, and its remaining centered-density tail is $O(L/h)=o(1)$.  The finite region contains only $O(L^2)$ dyadic blocks.  On each block use a Vaaler approximation
+\[
+\psi(t)=P_K(t)+R_K(t),
+\]
+where the main Fourier coefficients are $O(1/|k|)$ for $0<|k|\le K$, and $R_K$ is dominated by a Fej\'er polynomial with coefficients $O(1/K)$.
+
+\begin{lemma}[Zero/nonzero Vaaler remainder split]\label{lem:vaaler-split}
+The zero Fej\'er-remainder frequency contributes globally
+\begin{equation}\label{eq:vaaler-zero}
+O(K^{-1}L^2)=O(L^{-8}).
+\end{equation}
+The nonzero remainder frequencies have total $\ell^1$ coefficient mass $O(1)$ and are sent through the same nonzero-frequency completion/reciprocal estimates as the main Vaaler modes.  Thus the zero mode is globally negligible, while every nonzero remainder mode is controlled by oscillation rather than by its individual $K^{-1}$ coefficient.
+\end{lemma}
+
+\begin{proposition}[Global exterior bound]\label{prop:exterior}
+Uniformly for $1\le H\le h$, the finitely many $p=3$ variants, and inherited forbidden-prime sets, the hyperbolic region complementary to the Boolean small box contributes $o(L)$; after removal of the deterministic density term in \cref{eq:parity-reduction}, its nonzero-frequency part is in fact $O_A(L^{-A})$ for every fixed $A>0$, apart from the explicit contribution from the slow exceptional region in \cref{eq:slow-resonant-band}.  The same assertion remains $o(L)$ after summing decorated rows with the factor \cref{eq:decoration-norm}.
+\end{proposition}
+
+\section{Reflection and the one-dimensional boundary}\label{sec:one-dimensional}
+
+The two-dimensional estimates leave two boundary families, $P_1$ and $P_2+D_1$.  They are linked by reflection across the interval $(0,h)$: a divisor of $h-y$ becomes a divisor of $y$, and the height-supported part of $D_1$ combines with $P_2$.  The result is the same one-dimensional family $P_1$, up to a small residue supported entirely on primes dividing $h$.  Both logarithmic boundary terms can therefore be compared with the free pair sum $S(h)$ through a single floor-error asymptotic.
+
+\begin{lemma}[Reflection assembly]\label{lem:reflection-assembly}
+Let $D_1$ be as in \cref{eq:degenerate-split}.  Then
+\begin{equation}\label{eq:reflection-row}
+\Delta_w(h;d,e_2)=\Delta_w(h;de_2,1)
+\end{equation}
+for $d\mid h$, $(e_2,h)=1$, and
+\begin{equation}\label{eq:reflection-weight}
+\kappa(d)\om(e_2)=v_h(de_2).
+\end{equation}
+Hence
+\begin{equation}\label{eq:reflection-assembly}
+\boxed{P_2(h)+D_1(h)=P_1(h)-P_{1,h}^{\supp},}
+\end{equation}
+where
+\begin{equation}\label{eq:support-term}
+P_{1,h}^{\supp}
+ =C^*(h)\sum_{\substack{f>1\\f\mid\rad_{\ge5}(h)}}
+ v_h(f)\Delta_w(h;f,1)
+ =O(\llog h).
+\end{equation}
+\end{lemma}
+
+Let $h=2n$, $x=n-1$, and let $\chi=\modthree$ be the nonprincipal real character modulo $3$.  Put
+\[
+C_f=\prod_{p\ge5}c_1(p),\qquad
+\eta(e)=\mu^2(e)\1_{(e,6)=1}\prod_{p\mid e}\frac1{p-2}.
+\]
+For a coefficient $v$ define the floor-error transform
+\begin{equation}\label{eq:Ev}
+A(v)=\sum_{m\ge1}\frac{v(m)}m,
+\qquad
+E_v(t)=\sum_{m\ge1}v(m)\left\lfloor\frac tm\right\rfloor-tA(v).
+\end{equation}
+For a fixed coefficient $v$, let $F_0(v)$ denote the constant in its linear mean
+\[
+\sum_{m\le z}m v(m)=F_0(v)z+o(z).
+\]
+P'etermann's Walfisz-type estimate~\cite{Petermann1998}, specialized to $\alpha=0$, gives for the coefficient sequences occurring here
+\begin{equation}\label{eq:petermann}
+E_v(t)=-\frac{F_0(v)}2\log t
+ +O\!\left((\log t)^{2/3}(\llog t)^{4/3}\right).
+\end{equation}
+Put $C_0:=\prod_{p\ge5}c_0(p)$.  The exact Euler constants satisfy
+\begin{equation}\label{eq:mean-constants}
+C_0F_0(\om)=\frac13,\qquad
+C_fF_0(\eta)=\frac13,\qquad
+C^*(h)F_0(v_h)=\frac13.
+\end{equation}
+Moreover $v_h=\om*c_h$ with
+\begin{equation}\label{eq:ch-moment}
+\sup_h\sum_r|c_h(r)|(1+\log r)<\infty,
+\end{equation}
+so \cref{eq:petermann} transfers uniformly to $v_h$.
+
+The exact pure-one low-prime count is
+\begin{equation}\label{eq:free-low-count}
+N_f(x;e)=\frac32\left(\left\lfloor\frac xe\right\rfloor+
+                    \left\lfloor\frac{x}{3e}\right\rfloor\right).
+\end{equation}
+If $3\nmid h$, the anchored count differs by
+\begin{equation}\label{eq:character-correction}
+N_w(h;e,1)-N_f(x;e)
+ =\frac32\chi(n)\chi(e)\sum_{t\le x/e}\chi(t).
+\end{equation}
+This leads to
+\[
+\Xcal_v(x)=\sum_{e\le x}v(e)\chi(e)\sum_{t\le x/e}\chi(t).
+\]
+To retain P\'etermann's nonnegative and monotone coefficient hypotheses, we keep the fixed character inside the exponential phase.  It remains to verify that the rational shifts $1/3$ and $2/3$ are compatible with the smoothing step at the correct scaled width.
+
+\begin{lemma}[Fixed-mod-$3$ P\'etermann correction]\label{lem:mod3-petermann}
+Let $X_0$ be the local integer parameter in the shifted sawtooth estimate
+(eventually $X_0=x=n-1$ in the application below).  For $a\in\{1,2\}$ the
+P\'etermann smoothing step is applied to
+\begin{equation}\label{eq:mod3-smoothing}
+\boxed{\psi\!\left(\frac{X_0}{3q}+\frac a3\right)}
+\end{equation}
+with smoothing width $1/X_0$; equivalently, if $z=X_0/3$, the width is
+$1/(3z)$.  A crossing would require
+\begin{equation}\label{eq:no-crossing}
+X_0+aq<3qr\le X_0+aq+\frac{3q}{X_0},
+\end{equation}
+which is impossible in P\'etermann's range $q<X_0/3$.  Keeping $\chi_3(p)$ in the oscillatory factor, rather than in the monotone prime coefficient, leaves the higher derivative hypotheses unchanged.  Consequently
+\begin{equation}\label{eq:mod3-bound}
+\Xcal_{v_h}(x)
+ \ll (\log x)^{3/4}
+     +(\log x)^{2/3}(\llog x)^{4/3}+1
+ =o(\log x)
+\end{equation}
+uniformly in $h$.
+\end{lemma}
+
+\begin{proposition}[One-dimensional brackets]\label{prop:one-dimensional}
+With $Q_1=C+P_1$,
+\begin{equation}\label{eq:Q1-asymptotic}
+Q_1(h)=-\frac12\log h+o(L),
+\end{equation}
+and
+\begin{equation}\label{eq:S-asymptotic}
+S(h)=-\frac12\log h
+ +O\!\left(L^{2/3}(\log L)^{4/3}\right).
+\end{equation}
+Therefore
+\begin{equation}\label{eq:one-d-brackets}
+P_1(h)-S(h)=o(L),\qquad
+P_2(h)+D_1(h)-S(h)=o(L),
+\end{equation}
+the first relation following from the corresponding assertion for $Q_1=C+P_1$ and the bound $C(h)=O(1)$.
+\end{proposition}
+
+\section{Proof of the theorem}\label{sec:final-assembly}
+
+\begin{proof}[Proof of \cref{thm:main}]
+The divisor expansion of \cref{eq:T-pair-expansion}, the split $D=D_1+D_{2D}$ from \cref{eq:degenerate-split}, and the identity $M=T-2S$ give
+\begin{equation}\label{eq:final-assembly}
+\boxed{
+M(h)=[P_1(h)-S(h)]+[P_2(h)+D_1(h)-S(h)]
+     +C(h)+[G(h)+D_{2D}(h)].
+}
+\end{equation}
+Each term now belongs to a part of the proof already closed.  By \cref{prop:one-dimensional},
+\[
+P_1-S=o(L),\qquad P_2+D_1-S=o(L).
+\]
+The corner satisfies $C=O(1)$ by \cref{eq:corner-bound}.  For $G+D_{2D}$, the deterministic centering and parity terms contribute only $O(1)+O(\llog h)$ by \cref{eq:decorated-density-correction,lem:parity-reduction}.  The centered small box is $o(L)$ by \cref{prop:boolean-hyperbolic,eq:boolean-numerics}, and its hyperbolic fill belongs to the exterior.  The complementary region is $o(L)$ by \cref{prop:exterior}; the decoration norm \cref{eq:decoration-norm} is already included in that assertion.  Hence every summand in \cref{eq:final-assembly} is $o(L)$, and therefore
+\[
+M(h)=o(\log h).
+\]
+\end{proof}
+
+\begin{remark}[The exponent margin and asymptotic onset]\label{rem:onset}
+The strict Boolean margin is
+\[
+1-\sigma 2\sqrt{0.505}=0.0382759693596551\ldots.
+\]
+It is not converted here into a useful finite-height inequality.  The reciprocal argument also uses the saving $\exp(-cL^{0.03})$, while the proof carries fixed powers of $\log L$ and subexponential forbidden-prime factors.  The height at which the displayed asymptotic inequalities dominate all such losses is therefore astronomically large.  \Cref{thm:main} is an asymptotic theorem, not an effective claim about computationally accessible heights.
+\end{remark}
+
+\begin{remark}[Scope]\label{rem:scope}
+The argument proves only the fixed pointwise statement in \cref{thm:main}.  In the terminology of the predecessor manuscript this is the $k=1$ anchored case.  It neither proves a uniform all-orders diagonal-tail estimate nor supplies a growing-rank analogue of the Boolean argument; those questions require additional ideas.
+\end{remark}
+
+\appendix
+
+\section{Algebra and the Boolean estimate}\label{app:boolean}
+
+This appendix proves the exact reductions and the Boolean--CRT estimate used in the main text.  The algebra precedes the estimates: the fixed-product cube is completed exactly, including its endpoint defect, before any absolute value is taken.
+
+\subsection{Decorated rows and parity}
+
+\begin{proof}[Proof of \cref{lem:decorated-reduction}]
+Write $h=dH^\sharp$ and $y=dz$.  Since $(d,ae_2)=1$ on a surviving selected row,
+\[
+da\mid y\Longleftrightarrow a\mid z,
+\qquad
+e_2\mid h-y=d(H^\sharp-z)\Longleftrightarrow e_2\mid H^\sharp-z.
+\]
+Every prime dividing $d$ is at least $5$, so multiplication by $d$ is a unit modulo $6$.  The $p=2,3$ local admissibility factor is therefore preserved under $(h,y)\mapsto(H^\sharp,z)$, which proves \cref{eq:decorated-root}.  Subtracting the two density terms gives
+\[
+-\frac{h-1}{dae_2}+\frac{H^\sharp-1}{ae_2}
+=-\frac{d-1}{dae_2},
+\]
+proving \cref{eq:decorated-discrepancy}.  The weight identity \cref{eq:decorated-weight} is primewise: the primes in $d$ are the selected primes dividing the ambient height, while every prime of $a$ is a non-height prime.  Finally
+\[
+\sum_{d\mid\rad_{\ge5}(h)}\kappa(d)
+=\prod_{\substack{p\mid h\\p\ge5}}\left(1+\frac1{p-2}\right)
+\ll\log\log h,
+\]
+by comparison with the Mertens product.  This proves \cref{eq:decoration-norm}.
+\end{proof}
+
+\begin{proof}[Proof of \cref{lem:parity-reduction}]
+Put $h=2n$ and write $y=2z$.  The $p=2$ local factor kills odd $y$.  If $3\mid n$, the $p=3$ weight on the reduced variable $z$ is $3$ when $3\mid z$ and $3/2$ otherwise.  Thus the weighted root count is
+\[
+\frac32N(e_1,e_2;n)+\frac32N(3e_1,e_2;n),
+\]
+where $N(a,b;n)$ denotes the unweighted count in \cref{eq:D-def}.  If $3\nmid n$, the admissible reduced residue classes are $3\mid z$ and $3\mid n-z$, each with weight $3$, so the count is
+\[
+3N(3e_1,e_2;n)+3N(e_1,3e_2;n).
+\]
+In the first case the density subtracted by twice \cref{eq:B-def} is
+\[
+2\left(\frac34\frac{n}{e_1e_2}+\frac34\frac{n}{3e_1e_2}\right)
+=\frac{2n}{e_1e_2};
+\]
+in the second it is
+\[
+2\left(\frac32\frac{n}{3e_1e_2}+\frac32\frac{n}{3e_1e_2}\right)
+=\frac{2n}{e_1e_2}.
+\]
+Since $\Delta_w(2n;e_1,e_2)$ subtracts $(2n-1)/(e_1e_2)$, the difference is exactly $1/(e_1e_2)$, proving \cref{eq:parity-reduction}.
+
+For the ordinary generic family, the deterministic contribution is bounded by
+\[
+\sum_{e_1,e_2}\frac{\om(e_1)\om(e_2)}{e_1e_2}
+\le\left(\sum_m\frac{\om(m)}m\right)^2<\infty.
+\]
+For decorated rows, \cref{eq:decoration-norm} introduces at most one further factor $O(\log\log h)$.
+\end{proof}
+
+\subsection{Fixed-product CRT completion}
+
+\begin{proof}[Proof of \cref{lem:boolean-normalization}]
+Write $H=qm+r$ with $1\le r<m$.  For each ordered divisor partition $m=e_1e_2$, let $u$ be the CRT idempotent satisfying
+\[
+u\equiv0\pmod{e_1},\qquad u\equiv1\pmod{e_2}.
+\]
+Then $t_u:=Hu\bmod m$ is the unique residue class modulo $m$ satisfying $e_1\mid y$ and $e_2\mid H-y$.  The number of positive representatives of a fixed residue $t\in\{0,\dots,m-1\}$ below $H$ is
+\[
+\#\{0<y<H:y\equiv t\pmod m\}
+=\begin{cases}
+q,&t=0,\\
+q+1,&0<t<r,\\
+q,&r\le t<m.
+\end{cases}
+\]
+Hence its discrepancy from $H/m=q+r/m$ is
+\[
+\mathbf1_{0<t<r}-\frac rm.
+\]
+Summing over the $P(m)$ idempotents gives
+\[
+\sum_{e_1e_2=m}D(e_1,e_2;H)
+=\#\{u:0<t_u<r\}-P(m)\frac rm.
+\]
+Because $(H,m)=1$, exactly one idempotent has $t_u=0$, namely $u=0$.  Therefore
+\[
+\#\{u:0<t_u<r\}=\#\{u:t_u<r\}-1,
+\]
+which proves \cref{eq:boolean-normalization}.  Removing the two endpoint partitions $(1,m)$ and $(m,1)$ changes the left side by less than $2$ in absolute value; together with the displayed $-1$, the proper-partition fiber differs from $P(m)\Dcal_m(H)$ by less than $3$.  Finally
+\[
+\sum_{m\le Z}\om(m)
+\le\prod_{5\le p\le Z}\left(1+\frac1{p-3}\right)
+\ll\log Z,
+\]
+so all fixed-product endpoint corrections total $O(\log Z)$.
+\end{proof}
+
+For the Fourier analysis it is convenient also to write
+\[
+W(t;m):=2^{-\Om(m)}\sum_{u^2\equiv u\ (m)}\e(tu/m).
+\]
+The change $x=2u-1$ gives
+\[
+|W(t;m)|=|V(\bar2t;m)|,
+\]
+where $\bar2$ is the inverse of $2$ modulo $m$ and $V$ is defined in \cref{eq:V-def}.
+
+\begin{proof}[Proof of \cref{lem:boolean-second-moment}]
+Both the set of sign roots and the unit group factor by CRT, so the mean factors primewise.  At a prime $p\mid s$,
+\[
+V(Hja;p)=\frac12\left(\e(Hja/p)+\e(-Hja/p)\right)
+=\cos(2\pi Hja/p).
+\]
+If $p\mid j$, this equals $1$.  Otherwise $Hj$ is a unit modulo $p$, and
+\[
+\frac1{p-1}\sum_{a\ne0\ (p)}\cos^2(2\pi Hja/p)
+=\frac12+\frac1{2(p-1)}\sum_{a\ne0\ (p)}\cos(4\pi a/p)
+=\frac{p-2}{2(p-1)}.
+\]
+Multiplying the local means proves \cref{eq:boolean-second-moment}.
+\end{proof}
+
+\subsection{Shiu transference and the dyadic Boolean bound}
+
+We now prove \cref{prop:boolean-hyperbolic}.  The external input in this subsection is Shiu's theorem in the form \cref{lem:shiu-required}.  Its hypotheses for the moving functions below are uniform in the roughness threshold because higher prime powers vanish and the prime values are bounded by a fixed constant.
+
+For a dyadic product block $m\asymp M$, let
+\[
+Y=\exp((\log M)^\theta),\qquad \delta_B=0.01,
+\qquad J=(\log M)^2.
+\]
+For $x>0$ define
+\[
+f_x(n):=n\om(n)x^{\Om(n)}.
+\]
+On a prime $p\ge5$,
+\[
+f_x(p)=x\frac p{p-3},\qquad f_x(p^\nu)=0\quad(\nu\ge2).
+\]
+Thus the modulus-one corollary of Shiu's proof, applied on $(M,2M]$, gives
+\begin{equation}\label{eq:app-Ax}
+A_x(M):=\sum_{m\asymp M}\om(m)x^{\Om(m)}
+\ll(\log M)^{x-1}.
+\end{equation}
+Indeed $1/m\asymp1/M$ and
+\[
+\sum_{p\le2M}\frac{x}{p-3}=x\log\log M+O_x(1).
+\]
+Any restriction $(m,H)=1$ or any inherited forbidden-prime condition only deletes nonnegative terms.
+
+For the second moment write uniquely $m=sr$, where every prime of $s$ is at most $Y$ and every prime of $r$ exceeds $Y$.  Call $s$ good if $s\le M^{\delta_B}$ and write $R_0=M/s$.  For fixed $v>0$ define
+\[
+g_{v,Y}(r)
+=\mu^2(r)\mathbf1_{P^-(r)>Y}v^{\Om(r)}
+ \prod_{p\mid r}\frac p{p-3},
+\qquad
+\om(r)v^{\Om(r)}=\frac{g_{v,Y}(r)}r.
+\]
+Here $P^-(1)=\infty$, so $g_{v,Y}(1)=1$.
+Uniformly in $Y$,
+\[
+g_{v,Y}(p)\le\frac52v,\qquad g_{v,Y}(p^\nu)=0\ (\nu\ge2).
+\]
+Shiu's proof is uniform for this family as $Y$ varies; the same argument appears in Chapter~3 of his 1980 Nottingham thesis~\cite{ShiuThesis1980}.  The fixed prime-power constant is bounded uniformly, higher prime powers vanish, and squarefree support gives the required $n^\ep$ bound with a constant independent of $Y$: if $k=\Om(n)$, then $n\ge(k+1)!$, so a fixed exponential in $k$ is $O_\ep(n^\ep)$.
+
+Apply \cref{lem:shiu-required} with
+\[
+q=s,
+\quad x_{\rm Shiu}=2R_0,
+\quad y_{\rm Shiu}=R_0,
+\quad \alpha=\beta=\frac14.
+\]
+The length condition is automatic, and the modulus condition follows from
+\[
+s\le M^{0.01}<R_0^{3/4}
+\]
+for large $M$.  For every reduced class $b\pmod s$ we obtain
+\begin{equation}\label{eq:app-shiu-rough}
+\sum_{\substack{r\asymp R_0\\r\equiv b\ (s)}}
+ \om(r)v^{\Om(r)}
+\ll\frac1{\ph(s)\log R_0}
+ \exp\!\left(\sum_{Y<p\le2R_0}\frac{v}{p-3}\right).
+\end{equation}
+Since $\log R_0\asymp\log M$,
+\begin{equation}\label{eq:app-rough-factor}
+\frac1{\log R_0}
+ \exp\!\left(\sum_{Y<p\le2R_0}\frac{v}{p-3}\right)
+\ll(\log M)^{v(1-\theta)-1}.
+\end{equation}
+
+Factorization of the Boolean transform gives, for $(s,r)=1$,
+\[
+|W(Hj;sr)|^2
+=|W(Hj\bar r;s)|^2|W(Hj\bar s;r)|^2
+\le |W(Hj\bar r;s)|^2.
+\]
+Grouping the rough factor by its unit class modulo $s$, applying \cref{eq:app-shiu-rough}, and then using \cref{lem:boolean-second-moment}, the good-$s$ contribution is dominated by an Euler product whose nonresonant local factor is
+\[
+1+\frac{v}{p-3}\frac{p-2}{2(p-1)}
+=1+\frac{v}{2p}+O_v(p^{-2}),
+\]
+whereas a resonance prime $p\mid j$ contributes
+\[
+1+\frac{v}{p-3}=1+\frac vp+O_v(p^{-2}).
+\]
+Therefore
+\begin{align}
+\prod_{p\le Y}(\cdots)
+&\ll(\log Y)^{v/2}
+ \exp\!\left(C_v\sum_{p\mid j}\frac1p\right)\\
+&\ll(\log M)^{v\theta/2}(\log\log M)^{C_v},
+\label{eq:app-resonance-product}
+\end{align}
+for $j\le J$, because $\sum_{p\mid j}p^{-1}\ll\log\log j$.  Combining this with \cref{eq:app-rough-factor} gives
+\begin{equation}\label{eq:app-good-second}
+F_{v,j}^{\rm good}(M)
+\ll(\log\log M)^C(\log M)^{v(1-\theta/2)-1}.
+\end{equation}
+
+For bad $s>M^{\delta_B}$, take $\lambda=1/\log Y$.  Then
+\[
+\mathbf1_{s>M^{\delta_B}}
+\le s^\lambda M^{-\delta_B\lambda},
+\qquad
+M^{-\delta_B\lambda}
+=\exp(-\delta_B(\log M)^{1-\theta}).
+\]
+Using $|W|\le1$ and $p^\lambda\le e$ for $p\le Y$, the remaining Euler product is at most a fixed power of $\log M$.  Hence, for every fixed $A>0$,
+\begin{equation}\label{eq:app-bad-second}
+F_{v,j}^{\rm bad}(M)\ll_A(\log M)^{-A}
+\end{equation}
+for sufficiently large $M$, uniformly for $j\le J$.
+
+Erd\H{o}s--Tur\'an gives
+\[
+|\Dcal_m(H)|
+\ll J^{-1}+\sum_{j\le J}\frac{|W(Hj;m)|}{j},
+\]
+so Cauchy in the frequency variable yields
+\[
+|\Dcal_m(H)|^2
+\ll J^{-2}+(\log J)\sum_{j\le J}\frac{|W(Hj;m)|^2}{j}.
+\]
+Summing with weight $\om(m)v^{\Om(m)}$ and using
+\cref{eq:app-good-second,eq:app-bad-second} gives
+\begin{equation}\label{eq:app-Bv}
+B_v(M)
+:=\sum_{m\asymp M}\om(m)v^{\Om(m)}|\Dcal_m(H)|^2
+\ll(\log\log M)^C(\log M)^{va-1},
+\end{equation}
+where $a=1-\theta/2=0.505$.  The $J^{-2}$ term is smaller because $J=(\log M)^2$ and
+$4>v(1-a)$ for the value of $v$ below.  The two harmonic losses are powers of $\log J=O(\log\log M)$ and are visible in the exponent $C$.
+
+Choose
+\[
+x_0=2\sqrt a,
+\qquad v_0=\frac2{\sqrt a},
+\qquad x_0v_0=4.
+\]
+Then exactly
+\[
+2^{\Om(m)}=x_0^{\Om(m)/2}v_0^{\Om(m)/2},
+\]
+and ordinary Cauchy with \cref{eq:app-Ax,eq:app-Bv} gives
+\begin{equation}\label{eq:app-dyadic-boolean}
+\sum_{m\asymp M}\om(m)2^{\Om(m)}|\Dcal_m(H)|
+\ll(\log\log M)^C(\log M)^{2\sqrt a-1}.
+\end{equation}
+Finally, if $M=2^r$ and
+$\gamma=2\sqrt a-1>-1$, then
+\[
+\sum_{2^r\le Z}(\log 2^r)^\gamma\ll(\log Z)^{\gamma+1}.
+\]
+Thus
+\[
+\sum_{\substack{1<m\le Z\\(m,HR)=1}}\om(m)2^{\Om(m)}|\Dcal_m(H)|
+\ll(\log\log Z)^C(\log Z)^{2\sqrt a}.
+\]
+Adding the $O(\log Z)$ endpoint contribution from \cref{lem:boolean-normalization} proves \cref{eq:boolean-hyperbolic}.  Since
+\[
+\log Z=4L^\sigma+6L^\rho=4L^\sigma(1+o(1)),
+\]
+we obtain \cref{eq:boolean-exponent}.  Numerically
+\[
+2\sqrt{0.505}=1.421267040355\ldots,
+\qquad
+\left(\frac23+0.01\right)2\sqrt{0.505}
+=0.9617240306403449\ldots<1,
+\]
+which proves \cref{eq:boolean-numerics} and \cref{prop:boolean-hyperbolic}.  Additional forbidden high primes can only delete terms after the positive majorants have been formed, and the finitely many $p=3$ variants carry only absolute coefficients.
+More explicitly, if $3\mid H$ then
+$D(3e_1,e_2;H)=D(e_1,e_2;H/3)$.  If $3\nmid H$, the conditions occurring in
+\cref{eq:B-def} append one of the two fixed congruences $y\equiv0,H\pmod3$ to
+the high-prime CRT system.  This adds only the single local modulus $3$ to
+the completion; its finite Fourier transform has bounded $\ell^1$ and
+$\ell^2$ norms.  Thus the high-prime Boolean second moment and every
+logarithmic exponent above are unchanged, up to an absolute factor.
+
+\section{Weighted completion}\label{app:completion}
+
+We prove \cref{lem:weighted-completion}.  Squarefree removal requires a finite split in the square-divisor variable, and the inherited height primes contribute the explicit factor $\Ecal(R)$; both features are retained in the estimate.
+
+\subsection{A squarefree incomplete Kloosterman bound}
+Let $g=(A,q)$ and $r=q/g>1$.  Write $q=gr$ and $A=gA_0$.  For $(x,q)=1$,
+\[
+\e(A\bar x/q)=\e(A_0\bar x/r).
+\]
+Inclusion--exclusion for $(x,g)=1$ gives
+\[
+\sum_{\substack{x\in J\\(x,q)=1}}\e(A\bar x/q)
+=\sum_{d\mid g}\mu(d)
+ \sum_{\substack{dy\in J\\(y,r)=1}}
+ \e(A_0\bar d\,\bar y/r).
+\]
+Complete each arbitrary interval in $y$ modulo $r$.  The $\ell^1$ norm of the discrete Fourier transform of an interval is $O(r\log(2r))$, while the complete transform is the Kloosterman sum
+\[
+S(b,A_0\bar d;r)
+=\sum_{y\bmod r}^{*}\e((by+A_0\bar d\,\bar y)/r).
+\]
+CRT factorization and the classical prime-modulus Weil bound give
+\[
+|S(b,A_0\bar d;r)|\le2^{\Om(r)}r^{1/2}.
+\]
+Summing the $2^{\Om(g)}$ divisors of $g$ therefore yields
+\begin{equation}\label{eq:app-incomplete-kl}
+\left|\sum_{\substack{x\in J\\(x,q)=1}}\e(A\bar x/q)\right|
+\ll2^{\Om(q)}r^{1/2}\log(2q),
+\end{equation}
+uniformly in both endpoints.  The case $r=1$ is genuinely resonant and is excluded from this estimate.
+
+\subsection{Squarefree removal with the finite \texorpdfstring{$f$}{f}-split}
+The identity
+\[
+\om(m)=\frac{\mu^2(m)\1_{(m,6)=1}}m\sum_{d\mid m}\gamma(d)
+\]
+from \cref{eq:omega-convolution} is immediate from the local relation
+$1+3/(p-3)=p/(p-3)$.  After choosing $d\mid m$, expand
+\[
+\mu^2(t)=\sum_{f^2\mid t}\mu(f),
+\qquad
+\mathbf1_{(m,R)=1}=\sum_{c\mid(m,R)}\mu(c).
+\]
+Every surviving channel may be written
+\[
+m=dcf^2\ell.
+\]
+The factors $dcf^2$ are units modulo $q$, so the reciprocal phase remains a reciprocal phase in $\ell$.  If the original $m$-interval has scale $U$, the $\ell$-interval has scale
+\[
+Y_0\asymp\frac{U}{dcf^2},
+\]
+and the coefficient before the $\ell$-sum is
+\[
+\frac{\gamma(d)\mu(c)\mu(f)}{dcf^2}\frac1\ell.
+\]
+By \cref{eq:app-incomplete-kl} and partial summation,
+\[
+\left|\sum_{\substack{\ell\in J\\(\ell,q)=1}}
+ \frac1\ell\e(A'\bar\ell/q)\right|
+\ll \frac{C_q(A)}{Y_0},
+\quad
+C_q(A):=2^{\Om(q)}\left(\frac{q}{(A,q)}\right)^{1/2}\log(2q).
+\]
+For $f\le F$ this costs, for fixed $(d,c)$,
+\[
+\ll |\gamma(d)|F\frac{C_q(A)}U.
+\]
+For $f>F$, the trivial dyadic harmonic bound and
+$\sum_{f>F}f^{-2}\ll F^{-1}$ give
+\[
+\ll\frac{|\gamma(d)|}{dcF}.
+\]
+Choosing
+\[
+F\asymp\left(\frac{U}{dc\,C_q(A)}\right)^{1/2}
+\]
+when this is at least $1$, and otherwise using the trivial channel bound, gives
+\begin{equation}\label{eq:app-fixed-dc}
+\text{fixed $(d,c)$ channel}
+\ll|\gamma(d)|\left(\frac{C_q(A)}{Udc}\right)^{1/2}.
+\end{equation}
+Now
+\[
+\sum_d\frac{|\gamma(d)|}{d^{1/2}}
+=\prod_{p\ge5}\left(1+\frac{3}{(p-3)p^{1/2}}\right)<\infty,
+\]
+while
+\[
+\sum_{c\mid R}c^{-1/2}=\prod_{p\mid R}(1+p^{-1/2})=\Ecal(R).
+\]
+Summing \cref{eq:app-fixed-dc} proves \cref{eq:weighted-completion}.
+
+To sum the modulus variable, discard the favorable factor $(A,q)^{-1/4}$ and use
+\[
+\sum_{q\le2V}\om(q)2^{\Om(q)/2}
+\le\prod_{5\le p\le2V}\left(1+\frac{\sqrt2}{p-3}\right)
+\ll(\log(2V))^{\sqrt2}.
+\]
+This gives \cref{eq:completion-block} with an absolute fixed $C_{\rm comp}$.
+
+Finally, if $R\mid\rad_{\ge5}(h)$, then
+\[
+\log\Ecal(R)\le\sum_{p\mid R}p^{-1/2}.
+\]
+If $R$ has $r_0$ prime factors, then $r_0!\le R\le h$, so
+$r_0\ll L/\log L$; ordering the primes gives
+\[
+\sum_{p\mid R}p^{-1/2}\ll\sqrt{L/\log L}.
+\]
+This proves \cref{eq:forbidden-surcharge}.  Because $\rho>1/2$,
+\[
+\Ecal(R)L^CT_{\rm comp}^{-1/2}
+=\exp\!\left(-\tfrac12L^\rho+O(\sqrt{L/\log L})+O(\log L)\right)
+=O_A(L^{-A})
+\]
+for every fixed $A$.  Thus the completion decay absorbs the forbidden-prime factor in every range where the lemma is used.
+
+For a fully resonant Fourier mode with modulus at most $K$, return to the underlying sawtooth before Fourier expansion.  If $A_0$ denotes its fixed numerator, then $(A_0,q)=1$ in the generic application; inversion permutes the units and pairing $a$ with $q-a$ gives
+\[
+\sum_{a\bmod q}^{*}\psi(A_0\bar a/q)=0.
+\]
+Thus the resonant Fourier modes are absorbed by the exact zero mean of the full sawtooth over complete unit periods.  Applying the same finite $f$-split to the remaining incomplete period, with the trivial $O(q)$ period bound, gives
+\[
+\ll \Ecal(R)(\log(2q))^C(q/U)^{1/2}.
+\]
+This is super-logarithmically small in the only range where it is needed, namely $U>X$ and $q\le K$.
+
+\section{Reciprocal blocks and the global exterior}\label{app:reciprocal}
+
+This appendix proves \cref{lem:reciprocal,lem:vaaler-split,prop:exterior}.  The symbol $H$ is the row height throughout this appendix.  The ambient height $h$ enters only through $L$, the global cutoffs, and inherited prime restrictions.
+
+\subsection{Range partition and the slow exceptional region}
+Let $u\asymp U$, $q\asymp V$, $U\le V$, $V>X$, and suppose direct completion has failed:
+\[
+U<V^{1/2}T_{\rm comp}.
+\]
+Then
+\begin{equation}\label{eq:app-ratio}
+\frac VU>\frac{V^{1/2}}{T_{\rm comp}}
+>\frac{X^{1/2}}{T_{\rm comp}}
+=T_{\rm comp}^{1/2}W.
+\end{equation}
+Reciprocity is exactly \cref{eq:reciprocity}, and the variation of the smooth factor across a $q$-block is $O(1+\lambda)$ with
+$\lambda=|k|H/(uV)$.
+
+For generic rows $(H,u)=1$.  The reduced modulus of the modular reciprocal phase
+$\e(-kH\bar q/u)$ is $u/(kH,u)$, so it equals $1$ exactly when $u\mid k$.  Hence full resonance forces $u\le|k|\le K$.  Thus every fully resonant slow row lies inside the geometric region \cref{eq:slow-resonant-region}, which we separate before applying completion.
+
+For $H/W^\xi\le q\le H$, each of the finitely many $p=3$ progression discrepancies is $O(1)$.  The elementary mean
+\begin{equation}\label{eq:omega-mean}
+\sum_{m\le t}\om(m)=F_0(\om)\log t+O(1)
+\end{equation}
+proved again in \cref{app:petermann} gives
+\[
+\sum_{u\le K}\om(u)
+\sum_{H/W^\xi\le q\le H}\om(q)
+\ll(\log K)(\log W^\xi)
+=O(L^\sigma\log L)=o(L).
+\]
+If $q>H$, the root count is zero and
+$D(u,q;H)=-H/(uq)$, with only bounded changes for the finitely many $p=3$ variants.  Partial summation in \cref{eq:omega-mean} gives
+\[
+\sum_{q>H}\frac{\om(q)}q=O(H^{-1}),
+\qquad
+\sum_u\frac{\om(u)}u<\infty,
+\]
+so this tail is $O(1)$.  This proves the two contributions stated in \cref{eq:slow-resonant-band}.
+
+Outside this exceptional region, a slow/moderate row $\lambda\le W^\xi$ has nontrivial reduced modulus.  Apply \cref{lem:weighted-completion} to the long variable after reciprocity and partial summation against the smooth factor.  The total variation is $O(W^\xi)$, so the block is
+\[
+\ll\Ecal(R)L^CW^\xi
+ \left(\frac{U^{1/2}}V\right)^{1/2}.
+\]
+Since $U\le V$ and $V>X$,
+\[
+\left(\frac{U^{1/2}}V\right)^{1/2}
+\le V^{-1/4}<T_{\rm comp}^{-3/4}W^{-1/2},
+\]
+and this is $O_A(L^{-A})$ for every fixed $A$ because $\xi<1/2$, $\rho>1/2$, and the surcharge is only \cref{eq:forbidden-surcharge}.  Any other fully resonant row satisfies $q<H/W^\xi$ and is therefore fast; its cancellation comes from the smooth reciprocal phase below, not from modular completion.
+
+\subsection{The fast long-weight convolution}
+Put
+\[
+F_R(q)=q\om(q)\mathbf1_{(q,R)=1},
+\qquad b_6(m)=\mathbf1_{(m,6)=1}.
+\]
+There is an exact convolution
+\begin{equation}\label{eq:app-fast-convolution}
+F_R=b_6*a_R.
+\end{equation}
+At $p=2,3$ all nontrivial $a_R(p^j)$ vanish.  At a high prime $p\mid R$,
+\[
+a_R(p)=-1,\qquad a_R(p^j)=0\quad(j\ge2),
+\]
+and at an allowed high prime
+\[
+a_R(p)=\frac3{p-3},\qquad
+a_R(p^2)=-\frac p{p-3},\qquad
+a_R(p^j)=0\quad(j\ge3).
+\]
+Indeed the allowed local factor is
+\[
+(1-t)\left(1+\frac p{p-3}t\right)
+=1+\frac3{p-3}t-\frac p{p-3}t^2,
+\]
+while an excluded high prime contributes $1-t$.  It follows that
+\begin{equation}\label{eq:app-aR-l1}
+\sum_D\frac{|a_R(D)|}{D}
+\ll\prod_{p\mid R}(1+1/p)\ll\log\log h,
+\end{equation}
+and, for $\alpha=1/4$,
+\begin{equation}\label{eq:app-aR-moment}
+\sum_D|a_R(D)|D^{-3/4}
+\le\exp\!\left(O((L/\log L)^{1/4})\right).
+\end{equation}
+The first follows because the unrestricted local error is $1+O(p^{-2})$; the second because the excluded-prime surcharge is
+$\prod_{p\mid R}(1+p^{-3/4})$ and the number of height primes is $O(L/\log L)$.
+
+For fixed fast $u$, expand \cref{eq:app-fast-convolution} in the long variable.  A surviving channel has $q=D\ell$ and, after splitting $\ell$ into reduced residue classes modulo $6u$,
+\[
+\ell=6u(t+\beta),\qquad0<\beta\le1.
+\]
+The modular factor in \cref{eq:reciprocity} is constant on such a class.  The varying phase is
+\[
+\e\!\left(\frac{A_D}{t+\beta}\right),
+\qquad
+A_D=\frac{|k|H}{6Du^2},
+\qquad
+N_D=\frac{V}{6Du},
+\]
+and the shifted interval lies in $(N_D,2N_D]$.  The invariant
+\[
+\frac{A_D}{N_D}=\frac{|k|H}{uV}=\lambda
+\]
+is exact.
+
+Restrict first to $D\le D_0:=W^{\delta_R}$.  From \cref{eq:app-ratio},
+\[
+N_D\gg W^{1-\delta_R}T_{\rm comp}^{1/2},
+\qquad
+\log N_D\gg L^\sigma.
+\]
+If $A_D<N_D^2$, the standard second-derivative estimate applied to
+$f(t)=A_D/(t+\beta)$ gives
+\[
+|S_J|\ll A_D^{1/2}N_D^{-1/2}+A_D^{-1/2}N_D^{3/2},
+\]
+whence
+\[
+\frac{|S_J|}{N_D}
+\ll N_D^{-1/2}+(A_D/N_D)^{-1/2}
+\ll W^{-(1-\delta_R)/2}T_{\rm comp}^{-1/4}+W^{-\xi/2}.
+\]
+This proves \cref{eq:vdc-saving}.
+
+If $A_D\ge N_D^2$, invoke Karatsuba's Theorem~1~\cite{Karatsuba1971} in the reciprocal specialization also recorded in P\'etermann~\cite{Petermann1998}: uniformly for $A\ge N^2$, $0\le\beta\le1$, and an incomplete interval with $t+\beta\asymp N$,
+\begin{equation}\label{eq:app-karatsuba}
+\left|\sum_{t\in J}\e(A/(t+\beta))\right|
+\ll N\exp\!\left(-c\frac{(\log N)^3}{(\log(2A/N))^2}\right).
+\end{equation}
+The shift causes no change in the derivative hypotheses because for every $j\ge2$,
+\[
+\frac{d^j}{dt^j}\frac{A}{t+\beta}
+=(-1)^jj!A(t+\beta)^{-j-1}.
+\]
+Here $\log N_D\gg L^\sigma$ and
+$\log(2A_D/N_D)\le L+O(\log L)$, since $A_D/N_D=\lambda\le Kh$.  Therefore
+\[
+|S_J|/N_D\ll\exp(-c_1L^{3\sigma-2}),
+\qquad 3\sigma-2=0.03,
+\]
+which is \cref{eq:karatsuba-saving}.  This is the only place where the strict inequality $\sigma>2/3$ is needed.
+
+The factor $1/\ell$ is removed by partial summation, using the endpoint-uniform estimates above.  Summing the at most $u$ reduced classes costs at most the reciprocal $1/u$ produced by $1/\ell$, so a fixed main channel is bounded by a common saving
+\[
+\Delta(h):=W^{-(1-\delta_R)/2}T_{\rm comp}^{-1/4}
++W^{-\xi/2}+\exp(-c_1L^{3\sigma-2}).
+\]
+After \cref{eq:app-aR-l1}, the main channels cost
+$O((\log\log h)\Delta(h))$ for fixed $u$.  For $D>D_0$, Rankin and \cref{eq:app-aR-moment} give
+\[
+\sum_{D>D_0}\frac{|a_R(D)|}{D}
+\le\exp\!\left(-\frac{\delta_R}{4}L^\sigma
++O((L/\log L)^{1/4})\right).
+\]
+Finally
+\[
+\sum_{u\le Y_0}\om(u)\ll\log Y_0
+\]
+and the main Vaaler coefficients have total harmonic mass $O(\log K)=O(\log L)$.  Thus every nonzero fast reciprocal dyadic block is $O_A(L^{-A})$ for every fixed $A$.  This proves the analytic part of \cref{lem:reciprocal}.  Fixed modulus $3$ conditions merely replace the progression step $6u$ by another bounded multiple and do not change $A_D/N_D$.
+
+\subsection{Finite exterior and the Vaaler remainder}
+We first make the full complementary family finite.  The elementary bounds
+\[
+\sum_{m\le Y}\om(m)\ll\log Y,
+\qquad
+\sum_m\frac{\om(m)}m<\infty
+\]
+imply by partial summation
+\[
+\sum_{m>Y}\frac{\om(m)}m\ll\frac{1+\log Y}{Y}.
+\]
+Set $Y_*=h^2$.  If one modulus exceeds $Y_*$, it exceeds the row height $H$, so its positive root count is zero and only the centered density remains.  Consequently the union of the tails $a>Y_*$ or $b>Y_*$ is
+\[
+\ll H\frac{\log Y_*}{Y_*}=O(L/h)=o(1),
+\]
+uniformly for $H\le h$.  We may therefore restrict to
+\[
+X<\max(a,b)\le h^2,
+\]
+which has $O(L^2)$ dyadic blocks.
+
+On this finite range the untwisted arithmetic mass is
+\[
+\sum_{a,b\le h^2}\om(a)\om(b)\ll L^2.
+\]
+Use Vaaler's degree-$K$ approximation.  The zero frequency of its Fej\'er remainder has coefficient $O(1/K)$ and therefore contributes
+\[
+O(K^{-1}L^2)=O(L^{-8}).
+\]
+This is \cref{eq:vaaler-zero}.  Every nonzero remainder coefficient is $O(1/K)$.  Since there are $O(K)$ such coefficients, their total $\ell^1$ mass is $O(1)$; each nonzero mode is sent through the same completion or reciprocal estimate just proved.  This proves \cref{lem:vaaler-split}.
+
+For one sawtooth orientation, the long variable is the numerator variable and \cref{lem:weighted-completion} applies directly.  If its modulus is at most $K$, the exact period-zero argument at the end of \cref{app:completion} treats all resonant modes together.  In the opposite orientation, direct completion applies when
+$U\ge V^{1/2}T_{\rm comp}$; otherwise the reciprocal analysis above applies.  Hyperbolic restrictions only change an interval endpoint, and every bound used above is uniform in incomplete endpoints.
+
+Choose the arbitrary nonzero-mode block saving as $L^{-20}$.  After $O(L^2)$ blocks and the $O(\log L)$ harmonic mass of the main Vaaler modes, the total is $o(1)$.  Together with the $O(L/h)$ far tail and the zero/nonzero remainder decomposition, this proves \cref{prop:exterior} for ordinary generic rows.  For $D_{2D}$, multiply the restricted-generic estimate by the outer norm \cref{eq:decoration-norm}; the arbitrary fixed log saving absorbs this extra $O(\log\log h)$, while the deterministic density correction is already $O(\log\log h)$.  Thus the decorated two-dimensional exterior remains $o(L)$.
+
+\section{One-dimensional assembly and the fixed-mod-\texorpdfstring{$3$}{3} term}\label{app:petermann}
+
+\subsection{Reflection and the support residue}
+
+\begin{proof}[Proof of \cref{lem:reflection-assembly}]
+Take a row of $D_1$, so $e_1=d>1$, $d\mid h$, $e_2>1$, and $(e_2,h)=1$.  Put $f=de_2$.  Reflection $y\mapsto h-y$ preserves the low-prime weight and, because $d\mid h$,
+\[
+d\mid y\Longleftrightarrow d\mid h-y.
+\]
+If $z=h-y$ is the reflected variable, then $e_2\mid z$ by definition and
+$d\mid z$ by the displayed equivalence.  Since $(d,e_2)=1$, the two
+conditions are exactly $f=de_2\mid z$.  Renaming $z$ as the running variable
+gives the pure-one condition.  The density denominator is unchanged, giving
+\cref{eq:reflection-row}.  Since $d$ is exactly the height-prime part of $f$,
+$\kappa(d)\om(e_2)=v_h(f)$, proving \cref{eq:reflection-weight}.
+
+The family $P_2$ supplies $d=1$ and hence the $f$ with no high height prime; $D_1$ supplies the $f$ having at least one high height prime and at least one non-height prime.  The omitted $f>1$ are exactly those supported wholly on $\rad_{\ge5}(h)$, giving \cref{eq:reflection-assembly,eq:support-term}.  For such $f$, \cref{eq:decorated-discrepancy} with $a=e_2=1$ gives
+\[
+\Delta_w(h;f,1)=\Delta_w(h/f;1,1)-\frac{f-1}{f}=O(1),
+\]
+because the corner weight is periodic modulo $6$ with mean one.  Hence
+\[
+|P_{1,h}^{\supp}|
+\ll\sum_{f\mid\rad_{\ge5}(h)}\kappa(f)
+\ll\log\log h.
+\]
+\end{proof}
+
+\subsection{P\'etermann's input and the coefficient sequences}
+The form of P\'etermann's theorem~\cite{Petermann1998} used here is the following.  Let $v$ be a real multiplicative function satisfying, for some $\alpha,\beta\ge0$, constants $F_r$, and every positive integer $\lambda$,
+\[
+\sum_{m\le z}m|v(m)|
+=z\sum_{r=0}^{\lambda+[\alpha]}F_r(\log z)^{\alpha-r}
++O(z(\log z)^{-\lambda}),
+\]
+\[
+\sum_{m\le z}(mv(m))^2=O(z(\log z)^\beta),
+\]
+and ultimate monotonicity of $pv(p)$ together with boundedness of $p^\nu v(p^\nu)$ for every $\nu$.  If
+$y=z\exp(- (\log z)^b)$, $0<b<1$, then
+\begin{equation}\label{eq:app-petermann-input}
+\sum_{m\le y}v(m)\psi(z/m)
+\ll(\log z)^{2(\alpha+1)/3}(\log\log z)^{4(\alpha+1)/3}.
+\end{equation}
+We use only $\alpha=0$.
+
+For $g(m)=m\om(m)$, let $b_6(m)=\mathbf1_{(m,6)=1}$.  There is an exact convolution $g=b_6*a$ with, for $p\ge5$,
+\[
+a(p)=\frac3{p-3},\qquad
+a(p^2)=-\frac p{p-3},\qquad a(p^\nu)=0\ (\nu\ge3).
+\]
+For every fixed $\delta_0>1/2$,
+$\sum_d|a(d)|d^{-\delta_0}<\infty$.  Since
+$\sum_{m\le z}b_6(m)=z/3+O(1)$, it follows that
+\begin{equation}\label{eq:app-omega-linear-mean}
+\sum_{m\le z}m\om(m)=F_0(\om)z+O_{\delta_0}(z^{\delta_0}).
+\end{equation}
+A crude divisor bound gives
+$\sum_{m\le z}(m\om(m))^2\ll z(\log z)^B$ for a fixed $B$, while
+$p\om(p)=p/(p-3)$ is decreasing and higher prime powers vanish.  Thus P\'etermann applies to $\om$.  The same argument applies to $\eta$, with local coefficients
+$a_f(p)=2/(p-2)$ and $a_f(p^2)=-p/(p-2)$.
+
+Partial summation in \cref{eq:app-omega-linear-mean} yields the mean already used in \cref{eq:omega-mean}, and also
+\[
+\sum_{m\le z}\eta(m)=F_0(\eta)\log z+O(1).
+\]
+The local identities
+\[
+c_0(p)\left(1-\frac1p\right)\left(1+\frac1{p-3}\right)=1,
+\qquad
+c_1(p)\left(1-\frac1p\right)\left(1+\frac1{p-2}\right)=1
+\]
+show, after accounting for the missing primes $2,3$, that
+\[
+C_0F_0(\om)=\frac13,
+\qquad C_fF_0(\eta)=\frac13.
+\]
+
+To pass from the fixed coefficient $\om$ to the height-dependent coefficient $v_h$, factor their Dirichlet-series ratio prime by prime.  At each high prime $p\mid h$ put
+\[
+a_p=\frac1{p-3},\qquad b_p=\frac1{p-2}.
+\]
+The local Dirichlet-series ratio is
+\[
+\frac{1+b_pz}{1+a_pz}
+=1+\sum_{\nu\ge1}c_p(p^\nu)z^\nu,
+\qquad
+c_p(p^\nu)=(b_p-a_p)(-a_p)^{\nu-1}.
+\]
+Let $c_h$ be the multiplicative product of these correction factors.  Then exactly
+\[
+v_h=\om*c_h,
+\]
+and
+\[
+1+\sum_{\nu\ge1}|c_p(p^\nu)|
+=1+\frac1{(p-2)(p-4)}.
+\]
+Therefore
+\begin{equation}\label{eq:app-ch-logmoment}
+\sup_h\sum_r|c_h(r)|(1+\log r)<\infty.
+\end{equation}
+From the convolution and \cref{eq:Ev},
+\[
+E_{v_h}(t)=\sum_rc_h(r)E_\om(t/r).
+\]
+For completeness, split this sum at $r=t/2$.  On $r\le t/2$ insert the
+fixed-base P\'etermann estimate at $t/r$.  Its error is bounded by the error
+at $t$ and sums against $\sum_r|c_h(r)|=O(1)$.  In the main term one may
+replace the truncated sums of $c_h(r)$ and $c_h(r)\log r$ by their full sums:
+\cref{eq:app-ch-logmoment} gives
+\[
+\log t\sum_{r>t/2}|c_h(r)|=O(1),
+\qquad
+\sum_r|c_h(r)|\log r=O(1).
+\]
+For $r>t/2$, the defining formula gives $E_\om(t/r)=O(1)$ uniformly (and for
+$r>t$ it is exactly $-(t/r)A(\om)$), so this range is also $O(1)$.  This gives the required uniform transfer.  At $z=1$ the local correction sum is
+\[
+\sum_{\nu\ge0}c_p(p^\nu)
+=\frac{1+1/(p-2)}{1+1/(p-3)}
+=\frac{(p-1)(p-3)}{(p-2)^2},
+\]
+which is the reciprocal of $c_1(p)/c_0(p)$.  Thus
+\[
+C^*(h)F_0(v_h)=\frac13,
+\]
+completing \cref{eq:mean-constants}.
+
+To derive \cref{eq:petermann}, write, for a fixed coefficient $v$,
+\[
+E_v(t)
+=-\sum_{m\le t}v(m)\psi(t/m)
+ -\frac12\sum_{m\le t}v(m)
+ -t\sum_{m>t}\frac{v(m)}m.
+\]
+Take $y=t\exp(- (\log t)^{2/3})$.  The first sum through $y$ is bounded by \cref{eq:app-petermann-input}; the strip $y<m\le t$ has mass $O((\log t)^{2/3})$ by the mean formula; the second sum is $F_0(v)\log t+O(1)$; and the last is $O(1)$ by partial summation.  Hence
+\[
+E_v(t)=-\frac{F_0(v)}2\log t
++O((\log t)^{2/3}(\log\log t)^{4/3}).
+\]
+The same formula for $v_h$, uniformly in $h$, follows from the exact convolution and \cref{eq:app-ch-logmoment}.
+
+\subsection{The pure-one count and the fixed character}
+Write $h=2n$, $x=n-1$, and $\chi=\chi_3$.  For odd high-prime $e$, the free pair low-prime count is
+\[
+N_f(x;e)=\frac32\left(\left\lfloor\frac xe\right\rfloor+
+\left\lfloor\frac{x}{3e}\right\rfloor\right),
+\]
+because after $y=2m$ the free $p=3$ weight is $3$ on $3\mid m$ and $3/2$ otherwise.  If $3\mid h$, this equals the anchored pure-one count.  If $3\nmid h$, the anchored weight is $3$ on the two classes
+$m\equiv0,n\pmod3$ and zero on the third; separating the free part gives exactly \cref{eq:character-correction}.
+
+Including the corner with $P_1$, put $Q_1=C+P_1$.  Direct summation of the free part gives
+\begin{equation}\label{eq:app-Q1free}
+Q_{1,\free}(h)
+=\frac32C^*(h)\{E_{v_h}(x)+E_{v_h}(x/3)\}
+-C^*(h)A(v_h),
+\end{equation}
+while the anchored-minus-free difference when $3\nmid h$ is
+\begin{equation}\label{eq:app-Q1char}
+Q_1-Q_{1,\free}
+=\frac32\chi(n)C^*(h)\Xcal_{v_h}(x).
+\end{equation}
+For the free pair singular series,
+\begin{equation}\label{eq:app-Sfree}
+S(h)=\frac32C_f\{E_\eta(x)+E_\eta(x/3)\}-1.
+\end{equation}
+
+It remains to control $\Xcal_{v_h}$.  For a fixed nonnegative coefficient $v$ supported on squarefree integers, the identity
+\[
+\chi_3(r)=\frac{\e(r/3)-\e(-r/3)}{i\sqrt3}
+\]
+places the character inside P\'etermann's prime exponential sums.  The resulting phases are reciprocal-plus-linear.  Every derivative estimate used in his exponential-sum stage begins at derivative order at least $2$, so the added linear term vanishes from all derivative hypotheses.  The only sign-sensitive use of the monotonicity hypothesis in the subsequent proof is the Abel step for prime powers; squarefree support removes $\nu\ge2$, and for $\nu=1$ the positive monotone coefficient $pv(p)$ is kept outside while $\chi_3(p)$ remains inside the already-controlled prime partial sum.  Absolute/Cauchy uses are unchanged.
+
+For the rational shifts needed here, use the scaled smoothing in \cref{eq:mod3-smoothing}: average
+\[
+\psi\!\left(\frac{X_0}{3q}+\frac a3+\vartheta\right)
+\quad(0\le\vartheta\le1/X_0).
+\]
+A jump requires \cref{eq:no-crossing}.  Both $X_0+aq$ and $3qr$ are integers and, in P\'etermann's range, $q<X_0/3$, so $0<3q/X_0<1$ and no such integer exists.  The nonzero Fourier modes acquire only the unit factor $\e(ja/3)$ and a fixed factor $1/3$ in the reciprocal parameter.  P\'etermann's proof therefore gives, for $a=1,2$,
+\begin{equation}\label{eq:app-shifted-petermann}
+\sum_{m\le Y}\chi(m)v(m)
+\psi\!\left(\frac{X_0}{3m}+\frac a3\right)
+\ll_b(\log X_0)^{2/3}(\log\log X_0)^{4/3},
+\end{equation}
+where $Y=(X_0/3)\exp(- (\log(X_0/3))^b)$.
+
+For integers $N\ge0$,
+\[
+\sum_{t\le N}\chi(t)
+=\left\lfloor\frac{N+2}{3}\right\rfloor
+ -\left\lfloor\frac{N+1}{3}\right\rfloor,
+\]
+so for real $u\ge0$,
+\[
+\sum_{t\le\lfloor u\rfloor}\chi(t)
+=\frac13+\psi(u/3+1/3)-\psi(u/3+2/3).
+\]
+Therefore
+\begin{align*}
+\Xcal_\om(x)
+={}&\frac13\sum_{e\le x}\chi(e)\om(e)\\
+&+\sum_{e\le x}\chi(e)\om(e)\psi(x/(3e)+1/3)\\
+&-\sum_{e\le x}\chi(e)\om(e)\psi(x/(3e)+2/3).
+\end{align*}
+The first sum is $O(1)$.  Indeed its Dirichlet series factors as
+$L(s+1,\chi)H(s)$, where for $p\ge5$
+\[
+H_p(s)=1+\frac{3\chi(p)}{p(p-3)}p^{-s}
+       -\frac1{p(p-3)}p^{-2s};
+\]
+the missing prime $2$ contributes only a fixed local factor, and
+$\prod_pH_p(s)$ is absolutely convergent at $\Re s=0$.  Equivalently,
+$\chi(e)\om(e)$ is the convolution of $\chi(m)/m$ with an $\ell^1$ sequence,
+and the partial sums of $\chi$ are bounded.  Put $z=x/3$.  The range
+$z<e\le x$ has absolute $\om$-mass $O(1)$.  On $e\le z$, use
+\cref{eq:app-shifted-petermann} with $b=3/4$; the strip between its truncation
+and $z$ costs $O((\log z)^{3/4})$.  Thus
+\[
+\Xcal_\om(x)
+\ll(\log x)^{3/4}
+ +(\log x)^{2/3}(\log\log x)^{4/3}+1.
+\]
+Finally the exact convolution identity is
+\[
+\Xcal_{v_h}(x)=\sum_{r\le x}c_h(r)\chi(r)\Xcal_\om(x/r).
+\]
+The plain $\ell^1$ part of \cref{eq:app-ch-logmoment} transfers the displayed increasing majorant uniformly in $h$, proving \cref{eq:mod3-bound} and \cref{lem:mod3-petermann}.
+
+Insert the uniform floor-error asymptotic and \cref{eq:mean-constants} into \cref{eq:app-Q1free}.  Since
+$\log x+\log(x/3)=2\log h+O(1)$,
+\[
+Q_{1,\free}(h)
+=-\frac12\log h+O(L^{2/3}(\log L)^{4/3}+1).
+\]
+The character correction \cref{eq:app-Q1char} is $o(L)$, hence
+$Q_1=-\tfrac12\log h+o(L)$.  Similarly \cref{eq:app-Sfree} gives
+\[
+S(h)=-\frac12\log h+O(L^{2/3}(\log L)^{4/3}).
+\]
+Since $C(h)=O(1)$, this proves $P_1-S=o(L)$.  The reflection identity
+\cref{eq:reflection-assembly,eq:support-term} then gives
+$P_2+D_1-S=o(L)$.  This proves \cref{prop:one-dimensional}.
+
+\section{Summary of error terms}\label{app:error-summary}
+The growing costs used in the proof are collected here:
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+source & cost & absorbed by \\
+\midrule
+Boolean resonant primes & $(\log\log Z)^C$ & strict exponent margin \\
+Erd\H{o}s--Tur\'an & $(\log\log Z)^C$ & strict exponent margin \\
+dyadic Boolean sum & one power of $\log Z$ & already in $2\sqrt a$ \\
+Boolean endpoints & $O(\log Z)$ & $\sigma<1$ \\
+forbidden-prime surcharge & $\exp(O(\sqrt{L/\log L}))$ & $T_{\rm comp}^{-1/2}$ \\
+slow exceptional region & $O(L^\sigma\log L)+O(1)$ & $\sigma<1$ \\
+fast main channels & $O(\log\log h)$ & exponential/superlog saving \\
+large divisor channels & $\exp(-cL^\sigma+O((L/\log L)^{1/4}))$ & direct \\
+Vaaler zero remainder mode & $L^{-8}$ & direct \\
+Vaaler nonzero remainder modes & $O(1)$ coefficient mass & block cancellation \\
+finite exterior blocks & $O(L^2)$ & choose block saving $L^{-20}$ \\
+decorated rows & $O(\log\log h)$ & strict/superlog savings \\
+P\'etermann floor error & $L^{2/3}(\log L)^{4/3}$ & $o(L)$ \\
+fixed mod $3$ correction & $L^{3/4}+L^{2/3}(\log L)^{4/3}$ & $o(L)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+The Boolean contribution is the only place where a logarithmic power approaches $1$, and its final exponent is the explicit value in \cref{eq:boolean-numerics}.  The reciprocal Karatsuba saving is asymptotically stronger than any fixed logarithmic power because $3\sigma-2=0.03>0$, but this is also the source of the very late onset noted in \cref{rem:onset}.
+
+\bibliographystyle{abbrv}
+\bibliography{references}
+\end{document}

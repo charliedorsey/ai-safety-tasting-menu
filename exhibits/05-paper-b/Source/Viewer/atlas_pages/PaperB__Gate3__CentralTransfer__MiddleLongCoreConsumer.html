@@ -1,0 +1,69 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · PaperB/Gate3/CentralTransfer/MiddleLongCoreConsumer.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>PaperB/Gate3/CentralTransfer/MiddleLongCoreConsumer.lean</h1><p class="meta">LEAN/PaperB/Gate3/CentralTransfer/MiddleLongCoreConsumer.lean · 68 lines · SHA-256 7955a44eedf216199121c89853e624eee487c502113f5331e0cc36b966764f1e</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import PaperB.Gate3.CentralTransfer.MiddleDirectionalPartition</span>
+<span class="l" id="L2"><span class="n">2</span>import PaperB.Gate3.CentralTransfer.ThreeSectorTerminalAssembly</span>
+<span class="l" id="L3"><span class="n">3</span>open scoped BigOperators Classical</span>
+<span class="l" id="L4"><span class="n">4</span>namespace Merivelle.Central</span>
+<span class="l" id="L5"><span class="n">5</span>open GoldC</span>
+<span class="l" id="L6"><span class="n">6</span></span>
+<span class="l" id="L7"><span class="n">7</span>noncomputable def longEither (δ : ℝ) (r s : ℕ) : Prop :=</span>
+<span class="l" id="L8"><span class="n">8</span>  longInverseLeft δ r s ∨ longInverseRight δ r s</span>
+<span class="l" id="L9"><span class="n">9</span></span>
+<span class="l" id="L10"><span class="n">10</span>noncomputable def signedLongMiddle (Jlow Jhigh : ℕ → ℕ)</span>
+<span class="l" id="L11"><span class="n">11</span>    (δ : ℝ) (q a h : ℕ) : ℝ :=</span>
+<span class="l" id="L12"><span class="n">12</span>  regionSumMiddleWhere (Jlow h) (Jhigh h) q h</span>
+<span class="l" id="L13"><span class="n">13</span>    (centralGate h) (longEither δ) (foldRow q a)</span>
+<span class="l" id="L14"><span class="n">14</span></span>
+<span class="l" id="L15"><span class="n">15</span>noncomputable def signedCoreMiddle (Jlow Jhigh : ℕ → ℕ)</span>
+<span class="l" id="L16"><span class="n">16</span>    (δ : ℝ) (q a h : ℕ) : ℝ :=</span>
+<span class="l" id="L17"><span class="n">17</span>  regionSumMiddleWhere (Jlow h) (Jhigh h) q h</span>
+<span class="l" id="L18"><span class="n">18</span>    (centralGate h) (fun r s =&gt; ¬ longEither δ r s) (foldRow q a)</span>
+<span class="l" id="L19"><span class="n">19</span></span>
+<span class="l" id="L20"><span class="n">20</span>theorem foldedMiddle_long_core (Jlow Jhigh q a h : ℕ) (δ : ℝ) :</span>
+<span class="l" id="L21"><span class="n">21</span>    regionSumMiddle Jlow Jhigh q h (centralGate h) (foldRow q a) =</span>
+<span class="l" id="L22"><span class="n">22</span>      regionSumMiddleWhere Jlow Jhigh q h (centralGate h)</span>
+<span class="l" id="L23"><span class="n">23</span>        (longEither δ) (foldRow q a) +</span>
+<span class="l" id="L24"><span class="n">24</span>      regionSumMiddleWhere Jlow Jhigh q h (centralGate h)</span>
+<span class="l" id="L25"><span class="n">25</span>        (fun r s =&gt; ¬ longEither δ r s) (foldRow q a) :=</span>
+<span class="l" id="L26"><span class="n">26</span>  regionSumMiddleWhere_add_compl Jlow Jhigh q h</span>
+<span class="l" id="L27"><span class="n">27</span>    (centralGate h) (longEither δ) (foldRow q a)</span>
+<span class="l" id="L28"><span class="n">28</span></span>
+<span class="l" id="L29"><span class="n">29</span>theorem middleSublog_of_long_core</span>
+<span class="l" id="L30"><span class="n">30</span>    (Jlow Jhigh : ℕ → ℕ) (δ : ℝ)</span>
+<span class="l" id="L31"><span class="n">31</span>    (hLong : SourceUniformSublog (signedLongMiddle Jlow Jhigh δ))</span>
+<span class="l" id="L32"><span class="n">32</span>    (hCore : SourceUniformSublog (signedCoreMiddle Jlow Jhigh δ)) :</span>
+<span class="l" id="L33"><span class="n">33</span>    SourceUniformSublog (middleSector Jlow Jhigh) := by</span>
+<span class="l" id="L34"><span class="n">34</span>  intro q hq hsq eps heps</span>
+<span class="l" id="L35"><span class="n">35</span>  have he : 0 &lt; eps / 2 := by positivity</span>
+<span class="l" id="L36"><span class="n">36</span>  obtain ⟨Hl, hl⟩ := hLong q hq hsq (eps / 2) he</span>
+<span class="l" id="L37"><span class="n">37</span>  obtain ⟨Hc, hc⟩ := hCore q hq hsq (eps / 2) he</span>
+<span class="l" id="L38"><span class="n">38</span>  refine ⟨max Hl Hc, ?_⟩</span>
+<span class="l" id="L39"><span class="n">39</span>  intro a h ha hh hp hH</span>
+<span class="l" id="L40"><span class="n">40</span>  have h1 := hl a h ha hh hp ((le_max_left _ _).trans hH)</span>
+<span class="l" id="L41"><span class="n">41</span>  have h2 := hc a h ha hh hp ((le_max_right _ _).trans hH)</span>
+<span class="l" id="L42"><span class="n">42</span>  change |regionSumMiddle (Jlow h) (Jhigh h) q h</span>
+<span class="l" id="L43"><span class="n">43</span>    (centralGate h) (foldRow q a)| ≤ eps * Real.log (h : ℝ)</span>
+<span class="l" id="L44"><span class="n">44</span>  rw [foldedMiddle_long_core]</span>
+<span class="l" id="L45"><span class="n">45</span>  change |signedLongMiddle Jlow Jhigh δ q a h +</span>
+<span class="l" id="L46"><span class="n">46</span>    signedCoreMiddle Jlow Jhigh δ q a h| ≤ eps * Real.log (h : ℝ)</span>
+<span class="l" id="L47"><span class="n">47</span>  calc</span>
+<span class="l" id="L48"><span class="n">48</span>    _ ≤ |signedLongMiddle Jlow Jhigh δ q a h| +</span>
+<span class="l" id="L49"><span class="n">49</span>        |signedCoreMiddle Jlow Jhigh δ q a h| := abs_add_le _ _</span>
+<span class="l" id="L50"><span class="n">50</span>    _ ≤ (eps / 2) * Real.log (h : ℝ) +</span>
+<span class="l" id="L51"><span class="n">51</span>        (eps / 2) * Real.log (h : ℝ) := add_le_add h1 h2</span>
+<span class="l" id="L52"><span class="n">52</span>    _ = eps * Real.log (h : ℝ) := by ring</span>
+<span class="l" id="L53"><span class="n">53</span></span>
+<span class="l" id="L54"><span class="n">54</span>theorem paperB_terminal_of_low_high_long_core</span>
+<span class="l" id="L55"><span class="n">55</span>    (Jlow Jhigh : ℕ → ℕ) (δ : ℝ)</span>
+<span class="l" id="L56"><span class="n">56</span>    (hord : ∀ h, Jlow h ≤ Jhigh h)</span>
+<span class="l" id="L57"><span class="n">57</span>    (hLow : SourceUniformSublog (lowSector Jlow))</span>
+<span class="l" id="L58"><span class="n">58</span>    (hHigh : SourceUniformSublog (highSector Jhigh))</span>
+<span class="l" id="L59"><span class="n">59</span>    (hLong : SourceUniformSublog (signedLongMiddle Jlow Jhigh δ))</span>
+<span class="l" id="L60"><span class="n">60</span>    (hCore : SourceUniformSublog (signedCoreMiddle Jlow Jhigh δ)) :</span>
+<span class="l" id="L61"><span class="n">61</span>    PaperB.Closure.PaperBTerminalStatement :=</span>
+<span class="l" id="L62"><span class="n">62</span>  paperB_terminal_of_three_sector_rates Jlow Jhigh hord hLow</span>
+<span class="l" id="L63"><span class="n">63</span>    (middleSublog_of_long_core Jlow Jhigh δ hLong hCore) hHigh</span>
+<span class="l" id="L64"><span class="n">64</span></span>
+<span class="l" id="L65"><span class="n">65</span>#print axioms foldedMiddle_long_core</span>
+<span class="l" id="L66"><span class="n">66</span>#print axioms middleSublog_of_long_core</span>
+<span class="l" id="L67"><span class="n">67</span>#print axioms paperB_terminal_of_low_high_long_core</span>
+<span class="l" id="L68"><span class="n">68</span>end Merivelle.Central</span></pre></div></body></html>

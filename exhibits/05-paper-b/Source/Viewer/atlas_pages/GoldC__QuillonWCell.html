@@ -1,0 +1,433 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · GoldC/QuillonWCell.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>GoldC/QuillonWCell.lean</h1><p class="meta">LEAN/GoldC/QuillonWCell.lean · 432 lines · SHA-256 732bfa8ae9dd708079c0a22d61643a019531a2c7072e1877b28e8816fc1f8846</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import GoldC.QuillonWLemma</span>
+<span class="l" id="L2"><span class="n">2</span>import GoldC.QuillonDecorationGronwall</span>
+<span class="l" id="L3"><span class="n">3</span>import Mathlib.RingTheory.Coprime.Lemmas</span>
+<span class="l" id="L4"><span class="n">4</span>import Mathlib.Analysis.SpecialFunctions.Pow.NNReal</span>
+<span class="l" id="L5"><span class="n">5</span></span>
+<span class="l" id="L6"><span class="n">6</span>/-!</span>
+<span class="l" id="L7"><span class="n">7</span># Quillon CSC3 F7.4a: the W′ cell bound with explicit gcd moment</span>
+<span class="l" id="L8"><span class="n">8</span></span>
+<span class="l" id="L9"><span class="n">9</span>For `s = ∏_{p∈P} p` (distinct primes), set</span>
+<span class="l" id="L10"><span class="n">10</span>`KB(c) := (∏_{p∈P} 3p³·(p if p ∣ c else 1))^{1/4}`.</span>
+<span class="l" id="L11"><span class="n">11</span></span>
+<span class="l" id="L12"><span class="n">12</span>* `norm_K_le_KB`: `‖K_s(b, c)‖ ≤ KB(c)` for all `b`. This combines `K_symm` and `K_squarefree_bound`.</span>
+<span class="l" id="L13"><span class="n">13</span>* `KB_le`: `KB(c) ≤ 3^{|P|/4}·s^{3/4}·(∏_{p∈P, p|c} p)^{1/4}`.</span>
+<span class="l" id="L14"><span class="n">14</span></span>
+<span class="l" id="L15"><span class="n">15</span>No axiom, no `sorry`.</span>
+<span class="l" id="L16"><span class="n">16</span>-/</span>
+<span class="l" id="L17"><span class="n">17</span></span>
+<span class="l" id="L18"><span class="n">18</span>open scoped BigOperators</span>
+<span class="l" id="L19"><span class="n">19</span>open Finset</span>
+<span class="l" id="L20"><span class="n">20</span></span>
+<span class="l" id="L21"><span class="n">21</span>namespace GoldC.QuillonWCell</span>
+<span class="l" id="L22"><span class="n">22</span></span>
+<span class="l" id="L23"><span class="n">23</span>open GoldC.QuillonKl GoldC.QuillonCompletion</span>
+<span class="l" id="L24"><span class="n">24</span></span>
+<span class="l" id="L25"><span class="n">25</span>/-- The Kloosterman majorant. -/</span>
+<span class="l" id="L26"><span class="n">26</span>noncomputable def KB (P : Finset ℕ) {s : ℕ} [NeZero s] (c : ZMod s) : ℝ :=</span>
+<span class="l" id="L27"><span class="n">27</span>  (∏ p ∈ P, (3 * (p : ℝ) ^ 3 * (if (ZMod.cast c : ZMod p) = 0 then (p : ℝ) else 1))) ^ ((1 : ℝ) / 4)</span>
+<span class="l" id="L28"><span class="n">28</span></span>
+<span class="l" id="L29"><span class="n">29</span>lemma KB_base_nonneg (P : Finset ℕ) {s : ℕ} [NeZero s] (c : ZMod s) :</span>
+<span class="l" id="L30"><span class="n">30</span>    0 ≤ ∏ p ∈ P, (3 * (p : ℝ) ^ 3 * (if (ZMod.cast c : ZMod p) = 0 then (p : ℝ) else 1)) :=</span>
+<span class="l" id="L31"><span class="n">31</span>  Finset.prod_nonneg fun p _ =&gt; by split_ifs &lt;;&gt; positivity</span>
+<span class="l" id="L32"><span class="n">32</span></span>
+<span class="l" id="L33"><span class="n">33</span>theorem norm_K_le_KB (P : Finset ℕ) (hP : ∀ p ∈ P, p.Prime) (s : ℕ) (hs : s = ∏ p ∈ P, p)</span>
+<span class="l" id="L34"><span class="n">34</span>    [NeZero s] (b c : ZMod s) : ‖K s b c‖ ≤ KB P c := by</span>
+<span class="l" id="L35"><span class="n">35</span>  rw [K_symm]</span>
+<span class="l" id="L36"><span class="n">36</span>  have h4 := K_squarefree_bound P hP s hs c b</span>
+<span class="l" id="L37"><span class="n">37</span>  have h0 := KB_base_nonneg P c</span>
+<span class="l" id="L38"><span class="n">38</span>  unfold KB</span>
+<span class="l" id="L39"><span class="n">39</span>  have : ‖K s c b‖ = (‖K s c b‖ ^ (4 : ℝ)) ^ ((1 : ℝ) / 4) := by</span>
+<span class="l" id="L40"><span class="n">40</span>    rw [← Real.rpow_mul (norm_nonneg _)]; norm_num</span>
+<span class="l" id="L41"><span class="n">41</span>  rw [this]</span>
+<span class="l" id="L42"><span class="n">42</span>  apply Real.rpow_le_rpow (by positivity) _ (by norm_num)</span>
+<span class="l" id="L43"><span class="n">43</span>  rw [show (4 : ℝ) = ((4 : ℕ) : ℝ) by norm_num, Real.rpow_natCast]</span>
+<span class="l" id="L44"><span class="n">44</span>  exact h4</span>
+<span class="l" id="L45"><span class="n">45</span></span>
+<span class="l" id="L46"><span class="n">46</span>theorem KB_le (P : Finset ℕ) (hP : ∀ p ∈ P, p.Prime) {s : ℕ} [NeZero s] (c : ZMod s) :</span>
+<span class="l" id="L47"><span class="n">47</span>    KB P c ≤ (3 : ℝ) ^ ((P.card : ℝ) / 4) * ((∏ p ∈ P, (p : ℝ)) ^ ((3 : ℝ) / 4)) *</span>
+<span class="l" id="L48"><span class="n">48</span>      (∏ p ∈ P.filter (fun p =&gt; (ZMod.cast c : ZMod p) = 0), (p : ℝ)) ^ ((1 : ℝ) / 4) := by</span>
+<span class="l" id="L49"><span class="n">49</span>  unfold KB</span>
+<span class="l" id="L50"><span class="n">50</span>  have hsplit : ∏ p ∈ P, (3 * (p : ℝ) ^ 3 * (if (ZMod.cast c : ZMod p) = 0 then (p : ℝ) else 1)) =</span>
+<span class="l" id="L51"><span class="n">51</span>      (3 : ℝ) ^ P.card * (∏ p ∈ P, (p : ℝ)) ^ 3 *</span>
+<span class="l" id="L52"><span class="n">52</span>        ∏ p ∈ P.filter (fun p =&gt; (ZMod.cast c : ZMod p) = 0), (p : ℝ) := by</span>
+<span class="l" id="L53"><span class="n">53</span>    rw [Finset.prod_mul_distrib, Finset.prod_mul_distrib, Finset.prod_const, Finset.prod_pow,</span>
+<span class="l" id="L54"><span class="n">54</span>      Finset.prod_ite, Finset.prod_const_one, mul_one]</span>
+<span class="l" id="L55"><span class="n">55</span>  rw [hsplit]</span>
+<span class="l" id="L56"><span class="n">56</span>  have h1 : (0 : ℝ) ≤ (3 : ℝ) ^ P.card := by positivity</span>
+<span class="l" id="L57"><span class="n">57</span>  have h2 : (0 : ℝ) ≤ (∏ p ∈ P, (p : ℝ)) ^ 3 := by</span>
+<span class="l" id="L58"><span class="n">58</span>    have : (0 : ℝ) ≤ ∏ p ∈ P, (p : ℝ) := Finset.prod_nonneg fun p _ =&gt; by positivity</span>
+<span class="l" id="L59"><span class="n">59</span>    positivity</span>
+<span class="l" id="L60"><span class="n">60</span>  have h3 : (0 : ℝ) ≤ ∏ p ∈ P.filter (fun p =&gt; (ZMod.cast c : ZMod p) = 0), (p : ℝ) :=</span>
+<span class="l" id="L61"><span class="n">61</span>    Finset.prod_nonneg fun p _ =&gt; by positivity</span>
+<span class="l" id="L62"><span class="n">62</span>  have hP0 : (0 : ℝ) ≤ ∏ p ∈ P, (p : ℝ) := Finset.prod_nonneg fun p _ =&gt; by positivity</span>
+<span class="l" id="L63"><span class="n">63</span>  rw [Real.mul_rpow (by positivity) h3, Real.mul_rpow h1 h2]</span>
+<span class="l" id="L64"><span class="n">64</span>  apply le_of_eq</span>
+<span class="l" id="L65"><span class="n">65</span>  congr 2</span>
+<span class="l" id="L66"><span class="n">66</span>  · rw [← Real.rpow_natCast, ← Real.rpow_mul (by norm_num)]; congr 1; ring</span>
+<span class="l" id="L67"><span class="n">67</span>  · rw [← Real.rpow_natCast, ← Real.rpow_mul hP0]; congr 1; norm_num</span>
+<span class="l" id="L68"><span class="n">68</span></span>
+<span class="l" id="L69"><span class="n">69</span>/-! ## The gcd moment -/</span>
+<span class="l" id="L70"><span class="n">70</span></span>
+<span class="l" id="L71"><span class="n">71</span>/-- Symmetric form of the pair count: ordered pairs `y ≠ y&#x27;` with `g ∣ y − y&#x27;`. -/</span>
+<span class="l" id="L72"><span class="n">72</span>lemma gcd_pair_sum_sym (g Y : ℕ) (hg : 1 ≤ g) :</span>
+<span class="l" id="L73"><span class="n">73</span>    ∑ y ∈ Icc 1 Y, ∑ y&#x27; ∈ (Icc 1 Y).filter (fun y&#x27; =&gt; y ≠ y&#x27; ∧ (g : ℤ) ∣ (y : ℤ) - y&#x27;),</span>
+<span class="l" id="L74"><span class="n">74</span>      (1 / ((y : ℝ) * y&#x27;)) ≤ 2 * (1 + Real.log Y) ^ 2 / g := by</span>
+<span class="l" id="L75"><span class="n">75</span>  have hbase := GoldC.QuillonCopyG.gcd_pair_sum_le g Y hg</span>
+<span class="l" id="L76"><span class="n">76</span>  -- split y ≠ y&#x27; into y &lt; y&#x27; and y&#x27; &lt; y</span>
+<span class="l" id="L77"><span class="n">77</span>  have hsplit : ∀ y ∈ Icc 1 Y, ∑ y&#x27; ∈ (Icc 1 Y).filter (fun y&#x27; =&gt; y ≠ y&#x27; ∧ (g : ℤ) ∣ (y : ℤ) - y&#x27;),</span>
+<span class="l" id="L78"><span class="n">78</span>      (1 / ((y : ℝ) * y&#x27;)) =</span>
+<span class="l" id="L79"><span class="n">79</span>      ∑ y&#x27; ∈ (Icc 1 Y).filter (fun y&#x27; =&gt; y &lt; y&#x27; ∧ g ∣ y&#x27; - y), (1 / ((y : ℝ) * y&#x27;)) +</span>
+<span class="l" id="L80"><span class="n">80</span>      ∑ y&#x27; ∈ (Icc 1 Y).filter (fun y&#x27; =&gt; y&#x27; &lt; y ∧ g ∣ y - y&#x27;), (1 / ((y : ℝ) * y&#x27;)) := by</span>
+<span class="l" id="L81"><span class="n">81</span>    intro y _</span>
+<span class="l" id="L82"><span class="n">82</span>    rw [← Finset.sum_union]</span>
+<span class="l" id="L83"><span class="n">83</span>    · apply Finset.sum_congr _ (fun _ _ =&gt; rfl)</span>
+<span class="l" id="L84"><span class="n">84</span>      ext y&#x27;</span>
+<span class="l" id="L85"><span class="n">85</span>      simp only [mem_filter, mem_union, mem_Icc]</span>
+<span class="l" id="L86"><span class="n">86</span>      constructor</span>
+<span class="l" id="L87"><span class="n">87</span>      · rintro ⟨hy&#x27;, hne, hdvd⟩</span>
+<span class="l" id="L88"><span class="n">88</span>        rcases lt_or_gt_of_ne hne with h | h</span>
+<span class="l" id="L89"><span class="n">89</span>        · left; refine ⟨hy&#x27;, h, ?_⟩</span>
+<span class="l" id="L90"><span class="n">90</span>          have : (g : ℤ) ∣ ((y&#x27; - y : ℕ) : ℤ) := by</span>
+<span class="l" id="L91"><span class="n">91</span>            rw [Nat.cast_sub h.le]; rw [← dvd_neg]; convert hdvd using 1; ring</span>
+<span class="l" id="L92"><span class="n">92</span>          exact_mod_cast this</span>
+<span class="l" id="L93"><span class="n">93</span>        · right; refine ⟨hy&#x27;, h, ?_⟩</span>
+<span class="l" id="L94"><span class="n">94</span>          have : (g : ℤ) ∣ ((y - y&#x27; : ℕ) : ℤ) := by rw [Nat.cast_sub h.le]; exact hdvd</span>
+<span class="l" id="L95"><span class="n">95</span>          exact_mod_cast this</span>
+<span class="l" id="L96"><span class="n">96</span>      · rintro (⟨hy&#x27;, h, hdvd⟩ | ⟨hy&#x27;, h, hdvd⟩)</span>
+<span class="l" id="L97"><span class="n">97</span>        · refine ⟨hy&#x27;, h.ne, ?_⟩</span>
+<span class="l" id="L98"><span class="n">98</span>          have : (g : ℤ) ∣ ((y&#x27; - y : ℕ) : ℤ) := by exact_mod_cast hdvd</span>
+<span class="l" id="L99"><span class="n">99</span>          rw [Nat.cast_sub h.le] at this; rw [← dvd_neg]; convert this using 1; ring</span>
+<span class="l" id="L100"><span class="n">100</span>        · refine ⟨hy&#x27;, h.ne&#x27;, ?_⟩</span>
+<span class="l" id="L101"><span class="n">101</span>          have : (g : ℤ) ∣ ((y - y&#x27; : ℕ) : ℤ) := by exact_mod_cast hdvd</span>
+<span class="l" id="L102"><span class="n">102</span>          rw [Nat.cast_sub h.le] at this; exact this</span>
+<span class="l" id="L103"><span class="n">103</span>    · rw [Finset.disjoint_left]</span>
+<span class="l" id="L104"><span class="n">104</span>      intro y&#x27; h1 h2; simp only [mem_filter] at h1 h2; omega</span>
+<span class="l" id="L105"><span class="n">105</span>  rw [Finset.sum_congr rfl hsplit, Finset.sum_add_distrib]</span>
+<span class="l" id="L106"><span class="n">106</span>  -- the second double sum equals the first after swapping (y, y&#x27;)</span>
+<span class="l" id="L107"><span class="n">107</span>  have hswap : ∑ y ∈ Icc 1 Y, ∑ y&#x27; ∈ (Icc 1 Y).filter (fun y&#x27; =&gt; y&#x27; &lt; y ∧ g ∣ y - y&#x27;),</span>
+<span class="l" id="L108"><span class="n">108</span>      (1 / ((y : ℝ) * y&#x27;)) =</span>
+<span class="l" id="L109"><span class="n">109</span>      ∑ y ∈ Icc 1 Y, ∑ y&#x27; ∈ (Icc 1 Y).filter (fun y&#x27; =&gt; y &lt; y&#x27; ∧ g ∣ y&#x27; - y),</span>
+<span class="l" id="L110"><span class="n">110</span>        (1 / ((y : ℝ) * y&#x27;)) := by</span>
+<span class="l" id="L111"><span class="n">111</span>    rw [Finset.sum_comm&#x27; (t&#x27; := Icc 1 Y) (s&#x27; := fun y&#x27; =&gt; (Icc 1 Y).filter (fun y =&gt; y&#x27; &lt; y ∧ g ∣ y - y&#x27;))]</span>
+<span class="l" id="L112"><span class="n">112</span>    · refine Finset.sum_congr rfl fun y&#x27; _ =&gt; Finset.sum_congr rfl fun y _ =&gt; by ring</span>
+<span class="l" id="L113"><span class="n">113</span>    · intro y y&#x27;</span>
+<span class="l" id="L114"><span class="n">114</span>      simp only [mem_Icc, mem_filter]</span>
+<span class="l" id="L115"><span class="n">115</span>      tauto</span>
+<span class="l" id="L116"><span class="n">116</span>  rw [hswap]</span>
+<span class="l" id="L117"><span class="n">117</span>  have hg&#x27; : (0 : ℝ) &lt; g := by exact_mod_cast hg</span>
+<span class="l" id="L118"><span class="n">118</span>  have : 2 * (1 + Real.log Y) ^ 2 / g = (1 + Real.log Y) ^ 2 / g + (1 + Real.log Y) ^ 2 / g := by</span>
+<span class="l" id="L119"><span class="n">119</span>    ring</span>
+<span class="l" id="L120"><span class="n">120</span>  rw [this]</span>
+<span class="l" id="L121"><span class="n">121</span>  exact add_le_add hbase hbase</span>
+<span class="l" id="L122"><span class="n">122</span></span>
+<span class="l" id="L123"><span class="n">123</span>/-- Expanding `(∏_{p∈S} p)^{1/4}` over subsets. -/</span>
+<span class="l" id="L124"><span class="n">124</span>lemma prod_rpow_quarter_eq (S : Finset ℕ) :</span>
+<span class="l" id="L125"><span class="n">125</span>    (∏ p ∈ S, (p : ℝ)) ^ ((1 : ℝ) / 4) =</span>
+<span class="l" id="L126"><span class="n">126</span>      ∑ D ∈ S.powerset, ∏ p ∈ D, ((p : ℝ) ^ ((1 : ℝ) / 4) - 1) := by</span>
+<span class="l" id="L127"><span class="n">127</span>  rw [← Real.finsetProd_rpow S _ (fun p _ =&gt; by positivity), ← Finset.prod_one_add]</span>
+<span class="l" id="L128"><span class="n">128</span>  exact Finset.prod_congr rfl fun p _ =&gt; by ring</span>
+<span class="l" id="L129"><span class="n">129</span></span>
+<span class="l" id="L130"><span class="n">130</span>lemma prime_prod_dvd (D : Finset ℕ) (hD : ∀ p ∈ D, p.Prime) (z : ℤ)</span>
+<span class="l" id="L131"><span class="n">131</span>    (h : ∀ p ∈ D, (p : ℤ) ∣ z) : ((∏ p ∈ D, p : ℕ) : ℤ) ∣ z := by</span>
+<span class="l" id="L132"><span class="n">132</span>  push_cast</span>
+<span class="l" id="L133"><span class="n">133</span>  apply Finset.prod_dvd_of_coprime _ h</span>
+<span class="l" id="L134"><span class="n">134</span>  intro p hp q hq hpq</span>
+<span class="l" id="L135"><span class="n">135</span>  simp only [Function.onFun]</span>
+<span class="l" id="L136"><span class="n">136</span>  rw [Nat.isCoprime_iff_coprime]</span>
+<span class="l" id="L137"><span class="n">137</span>  exact (Nat.coprime_primes (hD p hp) (hD q hq)).2 hpq</span>
+<span class="l" id="L138"><span class="n">138</span></span>
+<span class="l" id="L139"><span class="n">139</span>/-- **W4 (gcd moment).** For distinct primes `P`,</span>
+<span class="l" id="L140"><span class="n">140</span>`Σ_{y≠y&#x27; ≤ Y} (1/(yy&#x27;))·(∏_{p∈P, p∣y−y&#x27;} p)^{1/4} ≤ 2(1+log Y)²·∏_{p∈P}(1+p^{−3/4})`. -/</span>
+<span class="l" id="L141"><span class="n">141</span>theorem gcd_moment (P : Finset ℕ) (hP : ∀ p ∈ P, p.Prime) (Y : ℕ) :</span>
+<span class="l" id="L142"><span class="n">142</span>    ∑ y ∈ Icc 1 Y, ∑ y&#x27; ∈ (Icc 1 Y).filter (fun y&#x27; =&gt; y ≠ y&#x27;),</span>
+<span class="l" id="L143"><span class="n">143</span>      (1 / ((y : ℝ) * y&#x27;)) *</span>
+<span class="l" id="L144"><span class="n">144</span>        (∏ p ∈ P.filter (fun p : ℕ =&gt; (p : ℤ) ∣ (y : ℤ) - y&#x27;), (p : ℝ)) ^ ((1 : ℝ) / 4)</span>
+<span class="l" id="L145"><span class="n">145</span>    ≤ 2 * (1 + Real.log Y) ^ 2 * ∏ p ∈ P, (1 + (p : ℝ) ^ (-(3 : ℝ) / 4)) := by</span>
+<span class="l" id="L146"><span class="n">146</span>  classical</span>
+<span class="l" id="L147"><span class="n">147</span>  set a : Finset ℕ → ℝ := fun D =&gt; ∏ p ∈ D, ((p : ℝ) ^ ((1 : ℝ) / 4) - 1) with ha_def</span>
+<span class="l" id="L148"><span class="n">148</span>  have hq : ∀ p ∈ P, (1 : ℝ) ≤ (p : ℝ) ^ ((1 : ℝ) / 4) := fun p hp =&gt;</span>
+<span class="l" id="L149"><span class="n">149</span>    Real.one_le_rpow (by exact_mod_cast (hP p hp).one_lt.le) (by norm_num)</span>
+<span class="l" id="L150"><span class="n">150</span>  have ha : ∀ D ∈ P.powerset, 0 ≤ a D := fun D hD =&gt; prod_nonneg fun p hp =&gt; by</span>
+<span class="l" id="L151"><span class="n">151</span>    have := hq p (mem_powerset.1 hD hp); linarith</span>
+<span class="l" id="L152"><span class="n">152</span>  set ind : Finset ℕ → ℕ → ℕ → ℝ := fun D y y&#x27; =&gt;</span>
+<span class="l" id="L153"><span class="n">153</span>    if ((∏ p ∈ D, p : ℕ) : ℤ) ∣ (y : ℤ) - y&#x27; then 1 else 0 with hind</span>
+<span class="l" id="L154"><span class="n">154</span>  have step1 : ∀ y y&#x27; : ℕ,</span>
+<span class="l" id="L155"><span class="n">155</span>      (∏ p ∈ P.filter (fun p : ℕ =&gt; (p : ℤ) ∣ (y : ℤ) - y&#x27;), (p : ℝ)) ^ ((1 : ℝ) / 4) ≤</span>
+<span class="l" id="L156"><span class="n">156</span>        ∑ D ∈ P.powerset, a D * ind D y y&#x27; := by</span>
+<span class="l" id="L157"><span class="n">157</span>    intro y y&#x27;</span>
+<span class="l" id="L158"><span class="n">158</span>    rw [prod_rpow_quarter_eq]</span>
+<span class="l" id="L159"><span class="n">159</span>    simp only [hind, mul_ite, mul_one, mul_zero]</span>
+<span class="l" id="L160"><span class="n">160</span>    rw [← Finset.sum_filter]</span>
+<span class="l" id="L161"><span class="n">161</span>    apply Finset.sum_le_sum_of_subset_of_nonneg</span>
+<span class="l" id="L162"><span class="n">162</span>    · intro D hD</span>
+<span class="l" id="L163"><span class="n">163</span>      rw [mem_powerset] at hD</span>
+<span class="l" id="L164"><span class="n">164</span>      rw [mem_filter, mem_powerset]</span>
+<span class="l" id="L165"><span class="n">165</span>      refine ⟨hD.trans (filter_subset _ _), ?_⟩</span>
+<span class="l" id="L166"><span class="n">166</span>      apply prime_prod_dvd D (fun p hp =&gt; hP p (filter_subset _ _ (hD hp)))</span>
+<span class="l" id="L167"><span class="n">167</span>      intro p hp; exact (mem_filter.1 (hD hp)).2</span>
+<span class="l" id="L168"><span class="n">168</span>    · intro D hD _</span>
+<span class="l" id="L169"><span class="n">169</span>      exact ha D (mem_filter.1 hD).1</span>
+<span class="l" id="L170"><span class="n">170</span>  have hY := fun (D : Finset ℕ) (hD : D ∈ P.powerset) =&gt;</span>
+<span class="l" id="L171"><span class="n">171</span>    gcd_pair_sum_sym (∏ p ∈ D, p) Y</span>
+<span class="l" id="L172"><span class="n">172</span>      (Nat.one_le_iff_ne_zero.2 (Finset.prod_ne_zero_iff.2 fun p hp =&gt;</span>
+<span class="l" id="L173"><span class="n">173</span>        (hP p (mem_powerset.1 hD hp)).ne_zero))</span>
+<span class="l" id="L174"><span class="n">174</span>  calc _ ≤ ∑ y ∈ Icc 1 Y, ∑ y&#x27; ∈ (Icc 1 Y).filter (fun y&#x27; =&gt; y ≠ y&#x27;),</span>
+<span class="l" id="L175"><span class="n">175</span>        ∑ D ∈ P.powerset, a D * ((1 / ((y : ℝ) * y&#x27;)) * ind D y y&#x27;) := by</span>
+<span class="l" id="L176"><span class="n">176</span>        refine sum_le_sum fun y hy =&gt; sum_le_sum fun y&#x27; hy&#x27; =&gt; ?_</span>
+<span class="l" id="L177"><span class="n">177</span>        have hpos : (0 : ℝ) ≤ 1 / ((y : ℝ) * y&#x27;) := by positivity</span>
+<span class="l" id="L178"><span class="n">178</span>        calc _ ≤ (1 / ((y : ℝ) * y&#x27;)) * ∑ D ∈ P.powerset, a D * ind D y y&#x27; :=</span>
+<span class="l" id="L179"><span class="n">179</span>              mul_le_mul_of_nonneg_left (step1 y y&#x27;) hpos</span>
+<span class="l" id="L180"><span class="n">180</span>          _ = _ := by rw [mul_sum]; exact sum_congr rfl fun D _ =&gt; by ring</span>
+<span class="l" id="L181"><span class="n">181</span>    _ = ∑ D ∈ P.powerset, a D * ∑ y ∈ Icc 1 Y,</span>
+<span class="l" id="L182"><span class="n">182</span>          ∑ y&#x27; ∈ (Icc 1 Y).filter (fun y&#x27; =&gt; y ≠ y&#x27; ∧</span>
+<span class="l" id="L183"><span class="n">183</span>            ((∏ p ∈ D, p : ℕ) : ℤ) ∣ (y : ℤ) - y&#x27;), (1 / ((y : ℝ) * y&#x27;)) := by</span>
+<span class="l" id="L184"><span class="n">184</span>        rw [sum_congr rfl fun y _ =&gt; sum_comm, sum_comm]</span>
+<span class="l" id="L185"><span class="n">185</span>        refine sum_congr rfl fun D _ =&gt; ?_</span>
+<span class="l" id="L186"><span class="n">186</span>        rw [mul_sum]</span>
+<span class="l" id="L187"><span class="n">187</span>        refine sum_congr rfl fun y _ =&gt; ?_</span>
+<span class="l" id="L188"><span class="n">188</span>        rw [mul_sum, ← filter_filter,</span>
+<span class="l" id="L189"><span class="n">189</span>          Finset.sum_filter (p := fun y&#x27; : ℕ =&gt; ((∏ p ∈ D, p : ℕ) : ℤ) ∣ (y : ℤ) - y&#x27;)]</span>
+<span class="l" id="L190"><span class="n">190</span>        refine sum_congr rfl fun y&#x27; _ =&gt; ?_</span>
+<span class="l" id="L191"><span class="n">191</span>        simp only [hind]; split_ifs &lt;;&gt; simp</span>
+<span class="l" id="L192"><span class="n">192</span>    _ ≤ ∑ D ∈ P.powerset, a D * (2 * (1 + Real.log Y) ^ 2 / ((∏ p ∈ D, p : ℕ) : ℝ)) :=</span>
+<span class="l" id="L193"><span class="n">193</span>        sum_le_sum fun D hD =&gt; mul_le_mul_of_nonneg_left (hY D hD) (ha D hD)</span>
+<span class="l" id="L194"><span class="n">194</span>    _ ≤ ∑ D ∈ P.powerset, 2 * (1 + Real.log Y) ^ 2 * ∏ p ∈ D, (p : ℝ) ^ (-(3 : ℝ) / 4) := by</span>
+<span class="l" id="L195"><span class="n">195</span>        refine sum_le_sum fun D hD =&gt; ?_</span>
+<span class="l" id="L196"><span class="n">196</span>        have hDP := mem_powerset.1 hD</span>
+<span class="l" id="L197"><span class="n">197</span>        have hC : (0 : ℝ) ≤ 2 * (1 + Real.log Y) ^ 2 := by positivity</span>
+<span class="l" id="L198"><span class="n">198</span>        have key : a D / ((∏ p ∈ D, p : ℕ) : ℝ) ≤ ∏ p ∈ D, (p : ℝ) ^ (-(3 : ℝ) / 4) := by</span>
+<span class="l" id="L199"><span class="n">199</span>          rw [ha_def, Nat.cast_prod, ← prod_div_distrib]</span>
+<span class="l" id="L200"><span class="n">200</span>          apply Finset.prod_le_prod₀</span>
+<span class="l" id="L201"><span class="n">201</span>          · intro p hp</span>
+<span class="l" id="L202"><span class="n">202</span>            have := hq p (hDP hp)</span>
+<span class="l" id="L203"><span class="n">203</span>            have : (0 : ℝ) &lt; p := by exact_mod_cast (hP p (hDP hp)).pos</span>
+<span class="l" id="L204"><span class="n">204</span>            apply div_nonneg &lt;;&gt; linarith</span>
+<span class="l" id="L205"><span class="n">205</span>          · intro p hp</span>
+<span class="l" id="L206"><span class="n">206</span>            have hp0 : (0 : ℝ) &lt; p := by exact_mod_cast (hP p (hDP hp)).pos</span>
+<span class="l" id="L207"><span class="n">207</span>            calc ((p : ℝ) ^ ((1 : ℝ) / 4) - 1) / p ≤ (p : ℝ) ^ ((1 : ℝ) / 4) / p :=</span>
+<span class="l" id="L208"><span class="n">208</span>                  div_le_div_of_nonneg_right (by linarith) hp0.le</span>
+<span class="l" id="L209"><span class="n">209</span>              _ = (p : ℝ) ^ (-(3 : ℝ) / 4) := by</span>
+<span class="l" id="L210"><span class="n">210</span>                  rw [← Real.rpow_sub_one hp0.ne&#x27;]; norm_num</span>
+<span class="l" id="L211"><span class="n">211</span>        calc a D * (2 * (1 + Real.log Y) ^ 2 / ((∏ p ∈ D, p : ℕ) : ℝ))</span>
+<span class="l" id="L212"><span class="n">212</span>            = 2 * (1 + Real.log Y) ^ 2 * (a D / ((∏ p ∈ D, p : ℕ) : ℝ)) := by ring</span>
+<span class="l" id="L213"><span class="n">213</span>          _ ≤ _ := mul_le_mul_of_nonneg_left key hC</span>
+<span class="l" id="L214"><span class="n">214</span>    _ = _ := by rw [← mul_sum, ← Finset.prod_one_add]</span>
+<span class="l" id="L215"><span class="n">215</span></span>
+<span class="l" id="L216"><span class="n">216</span>/-! ## W3: which primes divide the off-diagonal frequency -/</span>
+<span class="l" id="L217"><span class="n">217</span></span>
+<span class="l" id="L218"><span class="n">218</span>lemma cast_freq_zero {s : ℕ} (p : ℕ) (hp : p.Prime) (hps : p ∣ s) (c₀ : ZMod s) (y y&#x27; : ℕ)</span>
+<span class="l" id="L219"><span class="n">219</span>    (hy : IsUnit (y : ZMod s)) (hy&#x27; : IsUnit (y&#x27; : ZMod s))</span>
+<span class="l" id="L220"><span class="n">220</span>    (h : (ZMod.cast (c₀ * ((y : ZMod s)⁻¹ - (y&#x27; : ZMod s)⁻¹)) : ZMod p) = 0) :</span>
+<span class="l" id="L221"><span class="n">221</span>    (ZMod.cast c₀ : ZMod p) = 0 ∨ (p : ℤ) ∣ (y : ℤ) - y&#x27; := by</span>
+<span class="l" id="L222"><span class="n">222</span>  have := Fact.mk hp</span>
+<span class="l" id="L223"><span class="n">223</span>  set φ := ZMod.castHom hps (ZMod p)</span>
+<span class="l" id="L224"><span class="n">224</span>  have hφ : ∀ x : ZMod s, (ZMod.cast x : ZMod p) = φ x := fun x =&gt; (ZMod.castHom_apply x).symm</span>
+<span class="l" id="L225"><span class="n">225</span>  rw [hφ, map_mul, map_sub, mul_eq_zero] at h</span>
+<span class="l" id="L226"><span class="n">226</span>  rcases h with h | h</span>
+<span class="l" id="L227"><span class="n">227</span>  · left; rw [hφ]; exact h</span>
+<span class="l" id="L228"><span class="n">228</span>  · right</span>
+<span class="l" id="L229"><span class="n">229</span>    have e1 : (y : ZMod p) * φ ((y : ZMod s)⁻¹) = 1 := by</span>
+<span class="l" id="L230"><span class="n">230</span>      have := congrArg φ (ZMod.mul_inv_of_unit _ hy); rwa [map_mul, map_natCast, map_one] at this</span>
+<span class="l" id="L231"><span class="n">231</span>    have e2 : (y&#x27; : ZMod p) * φ ((y&#x27; : ZMod s)⁻¹) = 1 := by</span>
+<span class="l" id="L232"><span class="n">232</span>      have := congrArg φ (ZMod.mul_inv_of_unit _ hy&#x27;); rwa [map_mul, map_natCast, map_one] at this</span>
+<span class="l" id="L233"><span class="n">233</span>    have hyy : (y : ZMod p) = y&#x27; := by</span>
+<span class="l" id="L234"><span class="n">234</span>      have h&#x27; : φ ((y : ZMod s)⁻¹) = φ ((y&#x27; : ZMod s)⁻¹) := sub_eq_zero.1 h</span>
+<span class="l" id="L235"><span class="n">235</span>      calc (y : ZMod p) = y * ((y&#x27; : ZMod p) * φ ((y&#x27; : ZMod s)⁻¹)) := by rw [e2, mul_one]</span>
+<span class="l" id="L236"><span class="n">236</span>        _ = y&#x27; * ((y : ZMod p) * φ ((y : ZMod s)⁻¹)) := by rw [h&#x27;]; ring</span>
+<span class="l" id="L237"><span class="n">237</span>        _ = y&#x27; := by rw [e1, mul_one]</span>
+<span class="l" id="L238"><span class="n">238</span>    have : ((y&#x27; : ℤ) : ZMod p) = ((y : ℤ) : ZMod p) := by</span>
+<span class="l" id="L239"><span class="n">239</span>      push_cast; exact hyy.symm</span>
+<span class="l" id="L240"><span class="n">240</span>    exact (ZMod.intCast_eq_intCast_iff_dvd_sub _ _ _).1 this</span>
+<span class="l" id="L241"><span class="n">241</span></span>
+<span class="l" id="L242"><span class="n">242</span>/-- Product form of W3: `∏_{p∈P, p∣c} p ≤ G₀(c₀) · ∏_{p∈P, p∣y−y&#x27;} p`. -/</span>
+<span class="l" id="L243"><span class="n">243</span>lemma prod_freq_le {s : ℕ} (P : Finset ℕ) (hP : ∀ p ∈ P, p.Prime) (hs : s = ∏ p ∈ P, p)</span>
+<span class="l" id="L244"><span class="n">244</span>    (c₀ : ZMod s) (y y&#x27; : ℕ) (hy : IsUnit (y : ZMod s)) (hy&#x27; : IsUnit (y&#x27; : ZMod s)) :</span>
+<span class="l" id="L245"><span class="n">245</span>    ∏ p ∈ P.filter (fun p =&gt; (ZMod.cast (c₀ * ((y : ZMod s)⁻¹ - (y&#x27; : ZMod s)⁻¹)) : ZMod p) = 0),</span>
+<span class="l" id="L246"><span class="n">246</span>        (p : ℝ) ≤</span>
+<span class="l" id="L247"><span class="n">247</span>      (∏ p ∈ P.filter (fun p =&gt; (ZMod.cast c₀ : ZMod p) = 0), (p : ℝ)) *</span>
+<span class="l" id="L248"><span class="n">248</span>        ∏ p ∈ P.filter (fun p : ℕ =&gt; (p : ℤ) ∣ (y : ℤ) - y&#x27;), (p : ℝ) := by</span>
+<span class="l" id="L249"><span class="n">249</span>  classical</span>
+<span class="l" id="L250"><span class="n">250</span>  set B := P.filter (fun p =&gt; (ZMod.cast c₀ : ZMod p) = 0)</span>
+<span class="l" id="L251"><span class="n">251</span>  set C := P.filter (fun p : ℕ =&gt; (p : ℤ) ∣ (y : ℤ) - y&#x27;)</span>
+<span class="l" id="L252"><span class="n">252</span>  have h1 : ∀ p ∈ P, (1 : ℝ) ≤ p := fun p hp =&gt; by exact_mod_cast (hP p hp).one_lt.le</span>
+<span class="l" id="L253"><span class="n">253</span>  have hsub : P.filter (fun p =&gt; (ZMod.cast (c₀ * ((y : ZMod s)⁻¹ - (y&#x27; : ZMod s)⁻¹)) :</span>
+<span class="l" id="L254"><span class="n">254</span>      ZMod p) = 0) ⊆ B ∪ C := by</span>
+<span class="l" id="L255"><span class="n">255</span>    intro p hp</span>
+<span class="l" id="L256"><span class="n">256</span>    rw [mem_filter] at hp</span>
+<span class="l" id="L257"><span class="n">257</span>    have hps : p ∣ s := by rw [hs]; exact Finset.dvd_prod_of_mem _ hp.1</span>
+<span class="l" id="L258"><span class="n">258</span>    rcases cast_freq_zero p (hP p hp.1) hps c₀ y y&#x27; hy hy&#x27; hp.2 with h | h</span>
+<span class="l" id="L259"><span class="n">259</span>    · exact mem_union_left _ (mem_filter.2 ⟨hp.1, h⟩)</span>
+<span class="l" id="L260"><span class="n">260</span>    · exact mem_union_right _ (mem_filter.2 ⟨hp.1, h⟩)</span>
+<span class="l" id="L261"><span class="n">261</span>  calc _ ≤ ∏ p ∈ B ∪ C, (p : ℝ) :=</span>
+<span class="l" id="L262"><span class="n">262</span>        Finset.prod_le_prod_of_subset_of_one_le₀ hsub (fun p _ =&gt; by positivity) fun p hp _ =&gt;</span>
+<span class="l" id="L263"><span class="n">263</span>          h1 p (by rcases mem_union.1 hp with h | h &lt;;&gt; exact (mem_filter.1 h).1)</span>
+<span class="l" id="L264"><span class="n">264</span>    _ ≤ (∏ p ∈ B ∪ C, (p : ℝ)) * ∏ p ∈ B ∩ C, (p : ℝ) := by</span>
+<span class="l" id="L265"><span class="n">265</span>        apply le_mul_of_one_le_right (prod_nonneg fun p _ =&gt; by positivity)</span>
+<span class="l" id="L266"><span class="n">266</span>        exact Finset.one_le_prod₀ fun p hp =&gt; h1 p (mem_filter.1 (mem_inter.1 hp).1).1</span>
+<span class="l" id="L267"><span class="n">267</span>    _ = _ := Finset.prod_union_inter</span>
+<span class="l" id="L268"><span class="n">268</span></span>
+<span class="l" id="L269"><span class="n">269</span>/-- Off-diagonal Kloosterman majorant: `KB(c₀(ȳ−ȳ&#x27;)) ≤ 3^{|P|/4}s^{3/4}G₀^{1/4}(∏_{p∣y−y&#x27;}p)^{1/4}`. -/</span>
+<span class="l" id="L270"><span class="n">270</span>lemma KB_offdiag {s : ℕ} [NeZero s] (P : Finset ℕ) (hP : ∀ p ∈ P, p.Prime) (hs : s = ∏ p ∈ P, p)</span>
+<span class="l" id="L271"><span class="n">271</span>    (c₀ : ZMod s) (y y&#x27; : ℕ) (hy : IsUnit (y : ZMod s)) (hy&#x27; : IsUnit (y&#x27; : ZMod s)) :</span>
+<span class="l" id="L272"><span class="n">272</span>    KB P (c₀ * ((y : ZMod s)⁻¹ - (y&#x27; : ZMod s)⁻¹)) ≤</span>
+<span class="l" id="L273"><span class="n">273</span>      (3 : ℝ) ^ ((P.card : ℝ) / 4) * (s : ℝ) ^ ((3 : ℝ) / 4) *</span>
+<span class="l" id="L274"><span class="n">274</span>        (∏ p ∈ P.filter (fun p =&gt; (ZMod.cast c₀ : ZMod p) = 0), (p : ℝ)) ^ ((1 : ℝ) / 4) *</span>
+<span class="l" id="L275"><span class="n">275</span>        (∏ p ∈ P.filter (fun p : ℕ =&gt; (p : ℤ) ∣ (y : ℤ) - y&#x27;), (p : ℝ)) ^ ((1 : ℝ) / 4) := by</span>
+<span class="l" id="L276"><span class="n">276</span>  refine (KB_le P hP _).trans ?_</span>
+<span class="l" id="L277"><span class="n">277</span>  have hsR : (∏ p ∈ P, (p : ℝ)) = (s : ℝ) := by rw [hs, Nat.cast_prod]</span>
+<span class="l" id="L278"><span class="n">278</span>  rw [hsR, mul_assoc _ (_ ^ ((1 : ℝ) / 4)), ← Real.mul_rpow (prod_nonneg fun p _ =&gt; by positivity)</span>
+<span class="l" id="L279"><span class="n">279</span>    (prod_nonneg fun p _ =&gt; by positivity)]</span>
+<span class="l" id="L280"><span class="n">280</span>  apply mul_le_mul_of_nonneg_left _ (by positivity)</span>
+<span class="l" id="L281"><span class="n">281</span>  exact Real.rpow_le_rpow (prod_nonneg fun p _ =&gt; by positivity)</span>
+<span class="l" id="L282"><span class="n">282</span>    (prod_freq_le P hP hs c₀ y y&#x27; hy hy&#x27;) (by norm_num)</span>
+<span class="l" id="L283"><span class="n">283</span></span>
+<span class="l" id="L284"><span class="n">284</span>/-- **W5 (the W′ cell bound).** For `s = ∏P` (distinct primes), `𝒴 ⊆ [1, Y]` units mod `s`,</span>
+<span class="l" id="L285"><span class="n">285</span>`𝒩 ⊆ (N, M]` and `‖α_y‖ ≤ A/y`:</span>
+<span class="l" id="L286"><span class="n">286</span></span>
+<span class="l" id="L287"><span class="n">287</span>    ‖Σ_n β_n Σ_y α_y g(y,n)‖² ≤ (Σ‖β‖²)·[(M−N)·Σ_y‖α_y‖² + A²·((M−N)·2(1+log Y)²/s</span>
+<span class="l" id="L288"><span class="n">288</span>        + 3^{|P|/4}s^{3/4}G₀^{1/4}((M−N)/s + 1 + log s)·2(1+log Y)²∏(1+p^{−3/4}))],</span>
+<span class="l" id="L289"><span class="n">289</span></span>
+<span class="l" id="L290"><span class="n">290</span>where `G₀ = ∏_{p∈P, p∣c₀} p`. -/</span>
+<span class="l" id="L291"><span class="n">291</span>theorem W_cell {s : ℕ} [NeZero s] (hs2 : 2 ≤ s) (P : Finset ℕ) (hP : ∀ p ∈ P, p.Prime)</span>
+<span class="l" id="L292"><span class="n">292</span>    (hsP : s = ∏ p ∈ P, p) (c₀ : ZMod s) (𝒴 𝒩 : Finset ℕ) (Y N M : ℕ) (hNM : N ≤ M)</span>
+<span class="l" id="L293"><span class="n">293</span>    (h𝒩 : 𝒩 ⊆ Ioc N M) (h𝒴 : 𝒴 ⊆ Icc 1 Y) (hunit : ∀ y ∈ 𝒴, IsUnit (y : ZMod s))</span>
+<span class="l" id="L294"><span class="n">294</span>    (α β : ℕ → ℂ) (A : ℝ) (hα : ∀ y ∈ 𝒴, ‖α y‖ ≤ A / y) :</span>
+<span class="l" id="L295"><span class="n">295</span>    ‖∑ n ∈ 𝒩, β n * ∑ y ∈ 𝒴, α y * GoldC.QuillonW.g c₀ y n‖ ^ 2 ≤</span>
+<span class="l" id="L296"><span class="n">296</span>      (∑ n ∈ 𝒩, ‖β n‖ ^ 2) * (((M - N : ℕ) : ℝ) * ∑ y ∈ 𝒴, ‖α y‖ ^ 2 +</span>
+<span class="l" id="L297"><span class="n">297</span>        A ^ 2 * (((M - N : ℕ) : ℝ) * (2 * (1 + Real.log Y) ^ 2 / s) +</span>
+<span class="l" id="L298"><span class="n">298</span>          (3 : ℝ) ^ ((P.card : ℝ) / 4) * (s : ℝ) ^ ((3 : ℝ) / 4) *</span>
+<span class="l" id="L299"><span class="n">299</span>            (∏ p ∈ P.filter (fun p =&gt; (ZMod.cast c₀ : ZMod p) = 0), (p : ℝ)) ^ ((1 : ℝ) / 4) *</span>
+<span class="l" id="L300"><span class="n">300</span>            (((M - N : ℕ) : ℝ) / s + 1 + Real.log s) *</span>
+<span class="l" id="L301"><span class="n">301</span>            (2 * (1 + Real.log Y) ^ 2 * ∏ p ∈ P, (1 + (p : ℝ) ^ (-(3 : ℝ) / 4))))) := by</span>
+<span class="l" id="L302"><span class="n">302</span>  classical</span>
+<span class="l" id="L303"><span class="n">303</span>  refine (GoldC.QuillonW.W_cauchy hs2 c₀ 𝒴 𝒩 hNM h𝒩 hunit α β (KB P)</span>
+<span class="l" id="L304"><span class="n">304</span>    (fun c b =&gt; norm_K_le_KB P hP s hsP b c)).trans ?_</span>
+<span class="l" id="L305"><span class="n">305</span>  apply mul_le_mul_of_nonneg_left _ (sum_nonneg fun n _ =&gt; by positivity)</span>
+<span class="l" id="L306"><span class="n">306</span>  set L : ℝ := ((M - N : ℕ) : ℝ) with hL</span>
+<span class="l" id="L307"><span class="n">307</span>  set G : ℝ := (∏ p ∈ P.filter (fun p =&gt; (ZMod.cast c₀ : ZMod p) = 0), (p : ℝ)) ^ ((1 : ℝ) / 4)</span>
+<span class="l" id="L308"><span class="n">308</span>    with hG</span>
+<span class="l" id="L309"><span class="n">309</span>  set Kc : ℝ := (3 : ℝ) ^ ((P.card : ℝ) / 4) * (s : ℝ) ^ ((3 : ℝ) / 4) * G *</span>
+<span class="l" id="L310"><span class="n">310</span>    (L / s + 1 + Real.log s) with hKc</span>
+<span class="l" id="L311"><span class="n">311</span>  have hL0 : 0 ≤ L := by positivity</span>
+<span class="l" id="L312"><span class="n">312</span>  have hsR : (1 : ℝ) ≤ s := by exact_mod_cast (show 1 ≤ s by omega)</span>
+<span class="l" id="L313"><span class="n">313</span>  have hlogs : 0 ≤ Real.log s := Real.log_nonneg hsR</span>
+<span class="l" id="L314"><span class="n">314</span>  have hG0 : 0 ≤ G := by positivity</span>
+<span class="l" id="L315"><span class="n">315</span>  have hKc0 : 0 ≤ Kc := by positivity</span>
+<span class="l" id="L316"><span class="n">316</span>  have hA : ∀ y ∈ 𝒴, 0 ≤ A / y := fun y hy =&gt; (norm_nonneg _).trans (hα y hy)</span>
+<span class="l" id="L317"><span class="n">317</span>  set T1 : ℕ → ℕ → ℝ := fun y y&#x27; =&gt; if y = y&#x27; then L * ‖α y‖ ^ 2 else 0 with hT1</span>
+<span class="l" id="L318"><span class="n">318</span>  set T2 : ℕ → ℕ → ℝ := fun y y&#x27; =&gt;</span>
+<span class="l" id="L319"><span class="n">319</span>    if y ≠ y&#x27; ∧ ((s : ℕ) : ℤ) ∣ (y : ℤ) - y&#x27; then 1 / ((y : ℝ) * y&#x27;) else 0 with hT2</span>
+<span class="l" id="L320"><span class="n">320</span>  set T3 : ℕ → ℕ → ℝ := fun y y&#x27; =&gt; if y ≠ y&#x27; then (1 / ((y : ℝ) * y&#x27;)) *</span>
+<span class="l" id="L321"><span class="n">321</span>    (∏ p ∈ P.filter (fun p : ℕ =&gt; (p : ℤ) ∣ (y : ℤ) - y&#x27;), (p : ℝ)) ^ ((1 : ℝ) / 4) else 0</span>
+<span class="l" id="L322"><span class="n">322</span>    with hT3</span>
+<span class="l" id="L323"><span class="n">323</span>  have hT2n : ∀ y y&#x27;, 0 ≤ T2 y y&#x27; := fun y y&#x27; =&gt; by simp only [hT2]; split_ifs &lt;;&gt; positivity</span>
+<span class="l" id="L324"><span class="n">324</span>  have hT3n : ∀ y y&#x27;, 0 ≤ T3 y y&#x27; := fun y y&#x27; =&gt; by simp only [hT3]; split_ifs &lt;;&gt; positivity</span>
+<span class="l" id="L325"><span class="n">325</span>  have hT1n : ∀ y y&#x27;, 0 ≤ T1 y y&#x27; := fun y y&#x27; =&gt; by simp only [hT1]; split_ifs &lt;;&gt; positivity</span>
+<span class="l" id="L326"><span class="n">326</span>  -- pointwise</span>
+<span class="l" id="L327"><span class="n">327</span>  have hpt : ∀ y ∈ 𝒴, ∀ y&#x27; ∈ 𝒴, ‖α y‖ * ‖α y&#x27;‖ *</span>
+<span class="l" id="L328"><span class="n">328</span>      (if (y : ZMod s) = y&#x27; then L else</span>
+<span class="l" id="L329"><span class="n">329</span>        KB P (c₀ * ((y : ZMod s)⁻¹ - (y&#x27; : ZMod s)⁻¹)) * (L / s + 1 + Real.log s)) ≤</span>
+<span class="l" id="L330"><span class="n">330</span>      T1 y y&#x27; + A ^ 2 * L * T2 y y&#x27; + A ^ 2 * Kc * T3 y y&#x27; := by</span>
+<span class="l" id="L331"><span class="n">331</span>    intro y hy y&#x27; hy&#x27;</span>
+<span class="l" id="L332"><span class="n">332</span>    have hy1 : 1 ≤ y := (mem_Icc.1 (h𝒴 hy)).1</span>
+<span class="l" id="L333"><span class="n">333</span>    have hy1&#x27; : 1 ≤ y&#x27; := (mem_Icc.1 (h𝒴 hy&#x27;)).1</span>
+<span class="l" id="L334"><span class="n">334</span>    have hprod : ‖α y‖ * ‖α y&#x27;‖ ≤ A ^ 2 * (1 / ((y : ℝ) * y&#x27;)) := by</span>
+<span class="l" id="L335"><span class="n">335</span>      calc ‖α y‖ * ‖α y&#x27;‖ ≤ (A / y) * (A / y&#x27;) :=</span>
+<span class="l" id="L336"><span class="n">336</span>            mul_le_mul (hα y hy) (hα y&#x27; hy&#x27;) (norm_nonneg _) (hA y hy)</span>
+<span class="l" id="L337"><span class="n">337</span>        _ = _ := by ring</span>
+<span class="l" id="L338"><span class="n">338</span>    have h2 := hT2n y y&#x27;; have h3 := hT3n y y&#x27;; have h1 := hT1n y y&#x27;</span>
+<span class="l" id="L339"><span class="n">339</span>    have hA2 : 0 ≤ A ^ 2 := sq_nonneg A</span>
+<span class="l" id="L340"><span class="n">340</span>    by_cases hyy : y = y&#x27;</span>
+<span class="l" id="L341"><span class="n">341</span>    · subst hyy</span>
+<span class="l" id="L342"><span class="n">342</span>      rw [if_pos rfl]</span>
+<span class="l" id="L343"><span class="n">343</span>      have hT1v : T1 y y = L * ‖α y‖ ^ 2 := if_pos rfl</span>
+<span class="l" id="L344"><span class="n">344</span>      have : ‖α y‖ * ‖α y‖ * L = L * ‖α y‖ ^ 2 := by ring</span>
+<span class="l" id="L345"><span class="n">345</span>      rw [this, hT1v]</span>
+<span class="l" id="L346"><span class="n">346</span>      have := mul_nonneg (mul_nonneg hA2 hL0) h2</span>
+<span class="l" id="L347"><span class="n">347</span>      have := mul_nonneg (mul_nonneg hA2 hKc0) h3</span>
+<span class="l" id="L348"><span class="n">348</span>      linarith</span>
+<span class="l" id="L349"><span class="n">349</span>    · have hT1z : T1 y y&#x27; = 0 := by simp only [hT1, if_neg hyy]</span>
+<span class="l" id="L350"><span class="n">350</span>      rw [hT1z, zero_add]</span>
+<span class="l" id="L351"><span class="n">351</span>      split_ifs with hcong</span>
+<span class="l" id="L352"><span class="n">352</span>      · -- congruent distinct pair</span>
+<span class="l" id="L353"><span class="n">353</span>        have hdvd : ((s : ℕ) : ℤ) ∣ (y : ℤ) - y&#x27; := by</span>
+<span class="l" id="L354"><span class="n">354</span>          have : ((y&#x27; : ℤ) : ZMod s) = ((y : ℤ) : ZMod s) := by push_cast; exact hcong.symm</span>
+<span class="l" id="L355"><span class="n">355</span>          exact (ZMod.intCast_eq_intCast_iff_dvd_sub _ _ _).1 this</span>
+<span class="l" id="L356"><span class="n">356</span>        have hT2v : T2 y y&#x27; = 1 / ((y : ℝ) * y&#x27;) := if_pos (And.intro hyy hdvd)</span>
+<span class="l" id="L357"><span class="n">357</span>        rw [hT2v]</span>
+<span class="l" id="L358"><span class="n">358</span>        have := mul_nonneg (mul_nonneg hA2 hKc0) h3</span>
+<span class="l" id="L359"><span class="n">359</span>        calc ‖α y‖ * ‖α y&#x27;‖ * L ≤ A ^ 2 * (1 / ((y : ℝ) * y&#x27;)) * L :=</span>
+<span class="l" id="L360"><span class="n">360</span>              mul_le_mul_of_nonneg_right hprod hL0</span>
+<span class="l" id="L361"><span class="n">361</span>          _ = A ^ 2 * L * (1 / ((y : ℝ) * y&#x27;)) := by ring</span>
+<span class="l" id="L362"><span class="n">362</span>          _ ≤ _ := by linarith</span>
+<span class="l" id="L363"><span class="n">363</span>      · have hT3v : T3 y y&#x27; = (1 / ((y : ℝ) * y&#x27;)) *</span>
+<span class="l" id="L364"><span class="n">364</span>            (∏ p ∈ P.filter (fun p : ℕ =&gt; (p : ℤ) ∣ (y : ℤ) - y&#x27;), (p : ℝ)) ^ ((1 : ℝ) / 4) := by</span>
+<span class="l" id="L365"><span class="n">365</span>          simp only [hT3, if_neg (not_not.2 hyy), if_pos hyy]</span>
+<span class="l" id="L366"><span class="n">366</span>        rw [hT3v]</span>
+<span class="l" id="L367"><span class="n">367</span>        have hKB := KB_offdiag P hP hsP c₀ y y&#x27; (hunit y hy) (hunit y&#x27; hy&#x27;)</span>
+<span class="l" id="L368"><span class="n">368</span>        have hLf : 0 ≤ L / s + 1 + Real.log s := by positivity</span>
+<span class="l" id="L369"><span class="n">369</span>        have hKB0 : 0 ≤ KB P (c₀ * ((y : ZMod s)⁻¹ - (y&#x27; : ZMod s)⁻¹)) := by</span>
+<span class="l" id="L370"><span class="n">370</span>          unfold KB; exact Real.rpow_nonneg (KB_base_nonneg P _) _</span>
+<span class="l" id="L371"><span class="n">371</span>        have := mul_nonneg (mul_nonneg hA2 hL0) h2</span>
+<span class="l" id="L372"><span class="n">372</span>        calc ‖α y‖ * ‖α y&#x27;‖ * (KB P (c₀ * ((y : ZMod s)⁻¹ - (y&#x27; : ZMod s)⁻¹)) *</span>
+<span class="l" id="L373"><span class="n">373</span>              (L / s + 1 + Real.log s))</span>
+<span class="l" id="L374"><span class="n">374</span>            ≤ A ^ 2 * (1 / ((y : ℝ) * y&#x27;)) * ((3 : ℝ) ^ ((P.card : ℝ) / 4) *</span>
+<span class="l" id="L375"><span class="n">375</span>                (s : ℝ) ^ ((3 : ℝ) / 4) * G *</span>
+<span class="l" id="L376"><span class="n">376</span>                (∏ p ∈ P.filter (fun p : ℕ =&gt; (p : ℤ) ∣ (y : ℤ) - y&#x27;), (p : ℝ)) ^ ((1 : ℝ) / 4) *</span>
+<span class="l" id="L377"><span class="n">377</span>                (L / s + 1 + Real.log s)) :=</span>
+<span class="l" id="L378"><span class="n">378</span>              mul_le_mul hprod (mul_le_mul_of_nonneg_right hKB hLf) (by positivity) (by positivity)</span>
+<span class="l" id="L379"><span class="n">379</span>          _ = A ^ 2 * Kc * ((1 / ((y : ℝ) * y&#x27;)) *</span>
+<span class="l" id="L380"><span class="n">380</span>              (∏ p ∈ P.filter (fun p : ℕ =&gt; (p : ℤ) ∣ (y : ℤ) - y&#x27;), (p : ℝ)) ^ ((1 : ℝ) / 4)) := by</span>
+<span class="l" id="L381"><span class="n">381</span>              rw [hKc]; ring</span>
+<span class="l" id="L382"><span class="n">382</span>          _ ≤ _ := by linarith</span>
+<span class="l" id="L383"><span class="n">383</span>  -- sum the pointwise bound</span>
+<span class="l" id="L384"><span class="n">384</span>  calc _ ≤ ∑ y ∈ 𝒴, ∑ y&#x27; ∈ 𝒴, (T1 y y&#x27; + A ^ 2 * L * T2 y y&#x27; + A ^ 2 * Kc * T3 y y&#x27;) :=</span>
+<span class="l" id="L385"><span class="n">385</span>        sum_le_sum fun y hy =&gt; sum_le_sum fun y&#x27; hy&#x27; =&gt; hpt y hy y&#x27; hy&#x27;</span>
+<span class="l" id="L386"><span class="n">386</span>    _ = ∑ y ∈ 𝒴, ∑ y&#x27; ∈ 𝒴, T1 y y&#x27; + A ^ 2 * L * ∑ y ∈ 𝒴, ∑ y&#x27; ∈ 𝒴, T2 y y&#x27; +</span>
+<span class="l" id="L387"><span class="n">387</span>          A ^ 2 * Kc * ∑ y ∈ 𝒴, ∑ y&#x27; ∈ 𝒴, T3 y y&#x27; := by</span>
+<span class="l" id="L388"><span class="n">388</span>        simp only [sum_add_distrib, mul_sum]</span>
+<span class="l" id="L389"><span class="n">389</span>    _ ≤ L * ∑ y ∈ 𝒴, ‖α y‖ ^ 2 + A ^ 2 * L * (2 * (1 + Real.log Y) ^ 2 / s) +</span>
+<span class="l" id="L390"><span class="n">390</span>          A ^ 2 * Kc * (2 * (1 + Real.log Y) ^ 2 * ∏ p ∈ P, (1 + (p : ℝ) ^ (-(3 : ℝ) / 4))) := by</span>
+<span class="l" id="L391"><span class="n">391</span>        have e1 : ∑ y ∈ 𝒴, ∑ y&#x27; ∈ 𝒴, T1 y y&#x27; = L * ∑ y ∈ 𝒴, ‖α y‖ ^ 2 := by</span>
+<span class="l" id="L392"><span class="n">392</span>          rw [mul_sum]; refine sum_congr rfl fun y hy =&gt; ?_</span>
+<span class="l" id="L393"><span class="n">393</span>          simp only [hT1]; rw [sum_ite_eq 𝒴 y (fun _ =&gt; L * ‖α y‖ ^ 2), if_pos hy]</span>
+<span class="l" id="L394"><span class="n">394</span>        have e2 : ∑ y ∈ 𝒴, ∑ y&#x27; ∈ 𝒴, T2 y y&#x27; ≤ 2 * (1 + Real.log Y) ^ 2 / s := by</span>
+<span class="l" id="L395"><span class="n">395</span>          calc _ ≤ ∑ y ∈ Icc 1 Y, ∑ y&#x27; ∈ Icc 1 Y, T2 y y&#x27; := by</span>
+<span class="l" id="L396"><span class="n">396</span>                refine (sum_le_sum fun y _ =&gt; sum_le_sum_of_subset_of_nonneg h𝒴</span>
+<span class="l" id="L397"><span class="n">397</span>                  fun y&#x27; _ _ =&gt; hT2n y y&#x27;).trans ?_</span>
+<span class="l" id="L398"><span class="n">398</span>                exact sum_le_sum_of_subset_of_nonneg h𝒴 fun y _ _ =&gt; sum_nonneg fun y&#x27; _ =&gt; hT2n y y&#x27;</span>
+<span class="l" id="L399"><span class="n">399</span>            _ = ∑ y ∈ Icc 1 Y, ∑ y&#x27; ∈ (Icc 1 Y).filter (fun y&#x27; =&gt; y ≠ y&#x27; ∧</span>
+<span class="l" id="L400"><span class="n">400</span>                  ((s : ℕ) : ℤ) ∣ (y : ℤ) - y&#x27;), (1 / ((y : ℝ) * y&#x27;)) := by</span>
+<span class="l" id="L401"><span class="n">401</span>                refine sum_congr rfl fun y _ =&gt; ?_</span>
+<span class="l" id="L402"><span class="n">402</span>                rw [sum_filter]</span>
+<span class="l" id="L403"><span class="n">403</span>            _ ≤ _ := gcd_pair_sum_sym s Y (by omega)</span>
+<span class="l" id="L404"><span class="n">404</span>        have e3 : ∑ y ∈ 𝒴, ∑ y&#x27; ∈ 𝒴, T3 y y&#x27; ≤</span>
+<span class="l" id="L405"><span class="n">405</span>            2 * (1 + Real.log Y) ^ 2 * ∏ p ∈ P, (1 + (p : ℝ) ^ (-(3 : ℝ) / 4)) := by</span>
+<span class="l" id="L406"><span class="n">406</span>          calc _ ≤ ∑ y ∈ Icc 1 Y, ∑ y&#x27; ∈ Icc 1 Y, T3 y y&#x27; := by</span>
+<span class="l" id="L407"><span class="n">407</span>                refine (sum_le_sum fun y _ =&gt; sum_le_sum_of_subset_of_nonneg h𝒴</span>
+<span class="l" id="L408"><span class="n">408</span>                  fun y&#x27; _ _ =&gt; hT3n y y&#x27;).trans ?_</span>
+<span class="l" id="L409"><span class="n">409</span>                exact sum_le_sum_of_subset_of_nonneg h𝒴 fun y _ _ =&gt; sum_nonneg fun y&#x27; _ =&gt; hT3n y y&#x27;</span>
+<span class="l" id="L410"><span class="n">410</span>            _ = ∑ y ∈ Icc 1 Y, ∑ y&#x27; ∈ (Icc 1 Y).filter (fun y&#x27; =&gt; y ≠ y&#x27;),</span>
+<span class="l" id="L411"><span class="n">411</span>                  (1 / ((y : ℝ) * y&#x27;)) *</span>
+<span class="l" id="L412"><span class="n">412</span>                    (∏ p ∈ P.filter (fun p : ℕ =&gt; (p : ℤ) ∣ (y : ℤ) - y&#x27;), (p : ℝ)) ^</span>
+<span class="l" id="L413"><span class="n">413</span>                      ((1 : ℝ) / 4) := by</span>
+<span class="l" id="L414"><span class="n">414</span>                refine sum_congr rfl fun y _ =&gt; ?_</span>
+<span class="l" id="L415"><span class="n">415</span>                rw [sum_filter]</span>
+<span class="l" id="L416"><span class="n">416</span>            _ ≤ _ := gcd_moment P hP Y</span>
+<span class="l" id="L417"><span class="n">417</span>        rw [e1]</span>
+<span class="l" id="L418"><span class="n">418</span>        have hAL : 0 ≤ A ^ 2 * L := by positivity</span>
+<span class="l" id="L419"><span class="n">419</span>        have hAK : 0 ≤ A ^ 2 * Kc := by positivity</span>
+<span class="l" id="L420"><span class="n">420</span>        have := mul_le_mul_of_nonneg_left e2 hAL</span>
+<span class="l" id="L421"><span class="n">421</span>        have := mul_le_mul_of_nonneg_left e3 hAK</span>
+<span class="l" id="L422"><span class="n">422</span>        linarith</span>
+<span class="l" id="L423"><span class="n">423</span>    _ = _ := by rw [hKc]; ring</span>
+<span class="l" id="L424"><span class="n">424</span></span>
+<span class="l" id="L425"><span class="n">425</span>end GoldC.QuillonWCell</span>
+<span class="l" id="L426"><span class="n">426</span></span>
+<span class="l" id="L427"><span class="n">427</span>#print axioms GoldC.QuillonWCell.norm_K_le_KB</span>
+<span class="l" id="L428"><span class="n">428</span>#print axioms GoldC.QuillonWCell.KB_le</span>
+<span class="l" id="L429"><span class="n">429</span>#print axioms GoldC.QuillonWCell.gcd_pair_sum_sym</span>
+<span class="l" id="L430"><span class="n">430</span>#print axioms GoldC.QuillonWCell.gcd_moment</span>
+<span class="l" id="L431"><span class="n">431</span>#print axioms GoldC.QuillonWCell.prod_freq_le</span>
+<span class="l" id="L432"><span class="n">432</span>#print axioms GoldC.QuillonWCell.W_cell</span></pre></div></body></html>

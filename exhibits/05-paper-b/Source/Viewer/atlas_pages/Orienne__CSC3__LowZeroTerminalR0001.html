@@ -1,0 +1,45 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · Orienne/CSC3/LowZeroTerminalR0001.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>Orienne/CSC3/LowZeroTerminalR0001.lean</h1><p class="meta">LEAN/Orienne/CSC3/LowZeroTerminalR0001.lean · 44 lines · SHA-256 8827c16fed0ecde1e8ea45451a618ed009ef7ee088378ad8d13a7bfa1b45c051</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import Orienne.CSC3.PhysicalLongBridgeQ0001</span>
+<span class="l" id="L2"><span class="n">2</span></span>
+<span class="l" id="L3"><span class="n">3</span>open scoped BigOperators Classical</span>
+<span class="l" id="L4"><span class="n">4</span>namespace Thistle.LOW</span>
+<span class="l" id="L5"><span class="n">5</span></span>
+<span class="l" id="L6"><span class="n">6</span>/-- The literal physical LOW sector is exactly empty at the zero cutoff.</span>
+<span class="l" id="L7"><span class="n">7</span>    This uses the original source, not a copied or approximate sum. -/</span>
+<span class="l" id="L8"><span class="n">8</span>theorem lowSector_zero_exact (q a h : ℕ) :</span>
+<span class="l" id="L9"><span class="n">9</span>    Merivelle.Central.lowSector (fun _ : ℕ =&gt; 0) q a h = 0 := by</span>
+<span class="l" id="L10"><span class="n">10</span>  simp [Merivelle.Central.lowSector,</span>
+<span class="l" id="L11"><span class="n">11</span>    GoldC.regionSumCard, GoldC.regionPairSumCard]</span>
+<span class="l" id="L12"><span class="n">12</span></span>
+<span class="l" id="L13"><span class="n">13</span>/-- The original signed physical LOW source has uniform sublog rate for</span>
+<span class="l" id="L14"><span class="n">14</span>    the identically-zero cutoff, with the exact anchor quantifiers. -/</span>
+<span class="l" id="L15"><span class="n">15</span>theorem lowSector_zero_sublog :</span>
+<span class="l" id="L16"><span class="n">16</span>    Merivelle.Central.SourceUniformSublog</span>
+<span class="l" id="L17"><span class="n">17</span>      (Merivelle.Central.lowSector (fun _ : ℕ =&gt; 0)) := by</span>
+<span class="l" id="L18"><span class="n">18</span>  intro q _ _ eps heps</span>
+<span class="l" id="L19"><span class="n">19</span>  refine ⟨1, ?_⟩</span>
+<span class="l" id="L20"><span class="n">20</span>  intro a h _ hh _ _</span>
+<span class="l" id="L21"><span class="n">21</span>  have hh1 : (1 : ℝ) ≤ h := by exact_mod_cast (show 1 ≤ h by omega)</span>
+<span class="l" id="L22"><span class="n">22</span>  have hnonneg := mul_nonneg heps.le (Real.log_nonneg hh1)</span>
+<span class="l" id="L23"><span class="n">23</span>  simpa only [lowSector_zero_exact, abs_zero] using hnonneg</span>
+<span class="l" id="L24"><span class="n">24</span></span>
+<span class="l" id="L25"><span class="n">25</span>theorem zero_cutoff_order :</span>
+<span class="l" id="L26"><span class="n">26</span>    ∀ h : ℕ, (fun _ : ℕ =&gt; 0) h ≤ GoldC.orienneCentralHighCut h := by</span>
+<span class="l" id="L27"><span class="n">27</span>  intro h</span>
+<span class="l" id="L28"><span class="n">28</span>  exact Nat.zero_le _</span>
+<span class="l" id="L29"><span class="n">29</span></span>
+<span class="l" id="L30"><span class="n">30</span>/-- A striking consequence of the literal *arbitrary-cutoff* CORE and LONG</span>
+<span class="l" id="L31"><span class="n">31</span>    theorems: choosing the zero LOW cutoff closes the remaining premise.</span>
+<span class="l" id="L32"><span class="n">32</span>    This theorem must receive an independent mathematical/source audit. -/</span>
+<span class="l" id="L33"><span class="n">33</span>theorem paperB_terminal_via_empty_low :</span>
+<span class="l" id="L34"><span class="n">34</span>    PaperB.Closure.PaperBTerminalStatement := by</span>
+<span class="l" id="L35"><span class="n">35</span>  exact Orienne.CSC3.paperB_terminal_of_native_low</span>
+<span class="l" id="L36"><span class="n">36</span>    (fun _ : ℕ =&gt; 0) (1 / 4 : ℝ)</span>
+<span class="l" id="L37"><span class="n">37</span>    (by norm_num) (by norm_num)</span>
+<span class="l" id="L38"><span class="n">38</span>    zero_cutoff_order lowSector_zero_sublog</span>
+<span class="l" id="L39"><span class="n">39</span></span>
+<span class="l" id="L40"><span class="n">40</span>#print axioms Thistle.LOW.lowSector_zero_exact</span>
+<span class="l" id="L41"><span class="n">41</span>#print axioms Thistle.LOW.lowSector_zero_sublog</span>
+<span class="l" id="L42"><span class="n">42</span>#print axioms Thistle.LOW.paperB_terminal_via_empty_low</span>
+<span class="l" id="L43"><span class="n">43</span></span>
+<span class="l" id="L44"><span class="n">44</span>end Thistle.LOW</span></pre></div></body></html>

@@ -1,0 +1,23 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · rml/weil/prime_kloosterman.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>rml/weil/prime_kloosterman.lean</h1><p class="meta">LEAN/rml/weil/prime_kloosterman.lean · 22 lines · SHA-256 02aa4f011adb51741af46ae2c1a295b53047a150be260e5dd79cbcb2ff39ce27</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import rml.stepanov.prime_weil_bridge</span>
+<span class="l" id="L2"><span class="n">2</span></span>
+<span class="l" id="L3"><span class="n">3</span>/-!</span>
+<span class="l" id="L4"><span class="n">4</span># The public prime estimate</span>
+<span class="l" id="L5"><span class="n">5</span></span>
+<span class="l" id="L6"><span class="n">6</span>Exports Weil’s classical bound and the equivalent coefficient ordering used in Harcos</span>
+<span class="l" id="L7"><span class="n">7</span>(2015), Theorem 1.</span>
+<span class="l" id="L8"><span class="n">8</span>-/</span>
+<span class="l" id="L9"><span class="n">9</span></span>
+<span class="l" id="L10"><span class="n">10</span>namespace RML.ExpSum.Weil</span>
+<span class="l" id="L11"><span class="n">11</span></span>
+<span class="l" id="L12"><span class="n">12</span>/-- Fully proved prime nondegenerate Kloosterman-Weil bound, using the Stepanov–Carlitz development. -/</span>
+<span class="l" id="L13"><span class="n">13</span>theorem prime_bound : PrimeNondegenerateWeil :=</span>
+<span class="l" id="L14"><span class="n">14</span>  RML.ExpSum.Stepanov.primeNondegenerateWeil_proved</span>
+<span class="l" id="L15"><span class="n">15</span></span>
+<span class="l" id="L16"><span class="n">16</span>/-- Conventional Weil (1948) coefficient order and normalization. -/</span>
+<span class="l" id="L17"><span class="n">17</span>theorem weil1948_bound : Weil1948PrimeKloostermanBound :=</span>
+<span class="l" id="L18"><span class="n">18</span>  primeNondegenerateWeil_iff_weil1948.mp prime_bound</span>
+<span class="l" id="L19"><span class="n">19</span></span>
+<span class="l" id="L20"><span class="n">20</span>#print axioms prime_bound</span>
+<span class="l" id="L21"><span class="n">21</span>#print axioms weil1948_bound</span>
+<span class="l" id="L22"><span class="n">22</span>end RML.ExpSum.Weil</span></pre></div></body></html>

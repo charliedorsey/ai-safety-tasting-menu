@@ -1,0 +1,71 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · Orienne/Central/HighCardGrowingR0001.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>Orienne/Central/HighCardGrowingR0001.lean</h1><p class="meta">LEAN/Orienne/Central/HighCardGrowingR0001.lean · 70 lines · SHA-256 7106015662f019b2a56a2037536f4d1007ddce3c6de9b3f24cc79ffc5b575f04</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import ScratchElowrynFoldedHighCard</span>
+<span class="l" id="L2"><span class="n">2</span>import ScratchElowrynHighEventualNumericalR0003</span>
+<span class="l" id="L3"><span class="n">3</span></span>
+<span class="l" id="L4"><span class="n">4</span>open scoped BigOperators</span>
+<span class="l" id="L5"><span class="n">5</span>open Filter Real</span>
+<span class="l" id="L6"><span class="n">6</span></span>
+<span class="l" id="L7"><span class="n">7</span>namespace GoldC</span>
+<span class="l" id="L8"><span class="n">8</span></span>
+<span class="l" id="L9"><span class="n">9</span>/-!</span>
+<span class="l" id="L10"><span class="n">10</span># Physical high-cardinality Central: the growing cutoff.</span>
+<span class="l" id="L11"><span class="n">11</span></span>
+<span class="l" id="L12"><span class="n">12</span>This module consumes Elowryn&#x27;s independently kernel-checked **physical**</span>
+<span class="l" id="L13"><span class="n">13</span>Rankin envelope and her independently checked numerical large-cutoff</span>
+<span class="l" id="L14"><span class="n">14</span>inequality. The source is the actual `regionSumCard`, with all</span>
+<span class="l" id="L15"><span class="n">15</span>decorations and both orientations, not an abstract Euler model.</span>
+<span class="l" id="L16"><span class="n">16</span>-/</span>
+<span class="l" id="L17"><span class="n">17</span></span>
+<span class="l" id="L18"><span class="n">18</span>noncomputable def orienneCentralHighCut (h : ℕ) : ℕ :=</span>
+<span class="l" id="L19"><span class="n">19</span>  elowrynHighCutFromY (Real.log (((h ^ 2 : ℕ) : ℝ)))</span>
+<span class="l" id="L20"><span class="n">20</span></span>
+<span class="l" id="L21"><span class="n">21</span>/-- Entire physical folded high-card source is bounded uniformly in h and a,</span>
+<span class="l" id="L22"><span class="n">22</span>at the growing natural-cardinality cutoff. The bound depends only on q. -/</span>
+<span class="l" id="L23"><span class="n">23</span>theorem orienne_physical_highCard_uniform</span>
+<span class="l" id="L24"><span class="n">24</span>    (q a h : ℕ) (hq : 0 &lt; q) (hh : 3 ≤ h)</span>
+<span class="l" id="L25"><span class="n">25</span>    (gate : ℕ → ℕ → ℕ → Prop) :</span>
+<span class="l" id="L26"><span class="n">26</span>    |regionSumCard (orienneCentralHighCut h) true q h gate</span>
+<span class="l" id="L27"><span class="n">27</span>      (foldRow q a)| ≤</span>
+<span class="l" id="L28"><span class="n">28</span>      (4 + 48 * (q : ℝ)) * (8 * Real.exp 75) := by</span>
+<span class="l" id="L29"><span class="n">29</span>  let Y : ℝ := Real.log (((h ^ 2 : ℕ) : ℝ))</span>
+<span class="l" id="L30"><span class="n">30</span>  let H : ℝ := Real.log (h : ℝ)</span>
+<span class="l" id="L31"><span class="n">31</span>  let C : ℝ := (4 + 48 * (q : ℝ))</span>
+<span class="l" id="L32"><span class="n">32</span>  let w : ℝ := |regionSumCard (orienneCentralHighCut h) true q h gate</span>
+<span class="l" id="L33"><span class="n">33</span>      (foldRow q a)|</span>
+<span class="l" id="L34"><span class="n">34</span>  have hhpos : (0 : ℝ) &lt; h := by</span>
+<span class="l" id="L35"><span class="n">35</span>    exact_mod_cast (show 0 &lt; h by omega)</span>
+<span class="l" id="L36"><span class="n">36</span>  have hhthree : (3 : ℝ) ≤ ((h ^ 2 : ℕ) : ℝ) := by</span>
+<span class="l" id="L37"><span class="n">37</span>    exact_mod_cast (show 3 ≤ h ^ 2 by nlinarith)</span>
+<span class="l" id="L38"><span class="n">38</span>  have hExp : Real.exp (1 : ℝ) ≤ ((h ^ 2 : ℕ) : ℝ) :=</span>
+<span class="l" id="L39"><span class="n">39</span>    Real.exp_one_lt_three.le.trans hhthree</span>
+<span class="l" id="L40"><span class="n">40</span>  have hY : 1 ≤ Y := by</span>
+<span class="l" id="L41"><span class="n">41</span>    dsimp [Y]</span>
+<span class="l" id="L42"><span class="n">42</span>    calc</span>
+<span class="l" id="L43"><span class="n">43</span>      (1 : ℝ) = Real.log (Real.exp 1) := (Real.log_exp 1).symm</span>
+<span class="l" id="L44"><span class="n">44</span>      _ ≤ Real.log (((h ^ 2 : ℕ) : ℝ)) :=</span>
+<span class="l" id="L45"><span class="n">45</span>        Real.log_le_log (Real.exp_pos _) hExp</span>
+<span class="l" id="L46"><span class="n">46</span>  have hH : 0 ≤ H := by</span>
+<span class="l" id="L47"><span class="n">47</span>    dsimp [H]</span>
+<span class="l" id="L48"><span class="n">48</span>    exact Real.log_nonneg (by exact_mod_cast (show 1 ≤ h by omega))</span>
+<span class="l" id="L49"><span class="n">49</span>  have hHY : H ≤ Y := by</span>
+<span class="l" id="L50"><span class="n">50</span>    dsimp [H, Y]</span>
+<span class="l" id="L51"><span class="n">51</span>    have hsq : h ≤ h ^ 2 := by nlinarith</span>
+<span class="l" id="L52"><span class="n">52</span>    have hle : (h : ℝ) ≤ ((h ^ 2 : ℕ) : ℝ) := by exact_mod_cast hsq</span>
+<span class="l" id="L53"><span class="n">53</span>    exact Real.log_le_log hhpos hle</span>
+<span class="l" id="L54"><span class="n">54</span>  have hC : 0 ≤ C := by dsimp [C]; positivity</span>
+<span class="l" id="L55"><span class="n">55</span>  have hw : 0 ≤ w := by dsimp [w]; positivity</span>
+<span class="l" id="L56"><span class="n">56</span>  have hRankin :</span>
+<span class="l" id="L57"><span class="n">57</span>      (Real.exp 1) ^ (elowrynHighCutFromY Y) * w ≤</span>
+<span class="l" id="L58"><span class="n">58</span>        C * (1 + H)^3 *</span>
+<span class="l" id="L59"><span class="n">59</span>          Real.exp ((Real.exp 1) * (5 * (Real.log Y + 5))) := by</span>
+<span class="l" id="L60"><span class="n">60</span>    have hsource :=</span>
+<span class="l" id="L61"><span class="n">61</span>      elowryn_folded_highCard_rankin_cubic q a h</span>
+<span class="l" id="L62"><span class="n">62</span>        (orienneCentralHighCut h) hq (by omega : 2 ≤ h)</span>
+<span class="l" id="L63"><span class="n">63</span>        (Real.exp 1)</span>
+<span class="l" id="L64"><span class="n">64</span>        (Real.one_le_exp (by norm_num : (0 : ℝ) ≤ 1)) gate</span>
+<span class="l" id="L65"><span class="n">65</span>    simpa only [orienneCentralHighCut, Y, H, C, w] using hsource</span>
+<span class="l" id="L66"><span class="n">66</span>  exact elowryn_high_rankin_uniform_constant</span>
+<span class="l" id="L67"><span class="n">67</span>    Y H C w hY hH hHY hC hw hRankin</span>
+<span class="l" id="L68"><span class="n">68</span></span>
+<span class="l" id="L69"><span class="n">69</span>#print axioms orienne_physical_highCard_uniform</span>
+<span class="l" id="L70"><span class="n">70</span>end GoldC</span></pre></div></body></html>

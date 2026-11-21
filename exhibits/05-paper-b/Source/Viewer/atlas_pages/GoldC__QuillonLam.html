@@ -1,0 +1,154 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · GoldC/QuillonLam.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>GoldC/QuillonLam.lean</h1><p class="meta">LEAN/GoldC/QuillonLam.lean · 153 lines · SHA-256 a2928f7adffcfa70317284b475c7b6b2b41c0544d907d176ad828fe490cb1ec3</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import GoldC.QuillonAsymp</span>
+<span class="l" id="L2"><span class="n">2</span>import GoldC.QuillonResidue</span>
+<span class="l" id="L3"><span class="n">3</span></span>
+<span class="l" id="L4"><span class="n">4</span>/-!</span>
+<span class="l" id="L5"><span class="n">5</span># Quillon CSC3 F8.2: the `Λ`-calculus toolkit (eventual inequalities in `Λ = log h`)</span>
+<span class="l" id="L6"><span class="n">6</span></span>
+<span class="l" id="L7"><span class="n">7</span>* `natlog_le`: `Nat.log 2 n ≤ log n / log 2`.</span>
+<span class="l" id="L8"><span class="n">8</span>* `const_le_rpow`: `K ≤ Λ^c` eventually.</span>
+<span class="l" id="L9"><span class="n">9</span>* `Aω_le`: `e^{37.5}(1 + log₂ log₂ N)^{30} ≤ Λ^c` eventually, uniformly in `log N ≤ kΛ`.</span>
+<span class="l" id="L10"><span class="n">10</span>* `prodU_le`: `∏_U (1 + 1/(p−3)) ≤ e^{10}(log₂N + 1)^{10}` for primes `5 ≤ p ≤ N`;</span>
+<span class="l" id="L11"><span class="n">11</span>  `prodU_le_pow`: `≤ e^{10}(2k+1)^{10}Λ^{10}` if `log N ≤ kΛ`.</span>
+<span class="l" id="L12"><span class="n">12</span>* `decay`: `Λ^k · exp(−cΛ^τ) ≤ Λ^{−m}` eventually.</span>
+<span class="l" id="L13"><span class="n">13</span>* `exp_ge`: `exp(cΛ^τ) ≥ x₀` eventually.</span>
+<span class="l" id="L14"><span class="n">14</span></span>
+<span class="l" id="L15"><span class="n">15</span>No axiom, no `sorry`.</span>
+<span class="l" id="L16"><span class="n">16</span>-/</span>
+<span class="l" id="L17"><span class="n">17</span></span>
+<span class="l" id="L18"><span class="n">18</span>open scoped BigOperators</span>
+<span class="l" id="L19"><span class="n">19</span>open Finset</span>
+<span class="l" id="L20"><span class="n">20</span></span>
+<span class="l" id="L21"><span class="n">21</span>namespace GoldC.QuillonLam</span>
+<span class="l" id="L22"><span class="n">22</span></span>
+<span class="l" id="L23"><span class="n">23</span>open GoldC.QuillonWContext</span>
+<span class="l" id="L24"><span class="n">24</span></span>
+<span class="l" id="L25"><span class="n">25</span>lemma log2_gt_half : (1 / 2 : ℝ) &lt; Real.log 2 := by</span>
+<span class="l" id="L26"><span class="n">26</span>  have := Real.log_two_gt_d9; linarith</span>
+<span class="l" id="L27"><span class="n">27</span></span>
+<span class="l" id="L28"><span class="n">28</span>lemma natlog_le (n : ℕ) : (Nat.log 2 n : ℝ) ≤ Real.log n / Real.log 2 := by</span>
+<span class="l" id="L29"><span class="n">29</span>  rcases Nat.eq_zero_or_pos n with rfl | hn</span>
+<span class="l" id="L30"><span class="n">30</span>  · simp</span>
+<span class="l" id="L31"><span class="n">31</span>  have h1 : 2 ^ Nat.log 2 n ≤ n := Nat.pow_log_le_self 2 hn.ne&#x27;</span>
+<span class="l" id="L32"><span class="n">32</span>  have h2 : ((2 : ℝ)) ^ Nat.log 2 n ≤ n := by exact_mod_cast h1</span>
+<span class="l" id="L33"><span class="n">33</span>  have h3 := Real.log_le_log (by positivity) h2</span>
+<span class="l" id="L34"><span class="n">34</span>  rw [Real.log_pow] at h3</span>
+<span class="l" id="L35"><span class="n">35</span>  rw [le_div_iff₀ (Real.log_pos (by norm_num))]; exact h3</span>
+<span class="l" id="L36"><span class="n">36</span></span>
+<span class="l" id="L37"><span class="n">37</span>lemma natlog_le_of (n : ℕ) (L : ℝ) (h : Real.log n ≤ L) : (Nat.log 2 n : ℝ) ≤ 2 * max L 0 := by</span>
+<span class="l" id="L38"><span class="n">38</span>  have h1 := natlog_le n</span>
+<span class="l" id="L39"><span class="n">39</span>  have hl2 := log2_gt_half</span>
+<span class="l" id="L40"><span class="n">40</span>  have hl0 : 0 ≤ Real.log n := Real.log_natCast_nonneg n</span>
+<span class="l" id="L41"><span class="n">41</span>  calc (Nat.log 2 n : ℝ) ≤ Real.log n / Real.log 2 := h1</span>
+<span class="l" id="L42"><span class="n">42</span>    _ ≤ Real.log n / (1 / 2) := div_le_div_of_nonneg_left hl0 (by norm_num) hl2.le</span>
+<span class="l" id="L43"><span class="n">43</span>    _ = 2 * Real.log n := by ring</span>
+<span class="l" id="L44"><span class="n">44</span>    _ ≤ 2 * max L 0 := by have := le_max_left L 0; linarith</span>
+<span class="l" id="L45"><span class="n">45</span></span>
+<span class="l" id="L46"><span class="n">46</span>lemma const_le_rpow (K c : ℝ) (hc : 0 &lt; c) :</span>
+<span class="l" id="L47"><span class="n">47</span>    ∃ Λ₀ : ℝ, 1 ≤ Λ₀ ∧ ∀ Λ : ℝ, Λ₀ ≤ Λ → K ≤ Λ ^ c := by</span>
+<span class="l" id="L48"><span class="n">48</span>  refine ⟨max 1 ((max K 1) ^ (1 / c)), le_max_left _ _, fun Λ hΛ =&gt; ?_⟩</span>
+<span class="l" id="L49"><span class="n">49</span>  have hΛ1 : 1 ≤ Λ := le_trans (le_max_left _ _) hΛ</span>
+<span class="l" id="L50"><span class="n">50</span>  have hK1 : 1 ≤ max K 1 := le_max_right _ _</span>
+<span class="l" id="L51"><span class="n">51</span>  have h1 : (max K 1) ^ (1 / c) ≤ Λ := le_trans (le_max_right _ _) hΛ</span>
+<span class="l" id="L52"><span class="n">52</span>  calc K ≤ max K 1 := le_max_left _ _</span>
+<span class="l" id="L53"><span class="n">53</span>    _ = ((max K 1) ^ (1 / c)) ^ c := by</span>
+<span class="l" id="L54"><span class="n">54</span>        rw [← Real.rpow_mul (by linarith)]; field_simp; simp</span>
+<span class="l" id="L55"><span class="n">55</span>    _ ≤ Λ ^ c := Real.rpow_le_rpow (by positivity) h1 hc.le</span>
+<span class="l" id="L56"><span class="n">56</span></span>
+<span class="l" id="L57"><span class="n">57</span>/-- polylog absorption: `(1 + log Λ)^m ≤ Λ^c` eventually. -/</span>
+<span class="l" id="L58"><span class="n">58</span>lemma polylog_le (m : ℕ) (c : ℝ) (hc : 0 &lt; c) :</span>
+<span class="l" id="L59"><span class="n">59</span>    ∃ Λ₀ : ℝ, 1 ≤ Λ₀ ∧ ∀ Λ : ℝ, Λ₀ ≤ Λ → (1 + Real.log Λ) ^ m ≤ Λ ^ c :=</span>
+<span class="l" id="L60"><span class="n">60</span>  GoldC.QuillonAsymp.one_add_log_pow_le m c hc</span>
+<span class="l" id="L61"><span class="n">61</span></span>
+<span class="l" id="L62"><span class="n">62</span>theorem Aω_le (k c : ℝ) (hk : 0 &lt; k) (hc : 0 &lt; c) :</span>
+<span class="l" id="L63"><span class="n">63</span>    ∃ Λ₀ : ℝ, 1 ≤ Λ₀ ∧ ∀ Λ : ℝ, Λ₀ ≤ Λ → ∀ N : ℕ, Real.log N ≤ k * Λ →</span>
+<span class="l" id="L64"><span class="n">64</span>      Real.exp 37.5 * (1 + Nat.log 2 (Nat.log 2 N) : ℝ) ^ 30 ≤ Λ ^ c := by</span>
+<span class="l" id="L65"><span class="n">65</span>  set A₁ := 1 + 2 * |Real.log (2 * k)| with hA₁</span>
+<span class="l" id="L66"><span class="n">66</span>  obtain ⟨Λ₁, hΛ₁, h1⟩ := polylog_le 30 (c / 2) (by positivity)</span>
+<span class="l" id="L67"><span class="n">67</span>  obtain ⟨Λ₂, hΛ₂, h2⟩ := const_le_rpow (Real.exp 37.5 * (A₁ + 2) ^ 30) (c / 2) (by positivity)</span>
+<span class="l" id="L68"><span class="n">68</span>  refine ⟨max Λ₁ Λ₂, le_trans hΛ₁ (le_max_left _ _), fun Λ hΛ N hN =&gt; ?_⟩</span>
+<span class="l" id="L69"><span class="n">69</span>  have hΛ1 : 1 ≤ Λ := le_trans hΛ₁ (le_trans (le_max_left _ _) hΛ)</span>
+<span class="l" id="L70"><span class="n">70</span>  have hlogΛ : 0 ≤ Real.log Λ := Real.log_nonneg hΛ1</span>
+<span class="l" id="L71"><span class="n">71</span>  -- `Nat.log 2 N ≤ 2kΛ`</span>
+<span class="l" id="L72"><span class="n">72</span>  have hn1 : (Nat.log 2 N : ℝ) ≤ 2 * (k * Λ) := by</span>
+<span class="l" id="L73"><span class="n">73</span>    have := natlog_le_of N (k * Λ) hN</span>
+<span class="l" id="L74"><span class="n">74</span>    have : max (k * Λ) 0 = k * Λ := max_eq_left (by positivity)</span>
+<span class="l" id="L75"><span class="n">75</span>    linarith</span>
+<span class="l" id="L76"><span class="n">76</span>  -- `1 + Nat.log 2 (Nat.log 2 N) ≤ (A₁ + 2)(1 + log Λ)`</span>
+<span class="l" id="L77"><span class="n">77</span>  have hn2 : (1 + Nat.log 2 (Nat.log 2 N) : ℝ) ≤ (A₁ + 2) * (1 + Real.log Λ) := by</span>
+<span class="l" id="L78"><span class="n">78</span>    rcases Nat.eq_zero_or_pos (Nat.log 2 N) with h0 | hpos</span>
+<span class="l" id="L79"><span class="n">79</span>    · rw [h0]; simp</span>
+<span class="l" id="L80"><span class="n">80</span>      have : 0 ≤ |Real.log (2 * k)| := abs_nonneg _</span>
+<span class="l" id="L81"><span class="n">81</span>      nlinarith</span>
+<span class="l" id="L82"><span class="n">82</span>    · have hpos&#x27; : (0 : ℝ) &lt; Nat.log 2 N := by exact_mod_cast hpos</span>
+<span class="l" id="L83"><span class="n">83</span>      have h3 := natlog_le_of (Nat.log 2 N) (Real.log (2 * k) + Real.log Λ) (by</span>
+<span class="l" id="L84"><span class="n">84</span>        rw [← Real.log_mul (by positivity) (by linarith)]</span>
+<span class="l" id="L85"><span class="n">85</span>        exact Real.log_le_log hpos&#x27; (by linarith))</span>
+<span class="l" id="L86"><span class="n">86</span>      have h4 : max (Real.log (2 * k) + Real.log Λ) 0 ≤ |Real.log (2 * k)| + Real.log Λ := by</span>
+<span class="l" id="L87"><span class="n">87</span>        apply max_le</span>
+<span class="l" id="L88"><span class="n">88</span>        · have := le_abs_self (Real.log (2 * k)); linarith</span>
+<span class="l" id="L89"><span class="n">89</span>        · have := abs_nonneg (Real.log (2 * k)); linarith</span>
+<span class="l" id="L90"><span class="n">90</span>      have : 0 ≤ |Real.log (2 * k)| := abs_nonneg _</span>
+<span class="l" id="L91"><span class="n">91</span>      rw [hA₁]; nlinarith</span>
+<span class="l" id="L92"><span class="n">92</span>  have hn0 : (0 : ℝ) ≤ 1 + Nat.log 2 (Nat.log 2 N) := by positivity</span>
+<span class="l" id="L93"><span class="n">93</span>  calc Real.exp 37.5 * (1 + Nat.log 2 (Nat.log 2 N) : ℝ) ^ 30</span>
+<span class="l" id="L94"><span class="n">94</span>      ≤ Real.exp 37.5 * ((A₁ + 2) * (1 + Real.log Λ)) ^ 30 := by gcongr</span>
+<span class="l" id="L95"><span class="n">95</span>    _ = (Real.exp 37.5 * (A₁ + 2) ^ 30) * (1 + Real.log Λ) ^ 30 := by rw [mul_pow]; ring</span>
+<span class="l" id="L96"><span class="n">96</span>    _ ≤ Λ ^ (c / 2) * Λ ^ (c / 2) := by</span>
+<span class="l" id="L97"><span class="n">97</span>        apply mul_le_mul (h2 Λ (le_trans (le_max_right _ _) hΛ))</span>
+<span class="l" id="L98"><span class="n">98</span>          (h1 Λ (le_trans (le_max_left _ _) hΛ)) (by positivity) (by positivity)</span>
+<span class="l" id="L99"><span class="n">99</span>    _ = Λ ^ c := by rw [← Real.rpow_add (by linarith)]; ring_nf</span>
+<span class="l" id="L100"><span class="n">100</span></span>
+<span class="l" id="L101"><span class="n">101</span>theorem prodU_le (U : Finset ℕ) (hU : ∀ p ∈ U, p.Prime ∧ 5 ≤ p) (N : ℕ) (hUN : ∀ p ∈ U, p ≤ N) :</span>
+<span class="l" id="L102"><span class="n">102</span>    ∏ p ∈ U, (1 + 1 / ((p : ℝ) - 3)) ≤ Real.exp 10 * ((Nat.log 2 N : ℝ) + 1) ^ 10 := by</span>
+<span class="l" id="L103"><span class="n">103</span>  rw [← sum_ωR_powerset]</span>
+<span class="l" id="L104"><span class="n">104</span>  exact GoldC.QuillonResidue.smooth_mass U hU (Nat.log 2 N) fun p hp =&gt;</span>
+<span class="l" id="L105"><span class="n">105</span>    lt_of_le_of_lt (hUN p hp) (Nat.lt_pow_succ_log_self (by norm_num) N)</span>
+<span class="l" id="L106"><span class="n">106</span></span>
+<span class="l" id="L107"><span class="n">107</span>theorem prodU_le_pow (U : Finset ℕ) (hU : ∀ p ∈ U, p.Prime ∧ 5 ≤ p) (N : ℕ) (hUN : ∀ p ∈ U, p ≤ N)</span>
+<span class="l" id="L108"><span class="n">108</span>    (k Λ : ℝ) (hk : 0 ≤ k) (hΛ : 1 ≤ Λ) (hN : Real.log N ≤ k * Λ) :</span>
+<span class="l" id="L109"><span class="n">109</span>    ∏ p ∈ U, (1 + 1 / ((p : ℝ) - 3)) ≤ Real.exp 10 * (2 * k + 1) ^ 10 * Λ ^ (10 : ℝ) := by</span>
+<span class="l" id="L110"><span class="n">110</span>  have h1 := prodU_le U hU N hUN</span>
+<span class="l" id="L111"><span class="n">111</span>  have h2 : (Nat.log 2 N : ℝ) + 1 ≤ (2 * k + 1) * Λ := by</span>
+<span class="l" id="L112"><span class="n">112</span>    have := natlog_le_of N (k * Λ) hN</span>
+<span class="l" id="L113"><span class="n">113</span>    have : max (k * Λ) 0 = k * Λ := max_eq_left (by positivity)</span>
+<span class="l" id="L114"><span class="n">114</span>    nlinarith</span>
+<span class="l" id="L115"><span class="n">115</span>  calc _ ≤ Real.exp 10 * ((Nat.log 2 N : ℝ) + 1) ^ 10 := h1</span>
+<span class="l" id="L116"><span class="n">116</span>    _ ≤ Real.exp 10 * ((2 * k + 1) * Λ) ^ 10 := by gcongr</span>
+<span class="l" id="L117"><span class="n">117</span>    _ = Real.exp 10 * (2 * k + 1) ^ 10 * Λ ^ (10 : ℝ) := by</span>
+<span class="l" id="L118"><span class="n">118</span>        rw [mul_pow, show Λ ^ (10 : ℝ) = Λ ^ (10 : ℕ) by exact_mod_cast Real.rpow_natCast Λ 10]; ring</span>
+<span class="l" id="L119"><span class="n">119</span></span>
+<span class="l" id="L120"><span class="n">120</span>/-- `Λ^k · exp(−cΛ^τ) ≤ Λ^{−m}` eventually. -/</span>
+<span class="l" id="L121"><span class="n">121</span>theorem decay (k m c τ : ℝ) (hkm : 0 ≤ k + m) (hc : 0 &lt; c) (hτ : 0 &lt; τ) :</span>
+<span class="l" id="L122"><span class="n">122</span>    ∃ Λ₀ : ℝ, 1 ≤ Λ₀ ∧ ∀ Λ : ℝ, Λ₀ ≤ Λ → Λ ^ k * Real.exp (-(c * Λ ^ τ)) ≤ Λ ^ (-m) := by</span>
+<span class="l" id="L123"><span class="n">123</span>  obtain ⟨Λ₀, hΛ₀, h⟩ := GoldC.QuillonAsymp.rpow_le_exp_rpow (k + m) c τ hkm hc hτ</span>
+<span class="l" id="L124"><span class="n">124</span>  refine ⟨Λ₀, hΛ₀, fun Λ hΛ =&gt; ?_⟩</span>
+<span class="l" id="L125"><span class="n">125</span>  have hΛ0 : 0 &lt; Λ := by linarith</span>
+<span class="l" id="L126"><span class="n">126</span>  have h1 := h Λ hΛ</span>
+<span class="l" id="L127"><span class="n">127</span>  have e : Λ ^ k = Λ ^ (k + m) * Λ ^ (-m) := by rw [← Real.rpow_add hΛ0]; ring_nf</span>
+<span class="l" id="L128"><span class="n">128</span>  rw [e]</span>
+<span class="l" id="L129"><span class="n">129</span>  have hexp : Real.exp (-(c * Λ ^ τ)) = (Real.exp (c * Λ ^ τ))⁻¹ := by rw [Real.exp_neg]</span>
+<span class="l" id="L130"><span class="n">130</span>  rw [hexp]</span>
+<span class="l" id="L131"><span class="n">131</span>  have hE : 0 &lt; Real.exp (c * Λ ^ τ) := Real.exp_pos _</span>
+<span class="l" id="L132"><span class="n">132</span>  have hm : 0 &lt; Λ ^ (-m) := Real.rpow_pos_of_pos hΛ0 _</span>
+<span class="l" id="L133"><span class="n">133</span>  calc Λ ^ (k + m) * Λ ^ (-m) * (Real.exp (c * Λ ^ τ))⁻¹</span>
+<span class="l" id="L134"><span class="n">134</span>      ≤ Real.exp (c * Λ ^ τ) * Λ ^ (-m) * (Real.exp (c * Λ ^ τ))⁻¹ := by gcongr</span>
+<span class="l" id="L135"><span class="n">135</span>    _ = Λ ^ (-m) := by field_simp</span>
+<span class="l" id="L136"><span class="n">136</span></span>
+<span class="l" id="L137"><span class="n">137</span>/-- `x₀ ≤ exp(cΛ^τ)` eventually. -/</span>
+<span class="l" id="L138"><span class="n">138</span>theorem exp_ge (x₀ c τ : ℝ) (hc : 0 &lt; c) (hτ : 0 &lt; τ) :</span>
+<span class="l" id="L139"><span class="n">139</span>    ∃ Λ₀ : ℝ, 1 ≤ Λ₀ ∧ ∀ Λ : ℝ, Λ₀ ≤ Λ → x₀ ≤ Real.exp (c * Λ ^ τ) := by</span>
+<span class="l" id="L140"><span class="n">140</span>  obtain ⟨Λ₀, hΛ₀, h⟩ := const_le_rpow (|x₀| / c) τ hτ</span>
+<span class="l" id="L141"><span class="n">141</span>  refine ⟨Λ₀, hΛ₀, fun Λ hΛ =&gt; ?_⟩</span>
+<span class="l" id="L142"><span class="n">142</span>  have h1 := h Λ hΛ</span>
+<span class="l" id="L143"><span class="n">143</span>  have h2 : |x₀| ≤ c * Λ ^ τ := by rw [div_le_iff₀ hc] at h1; linarith</span>
+<span class="l" id="L144"><span class="n">144</span>  have h3 := Real.add_one_le_exp (c * Λ ^ τ)</span>
+<span class="l" id="L145"><span class="n">145</span>  have := le_abs_self x₀</span>
+<span class="l" id="L146"><span class="n">146</span>  linarith</span>
+<span class="l" id="L147"><span class="n">147</span></span>
+<span class="l" id="L148"><span class="n">148</span>end GoldC.QuillonLam</span>
+<span class="l" id="L149"><span class="n">149</span></span>
+<span class="l" id="L150"><span class="n">150</span>#print axioms GoldC.QuillonLam.Aω_le</span>
+<span class="l" id="L151"><span class="n">151</span>#print axioms GoldC.QuillonLam.prodU_le_pow</span>
+<span class="l" id="L152"><span class="n">152</span>#print axioms GoldC.QuillonLam.decay</span>
+<span class="l" id="L153"><span class="n">153</span>#print axioms GoldC.QuillonLam.exp_ge</span></pre></div></body></html>

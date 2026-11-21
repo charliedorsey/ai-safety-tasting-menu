@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LEAN/Orienne/Publication/PaperBPrintedTerminalR0001.lean</title><style>body{background:#f9f8f4;color:#27332d;font:16px/1.5 Georgia,serif;margin:0}a{color:#2d6255}.wrap{max-width:1160px;margin:0 auto;padding:30px 24px}header{border-bottom:1px solid #d8ded7;margin-bottom:22px}h1{font-size:29px;font-weight:normal;overflow-wrap:anywhere}.meta,nav,th{font:13px/1.5 system-ui,sans-serif;color:#5b6b63}nav a{margin-right:18px}.tblwrap{overflow-x:auto}table{border-collapse:collapse;width:100%}td,th{padding:9px 12px;border-bottom:1px solid #e0e3de;text-align:left;vertical-align:top}td code{overflow-wrap:anywhere}code,pre{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}pre{font-size:12.5px;white-space:pre;overflow-x:auto;line-height:1.6;background:#fff;padding:12px;border:1px solid #e2e4df}.ln{color:#8b968e;padding-right:15px;user-select:none}.line{display:block}.focus{background:#e9f1ec}.line:target{outline:2px solid #276b54;outline-offset:1px;background:#f6f4e7}.legend{padding:12px 15px;background:#fff;border-left:2px solid #629280;margin:24px 0}@media(max-width:640px){.wrap{padding:18px 12px}h1{font-size:21px}td,th{padding:8px}.meta{font-size:11px}pre{font-size:11px}}</style></head><body><div class="wrap"><header><nav><a href="../source_index.html">All source waypoints</a><a href="../../../Docs/companion/reading_room/index.html">Reading room</a></nav><h1>LEAN/Orienne/Publication/PaperBPrintedTerminalR0001.lean</h1><p class="meta">Exact archived source · SHA-256 5a4da763d9accf33fdc836366b2312c90aa258d36a384ad088bc55c47a24f98d · Original line numbers · Not a new Lean replay</p></header><p class="meta">Deep source proof text is reproduced verbatim for inspection; this page does not assert a compiler-derived proof-dependency graph.</p><pre><span class="line" id="L1"><span class="ln">    1</span>import Orienne.Publication.F01PrintedLiteralBridgeR0001</span>
+<span class="line" id="L2"><span class="ln">    2</span>import Orienne.CSC3.LowZeroTerminalR0001</span>
+<span class="line" id="L3"><span class="ln">    3</span></span>
+<span class="line" id="L4"><span class="ln">    4</span>/-! A literal printed-Euler public terminal, assembled from the unchanged</span>
+<span class="line" id="L5"><span class="ln">    5</span>independently reviewed F-01 proof and the unconditional native terminal. -/</span>
+<span class="line" id="L6"><span class="ln">    6</span>namespace Orienne.Publication</span>
+<span class="line" id="L7"><span class="ln">    7</span></span>
+<span class="line" id="L8"><span class="ln">    8</span>/-- The frozen manuscript&#x27;s independently defined printed A and B singular</span>
+<span class="line" id="L9"><span class="ln">    9</span>series obey the uniform fixed-squarefree-q level-one epsilon estimate. -/</span>
+<span class="line" id="L10"><span class="ln">   10</span>theorem paperB_printed_terminal :</span>
+<span class="line" id="L11"><span class="ln">   11</span>    ∀ q : ℕ, 0 &lt; q → Squarefree q →</span>
+<span class="line" id="L12"><span class="ln">   12</span>      ∀ ε : ℝ, 0 &lt; ε →</span>
+<span class="line" id="L13"><span class="ln">   13</span>      ∃ h0 : ℕ, ∀ a b h : ℕ,</span>
+<span class="line" id="L14"><span class="ln">   14</span>        q.Coprime a → q.Coprime b →</span>
+<span class="line" id="L15"><span class="ln">   15</span>        Nat.ModEq q (a + h) b →</span>
+<span class="line" id="L16"><span class="ln">   16</span>        (¬ 2 ∣ q → 2 ∣ h) →</span>
+<span class="line" id="L17"><span class="ln">   17</span>        0 &lt; h → h0 ≤ h →</span>
+<span class="line" id="L18"><span class="ln">   18</span>        |Merivelle.F01.printedA1Literal q a h -</span>
+<span class="line" id="L19"><span class="ln">   19</span>          Elarienne.F01B.printedB1Literal q a b h| ≤</span>
+<span class="line" id="L20"><span class="ln">   20</span>          ε * Real.log (h : ℝ) := by</span>
+<span class="line" id="L21"><span class="ln">   21</span>  intro q hq hsq ε hε</span>
+<span class="line" id="L22"><span class="ln">   22</span>  obtain ⟨h0, hmain⟩ :=</span>
+<span class="line" id="L23"><span class="ln">   23</span>    Thistle.LOW.paperB_terminal_via_empty_low q hq hsq ε hε</span>
+<span class="line" id="L24"><span class="ln">   24</span>  refine ⟨h0, ?_⟩</span>
+<span class="line" id="L25"><span class="ln">   25</span>  intro a b h ha hb hcompat hparity hpos hlarge</span>
+<span class="line" id="L26"><span class="ln">   26</span>  rw [Elarienne.F01B.printedA_sub_printedB_eq_manuscriptKernels</span>
+<span class="line" id="L27"><span class="ln">   27</span>    q a b h hq hcompat hparity]</span>
+<span class="line" id="L28"><span class="ln">   28</span>  exact hmain a b h ha hb hcompat hparity hpos hlarge</span>
+<span class="line" id="L29"><span class="ln">   29</span></span>
+<span class="line" id="L30"><span class="ln">   30</span>#print axioms paperB_printed_terminal</span>
+<span class="line" id="L31"><span class="ln">   31</span>end Orienne.Publication</span>
+</pre></div></body></html>

@@ -1,0 +1,97 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · GoldB/QuillonLowY.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>GoldB/QuillonLowY.lean</h1><p class="meta">LEAN/GoldB/QuillonLowY.lean · 96 lines · SHA-256 adf0b8000f9cc1542227793a12e0a0c0612a74c4d8bccc1b2436930f4c34bb94</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import GoldB.Suzuki</span>
+<span class="l" id="L2"><span class="n">2</span>import GoldC.VKRegimes</span>
+<span class="l" id="L3"><span class="n">3</span></span>
+<span class="l" id="L4"><span class="n">4</span>/-!</span>
+<span class="l" id="L5"><span class="n">5</span># `GoldB.QuillonLowY`: the low-`Y` branch, and `ShiftedSuzukiCore` without hypotheses</span>
+<span class="l" id="L6"><span class="n">6</span></span>
+<span class="l" id="L7"><span class="n">7</span>Written by Quillon for Hunt B R0001. No axiom, no `sorry`.</span>
+<span class="l" id="L8"><span class="n">8</span></span>
+<span class="l" id="L9"><span class="n">9</span>* `quillon_shifted_lowY : ShiftedSuzukiLowY`. If `N ≥ 4096` and</span>
+<span class="l" id="L10"><span class="n">10</span>  `log Y &lt; (3/2)(log N + log 2)`, then `Y &lt; (2N)^{3/2} ≤ N²/2`. The reciprocal phase</span>
+<span class="l" id="L11"><span class="n">11</span>  `Y/(m+ϑ)` over `N &lt; m ≤ U ≤ 2N` is then in the Kusmin–Landau regime. Quillon&#x27;s proved</span>
+<span class="l" id="L12"><span class="n">12</span>  `GoldC.VK.recipSum_small_T` (window `[L,2L]`, `L = N+1`, `T = Y/L ≤ L/2`) gives</span>
+<span class="l" id="L13"><span class="n">13</span>  `‖S‖ ≤ 8L²/Y ≤ 16 N²/Y`. The `N²/Y` term of the target dominates, and no mean value theorem is</span>
+<span class="l" id="L14"><span class="n">14</span>  used.</span>
+<span class="l" id="L15"><span class="n">15</span>* `shiftedSuzukiCore_unconditional : ShiftedSuzukiCore`. This joins the low-`Y` branch with the</span>
+<span class="l" id="L16"><span class="n">16</span>  archived `GoldB.shiftedSuzukiCore_of_lowY`.</span>
+<span class="l" id="L17"><span class="n">17</span>-/</span>
+<span class="l" id="L18"><span class="n">18</span></span>
+<span class="l" id="L19"><span class="n">19</span>open Finset</span>
+<span class="l" id="L20"><span class="n">20</span></span>
+<span class="l" id="L21"><span class="n">21</span>namespace GoldB</span>
+<span class="l" id="L22"><span class="n">22</span></span>
+<span class="l" id="L23"><span class="n">23</span>open GoldB.Iface</span>
+<span class="l" id="L24"><span class="n">24</span></span>
+<span class="l" id="L25"><span class="n">25</span>/-- The `ℕ`-indexed clip sum as a GoldC run sum starting at `N+1`. -/</span>
+<span class="l" id="L26"><span class="n">26</span>lemma shiftedModeSum_eq_expSum (Y ϑ : ℝ) (N U : ℕ) :</span>
+<span class="l" id="L27"><span class="n">27</span>    shiftedModeSum 1 Y ϑ 0 N U =</span>
+<span class="l" id="L28"><span class="n">28</span>      GoldC.VK.expSum (GoldC.VK.recipPhase Y ϑ) ((N + 1 : ℕ) : ℤ) (U - N) := by</span>
+<span class="l" id="L29"><span class="n">29</span>  unfold shiftedModeSum GoldC.VK.expSum</span>
+<span class="l" id="L30"><span class="n">30</span>  rw [← Finset.Ico_add_one_add_one_eq_Ioc, Finset.sum_Ico_eq_sum_range,</span>
+<span class="l" id="L31"><span class="n">31</span>    show U + 1 - (N + 1) = U - N by omega]</span>
+<span class="l" id="L32"><span class="n">32</span>  apply sum_congr rfl; intro i _</span>
+<span class="l" id="L33"><span class="n">33</span>  unfold shiftedExpMode GoldC.VK.eAdd GoldC.VK.recipPhase</span>
+<span class="l" id="L34"><span class="n">34</span>  congr 1; push_cast; ring</span>
+<span class="l" id="L35"><span class="n">35</span></span>
+<span class="l" id="L36"><span class="n">36</span>/-- **Low-`Y` branch (Kusmin–Landau), unconditional.** -/</span>
+<span class="l" id="L37"><span class="n">37</span>theorem quillon_shifted_lowY : ShiftedSuzukiLowY := by</span>
+<span class="l" id="L38"><span class="n">38</span>  refine ⟨1, 16, one_pos, by norm_num, ?_⟩</span>
+<span class="l" id="L39"><span class="n">39</span>  intro Y hY N hN ϑ hϑ0 hϑ1 U hU hlow</span>
+<span class="l" id="L40"><span class="n">40</span>  have hNr : (4096 : ℝ) ≤ N := by exact_mod_cast hN</span>
+<span class="l" id="L41"><span class="n">41</span>  have hN0 : (0 : ℝ) &lt; N := by linarith</span>
+<span class="l" id="L42"><span class="n">42</span>  have hY0 : 0 &lt; Y := by linarith</span>
+<span class="l" id="L43"><span class="n">43</span>  have hYlt : Y &lt; (N : ℝ) ^ 2 / 2 := by</span>
+<span class="l" id="L44"><span class="n">44</span>    have h32 : Real.log 32 ≤ Real.log N := Real.log_le_log (by norm_num) (by linarith)</span>
+<span class="l" id="L45"><span class="n">45</span>    have e32 : Real.log 32 = 5 * Real.log 2 := by</span>
+<span class="l" id="L46"><span class="n">46</span>      rw [show (32 : ℝ) = 2 ^ 5 by norm_num, Real.log_pow]; norm_num</span>
+<span class="l" id="L47"><span class="n">47</span>    have eN : Real.log ((N : ℝ) ^ 2 / 2) = 2 * Real.log N - Real.log 2 := by</span>
+<span class="l" id="L48"><span class="n">48</span>      rw [Real.log_div (by positivity) (by norm_num), Real.log_pow]; push_cast; ring</span>
+<span class="l" id="L49"><span class="n">49</span>    have : Real.log Y &lt; Real.log ((N : ℝ) ^ 2 / 2) := by rw [eN]; linarith</span>
+<span class="l" id="L50"><span class="n">50</span>    exact (Real.log_lt_log_iff hY0 (by positivity)).mp this</span>
+<span class="l" id="L51"><span class="n">51</span>  have hR0 : 0 ≤ 16 * ((N : ℝ) * Real.exp (-(1 * Real.log (N : ℝ) ^ 3 / Real.log Y ^ 2)) +</span>
+<span class="l" id="L52"><span class="n">52</span>      (N : ℝ) ^ 2 / Y) := by positivity</span>
+<span class="l" id="L53"><span class="n">53</span>  rcases le_or_gt U N with hUN | hUN</span>
+<span class="l" id="L54"><span class="n">54</span>  · have : shiftedModeSum 1 Y ϑ 0 N U = 0 := by</span>
+<span class="l" id="L55"><span class="n">55</span>      unfold shiftedModeSum; rw [Finset.Ioc_eq_empty (by omega)]; simp</span>
+<span class="l" id="L56"><span class="n">56</span>    rw [this, norm_zero]; exact hR0</span>
+<span class="l" id="L57"><span class="n">57</span>  set L : ℝ := (N : ℝ) + 1 with hLdef</span>
+<span class="l" id="L58"><span class="n">58</span>  have hL : 0 &lt; L := by positivity</span>
+<span class="l" id="L59"><span class="n">59</span>  set T : ℝ := Y / L with hTdef</span>
+<span class="l" id="L60"><span class="n">60</span>  have hT : 0 &lt; T := by positivity</span>
+<span class="l" id="L61"><span class="n">61</span>  have hTL : T ≤ L / 2 := by</span>
+<span class="l" id="L62"><span class="n">62</span>    simp only [T]; rw [div_le_iff₀ hL]; nlinarith</span>
+<span class="l" id="L63"><span class="n">63</span>  have hwin : ∀ x ∈ GoldC.VK.runIcc ((N + 1 : ℕ) : ℤ) (U - N), L ≤ x + ϑ ∧ x + ϑ ≤ 2 * L := by</span>
+<span class="l" id="L64"><span class="n">64</span>    intro x hx</span>
+<span class="l" id="L65"><span class="n">65</span>    simp only [GoldC.VK.runIcc, Set.mem_Icc] at hx</span>
+<span class="l" id="L66"><span class="n">66</span>    have hUN&#x27; : ((U - N : ℕ) : ℝ) = (U : ℝ) - N := by rw [Nat.cast_sub hUN.le]</span>
+<span class="l" id="L67"><span class="n">67</span>    rw [hUN&#x27;] at hx</span>
+<span class="l" id="L68"><span class="n">68</span>    push_cast at hx</span>
+<span class="l" id="L69"><span class="n">69</span>    have hUr : (U : ℝ) ≤ 2 * N := by exact_mod_cast hU</span>
+<span class="l" id="L70"><span class="n">70</span>    constructor &lt;;&gt; simp only [L] &lt;;&gt; linarith [hx.1, hx.2]</span>
+<span class="l" id="L71"><span class="n">71</span>  have hS := GoldC.VK.recipSum_small_T (θ := ϑ) ((N + 1 : ℕ) : ℤ) (U - N) hL hT hTL hwin</span>
+<span class="l" id="L72"><span class="n">72</span>  have hTL&#x27; : T * L = Y := by simp only [T]; field_simp</span>
+<span class="l" id="L73"><span class="n">73</span>  rw [hTL&#x27;] at hS</span>
+<span class="l" id="L74"><span class="n">74</span>  rw [shiftedModeSum_eq_expSum]</span>
+<span class="l" id="L75"><span class="n">75</span>  refine hS.trans ?_</span>
+<span class="l" id="L76"><span class="n">76</span>  have e : 8 * L / T = 8 * L ^ 2 / Y := by simp only [T]; field_simp</span>
+<span class="l" id="L77"><span class="n">77</span>  rw [e]</span>
+<span class="l" id="L78"><span class="n">78</span>  have hLsq : 8 * L ^ 2 ≤ 16 * (N : ℝ) ^ 2 := by simp only [L]; nlinarith</span>
+<span class="l" id="L79"><span class="n">79</span>  have h1 : 8 * L ^ 2 / Y ≤ 16 * ((N : ℝ) ^ 2 / Y) := by</span>
+<span class="l" id="L80"><span class="n">80</span>    rw [mul_div_assoc&#x27;]; exact div_le_div_of_nonneg_right hLsq hY0.le</span>
+<span class="l" id="L81"><span class="n">81</span>  have h2 : 0 ≤ (N : ℝ) * Real.exp (-(1 * Real.log (N : ℝ) ^ 3 / Real.log Y ^ 2)) := by</span>
+<span class="l" id="L82"><span class="n">82</span>    positivity</span>
+<span class="l" id="L83"><span class="n">83</span>  nlinarith</span>
+<span class="l" id="L84"><span class="n">84</span></span>
+<span class="l" id="L85"><span class="n">85</span>/-- **`ShiftedSuzukiCore`, with no hypothesis.** It joins the archived high-`Y`/small-`N` theorem</span>
+<span class="l" id="L86"><span class="n">86</span>`GoldB.shifted_suzuki_highY`, which rests on the archived `karatsuba_lemma` and the reconstructed</span>
+<span class="l" id="L87"><span class="n">87</span>R0010/R0016 interface, with the Kusmin–Landau low-`Y` branch above. -/</span>
+<span class="l" id="L88"><span class="n">88</span>theorem shiftedSuzukiCore_unconditional : ShiftedSuzukiCore :=</span>
+<span class="l" id="L89"><span class="n">89</span>  shiftedSuzukiCore_of_lowY quillon_shifted_lowY</span>
+<span class="l" id="L90"><span class="n">90</span></span>
+<span class="l" id="L91"><span class="n">91</span>end GoldB</span>
+<span class="l" id="L92"><span class="n">92</span></span>
+<span class="l" id="L93"><span class="n">93</span>#print axioms GoldB.quillon_shifted_lowY</span>
+<span class="l" id="L94"><span class="n">94</span>#print axioms GoldB.shifted_highY_bound</span>
+<span class="l" id="L95"><span class="n">95</span>#print axioms GoldB.shifted_suzuki_highY</span>
+<span class="l" id="L96"><span class="n">96</span>#print axioms GoldB.shiftedSuzukiCore_unconditional</span></pre></div></body></html>

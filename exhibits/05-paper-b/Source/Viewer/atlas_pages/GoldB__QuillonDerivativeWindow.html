@@ -1,0 +1,85 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · GoldB/QuillonDerivativeWindow.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>GoldB/QuillonDerivativeWindow.lean</h1><p class="meta">LEAN/GoldB/QuillonDerivativeWindow.lean · 84 lines · SHA-256 f4092b5574fc5e81cb51c88e3f77c261777d62ed115bf2710e4f586d79384df3</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import GoldB.QuillonSelectedOrders</span>
+<span class="l" id="L2"><span class="n">2</span></span>
+<span class="l" id="L3"><span class="n">3</span>/-!</span>
+<span class="l" id="L4"><span class="n">4</span># Interface reconstruction (Quillon, Hunt B R0001) for the missing module</span>
+<span class="l" id="L5"><span class="n">5</span># `GoldB.QuillonDerivativeWindow`</span>
+<span class="l" id="L6"><span class="n">6</span></span>
+<span class="l" id="L7"><span class="n">7</span>**Provenance.** This is a from-scratch reconstruction by Quillon. It is not the original scratch</span>
+<span class="l" id="L8"><span class="n">8</span>source; see `GoldB.QuillonSelectedOrders` for the construction. No axiom, no</span>
+<span class="l" id="L9"><span class="n">9</span>`sorry`.</span>
+<span class="l" id="L10"><span class="n">10</span></span>
+<span class="l" id="L11"><span class="n">11</span>`veylan_suzuki_literal_selected_derivative_window` states that, for every selected order `j`</span>
+<span class="l" id="L12"><span class="n">12</span>and every `x ∈ [P, 2P]` and `ϑ ∈ [0,1]`, Suzuki&#x27;s window holds:</span>
+<span class="l" id="L13"><span class="n">13</span>`P^{-(599/624) j} ≤ |f^{(j)}(x)|/j! ≤ P^{-j/4}` for `f(z) = Y/(z+ϑ)`, with `P ≥ 4096`, in the</span>
+<span class="l" id="L14"><span class="n">14</span>regime `log Y ≥ (3/2)(log P + log 2)`.</span>
+<span class="l" id="L15"><span class="n">15</span>-/</span>
+<span class="l" id="L16"><span class="n">16</span></span>
+<span class="l" id="L17"><span class="n">17</span>namespace OrielUpper</span>
+<span class="l" id="L18"><span class="n">18</span></span>
+<span class="l" id="L19"><span class="n">19</span>/-- `log(2P+1) ≤ (157/144) log P` for `P ≥ 4096`. -/</span>
+<span class="l" id="L20"><span class="n">20</span>lemma quillon_log_two_P_add_one (P : ℝ) (hP : 4096 ≤ P) :</span>
+<span class="l" id="L21"><span class="n">21</span>    Real.log (2 * P + 1) ≤ (157 / 144) * Real.log P := by</span>
+<span class="l" id="L22"><span class="n">22</span>  have hP0 : 0 &lt; P := by linarith</span>
+<span class="l" id="L23"><span class="n">23</span>  have h1 : Real.log (2 * P + 1) - Real.log (2 * P) ≤ 1 / (2 * P) := by</span>
+<span class="l" id="L24"><span class="n">24</span>    rw [← Real.log_div (by positivity) (by positivity)]</span>
+<span class="l" id="L25"><span class="n">25</span>    have := Real.log_le_sub_one_of_pos (by positivity : (0 : ℝ) &lt; (2 * P + 1) / (2 * P))</span>
+<span class="l" id="L26"><span class="n">26</span>    have e : (2 * P + 1) / (2 * P) - 1 = 1 / (2 * P) := by field_simp; ring</span>
+<span class="l" id="L27"><span class="n">27</span>    linarith</span>
+<span class="l" id="L28"><span class="n">28</span>  have h2 : Real.log (2 * P) = Real.log 2 + Real.log P := Real.log_mul (by norm_num) hP0.ne&#x27;</span>
+<span class="l" id="L29"><span class="n">29</span>  have h3 : 12 * Real.log 2 ≤ Real.log P := by</span>
+<span class="l" id="L30"><span class="n">30</span>    have : Real.log ((2 : ℝ) ^ 12) = 12 * Real.log 2 := by rw [Real.log_pow]; norm_num</span>
+<span class="l" id="L31"><span class="n">31</span>    rw [← this]; exact Real.log_le_log (by norm_num) (by norm_num; linarith)</span>
+<span class="l" id="L32"><span class="n">32</span>  have h4 : 1 / (2 * P) ≤ 1 / 8192 := by</span>
+<span class="l" id="L33"><span class="n">33</span>    rw [div_le_div_iff₀ (by positivity) (by norm_num)]; linarith</span>
+<span class="l" id="L34"><span class="n">34</span>  have h5 : 1 - (2 : ℝ)⁻¹ ≤ Real.log 2 := Real.one_sub_inv_le_log_of_pos (by norm_num)</span>
+<span class="l" id="L35"><span class="n">35</span>  norm_num at h5</span>
+<span class="l" id="L36"><span class="n">36</span>  linarith</span>
+<span class="l" id="L37"><span class="n">37</span></span>
+<span class="l" id="L38"><span class="n">38</span>theorem veylan_suzuki_literal_selected_derivative_window (P x ϑ Y : ℝ) (j : ℕ)</span>
+<span class="l" id="L39"><span class="n">39</span>    (hP : 4096 ≤ P) (hx : P ≤ x) (hx2 : x ≤ 2 * P) (hϑ0 : 0 ≤ ϑ) (hϑ1 : ϑ ≤ 1) (hY : 0 &lt; Y)</span>
+<span class="l" id="L40"><span class="n">40</span>    (hreg : (3 / 2) * (Real.log P + Real.log 2) ≤ Real.log Y)</span>
+<span class="l" id="L41"><span class="n">41</span>    (hj : j ∈ veylanSuzukiSelected (Real.log Y / Real.log P)) :</span>
+<span class="l" id="L42"><span class="n">42</span>    P ^ (-(599 / 624 : ℝ) * (j : ℝ)) ≤</span>
+<span class="l" id="L43"><span class="n">43</span>        ‖iteratedDeriv j (fun z : ℝ =&gt; Y / (z + ϑ)) x / (j.factorial : ℝ)‖ ∧</span>
+<span class="l" id="L44"><span class="n">44</span>      ‖iteratedDeriv j (fun z : ℝ =&gt; Y / (z + ϑ)) x / (j.factorial : ℝ)‖ ≤</span>
+<span class="l" id="L45"><span class="n">45</span>        P ^ (-((1 / 4 : ℝ) * j)) := by</span>
+<span class="l" id="L46"><span class="n">46</span>  have hP0 : 0 &lt; P := by linarith</span>
+<span class="l" id="L47"><span class="n">47</span>  have hL : 0 &lt; Real.log P := Real.log_pos (by linarith)</span>
+<span class="l" id="L48"><span class="n">48</span>  have hu0 : 0 &lt; x + ϑ := by linarith</span>
+<span class="l" id="L49"><span class="n">49</span>  rw [veylan_suzuki_normalized_derivative Y ϑ x j hY.le hu0]</span>
+<span class="l" id="L50"><span class="n">50</span>  set L := Real.log P</span>
+<span class="l" id="L51"><span class="n">51</span>  set t := Real.log Y / L</span>
+<span class="l" id="L52"><span class="n">52</span>  have hl2 : 0 &lt; Real.log 2 := Real.log_pos (by norm_num)</span>
+<span class="l" id="L53"><span class="n">53</span>  have ht : (3 / 2 : ℝ) ≤ t := by</span>
+<span class="l" id="L54"><span class="n">54</span>    simp only [t]; rw [le_div_iff₀ hL]; nlinarith</span>
+<span class="l" id="L55"><span class="n">55</span>  have hY&#x27; : Real.log Y = t * L := by simp only [t]; field_simp</span>
+<span class="l" id="L56"><span class="n">56</span>  obtain ⟨_, hlo, hhi, _⟩ := veylan_suzuki_selected_order t ht j hj</span>
+<span class="l" id="L57"><span class="n">57</span>  set u := x + ϑ</span>
+<span class="l" id="L58"><span class="n">58</span>  have hV : Y / u ^ (j + 1) = Real.exp (Real.log Y - ((j : ℝ) + 1) * Real.log u) := by</span>
+<span class="l" id="L59"><span class="n">59</span>    rw [Real.exp_sub, Real.exp_log hY, show ((j : ℝ) + 1) * Real.log u = Real.log (u ^ (j + 1)) by</span>
+<span class="l" id="L60"><span class="n">60</span>      rw [Real.log_pow]; push_cast; ring, Real.exp_log (by positivity)]</span>
+<span class="l" id="L61"><span class="n">61</span>  have hlogu_lo : L ≤ Real.log u := Real.log_le_log hP0 (by simp only [u]; linarith)</span>
+<span class="l" id="L62"><span class="n">62</span>  have hlogu_hi : Real.log u ≤ (157 / 144) * L :=</span>
+<span class="l" id="L63"><span class="n">63</span>    (Real.log_le_log hu0 (by simp only [u]; linarith)).trans (quillon_log_two_P_add_one P hP)</span>
+<span class="l" id="L64"><span class="n">64</span>  rw [hV, Real.rpow_def_of_pos hP0, Real.rpow_def_of_pos hP0]</span>
+<span class="l" id="L65"><span class="n">65</span>  constructor</span>
+<span class="l" id="L66"><span class="n">66</span>  · apply Real.exp_le_exp.mpr</span>
+<span class="l" id="L67"><span class="n">67</span>    rw [hY&#x27;]</span>
+<span class="l" id="L68"><span class="n">68</span>    have hj0 : (0 : ℝ) ≤ (j : ℝ) + 1 := by positivity</span>
+<span class="l" id="L69"><span class="n">69</span>    have a1 := mul_le_mul_of_nonneg_left hlogu_hi hj0</span>
+<span class="l" id="L70"><span class="n">70</span>    have a2 : (j : ℝ) * (61 / 468) ≤ t - 157 / 144 := by nlinarith</span>
+<span class="l" id="L71"><span class="n">71</span>    have a3 := mul_le_mul_of_nonneg_left a2 hL.le</span>
+<span class="l" id="L72"><span class="n">72</span>    nlinarith</span>
+<span class="l" id="L73"><span class="n">73</span>  · apply Real.exp_le_exp.mpr</span>
+<span class="l" id="L74"><span class="n">74</span>    rw [hY&#x27;]</span>
+<span class="l" id="L75"><span class="n">75</span>    have hj0 : (0 : ℝ) ≤ (j : ℝ) + 1 := by positivity</span>
+<span class="l" id="L76"><span class="n">76</span>    have a1 := mul_le_mul_of_nonneg_left hlogu_lo hj0</span>
+<span class="l" id="L77"><span class="n">77</span>    have a2 : t - 1 ≤ (3 / 4) * (j : ℝ) := by linarith</span>
+<span class="l" id="L78"><span class="n">78</span>    have a3 := mul_le_mul_of_nonneg_left a2 hL.le</span>
+<span class="l" id="L79"><span class="n">79</span>    nlinarith</span>
+<span class="l" id="L80"><span class="n">80</span></span>
+<span class="l" id="L81"><span class="n">81</span>end OrielUpper</span>
+<span class="l" id="L82"><span class="n">82</span></span>
+<span class="l" id="L83"><span class="n">83</span>#print axioms OrielUpper.quillon_log_two_P_add_one</span>
+<span class="l" id="L84"><span class="n">84</span>#print axioms OrielUpper.veylan_suzuki_literal_selected_derivative_window</span></pre></div></body></html>

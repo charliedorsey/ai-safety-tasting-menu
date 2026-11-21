@@ -1,0 +1,384 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[margin=0.86in,headheight=14pt,headsep=16pt,footskip=25pt]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{newpxtext,newpxmath}
+\usepackage[scaled=0.92]{sourcesanspro}
+\usepackage{microtype}
+\usepackage{amsmath,mathtools}
+\usepackage{array,booktabs,enumitem,tabularx}
+\usepackage{xcolor,tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={Reading the Proof: A Mathematical Companion to Paper B},pdfauthor={Charlie Dorsey},pdfsubject={A reader's route through exact Euler identities and signed analytic estimates},pdfkeywords={Paper B, singular series, analytic number theory, proof guide}}
+\definecolor{pine}{HTML}{225748}
+\definecolor{ink}{HTML}{242C28}
+\definecolor{muted}{HTML}{62736A}
+\definecolor{shade}{HTML}{F4F6F2}
+\definecolor{line}{HTML}{DDE5DC}
+\color{ink}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\sffamily\footnotesize\textcolor{muted}{PAPER B \quad / \quad READING THE PROOF}}
+\fancyhead[R]{\sffamily\footnotesize\textcolor{muted}{R0007 \quad READING EDITION}}
+\fancyfoot[C]{\sffamily\footnotesize\textcolor{muted}{\thepage}}
+\renewcommand{\headrulewidth}{0.3pt}
+\newcommand{\kicker}[1]{{\sffamily\small\bfseries\color{pine}\MakeUppercase{#1}}}
+\newcommand{\subtitle}[1]{{\sffamily\small\color{muted}#1}}
+\newcommand{\locate}[3]{\par\smallskip\noindent{\sffamily\footnotesize\textcolor{pine}{\textbf{READ NEXT}}\quad\href{../paper/paper.pdf}{\textcolor{ink}{Main article: #1.}}\quad\href{../paper/paper.pdf\#page=#3}{\textcolor{ink}{Full-paper appendix: #2.}}}\par}
+\newcommand{\waypoint}[1]{\par\noindent{\sffamily\footnotesize\textcolor{muted}{\href{../source/source_index.html}{SEALED SOURCE INDEX}\quad\path{#1}}}\par}
+\newtcolorbox{quietbox}{colback=shade,colframe=line,boxrule=0.45pt,arc=2pt,left=12pt,right=12pt,top=11pt,bottom=11pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{8pt}
+\setlist[itemize]{leftmargin=18pt,itemsep=3pt,topsep=4pt}
+\setlist[enumerate]{leftmargin=19pt,itemsep=3pt,topsep=4pt}
+\begin{document}
+\thispagestyle{empty}
+\vspace*{1.0in}
+\kicker{A mathematical reading companion}\par
+\vspace{13pt}
+{\fontsize{40}{44}\selectfont Reading the Proof.}\par
+\vspace{8pt}
+{\Large\itshape Two roads, twelve cells, one logarithmic saving.}\par
+\vspace{20pt}
+\color{pine}\rule{0.83\linewidth}{0.7pt}\color{ink}\par
+\vspace{24pt}
+The complete mathematical article proves a pointwise transfer for restricted singular-series
+coefficients. This guide is an invitation to understand the mathematical
+moves before entering the dense analytic proof and its formal source.
+
+\begin{quietbox}
+\kicker{The theorem}\vspace{7pt}
+\[
+ A_{1,q}(a,b;h)-B_{1,q}(a,b;h)=o_q(\log h).
+\]
+For each \emph{fixed positive squarefree} $q$, the estimate holds along
+sufficiently large compatible positive heights, uniformly in compatible
+reduced endpoint classes $a,b$. It is a theorem about singular-series
+\emph{coefficients}, not actual prime-gap frequencies, growing-$q$ uniformity,
+or a theorem at all ranks.
+\end{quietbox}
+\vspace{7pt}
+\par\smallskip\noindent{\sffamily\small\bfseries\href{../paper/paper.pdf}{Open the complete 31-page mathematical article}\quad|\quad\href{../source/source_index.html}{Inspect the source index}}\par\medskip
+\kicker{Three ways into the work}\par
+\begin{tabularx}{\linewidth}{@{}p{1.38in}X@{}}
+\textbf{Follow the theorem} & See the exact Euler identity and the signed analytic estimate join.\\[6pt]
+\textbf{Follow a move} & Ask why LOW can be empty, or why the edge is counted rather than cancelled.\\[6pt]
+\textbf{Follow the cost} & Trace the exponents and see why one extra decoration charge would destroy the margin.\\
+\end{tabularx}
+\vfill
+\subtitle{Prepared reading edition, 25 October 2026 (publication requires final author authorization). Mathematical authorship and publication responsibility: Charlie Dorsey. This guide is not a separate mathematical proof or a substitute for the unified article and its appendices.}\par
+\newpage
+\kicker{The argument in one view}\par\vspace{8pt}
+{\Large Two mathematical obligations. One printed statement.}\par
+
+A proof of the desired asymptotic needs two things that cannot replace
+one another: the quantities in the theorem must be \emph{exactly} those
+estimated by the analytic source, and the difference of those source
+quantities must actually be small.
+
+\vspace{6pt}
+\begin{minipage}[t]{0.48\linewidth}
+\begin{quietbox}
+\kicker{Road I / representation}\par
+\textbf{Identify the Euler quantities.}\par
+Convergence and nonvanishing permit primewise division. The two
+B boundaries retain their exceptional-prime weights and an infinite
+centering subtraction. Reflection changes the anchor correctly.
+\[A_{1,q}^{\rm printed}-B_{1,q}^{\rm printed}
+  =A_{1,q}^{\rm src}-B_{1,q}^{\rm src}.\]
+\end{quietbox}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\begin{quietbox}
+\kicker{Road II / analytic estimate}\par
+\textbf{Bound the original signed source.}\par
+Keep the actual parents, weights, gate, reduced heights, and orientations.
+Partition the signed source into HIGH, MIDDLE and LOW; split MIDDLE into
+CORE and LONG. Pay each cell with a justified method.
+\[|A_{1,q}^{\rm src}-B_{1,q}^{\rm src}|
+ \le\varepsilon\log h.\]
+\end{quietbox}
+\end{minipage}
+
+\begin{center}
+\color{pine}\rule{0.50\linewidth}{0.6pt}\color{ink}\par\vspace{6pt}
+{\large\bfseries The two roads join at the literal theorem.}\par
+\end{center}
+
+The signed Central estimate is not the entire analytic road. An independently
+paid shifted Suzuki bound and a positive Vaaler approximation control other
+regions in the exact four-way quarter-middle split; the upper and far-quarter
+terms are paid separately. The source-to-kernel transfer and terminal use
+successive epsilon allocations. Replacing this chain with ``Central is small''
+would omit a mathematical obligation.
+
+\begin{quietbox}
+\kicker{A guide for choosing depth}\par
+The \textbf{article} states the theorem, source identity, twelve methods and
+uniform assembly (Article Sections 3--8). The \textbf{analytic appendices} work four quantitative interfaces in detail (Appendices B--E)
+and records the other cell contracts. The \textbf{source index} opens the
+archived Lean declarations at their exact original lines; it is not a
+compiler-extracted dependency graph.
+\end{quietbox}
+\newpage
+\kicker{M-001 / exact partition}\par\vspace{8pt}
+{\LARGE Where did LOW's parents go?}\par
+\subtitle{An empty sector need not mean an omitted contribution.}\par
+
+Every original quarter-parent $e$ has an integer cardinality $|e|$.
+For any ordered cutoffs $J_{\rm low}\le J_{\rm high}$, it satisfies
+exactly one of the three tests
+\[
+ |e|<J_{\rm low},\qquad
+ J_{\rm low}\le |e|<J_{\rm high},\qquad
+ |e|\ge J_{\rm high}.
+\]
+Because the same signed summand is retained in each branch, the equality
+\[
+ \mathrm{CENTRAL}=\mathrm{LOW}+\mathrm{MIDDLE}+\mathrm{HIGH}
+\]
+is established \emph{before} any estimate. The middle sector has another
+exact complementary split into CORE and LONG.
+
+\begin{quietbox}
+\kicker{The mathematical move}\par
+If $|e|=2$, then under symbolic cutoffs $J_{\rm low}=3$ and
+$J_{\rm high}=6$ the parent is assigned to LOW. Under
+$J_{\rm low}=0$ with the same high cutoff, it is assigned to MIDDLE.
+The signed row and all its coefficients are identical. The source's CORE
+and LONG estimates allow arbitrary lower cutoffs and therefore cover it.
+\end{quietbox}
+
+Setting $J_{\rm low}\equiv0$ makes the predicate $|e|<0$ impossible,
+so LOW vanishes \emph{exactly}. This is a reallocation, not a claim that
+formerly LOW terms are small on their own. The final source chooses
+$\delta=1/4$ for the CORE/LONG geometric split.
+
+\textbf{What would falsify this move?} A partition losing an equality case;
+changing the signed row as it changes sectors; or applying a CORE/LONG
+bound that is not genuinely uniform in the new cutoff.
+\locate{Section 5, signed partitions}{Appendix G, source assembly}{30}
+\waypoint{regionSum_three_sectors; foldedMiddle_long_core; lowSector_zero_exact}
+\newpage
+\kicker{M-004 / quantitative economy}\par\vspace{8pt}
+{\LARGE How does one thousandth survive?}\par
+\subtitle{Band governs CORE because a disjoint sum inherits the worst exponent.}\par
+
+After preceding packet tests fail, the Band mask restricts an actual signed
+CORE pair to a short logarithmic interval. For source parameters
+$\varepsilon_p=(\log h)^{-1/200}$ and $r,s>1$, its complement inequalities
+imply
+\[
+ r^{1/(1+\varepsilon_p)}<s<r^{1+3\varepsilon_p}.
+\]
+The harmonic interval-mass lemma controls this narrow $s$ range. The
+roughness input controls the remaining weighted $B$ factors. These are
+\emph{named supplier estimates}, not an argument that individual signed
+parents are negligible.
+
+\begin{quietbox}
+\kicker{The three payments}\vspace{8pt}
+\[
+ \underbrace{\frac{1991}{2000}}_{\substack{\text{roughness and}\\\text{interval mass}}}
+ +\underbrace{\frac1{400}}_{\text{fixed constants}}
+ =\underbrace{\frac{499}{500}}_{\text{physical Band}},
+ \]
+\[
+ \underbrace{\frac{499}{500}}_{\text{worst CORE cell}}
+ +\underbrace{\frac1{1000}}_{\text{decoration once}}
+ =\boxed{\frac{999}{1000}<1}.
+\]
+\end{quietbox}
+
+A five-way \emph{sum} is bounded by its largest power, not by the product
+of five powers. The whole sector then receives the decoration cost once.
+After division by $\log h$, the remaining saving is the positive power
+$(\log h)^{-1/1000}$, up to fixed constants.
+
+\textbf{An invalid shortcut:} charging decoration a second time would give
+$999/1000+1/1000=1$. That no longer establishes little-$o$ at the
+logarithmic scale. The false calculation explains why the real accounting
+is part of the proof, not book-keeping trivia.
+\locate{Section 7, largest cell and decoration}{Appendix B, Band; Appendix G, ledger}{18}
+\waypoint{interval_mass; rough_ev; Band_physical; core_sublog}
+\newpage
+\kicker{M-003 / geometric eligibility}\par\vspace{8pt}
+{\LARGE Why not use Weil at the edge?}\par
+\subtitle{A powerful estimate is useful only where its required cofactor exists.}\par
+
+The source's LONG-right routing first excludes reciprocal-packet and
+many-factor cases. What remains is split by geometry and the availability
+of a prime packet. Put $\eta=(\log h)^{-1/10}$. On EdgeL,
+\[
+ s^{1/2}\le r<s^{1/2+3\eta}.
+\]
+This is a thin logarithmic strip of width $3\eta\log s$.
+The proof switches summation order and pays for its weighted mass directly:
+\[
+ \frac1{4000}+\frac1{40}+\frac1{100}+\frac9{10}
+ =\frac{3741}{4000}<\frac{19}{20}.
+\]
+The remaining difference absorbs fixed constants. \emph{No Weil theorem
+is used on EdgeL.}
+
+\begin{quietbox}
+\kicker{Away from the strip}\par
+Outside EdgeL, $r\ge s^{1/2+3\eta}$. If the source's $B$-packet
+contains an eligible prime $p\le s^{\eta}$, its extracted cofactor obeys
+\[
+ \frac rp\ge s^{1/2+2\eta}.
+\]
+That length is enough for the coupled Weil--Cauchy argument, with
+its complete-sum bound
+\[
+ |K_s(a,b)|\le\tau(s)\sqrt{s\,\gcd(a,b,s)}.
+\]
+The divisor factor, conductor gcd, Fourier modes and their moments
+remain in the estimate. The corresponding off-edge cell is WRL.
+\end{quietbox}
+
+An off-edge pair without a valid packet does not enter WRL: it is sent
+to ResL. Thus EdgeL and WRL are \emph{disjoint physical populations},
+not two competing estimates on an arbitrary pair.
+\locate{Section 6, LONG-right decision}{Appendix C, EdgeL and WRL}{20}
+\waypoint{EdgeLPart; EdgeL_physical; WRLPart; W_final_LR; norm_quillon_K_weil}
+\newpage
+\kicker{M-005 / reciprocal cancellation}\par\vspace{8pt}
+{\LARGE Why do R and RL need different proofs?}\par
+\subtitle{The same Suzuki engine enters two distinct source geometries.}\par
+
+The analytic supplier controls a shifted reciprocal phase of the form
+\[
+ S(Y,\vartheta;N,U)=\sum_{N<m\le U}e\!\left(\frac{Y}{m+\vartheta}\right),
+ \qquad U\le2N,
+\]
+with $Y\ge2$, $N\ge1$, $0\le\vartheta\le1$. Its upper bound combines
+an exponentially decaying term and a lower-frequency remainder,
+\[
+ |S|\le C\left(N\exp\!\left[-c\frac{(\log N)^3}{(\log Y)^2}\right]
+ +\frac{N^2}{Y}\right).
+\]
+The actual source clips both $vu$ and $v'u$ and passes to
+$u=\rho+Qt$ with $Q=6qr$. Its transformed phase is
+$(Y/v-Y/v')/(\rho+Qt)$; the source proves $N\ge1$,
+$M\le2N$ and $|Y/v-Y/v'|\ge2Q$. The progressing cotangent
+amplitude is nonconstant. Its endpoint-plus-variation norm is
+\emph{at most $2$}, proved before Abel summation applies Suzuki.
+The four main/class Fourier channels are then handled separately.
+
+\begin{quietbox}
+\kicker{Two distinct eligibility tests}\par
+CORE's R source proves a lower logarithmic factor condition with
+constant \textbf{5}. LONG-right RL can provide only \textbf{4}; it
+has a different packet and geometry. The source re-proves the eventual
+parameter estimate in the latter range, using
+\[
+ 3\sigma_0-\frac3{200}-2
+ =3\left(\frac23+\frac1{100}\right)-\frac3{200}-2
+ =\frac3{200}>0.
+\]
+The positive exponent survives the change in the numerical coefficient,
+but not by reusing a hypothesis stronger than the physical source provides.
+\end{quietbox}
+
+\textbf{What would invalidate the transfer?} An absent packet; the
+wrong residue shift or sign; missing Abel variation; or silently using
+CORE's $5$-condition in the LONG $4$-region.
+\locate{Section 6, reciprocal methods}{Appendix D, physical Suzuki ports}{24}
+\waypoint{R_offdiag_class; ampC_abel_factor; R_exp_ev; R_exp_ev4; R_final; R_final_L}
+\newpage
+\kicker{M-002 / exact normalization}\par\vspace{8pt}
+{\LARGE Why must B retain an infinite tail?}\par
+\subtitle{A finite positive count does not permit an infinite subtraction to disappear.}\par
+
+A boundary coefficient first becomes an exact centered divisor series.
+With its appropriate first-anchor residue $r$, the printed identity has
+the form
+\[
+ S_1(q,r;h)=C_{f,q}\sum_{e\ge1}\eta_q(e)
+ \left(R_e^w(q,r;h)-\frac{N_q(r;h)}e\right).
+\]
+The positive progression mass $R_e^w$ carries the \emph{active} primes
+2 and 3 as local weights. The negative subtraction remains the
+\emph{ordinary admissible count} $N_q(r;h)/e$.
+
+\begin{quietbox}
+\kicker{The exact move}\par
+When $e\ge h$, no positive interior displacement $0<t<h$ is divisible
+by $e$, so $R_e^w(q,r;h)=0$. But
+\[
+ -C_{f,q}N_q(r;h)\sum_{e\ge h}\frac{\eta_q(e)}e
+\]
+is generally not zero. Absolute convergence justifies the complete
+centered series; it does not justify dropping the remaining tail.
+The reflected second boundary has its own anchor
+$r_b\equiv-b\pmod q$ and must be transported separately.
+\end{quietbox}
+
+The small exact falsifier is $q=1,h=2$: the active prime 2 kills the
+positive one-point progression and the first-boundary contribution
+is $-1$. Any formula that silently sets all active low-prime weights
+to one predicts the wrong value.
+
+\textbf{What would break the identity?} An unweighted positive
+progression, a weighted centering term, truncated negative tails, or
+reflection without the correct endpoint residue.
+\locate{Section 4, Euler quantities}{Appendix E, exact B centering}{27}
+\waypoint{printed_free_centered_sum; printedS1Literal_eq_manuscriptS1Kernel; printed_reflected_anchor_eq_S1}
+\newpage
+\kicker{A final invitation to interrogate the proof}\par\vspace{8pt}
+{\LARGE Where to read next.}\par
+
+\begin{tabularx}{\linewidth}{@{}p{1.22in}p{1.48in}X@{}}
+\toprule
+\sffamily\small Move & \sffamily\small Main article & \sffamily\small Full-paper appendix\\
+\midrule
+M-001 / LOW=0 & Section 5 & Appendix G\\[5pt]
+M-002 / B tail & Section 4 & Appendix E\\[5pt]
+M-003 / EdgeL vs WRL & Section 6 & Appendix C\\[5pt]
+M-004 / Band & Section 7 & Appendices B, G\\[5pt]
+M-005 / R vs RL & Section 6 & Appendix D\\
+\bottomrule
+\end{tabularx}
+
+\vspace{12pt}
+\kicker{Proof-type versus evidence standing}\par
+\textbf{Exact identity}: a literal equality of source populations, Euler
+objects, or decompositions; it does not by itself establish cancellation.
+\textbf{Estimate}: a bound with physical source masks, hypotheses,
+constants and ranges; deep supplier proofs reside in the sealed formal
+source unless independently derived on the page.
+\textbf{Representation transport}: a checked correspondence between
+literal manuscript and source objects, including signs and local factors.
+\textbf{Verification standing}: an independent question. Source inspection,
+terminal referee acceptance against cached imports, and a full clean
+replay are different kinds of evidence.
+
+\begin{quietbox}
+\kicker{Reproduction and limits}\par
+The selected Lean archive is the byte-preserved R0003 printed-terminal
+sealed source (SHA-256 begins \texttt{e8bccaf4c607a3b2}).
+The reading-room source index provides \textbf{52 hash-checked line
+waypoints in 30 exact source files}. It is a navigable map, not a
+compiler-extracted dependency graph. The two-stage cold analytic review
+narrowed its critique to four expository repairs. Ismerelle's 24 October
+2026 final court \emph{ACCEPTED all four R0004R2 repairs} at the stated
+source-application scope; the seven other physical leaves were not
+independently rederived in prose. An external pinned-source Lean build and printed-terminal axiom
+check were independently reproduced by Alex Breakell on 2 November
+2026 (reported exit statuses 0). This is technical reproducibility,
+not independent mathematical peer review; public release is still
+subject to author approval.
+\end{quietbox}
+
+The classical tools standing behind the proof include Boolean/M\"obius
+inversion, CRT, Vaaler's trigonometric approximation, Suzuki's reciprocal
+sum, Karatsuba/Vinogradov mean-value machinery, Ramar\'e extraction,
+Vaughan's identity, Parseval/Abel, Rankin estimates and the general
+Weil--Estermann Kloosterman bound. The paper's bibliography and
+source-concordance ledger distinguish those antecedents from this
+source-specific assembly; neither gives an unreviewed priority claim.
+
+\subtitle{Offline navigation: open \texttt{OPEN\_READING\_ROOM.html} from the packet root, then \href{technique_atlas/index.html}{Selvara's full Mathematical Machine (62 mechanisms)}. The paper and source targets are included; PDF viewers may restrict local cross-file navigation.}\par
+\end{document}

@@ -1,0 +1,227 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · GoldB/StepThm.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>GoldB/StepThm.lean</h1><p class="meta">LEAN/GoldB/StepThm.lean · 226 lines · SHA-256 53214daa13e7ac2157d58a1d81af0abd7aef6bc9e6036cd5bf346a565a239e08</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import GoldB.StepMain</span>
+<span class="l" id="L2"><span class="n">2</span></span>
+<span class="l" id="L3"><span class="n">3</span>/-!</span>
+<span class="l" id="L4"><span class="n">4</span># GoldB.StepThm — the p-adic step inequality</span>
+<span class="l" id="L5"><span class="n">5</span>-/</span>
+<span class="l" id="L6"><span class="n">6</span></span>
+<span class="l" id="L7"><span class="n">7</span>open Finset Complex</span>
+<span class="l" id="L8"><span class="n">8</span></span>
+<span class="l" id="L9"><span class="n">9</span>namespace GoldB</span>
+<span class="l" id="L10"><span class="n">10</span></span>
+<span class="l" id="L11"><span class="n">11</span>theorem vstep (k p N s : ℕ) [hp : Fact p.Prime] (hk2 : 2 ≤ k) (hk : k &lt; p) (hN : 1 ≤ N)</span>
+<span class="l" id="L12"><span class="n">12</span>    (hNp : N &lt; p ^ k) :</span>
+<span class="l" id="L13"><span class="n">13</span>    (Jc k (s + k) (Icc (1 : ℤ) N) : ℝ) ≤</span>
+<span class="l" id="L14"><span class="n">14</span>      max (4 * ((p : ℝ) ^ (2 * s) * ((N : ℝ) ^ k * (k.factorial * (p : ℝ) ^ (k * (k - 1) / 2)) *</span>
+<span class="l" id="L15"><span class="n">15</span>          Jc k s (Icc (1 : ℤ) ((N / p + 1 : ℕ) : ℤ)))))</span>
+<span class="l" id="L16"><span class="n">16</span>        ((4 * ((k : ℝ) ^ 4 * p * p)) ^ (((s + k : ℕ) : ℝ) / 2) *</span>
+<span class="l" id="L17"><span class="n">17</span>          Jc k (s + k) (Icc (1 : ℤ) ((N / p + 1 : ℕ) : ℤ))) := by</span>
+<span class="l" id="L18"><span class="n">18</span>  classical</span>
+<span class="l" id="L19"><span class="n">19</span>  have hp0 : 0 &lt; p := hp.out.pos</span>
+<span class="l" id="L20"><span class="n">20</span>  set T := s + k with hT</span>
+<span class="l" id="L21"><span class="n">21</span>  have hT2 : 2 ≤ T := by omega</span>
+<span class="l" id="L22"><span class="n">22</span>  set A := Icc (1 : ℤ) N</span>
+<span class="l" id="L23"><span class="n">23</span>  set N1 : ℤ := ((N / p + 1 : ℕ) : ℤ)</span>
+<span class="l" id="L24"><span class="n">24</span>  set M := T * N ^ k + 1</span>
+<span class="l" id="L25"><span class="n">25</span>  have hM0 : 0 &lt; M := Nat.succ_pos _</span>
+<span class="l" id="L26"><span class="n">26</span>  have hMT : T * N ^ k &lt; M := Nat.lt_succ_self _</span>
+<span class="l" id="L27"><span class="n">27</span>  set f := fS k M A</span>
+<span class="l" id="L28"><span class="n">28</span>  set fh : ℕ → (Fin k → Fin M) → ℂ := fun h =&gt; fS k M (resc A p h)</span>
+<span class="l" id="L29"><span class="n">29</span>  set W := (tup k A).filter (wcd p)</span>
+<span class="l" id="L30"><span class="n">30</span>  set I := (tup k A).filter fun x =&gt; ¬ wcd p x</span>
+<span class="l" id="L31"><span class="n">31</span>  set gW := esum M W (psv k)</span>
+<span class="l" id="L32"><span class="n">32</span>  set gI := esum M I (psv k)</span>
+<span class="l" id="L33"><span class="n">33</span>  set J := (Jc k T A : ℝ)</span>
+<span class="l" id="L34"><span class="n">34</span>  set J1 := (Jc k T (Icc (1 : ℤ) N1) : ℝ)</span>
+<span class="l" id="L35"><span class="n">35</span>  set Js := (Jc k s (Icc (1 : ℤ) N1) : ℝ)</span>
+<span class="l" id="L36"><span class="n">36</span>  set WC : ℝ := (N : ℝ) ^ k * (k.factorial * (p : ℝ) ^ (k * (k - 1) / 2)) * Js</span>
+<span class="l" id="L37"><span class="n">37</span>  have hMk : (0 : ℝ) &lt; (M : ℝ) ^ k := by positivity</span>
+<span class="l" id="L38"><span class="n">38</span>  -- membership helpers</span>
+<span class="l" id="L39"><span class="n">39</span>  have hA_mem : ∀ x ∈ A, x ∈ Icc (1 : ℤ) N := fun x hx =&gt; hx</span>
+<span class="l" id="L40"><span class="n">40</span>  have hresc_sub : ∀ h, resc A p h ⊆ A := fun h =&gt; filter_subset _ _</span>
+<span class="l" id="L41"><span class="n">41</span>  -- (1) J on the grid</span>
+<span class="l" id="L42"><span class="n">42</span>  have hJgrid : ∑ a : Fin k → Fin M, ‖f a‖ ^ (2 * T) = (M : ℝ) ^ k * J := by</span>
+<span class="l" id="L43"><span class="n">43</span>    apply Jc_eq_grid M hM0 T A</span>
+<span class="l" id="L44"><span class="n">44</span>    apply grid_bound_aux hN M T hMT (tup T A) (psv k)</span>
+<span class="l" id="L45"><span class="n">45</span>    intro x hx j</span>
+<span class="l" id="L46"><span class="n">46</span>    have := psv_range hN x (fun i =&gt; Fintype.mem_piFinset.mp hx i) j</span>
+<span class="l" id="L47"><span class="n">47</span>    exact ⟨this.1, by exact_mod_cast this.2⟩</span>
+<span class="l" id="L48"><span class="n">48</span>  -- splitting f^k</span>
+<span class="l" id="L49"><span class="n">49</span>  have hsplit : ∀ a, f a ^ k = gW a + gI a := by</span>
+<span class="l" id="L50"><span class="n">50</span>    intro a</span>
+<span class="l" id="L51"><span class="n">51</span>    simp only [f, fS, gW, gI]</span>
+<span class="l" id="L52"><span class="n">52</span>    rw [← esum_tup]</span>
+<span class="l" id="L53"><span class="n">53</span>    exact esum_filter_add M (tup k A) (wcd p) (psv k) a</span>
+<span class="l" id="L54"><span class="n">54</span>  -- f as a sum over residue classes</span>
+<span class="l" id="L55"><span class="n">55</span>  have hfsum : ∀ a, f a = ∑ h ∈ range p, fh h a := by</span>
+<span class="l" id="L56"><span class="n">56</span>    intro a; simp only [f, fh, fS, esum]; exact sum_resc A p hp0 _</span>
+<span class="l" id="L57"><span class="n">57</span>  have hfle : ∀ a, ‖f a‖ ≤ ∑ h ∈ range p, ‖fh h a‖ := by</span>
+<span class="l" id="L58"><span class="n">58</span>    intro a; rw [hfsum a]; exact norm_sum_le _ _</span>
+<span class="l" id="L59"><span class="n">59</span>  -- (2) well-conditioned part</span>
+<span class="l" id="L60"><span class="n">60</span>  have hWgrid : ∀ h, ∑ a : Fin k → Fin M, ‖gW a‖ ^ 2 * ‖fh h a‖ ^ (2 * s) ≤ (M : ℝ) ^ k * WC := by</span>
+<span class="l" id="L61"><span class="n">61</span>    intro h</span>
+<span class="l" id="L62"><span class="n">62</span>    have hb : ∀ x ∈ W ×ˢ tup s (resc A p h), ∀ y ∈ W ×ˢ tup s (resc A p h), ∀ j : Fin k,</span>
+<span class="l" id="L63"><span class="n">63</span>        |(fun q : (Fin k → ℤ) × (Fin s → ℤ) =&gt; psv k q.1 + psv k q.2) x j -</span>
+<span class="l" id="L64"><span class="n">64</span>          (fun q : (Fin k → ℤ) × (Fin s → ℤ) =&gt; psv k q.1 + psv k q.2) y j| &lt; M := by</span>
+<span class="l" id="L65"><span class="n">65</span>      apply grid_bound_aux hN M T hMT</span>
+<span class="l" id="L66"><span class="n">66</span>      intro q hq j</span>
+<span class="l" id="L67"><span class="n">67</span>      have := phase_range (k := k) hN k s (W ×ˢ tup s (resc A p h)) (by</span>
+<span class="l" id="L68"><span class="n">68</span>        intro q hq</span>
+<span class="l" id="L69"><span class="n">69</span>        rw [mem_product] at hq</span>
+<span class="l" id="L70"><span class="n">70</span>        exact ⟨fun i =&gt; Fintype.mem_piFinset.mp (mem_filter.mp hq.1).1 i,</span>
+<span class="l" id="L71"><span class="n">71</span>          fun i =&gt; hresc_sub h (Fintype.mem_piFinset.mp hq.2 i)⟩) q hq j</span>
+<span class="l" id="L72"><span class="n">72</span>      refine ⟨this.1, ?_⟩</span>
+<span class="l" id="L73"><span class="n">73</span>      have e : ((s + k : ℕ) : ℤ) = (T : ℤ) := by simp [hT]</span>
+<span class="l" id="L74"><span class="n">74</span>      rw [e] at this; exact this.2</span>
+<span class="l" id="L75"><span class="n">75</span>    have hg := grid_count_sq M hM0 (W ×ˢ tup s (resc A p h))</span>
+<span class="l" id="L76"><span class="n">76</span>      (fun q =&gt; psv k q.1 + psv k q.2) hb</span>
+<span class="l" id="L77"><span class="n">77</span>    have hprod : ∀ a, ‖esum M (W ×ˢ tup s (resc A p h)) (fun q =&gt; psv k q.1 + psv k q.2) a‖ ^ 2</span>
+<span class="l" id="L78"><span class="n">78</span>        = ‖gW a‖ ^ 2 * ‖fh h a‖ ^ (2 * s) := by</span>
+<span class="l" id="L79"><span class="n">79</span>      intro a</span>
+<span class="l" id="L80"><span class="n">80</span>      rw [esum_product, esum_tup, norm_mul, norm_pow, mul_pow, ← pow_mul, mul_comm s 2]</span>
+<span class="l" id="L81"><span class="n">81</span>      rfl</span>
+<span class="l" id="L82"><span class="n">82</span>    simp_rw [hprod] at hg</span>
+<span class="l" id="L83"><span class="n">83</span>    rw [hg]</span>
+<span class="l" id="L84"><span class="n">84</span>    apply mul_le_mul_of_nonneg_left _ hMk.le</span>
+<span class="l" id="L85"><span class="n">85</span>    have := NW_le k p N s h hk hNp hN</span>
+<span class="l" id="L86"><span class="n">86</span>    simp only at this</span>
+<span class="l" id="L87"><span class="n">87</span>    have h2 : ((((W ×ˢ tup s (resc A p h)) ×ˢ (W ×ˢ tup s (resc A p h))).filter fun q =&gt;</span>
+<span class="l" id="L88"><span class="n">88</span>        psv k q.1.1 + psv k q.1.2 = psv k q.2.1 + psv k q.2.2).card : ℝ) ≤</span>
+<span class="l" id="L89"><span class="n">89</span>        ((N ^ k * (k.factorial * p ^ (k * (k - 1) / 2)) *</span>
+<span class="l" id="L90"><span class="n">90</span>          Jc k s (Icc (1 : ℤ) ((N / p + 1 : ℕ) : ℤ)) : ℕ) : ℝ) := by</span>
+<span class="l" id="L91"><span class="n">91</span>      exact_mod_cast this</span>
+<span class="l" id="L92"><span class="n">92</span>    simpa [WC, Js, N1] using h2</span>
+<span class="l" id="L93"><span class="n">93</span>  have hWC : ∑ a : Fin k → Fin M, ‖gW a‖ ^ 2 * ‖f a‖ ^ (2 * s) ≤</span>
+<span class="l" id="L94"><span class="n">94</span>      (p : ℝ) ^ (2 * s) * ((M : ℝ) ^ k * WC) := by</span>
+<span class="l" id="L95"><span class="n">95</span>    have hcard : ((range p).card : ℝ) = p := by simp</span>
+<span class="l" id="L96"><span class="n">96</span>    have hne : (range p).Nonempty := nonempty_range_iff.mpr hp0.ne&#x27;</span>
+<span class="l" id="L97"><span class="n">97</span>    calc ∑ a : Fin k → Fin M, ‖gW a‖ ^ 2 * ‖f a‖ ^ (2 * s)</span>
+<span class="l" id="L98"><span class="n">98</span>        ≤ ∑ a : Fin k → Fin M, ‖gW a‖ ^ 2 *</span>
+<span class="l" id="L99"><span class="n">99</span>            (((p : ℝ) ^ (2 * s) / p) * ∑ h ∈ range p, ‖fh h a‖ ^ (2 * s)) := by</span>
+<span class="l" id="L100"><span class="n">100</span>          apply sum_le_sum; intro a _</span>
+<span class="l" id="L101"><span class="n">101</span>          apply mul_le_mul_of_nonneg_left _ (by positivity)</span>
+<span class="l" id="L102"><span class="n">102</span>          calc ‖f a‖ ^ (2 * s) ≤ (∑ h ∈ range p, ‖fh h a‖) ^ (2 * s) :=</span>
+<span class="l" id="L103"><span class="n">103</span>                pow_le_pow_left₀ (norm_nonneg _) (hfle a) _</span>
+<span class="l" id="L104"><span class="n">104</span>            _ ≤ (((range p).card : ℝ) ^ (2 * s) / (range p).card) *</span>
+<span class="l" id="L105"><span class="n">105</span>                  ∑ h ∈ range p, ‖fh h a‖ ^ (2 * s) :=</span>
+<span class="l" id="L106"><span class="n">106</span>                pow_sum_le_card_pow_div _ _ (fun _ _ =&gt; norm_nonneg _) hne _</span>
+<span class="l" id="L107"><span class="n">107</span>            _ = _ := by rw [hcard]</span>
+<span class="l" id="L108"><span class="n">108</span>      _ = ((p : ℝ) ^ (2 * s) / p) * ∑ h ∈ range p,</span>
+<span class="l" id="L109"><span class="n">109</span>            ∑ a : Fin k → Fin M, ‖gW a‖ ^ 2 * ‖fh h a‖ ^ (2 * s) := by</span>
+<span class="l" id="L110"><span class="n">110</span>          simp only [mul_sum]</span>
+<span class="l" id="L111"><span class="n">111</span>          rw [sum_comm]</span>
+<span class="l" id="L112"><span class="n">112</span>          apply sum_congr rfl; intro h _</span>
+<span class="l" id="L113"><span class="n">113</span>          apply sum_congr rfl; intro a _</span>
+<span class="l" id="L114"><span class="n">114</span>          ring</span>
+<span class="l" id="L115"><span class="n">115</span>      _ ≤ ((p : ℝ) ^ (2 * s) / p) * ∑ _h ∈ range p, (M : ℝ) ^ k * WC := by</span>
+<span class="l" id="L116"><span class="n">116</span>          apply mul_le_mul_of_nonneg_left (sum_le_sum (fun h _ =&gt; hWgrid h)) (by positivity)</span>
+<span class="l" id="L117"><span class="n">117</span>      _ = (p : ℝ) ^ (2 * s) * ((M : ℝ) ^ k * WC) := by</span>
+<span class="l" id="L118"><span class="n">118</span>          rw [sum_const, card_range, nsmul_eq_mul]</span>
+<span class="l" id="L119"><span class="n">119</span>          have : (p : ℝ) ≠ 0 := by exact_mod_cast hp0.ne&#x27;</span>
+<span class="l" id="L120"><span class="n">120</span>          field_simp</span>
+<span class="l" id="L121"><span class="n">121</span>  -- (3) ill-conditioned part</span>
+<span class="l" id="L122"><span class="n">122</span>  have hIb : ∀ x ∈ I ×ˢ tup s A, ∀ y ∈ I ×ˢ tup s A, ∀ j : Fin k,</span>
+<span class="l" id="L123"><span class="n">123</span>      |(fun q : (Fin k → ℤ) × (Fin s → ℤ) =&gt; psv k q.1 + psv k q.2) x j -</span>
+<span class="l" id="L124"><span class="n">124</span>        (fun q : (Fin k → ℤ) × (Fin s → ℤ) =&gt; psv k q.1 + psv k q.2) y j| &lt; M := by</span>
+<span class="l" id="L125"><span class="n">125</span>    apply grid_bound_aux hN M T hMT</span>
+<span class="l" id="L126"><span class="n">126</span>    intro q hq j</span>
+<span class="l" id="L127"><span class="n">127</span>    have := phase_range (k := k) hN k s (I ×ˢ tup s A) (by</span>
+<span class="l" id="L128"><span class="n">128</span>      intro q hq</span>
+<span class="l" id="L129"><span class="n">129</span>      rw [mem_product] at hq</span>
+<span class="l" id="L130"><span class="n">130</span>      exact ⟨fun i =&gt; Fintype.mem_piFinset.mp (mem_filter.mp hq.1).1 i,</span>
+<span class="l" id="L131"><span class="n">131</span>        fun i =&gt; Fintype.mem_piFinset.mp hq.2 i⟩) q hq j</span>
+<span class="l" id="L132"><span class="n">132</span>    refine ⟨this.1, ?_⟩</span>
+<span class="l" id="L133"><span class="n">133</span>    have e : ((s + k : ℕ) : ℤ) = (T : ℤ) := by simp [hT]</span>
+<span class="l" id="L134"><span class="n">134</span>    rw [e] at this; exact this.2</span>
+<span class="l" id="L135"><span class="n">135</span>  have hIgrid := grid_count_sq M hM0 (I ×ˢ tup s A) (fun q =&gt; psv k q.1 + psv k q.2) hIb</span>
+<span class="l" id="L136"><span class="n">136</span>  have hIprod : ∀ a, ‖esum M (I ×ˢ tup s A) (fun q =&gt; psv k q.1 + psv k q.2) a‖ ^ 2</span>
+<span class="l" id="L137"><span class="n">137</span>      = ‖gI a‖ ^ 2 * ‖f a‖ ^ (2 * s) := by</span>
+<span class="l" id="L138"><span class="n">138</span>    intro a</span>
+<span class="l" id="L139"><span class="n">139</span>    rw [esum_product, esum_tup, norm_mul, norm_pow, mul_pow, ← pow_mul, mul_comm s 2]</span>
+<span class="l" id="L140"><span class="n">140</span>    rfl</span>
+<span class="l" id="L141"><span class="n">141</span>  simp_rw [hIprod] at hIgrid</span>
+<span class="l" id="L142"><span class="n">142</span>  have hNI := NI_grid_le k p N s hk2 hN M (by simpa [hT] using hMT)</span>
+<span class="l" id="L143"><span class="n">143</span>  simp only at hNI</span>
+<span class="l" id="L144"><span class="n">144</span>  -- Hölder for each residue class</span>
+<span class="l" id="L145"><span class="n">145</span>  have hJgrid_h : ∀ h, ∑ a : Fin k → Fin M, ‖fh h a‖ ^ (2 * T) ≤ (M : ℝ) ^ k * J1 := by</span>
+<span class="l" id="L146"><span class="n">146</span>    intro h</span>
+<span class="l" id="L147"><span class="n">147</span>    have e := Jc_eq_grid M hM0 T (resc A p h) (by</span>
+<span class="l" id="L148"><span class="n">148</span>      apply grid_bound_aux hN M T hMT (tup T (resc A p h)) (psv k)</span>
+<span class="l" id="L149"><span class="n">149</span>      intro x hx j</span>
+<span class="l" id="L150"><span class="n">150</span>      have := psv_range hN x (fun i =&gt; hresc_sub h (Fintype.mem_piFinset.mp hx i)) j</span>
+<span class="l" id="L151"><span class="n">151</span>      exact ⟨this.1, by exact_mod_cast this.2⟩)</span>
+<span class="l" id="L152"><span class="n">152</span>    simp only [fh, fS]</span>
+<span class="l" id="L153"><span class="n">153</span>    rw [e]</span>
+<span class="l" id="L154"><span class="n">154</span>    apply mul_le_mul_of_nonneg_left _ hMk.le</span>
+<span class="l" id="L155"><span class="n">155</span>    exact Nat.cast_le.mpr (Jc_resc_le k T p h N hp0)</span>
+<span class="l" id="L156"><span class="n">156</span>  have hJ0 : 0 ≤ J := Nat.cast_nonneg _</span>
+<span class="l" id="L157"><span class="n">157</span>  have hJ10 : 0 ≤ J1 := Nat.cast_nonneg _</span>
+<span class="l" id="L158"><span class="n">158</span>  have hhold : ∀ h, ∑ a : Fin k → Fin M, ‖fh h a‖ ^ 4 * ‖f a‖ ^ (2 * T - 4) ≤</span>
+<span class="l" id="L159"><span class="n">159</span>      (M : ℝ) ^ k * (J1 ^ ((2 : ℝ) / T) * J ^ (1 - (2 : ℝ) / T)) := by</span>
+<span class="l" id="L160"><span class="n">160</span>    intro h</span>
+<span class="l" id="L161"><span class="n">161</span>    have hh := holder_four (univ : Finset (Fin k → Fin M)) (fun a =&gt; ‖fh h a‖) (fun a =&gt; ‖f a‖)</span>
+<span class="l" id="L162"><span class="n">162</span>      (fun _ =&gt; norm_nonneg _) (fun _ =&gt; norm_nonneg _) T hT2</span>
+<span class="l" id="L163"><span class="n">163</span>    have hT0 : (0 : ℝ) &lt; T := by</span>
+<span class="l" id="L164"><span class="n">164</span>      have h2T : (2 : ℝ) ≤ T := by exact_mod_cast hT2</span>
+<span class="l" id="L165"><span class="n">165</span>      linarith</span>
+<span class="l" id="L166"><span class="n">166</span>    have e1 : (0 : ℝ) ≤ (2 : ℝ) / T := by positivity</span>
+<span class="l" id="L167"><span class="n">167</span>    have e2 : (0 : ℝ) ≤ 1 - (2 : ℝ) / T := by</span>
+<span class="l" id="L168"><span class="n">168</span>      rw [sub_nonneg, div_le_one hT0]; exact_mod_cast hT2</span>
+<span class="l" id="L169"><span class="n">169</span>    calc ∑ a : Fin k → Fin M, ‖fh h a‖ ^ 4 * ‖f a‖ ^ (2 * T - 4)</span>
+<span class="l" id="L170"><span class="n">170</span>        ≤ (∑ a : Fin k → Fin M, ‖fh h a‖ ^ (2 * T)) ^ ((2 : ℝ) / T) *</span>
+<span class="l" id="L171"><span class="n">171</span>            (∑ a : Fin k → Fin M, ‖f a‖ ^ (2 * T)) ^ (1 - (2 : ℝ) / T) := hh</span>
+<span class="l" id="L172"><span class="n">172</span>      _ ≤ ((M : ℝ) ^ k * J1) ^ ((2 : ℝ) / T) * ((M : ℝ) ^ k * J) ^ (1 - (2 : ℝ) / T) := by</span>
+<span class="l" id="L173"><span class="n">173</span>          rw [hJgrid]</span>
+<span class="l" id="L174"><span class="n">174</span>          apply mul_le_mul_of_nonneg_right _ (Real.rpow_nonneg (mul_nonneg hMk.le hJ0) _)</span>
+<span class="l" id="L175"><span class="n">175</span>          exact Real.rpow_le_rpow (sum_nonneg (fun _ _ =&gt; by positivity)) (hJgrid_h h) e1</span>
+<span class="l" id="L176"><span class="n">176</span>      _ = (M : ℝ) ^ k * (J1 ^ ((2 : ℝ) / T) * J ^ (1 - (2 : ℝ) / T)) := by</span>
+<span class="l" id="L177"><span class="n">177</span>          rw [Real.mul_rpow hMk.le hJ10, Real.mul_rpow hMk.le hJ0]</span>
+<span class="l" id="L178"><span class="n">178</span>          have : ((M : ℝ) ^ k) ^ ((2 : ℝ) / T) * ((M : ℝ) ^ k) ^ (1 - (2 : ℝ) / T) = (M : ℝ) ^ k := by</span>
+<span class="l" id="L179"><span class="n">179</span>            rw [← Real.rpow_add hMk]; simp</span>
+<span class="l" id="L180"><span class="n">180</span>          calc ((M : ℝ) ^ k) ^ ((2 : ℝ) / T) * J1 ^ ((2 : ℝ) / T) *</span>
+<span class="l" id="L181"><span class="n">181</span>                (((M : ℝ) ^ k) ^ (1 - (2 : ℝ) / T) * J ^ (1 - (2 : ℝ) / T))</span>
+<span class="l" id="L182"><span class="n">182</span>              = (((M : ℝ) ^ k) ^ ((2 : ℝ) / T) * ((M : ℝ) ^ k) ^ (1 - (2 : ℝ) / T)) *</span>
+<span class="l" id="L183"><span class="n">183</span>                  (J1 ^ ((2 : ℝ) / T) * J ^ (1 - (2 : ℝ) / T)) := by ring</span>
+<span class="l" id="L184"><span class="n">184</span>            _ = _ := by rw [this]</span>
+<span class="l" id="L185"><span class="n">185</span>  have hIC : ∑ a : Fin k → Fin M, ‖gI a‖ ^ 2 * ‖f a‖ ^ (2 * s) ≤</span>
+<span class="l" id="L186"><span class="n">186</span>      ((k : ℝ) ^ 4 * p * p) * ((M : ℝ) ^ k * (J1 ^ ((2 : ℝ) / T) * J ^ (1 - (2 : ℝ) / T))) := by</span>
+<span class="l" id="L187"><span class="n">187</span>    rw [hIgrid]</span>
+<span class="l" id="L188"><span class="n">188</span>    refine hNI.trans ?_</span>
+<span class="l" id="L189"><span class="n">189</span>    calc ((k : ℝ) ^ 4 * p) * ∑ h ∈ range p, ∑ a : Fin k → Fin M,</span>
+<span class="l" id="L190"><span class="n">190</span>          ‖fS k M (resc A p h) a‖ ^ 4 * ‖fS k M A a‖ ^ (2 * (s + k) - 4)</span>
+<span class="l" id="L191"><span class="n">191</span>        ≤ ((k : ℝ) ^ 4 * p) * ∑ _h ∈ range p,</span>
+<span class="l" id="L192"><span class="n">192</span>            (M : ℝ) ^ k * (J1 ^ ((2 : ℝ) / T) * J ^ (1 - (2 : ℝ) / T)) := by</span>
+<span class="l" id="L193"><span class="n">193</span>          apply mul_le_mul_of_nonneg_left _ (by positivity)</span>
+<span class="l" id="L194"><span class="n">194</span>          apply sum_le_sum; intro h _</span>
+<span class="l" id="L195"><span class="n">195</span>          exact hhold h</span>
+<span class="l" id="L196"><span class="n">196</span>      _ = _ := by rw [sum_const, card_range, nsmul_eq_mul]; ring</span>
+<span class="l" id="L197"><span class="n">197</span>  -- combine</span>
+<span class="l" id="L198"><span class="n">198</span>  have hmain : (M : ℝ) ^ k * J ≤ (M : ℝ) ^ k * (2 * ((p : ℝ) ^ (2 * s) * WC) +</span>
+<span class="l" id="L199"><span class="n">199</span>      2 * ((k : ℝ) ^ 4 * p * p) * (J1 ^ ((2 : ℝ) / T) * J ^ (1 - (2 : ℝ) / T))) := by</span>
+<span class="l" id="L200"><span class="n">200</span>    rw [← hJgrid]</span>
+<span class="l" id="L201"><span class="n">201</span>    have hpt : ∀ a : Fin k → Fin M, ‖f a‖ ^ (2 * T) ≤</span>
+<span class="l" id="L202"><span class="n">202</span>        2 * (‖gW a‖ ^ 2 * ‖f a‖ ^ (2 * s)) + 2 * (‖gI a‖ ^ 2 * ‖f a‖ ^ (2 * s)) := by</span>
+<span class="l" id="L203"><span class="n">203</span>      intro a</span>
+<span class="l" id="L204"><span class="n">204</span>      have e : ‖f a‖ ^ (2 * T) = ‖f a ^ k‖ ^ 2 * ‖f a‖ ^ (2 * s) := by</span>
+<span class="l" id="L205"><span class="n">205</span>        rw [norm_pow, ← pow_mul, ← pow_add]; congr 1; rw [hT]; ring</span>
+<span class="l" id="L206"><span class="n">206</span>      rw [e, hsplit a]</span>
+<span class="l" id="L207"><span class="n">207</span>      have := norm_sq_add_le (gW a) (gI a)</span>
+<span class="l" id="L208"><span class="n">208</span>      nlinarith [pow_nonneg (norm_nonneg (f a)) (2 * s)]</span>
+<span class="l" id="L209"><span class="n">209</span>    calc ∑ a : Fin k → Fin M, ‖f a‖ ^ (2 * T)</span>
+<span class="l" id="L210"><span class="n">210</span>        ≤ ∑ a : Fin k → Fin M, (2 * (‖gW a‖ ^ 2 * ‖f a‖ ^ (2 * s)) +</span>
+<span class="l" id="L211"><span class="n">211</span>            2 * (‖gI a‖ ^ 2 * ‖f a‖ ^ (2 * s))) := sum_le_sum (fun a _ =&gt; hpt a)</span>
+<span class="l" id="L212"><span class="n">212</span>      _ = 2 * ∑ a : Fin k → Fin M, ‖gW a‖ ^ 2 * ‖f a‖ ^ (2 * s) +</span>
+<span class="l" id="L213"><span class="n">213</span>            2 * ∑ a : Fin k → Fin M, ‖gI a‖ ^ 2 * ‖f a‖ ^ (2 * s) := by</span>
+<span class="l" id="L214"><span class="n">214</span>          rw [sum_add_distrib, mul_sum, mul_sum]</span>
+<span class="l" id="L215"><span class="n">215</span>      _ ≤ 2 * ((p : ℝ) ^ (2 * s) * ((M : ℝ) ^ k * WC)) +</span>
+<span class="l" id="L216"><span class="n">216</span>            2 * (((k : ℝ) ^ 4 * p * p) *</span>
+<span class="l" id="L217"><span class="n">217</span>              ((M : ℝ) ^ k * (J1 ^ ((2 : ℝ) / T) * J ^ (1 - (2 : ℝ) / T)))) := by</span>
+<span class="l" id="L218"><span class="n">218</span>          gcongr</span>
+<span class="l" id="L219"><span class="n">219</span>      _ = _ := by ring</span>
+<span class="l" id="L220"><span class="n">220</span>  have hmain&#x27; := le_of_mul_le_mul_left hmain hMk</span>
+<span class="l" id="L221"><span class="n">221</span>  have hWC0 : 0 ≤ (p : ℝ) ^ (2 * s) * WC := by positivity</span>
+<span class="l" id="L222"><span class="n">222</span>  have hab := absorb J ((p : ℝ) ^ (2 * s) * WC) J1 ((k : ℝ) ^ 4 * p * p) T hT2 hJ0 hWC0 hJ10</span>
+<span class="l" id="L223"><span class="n">223</span>    (by positivity) (by linarith [hmain&#x27;])</span>
+<span class="l" id="L224"><span class="n">224</span>  simpa [WC, Js, J, J1, N1, A, hT] using hab</span>
+<span class="l" id="L225"><span class="n">225</span></span>
+<span class="l" id="L226"><span class="n">226</span>end GoldB</span></pre></div></body></html>

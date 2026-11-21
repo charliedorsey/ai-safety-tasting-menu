@@ -1,0 +1,184 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · GoldB/Final.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>GoldB/Final.lean</h1><p class="meta">LEAN/GoldB/Final.lean · 183 lines · SHA-256 c12e1f8741d8d1b8439e553b85a85fd00727ad2dcbc62a700be4b598a2938730</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import GoldB.KaratsubaMain</span>
+<span class="l" id="L2"><span class="n">2</span></span>
+<span class="l" id="L3"><span class="n">3</span>/-!</span>
+<span class="l" id="L4"><span class="n">4</span># GoldB.Final — Karatsuba&#x27;s lemma (Suzuki, arXiv:1811.02556v2, §3, Lemma 1)</span>
+<span class="l" id="L5"><span class="n">5</span></span>
+<span class="l" id="L6"><span class="n">6</span>`karatsuba_lemma`: constants `γ, C` depending only on `c0, c1, c2, c3`, valid for every</span>
+<span class="l" id="L7"><span class="n">7</span>order `k ≥ 1`, every length `P ≥ 1`, every real `X`, every phase `f`, and every sharp</span>
+<span class="l" id="L8"><span class="n">8</span>clip `P1 ≤ P` of the sum over integers `X &lt; n ≤ X + P1`.</span>
+<span class="l" id="L9"><span class="n">9</span>-/</span>
+<span class="l" id="L10"><span class="n">10</span></span>
+<span class="l" id="L11"><span class="n">11</span>open Finset Set</span>
+<span class="l" id="L12"><span class="n">12</span></span>
+<span class="l" id="L13"><span class="n">13</span>namespace GoldB</span>
+<span class="l" id="L14"><span class="n">14</span></span>
+<span class="l" id="L15"><span class="n">15</span>lemma sum_reflect (g : ℤ → ℂ) (u v : ℤ) :</span>
+<span class="l" id="L16"><span class="n">16</span>    ∑ a ∈ Finset.Icc u v, g a = ∑ m ∈ Finset.Icc (-v) (-u), g (-m) := by</span>
+<span class="l" id="L17"><span class="n">17</span>  apply Finset.sum_nbij&#x27; (fun a =&gt; -a) (fun m =&gt; -m)</span>
+<span class="l" id="L18"><span class="n">18</span>  · intro a ha; simp only [Finset.mem_coe, Finset.mem_Icc] at ha ⊢; omega</span>
+<span class="l" id="L19"><span class="n">19</span>  · intro m hm; simp only [Finset.mem_coe, Finset.mem_Icc] at hm ⊢; omega</span>
+<span class="l" id="L20"><span class="n">20</span>  · intro a _; simp</span>
+<span class="l" id="L21"><span class="n">21</span>  · intro m _; simp</span>
+<span class="l" id="L22"><span class="n">22</span>  · intro a _; simp</span>
+<span class="l" id="L23"><span class="n">23</span></span>
+<span class="l" id="L24"><span class="n">24</span>theorem karatsuba_lemma (c0 c1 c2 c3 : ℝ) (h0 : 0 &lt; c0) (h0&#x27; : c0 &lt; 1) (h3 : 0 &lt; c3)</span>
+<span class="l" id="L25"><span class="n">25</span>    (h32 : c3 ≤ c2) (h21 : c2 &lt; c1) (h1 : c1 &lt; 1) :</span>
+<span class="l" id="L26"><span class="n">26</span>    ∃ γ C : ℝ, 0 &lt; γ ∧ γ ≤ 1 ∧ 0 ≤ C ∧</span>
+<span class="l" id="L27"><span class="n">27</span>      ∀ k : ℕ, 1 ≤ k → ∀ X P : ℝ, 1 ≤ P → ∀ f : ℝ → ℝ,</span>
+<span class="l" id="L28"><span class="n">28</span>        (∀ x ∈ Set.Icc X (X + P), ContDiffAt ℝ (k + 1) f x) →</span>
+<span class="l" id="L29"><span class="n">29</span>        (∀ x ∈ Set.Icc X (X + P),</span>
+<span class="l" id="L30"><span class="n">30</span>          |iteratedDeriv (k + 1) f x| / (k + 1).factorial ≤ P ^ (-(c1 * (k + 1)))) →</span>
+<span class="l" id="L31"><span class="n">31</span>        ∀ Js : Finset ℕ, Js ⊆ Finset.Icc 1 k → c0 * k ≤ Js.card →</span>
+<span class="l" id="L32"><span class="n">32</span>        (∀ j ∈ Js, ∀ x ∈ Set.Icc X (X + P),</span>
+<span class="l" id="L33"><span class="n">33</span>          P ^ (-(c2 * j)) ≤ |iteratedDeriv j f x| / j.factorial ∧</span>
+<span class="l" id="L34"><span class="n">34</span>            |iteratedDeriv j f x| / j.factorial ≤ P ^ (-(c3 * j))) →</span>
+<span class="l" id="L35"><span class="n">35</span>        ∀ P1 : ℝ, P1 ≤ P →</span>
+<span class="l" id="L36"><span class="n">36</span>          ‖∑ n ∈ Finset.Ioc ⌊X⌋ ⌊X + P1⌋, ee (f n)‖ ≤ C * P ^ (1 - γ / (k : ℝ) ^ 2) := by</span>
+<span class="l" id="L37"><span class="n">37</span>  classical</span>
+<span class="l" id="L38"><span class="n">38</span>  let K : KParams := ⟨c0, c1, c2, c3, h0, h0&#x27;, h3, h32, h21, h1⟩</span>
+<span class="l" id="L39"><span class="n">39</span>  set P0 : ℝ := max ((2 : ℝ) ^ (1 / c3)) ((2 : ℝ) ^ (1 / (1 - c1)))</span>
+<span class="l" id="L40"><span class="n">40</span>  set C : ℝ := max (2 * P0) (2 * (K.Kc + 2 * Real.pi + 2))</span>
+<span class="l" id="L41"><span class="n">41</span>  have hKc := K.Kc_pos</span>
+<span class="l" id="L42"><span class="n">42</span>  have hP0pos : 0 &lt; P0 := lt_max_of_lt_left (by positivity)</span>
+<span class="l" id="L43"><span class="n">43</span>  refine ⟨K.γ, C, K.γ_pos, K.γ_le_one, le_max_of_le_left (by positivity), ?_⟩</span>
+<span class="l" id="L44"><span class="n">44</span>  intro k hk X P hP f hf hA Js hJs hJc hB P1 hP1</span>
+<span class="l" id="L45"><span class="n">45</span>  have hP0 : 0 &lt; P := by linarith</span>
+<span class="l" id="L46"><span class="n">46</span>  have hkr : (1 : ℝ) ≤ k := by exact_mod_cast hk</span>
+<span class="l" id="L47"><span class="n">47</span>  have hγk : K.γ / (k : ℝ) ^ 2 ≤ 1 :=</span>
+<span class="l" id="L48"><span class="n">48</span>    (div_le_self K.γ_pos.le (by nlinarith)).trans K.γ_le_one</span>
+<span class="l" id="L49"><span class="n">49</span>  have hCpos : 0 ≤ P ^ (1 - K.γ / (k : ℝ) ^ 2) := by positivity</span>
+<span class="l" id="L50"><span class="n">50</span>  -- the selected orders as `Fin k`</span>
+<span class="l" id="L51"><span class="n">51</span>  set S : Finset (Fin k) := univ.filter fun j : Fin k =&gt; (j : ℕ) + 1 ∈ Js</span>
+<span class="l" id="L52"><span class="n">52</span>  have hSc : S.card = Js.card := by</span>
+<span class="l" id="L53"><span class="n">53</span>    have himg : S.image (fun j : Fin k =&gt; (j : ℕ) + 1) = Js := by</span>
+<span class="l" id="L54"><span class="n">54</span>      ext n</span>
+<span class="l" id="L55"><span class="n">55</span>      simp only [S, Finset.mem_image, Finset.mem_filter, Finset.mem_univ, true_and]</span>
+<span class="l" id="L56"><span class="n">56</span>      constructor</span>
+<span class="l" id="L57"><span class="n">57</span>      · rintro ⟨j, hj, rfl⟩; exact hj</span>
+<span class="l" id="L58"><span class="n">58</span>      · intro hn</span>
+<span class="l" id="L59"><span class="n">59</span>        have := Finset.mem_Icc.mp (hJs hn)</span>
+<span class="l" id="L60"><span class="n">60</span>        exact ⟨⟨n - 1, by omega⟩, by simp; rwa [show n - 1 + 1 = n by omega], by simp; omega⟩</span>
+<span class="l" id="L61"><span class="n">61</span>    rw [← himg, Finset.card_image_of_injective _ (fun a b h =&gt; Fin.ext (by simpa using h))]</span>
+<span class="l" id="L62"><span class="n">62</span>  have hS : K.c0 * k ≤ S.card := by rw [hSc]; exact hJc</span>
+<span class="l" id="L63"><span class="n">63</span>  by_cases hbig : 2 ≤ P ^ c3 ∧ 2 ≤ P ^ (1 - c1)</span>
+<span class="l" id="L64"><span class="n">64</span>  · obtain ⟨hPc3, hPc1⟩ := hbig</span>
+<span class="l" id="L65"><span class="n">65</span>    have hP1&#x27; : 1 &lt; P := by</span>
+<span class="l" id="L66"><span class="n">66</span>      by_contra hle; push_neg at hle</span>
+<span class="l" id="L67"><span class="n">67</span>      have : P ^ c3 ≤ 1 := Real.rpow_le_one hP0.le hle h3.le</span>
+<span class="l" id="L68"><span class="n">68</span>      linarith</span>
+<span class="l" id="L69"><span class="n">69</span>    -- hypotheses (B) in `Fin k` form</span>
+<span class="l" id="L70"><span class="n">70</span>    have hBf : ∀ (g : ℝ → ℝ) (Y : ℝ),</span>
+<span class="l" id="L71"><span class="n">71</span>        (∀ j ∈ Js, ∀ x ∈ Set.Icc Y (Y + P), P ^ (-(c2 * j)) ≤ |iteratedDeriv j g x| / j.factorial ∧</span>
+<span class="l" id="L72"><span class="n">72</span>          |iteratedDeriv j g x| / j.factorial ≤ P ^ (-(c3 * j))) →</span>
+<span class="l" id="L73"><span class="n">73</span>        ∀ j ∈ S, ∀ x ∈ Set.Icc Y (Y + P),</span>
+<span class="l" id="L74"><span class="n">74</span>          P ^ (-(K.c2 * ((j : ℕ) + 1))) ≤ |iteratedDeriv ((j : ℕ) + 1) g x| / ((j : ℕ) + 1).factorial ∧</span>
+<span class="l" id="L75"><span class="n">75</span>          |iteratedDeriv ((j : ℕ) + 1) g x| / ((j : ℕ) + 1).factorial ≤ P ^ (-(K.c3 * ((j : ℕ) + 1))) := by</span>
+<span class="l" id="L76"><span class="n">76</span>      intro g Y hg j hj x hx</span>
+<span class="l" id="L77"><span class="n">77</span>      have := hg ((j : ℕ) + 1) (mem_filter.mp hj).2 x hx</span>
+<span class="l" id="L78"><span class="n">78</span>      simpa using this</span>
+<span class="l" id="L79"><span class="n">79</span>    set M := ⌊X + P / 2⌋</span>
+<span class="l" id="L80"><span class="n">80</span>    set lo := ⌊X⌋ + 1</span>
+<span class="l" id="L81"><span class="n">81</span>    set hi := ⌊X + P1⌋</span>
+<span class="l" id="L82"><span class="n">82</span>    have hsplit : ∑ n ∈ Finset.Ioc ⌊X⌋ hi, ee (f n) =</span>
+<span class="l" id="L83"><span class="n">83</span>        ∑ n ∈ Finset.Icc lo (min hi M), ee (f n) + ∑ n ∈ Finset.Icc (max lo (M + 1)) hi, ee (f n) := by</span>
+<span class="l" id="L84"><span class="n">84</span>      rw [← sum_filter_add_sum_filter_not (Finset.Ioc ⌊X⌋ hi) (fun n =&gt; n ≤ M)]</span>
+<span class="l" id="L85"><span class="n">85</span>      congr 1</span>
+<span class="l" id="L86"><span class="n">86</span>      · apply sum_congr _ (fun _ _ =&gt; rfl); ext n</span>
+<span class="l" id="L87"><span class="n">87</span>        simp only [mem_filter, Finset.mem_Ioc, Finset.mem_Icc, lo]; omega</span>
+<span class="l" id="L88"><span class="n">88</span>      · apply sum_congr _ (fun _ _ =&gt; rfl); ext n</span>
+<span class="l" id="L89"><span class="n">89</span>        simp only [mem_filter, Finset.mem_Ioc, Finset.mem_Icc, lo]; omega</span>
+<span class="l" id="L90"><span class="n">90</span>    -- left half</span>
+<span class="l" id="L91"><span class="n">91</span>    have hL := K.left_bound k hk X P hP1&#x27; hPc3 hPc1 f hf hA S hS (hBf f X hB) lo (min hi M) (by</span>
+<span class="l" id="L92"><span class="n">92</span>      intro a ha</span>
+<span class="l" id="L93"><span class="n">93</span>      rw [Finset.mem_Icc] at ha</span>
+<span class="l" id="L94"><span class="n">94</span>      constructor</span>
+<span class="l" id="L95"><span class="n">95</span>      · have := Int.lt_floor_add_one X</span>
+<span class="l" id="L96"><span class="n">96</span>        have : (lo : ℝ) ≤ a := by exact_mod_cast ha.1</span>
+<span class="l" id="L97"><span class="n">97</span>        simp only [lo] at this; push_cast at this; linarith</span>
+<span class="l" id="L98"><span class="n">98</span>      · have h1 : a ≤ M := ha.2.trans (min_le_right _ _)</span>
+<span class="l" id="L99"><span class="n">99</span>        have h2 : (M : ℝ) ≤ X + P / 2 := Int.floor_le _</span>
+<span class="l" id="L100"><span class="n">100</span>        have : (a : ℝ) ≤ M := by exact_mod_cast h1</span>
+<span class="l" id="L101"><span class="n">101</span>        linarith)</span>
+<span class="l" id="L102"><span class="n">102</span>    -- right half, by reflection</span>
+<span class="l" id="L103"><span class="n">103</span>    set g : ℝ → ℝ := fun y =&gt; f (-y)</span>
+<span class="l" id="L104"><span class="n">104</span>    have hR0 : ∑ n ∈ Finset.Icc (max lo (M + 1)) hi, ee (f n) =</span>
+<span class="l" id="L105"><span class="n">105</span>        ∑ m ∈ Finset.Icc (-hi) (-(max lo (M + 1))), ee (g m) := by</span>
+<span class="l" id="L106"><span class="n">106</span>      rw [sum_reflect]; apply sum_congr rfl; intro m _; simp [g]</span>
+<span class="l" id="L107"><span class="n">107</span>    have hgI : ∀ x ∈ Set.Icc (-X - P) (-X - P + P), -x ∈ Set.Icc X (X + P) := by</span>
+<span class="l" id="L108"><span class="n">108</span>      intro x hx; exact ⟨by linarith [hx.2], by linarith [hx.1]⟩</span>
+<span class="l" id="L109"><span class="n">109</span>    have hR := K.left_bound k hk (-X - P) P hP1&#x27; hPc3 hPc1 g</span>
+<span class="l" id="L110"><span class="n">110</span>      (fun x hx =&gt; contDiffAt_reflect f _ x (hf _ (hgI x hx)))</span>
+<span class="l" id="L111"><span class="n">111</span>      (fun x hx =&gt; by rw [iteratedDeriv_reflect]; exact hA _ (hgI x hx))</span>
+<span class="l" id="L112"><span class="n">112</span>      S hS</span>
+<span class="l" id="L113"><span class="n">113</span>      (hBf g (-X - P) (by</span>
+<span class="l" id="L114"><span class="n">114</span>        intro j hj x hx</span>
+<span class="l" id="L115"><span class="n">115</span>        rw [iteratedDeriv_reflect]; exact hB j hj _ (hgI x hx)))</span>
+<span class="l" id="L116"><span class="n">116</span>      (-hi) (-(max lo (M + 1))) (by</span>
+<span class="l" id="L117"><span class="n">117</span>        intro m hm</span>
+<span class="l" id="L118"><span class="n">118</span>        rw [Finset.mem_Icc] at hm</span>
+<span class="l" id="L119"><span class="n">119</span>        constructor</span>
+<span class="l" id="L120"><span class="n">120</span>        · have h1 : (hi : ℝ) ≤ X + P1 := Int.floor_le _</span>
+<span class="l" id="L121"><span class="n">121</span>          have : ((-hi : ℤ) : ℝ) ≤ m := by exact_mod_cast hm.1</span>
+<span class="l" id="L122"><span class="n">122</span>          push_cast at this; linarith</span>
+<span class="l" id="L123"><span class="n">123</span>        · have h1 : X + P / 2 &lt; (M : ℝ) + 1 := Int.lt_floor_add_one _</span>
+<span class="l" id="L124"><span class="n">124</span>          have h2 : m ≤ -(M + 1) := hm.2.trans (neg_le_neg (le_max_right _ _))</span>
+<span class="l" id="L125"><span class="n">125</span>          have : (m : ℝ) ≤ -((M : ℝ) + 1) := by exact_mod_cast h2</span>
+<span class="l" id="L126"><span class="n">126</span>          linarith)</span>
+<span class="l" id="L127"><span class="n">127</span>    rw [hsplit]</span>
+<span class="l" id="L128"><span class="n">128</span>    calc ‖∑ n ∈ Finset.Icc lo (min hi M), ee (f n) + ∑ n ∈ Finset.Icc (max lo (M + 1)) hi, ee (f n)‖</span>
+<span class="l" id="L129"><span class="n">129</span>        ≤ ‖∑ n ∈ Finset.Icc lo (min hi M), ee (f n)‖ +</span>
+<span class="l" id="L130"><span class="n">130</span>            ‖∑ n ∈ Finset.Icc (max lo (M + 1)) hi, ee (f n)‖ := norm_add_le _ _</span>
+<span class="l" id="L131"><span class="n">131</span>      _ ≤ (K.Kc + 2 * Real.pi + 2) * P ^ (1 - K.γ / (k : ℝ) ^ 2) +</span>
+<span class="l" id="L132"><span class="n">132</span>            (K.Kc + 2 * Real.pi + 2) * P ^ (1 - K.γ / (k : ℝ) ^ 2) := by</span>
+<span class="l" id="L133"><span class="n">133</span>          rw [hR0]; exact add_le_add hL hR</span>
+<span class="l" id="L134"><span class="n">134</span>      _ = 2 * (K.Kc + 2 * Real.pi + 2) * P ^ (1 - K.γ / (k : ℝ) ^ 2) := by ring</span>
+<span class="l" id="L135"><span class="n">135</span>      _ ≤ C * P ^ (1 - K.γ / (k : ℝ) ^ 2) :=</span>
+<span class="l" id="L136"><span class="n">136</span>          mul_le_mul_of_nonneg_right (le_max_right _ _) hCpos</span>
+<span class="l" id="L137"><span class="n">137</span>  · -- small `P`: the trivial bound</span>
+<span class="l" id="L138"><span class="n">138</span>    have hPle : P ≤ P0 := by</span>
+<span class="l" id="L139"><span class="n">139</span>      rw [not_and_or] at hbig</span>
+<span class="l" id="L140"><span class="n">140</span>      push_neg at hbig</span>
+<span class="l" id="L141"><span class="n">141</span>      rcases hbig with h | h</span>
+<span class="l" id="L142"><span class="n">142</span>      · have : P ≤ (2 : ℝ) ^ (1 / c3) := by</span>
+<span class="l" id="L143"><span class="n">143</span>          have e : P = (P ^ c3) ^ (1 / c3) := by</span>
+<span class="l" id="L144"><span class="n">144</span>            rw [← Real.rpow_mul hP0.le, mul_one_div_cancel h3.ne&#x27;, Real.rpow_one]</span>
+<span class="l" id="L145"><span class="n">145</span>          rw [e]</span>
+<span class="l" id="L146"><span class="n">146</span>          exact Real.rpow_le_rpow (by positivity) h.le (by positivity)</span>
+<span class="l" id="L147"><span class="n">147</span>        exact this.trans (le_max_left _ _)</span>
+<span class="l" id="L148"><span class="n">148</span>      · have hc : 0 &lt; 1 - c1 := by linarith</span>
+<span class="l" id="L149"><span class="n">149</span>        have : P ≤ (2 : ℝ) ^ (1 / (1 - c1)) := by</span>
+<span class="l" id="L150"><span class="n">150</span>          have e : P = (P ^ (1 - c1)) ^ (1 / (1 - c1)) := by</span>
+<span class="l" id="L151"><span class="n">151</span>            rw [← Real.rpow_mul hP0.le, mul_one_div_cancel hc.ne&#x27;, Real.rpow_one]</span>
+<span class="l" id="L152"><span class="n">152</span>          rw [e]</span>
+<span class="l" id="L153"><span class="n">153</span>          exact Real.rpow_le_rpow (by positivity) h.le (by positivity)</span>
+<span class="l" id="L154"><span class="n">154</span>        exact this.trans (le_max_right _ _)</span>
+<span class="l" id="L155"><span class="n">155</span>    have hcard : ((Finset.Ioc ⌊X⌋ ⌊X + P1⌋).card : ℝ) ≤ 2 * P := by</span>
+<span class="l" id="L156"><span class="n">156</span>      rw [Int.card_Ioc]</span>
+<span class="l" id="L157"><span class="n">157</span>      have h1 : (⌊X + P1⌋ : ℝ) ≤ X + P1 := Int.floor_le _</span>
+<span class="l" id="L158"><span class="n">158</span>      have h2 : X &lt; (⌊X⌋ : ℝ) + 1 := Int.lt_floor_add_one _</span>
+<span class="l" id="L159"><span class="n">159</span>      rcases le_or_gt ⌊X + P1⌋ ⌊X⌋ with hle | hlt</span>
+<span class="l" id="L160"><span class="n">160</span>      · rw [Int.toNat_of_nonpos (by omega)]; simp; linarith</span>
+<span class="l" id="L161"><span class="n">161</span>      · have : (((⌊X + P1⌋ - ⌊X⌋).toNat : ℤ) : ℝ) = (⌊X + P1⌋ : ℝ) - ⌊X⌋ := by</span>
+<span class="l" id="L162"><span class="n">162</span>          rw [Int.toNat_of_nonneg (by omega)]; push_cast; ring</span>
+<span class="l" id="L163"><span class="n">163</span>        have e : (((⌊X + P1⌋ - ⌊X⌋).toNat : ℕ) : ℝ) = (⌊X + P1⌋ : ℝ) - ⌊X⌋ := by exact_mod_cast this</span>
+<span class="l" id="L164"><span class="n">164</span>        rw [e]; linarith</span>
+<span class="l" id="L165"><span class="n">165</span>    have htriv : ‖∑ n ∈ Finset.Ioc ⌊X⌋ ⌊X + P1⌋, ee (f n)‖ ≤ 2 * P := by</span>
+<span class="l" id="L166"><span class="n">166</span>      calc ‖∑ n ∈ Finset.Ioc ⌊X⌋ ⌊X + P1⌋, ee (f n)‖ ≤ ∑ n ∈ Finset.Ioc ⌊X⌋ ⌊X + P1⌋, ‖ee (f n)‖ :=</span>
+<span class="l" id="L167"><span class="n">167</span>            norm_sum_le _ _</span>
+<span class="l" id="L168"><span class="n">168</span>        _ = ((Finset.Ioc ⌊X⌋ ⌊X + P1⌋).card : ℝ) := by simp</span>
+<span class="l" id="L169"><span class="n">169</span>        _ ≤ 2 * P := hcard</span>
+<span class="l" id="L170"><span class="n">170</span>    have hPsplit : P = P ^ (K.γ / (k : ℝ) ^ 2) * P ^ (1 - K.γ / (k : ℝ) ^ 2) := by</span>
+<span class="l" id="L171"><span class="n">171</span>      rw [← Real.rpow_add hP0]; simp</span>
+<span class="l" id="L172"><span class="n">172</span>    have hsmall : P ^ (K.γ / (k : ℝ) ^ 2) ≤ P0 := by</span>
+<span class="l" id="L173"><span class="n">173</span>      calc P ^ (K.γ / (k : ℝ) ^ 2) ≤ P ^ (1 : ℝ) := Real.rpow_le_rpow_of_exponent_le hP hγk</span>
+<span class="l" id="L174"><span class="n">174</span>        _ = P := Real.rpow_one P</span>
+<span class="l" id="L175"><span class="n">175</span>        _ ≤ P0 := hPle</span>
+<span class="l" id="L176"><span class="n">176</span>    calc ‖∑ n ∈ Finset.Ioc ⌊X⌋ ⌊X + P1⌋, ee (f n)‖ ≤ 2 * P := htriv</span>
+<span class="l" id="L177"><span class="n">177</span>      _ = 2 * (P ^ (K.γ / (k : ℝ) ^ 2) * P ^ (1 - K.γ / (k : ℝ) ^ 2)) := by rw [← hPsplit]</span>
+<span class="l" id="L178"><span class="n">178</span>      _ ≤ 2 * (P0 * P ^ (1 - K.γ / (k : ℝ) ^ 2)) := by gcongr</span>
+<span class="l" id="L179"><span class="n">179</span>      _ = (2 * P0) * P ^ (1 - K.γ / (k : ℝ) ^ 2) := by ring</span>
+<span class="l" id="L180"><span class="n">180</span>      _ ≤ C * P ^ (1 - K.γ / (k : ℝ) ^ 2) :=</span>
+<span class="l" id="L181"><span class="n">181</span>          mul_le_mul_of_nonneg_right (le_max_left _ _) hCpos</span>
+<span class="l" id="L182"><span class="n">182</span></span>
+<span class="l" id="L183"><span class="n">183</span>end GoldB</span></pre></div></body></html>

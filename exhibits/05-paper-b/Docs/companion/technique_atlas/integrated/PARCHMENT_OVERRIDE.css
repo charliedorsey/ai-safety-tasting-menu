@@ -1,0 +1,108 @@
+/* R0007 palette/typography integration. Original Selvara mathematical payload unchanged. */
+:root{color-scheme:light;--bg:#f8f7f3;--sidebar:#f2f1ea;--surface:#fffefa;--surface2:#f3f5ef;--surface3:#edf1e9;--border:#d8dfd6;--muted:#61736a;--text:#25342e;--cyan:#2b6356;--mint:#2b6356;--gold:#916333;--rose:#a4534d;--violet:#645b83;--max:1360px}
+html,body{background:#f8f7f3;color:#25342e}
+body{font:15.5px/1.68 Georgia,"Times New Roman",serif;-webkit-font-smoothing:antialiased}
+a{color:#2b6356;text-underline-offset:3px}
+a:hover{color:#214d44}
+button,input,select,.topbar,.rail,.eyebrow,.kicker,.meta,.tag,.btn,.stat,.footer,.sectorhead,.card .meta,.source h4,.stepno,.barvalue{font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #bc9255;outline-offset:3px}
+code,.mono{color:#31584d}
+.rail{background:linear-gradient(160deg,#efeee8 0%,#f5f3eb 100%);border-right:1px solid #d8dfd6}
+.logo{background:#315d50;color:#fffdf7;border:1px solid #27544a;letter-spacing:-.04em;border-radius:10px}
+.brand b{color:#25342e}.brand small,.rail .cap,.railfooter{color:#64756b}
+.rail .cap{font-weight:700;letter-spacing:.13em}
+.rail button.nav{color:#3c5247;font-weight:650;border-radius:6px}
+.rail button.nav span.num{border-color:#cbd7cc;color:#698174}
+.rail button.nav:hover{background:#e2eae2;color:#224a40}
+.rail button.nav.active{background:#dfece2;border-color:#b6cbb9;color:#214b40;box-shadow:inset 3px 0 #2b6356}
+.rail button.nav.active .num{border-color:#b0c8b4;color:#2b6356}
+.railfooter{border-top:1px solid #d8dfd6}
+.workspace{background:#f8f7f3}
+.integrated-utility{padding:11px clamp(17px,3.7vw,58px);display:flex;gap:16px;justify-content:space-between;align-items:center;background:#fffefa;border-bottom:1px solid #e1e5db;color:#627166;font:12px/1.5 ui-sans-serif,system-ui,sans-serif;flex-wrap:wrap}
+.integrated-utility a{font-weight:680;text-decoration:none}.integrated-utility .version{font-weight:520;color:#67776e}
+.topbar{background:#fffefa;border-bottom:1px solid #e1e5db}
+.topbar .toplabel,.eyebrow,.kicker{color:#326a5b}
+.topbar .status{color:#6e7970}.topbar .status em{color:#315d50}
+.main{padding-top:48px}.display{color:#27382f;letter-spacing:-.048em}.display em{color:#356e5b}
+.lede{color:#475d50;max-width:900px}.lede strong{color:#2a463b}
+h2,h3,h4{color:#2b3d32}h2{font-weight:400}.muted,small{color:#61736a}
+.divider{background:linear-gradient(90deg,#d8dfd6,transparent)}
+.card,.card.tint{background:#fffefa;border:1px solid #d8dfd6;border-radius:8px;box-shadow:0 4px 18px #243e3108}
+.card.tint{background:#edf3ec}.card .metric{color:#326b5a}
+.card .meta{color:#65766d}.card p{color:#51645a}
+.mathblock{background:#f1f4ed;border:1px solid #d6ded4;color:#29483a;border-radius:8px}
+.math{color:#29483a}
+.tag{background:#eef3ed;border-color:#ccd9cd;color:#2e6657;border-radius:5px;font-weight:700}
+.tag.gold{background:#f5ece0;border-color:#dfcdb4;color:#8c6234}
+.tag.violet{background:#efedf6;border-color:#d4cfe3;color:#5c527b}
+.tag.rose{background:#f8eeee;border-color:#e6d1d1;color:#9c4a45}
+.btn{background:#2b6356;border:1px solid #2b6356;border-radius:6px;color:#fffefa}
+.btn:hover{background:#214d42}.btn.secondary{background:#fffefa;border-color:#c1d2c5;color:#2f5e51}
+.btn.secondary:hover{background:#edf4ed}
+.btn.active,.btn[aria-pressed=true]{background:#dcebe0;color:#244f42;border-color:#7fa893}
+.info{background:#eaf1eb;border-left:3px solid #618c79;color:#445c4d;border-radius:0 6px 6px 0}
+.info.warn{background:#f8efe4;border-left-color:#b08a58}
+.pathline span,.flowitem,.numbers span{background:#eef3ed;border-color:#d9e2d9;color:#496257}
+.pathline i{color:#688b7b}.flowitem .n{color:#2f7660}.flowitem:not(:last-child):after{color:#698d79}
+.source,.datum,.stat,.listpanel,.detail{background:#fffefa;border-color:#d9e1d9;border-radius:8px}
+.source h4,.datum b{color:#765b3f}.srclabel{color:#315d50}.srcmeta{color:#667b70}
+.linecode{background:#f2f4ef;border:1px solid #d7ded5;border-radius:6px;color:#2b5344;max-height:360px}
+.stepno{color:#2b6356}.trace .datum{border-top:2px solid #7a9f87}
+.trace .datum em{color:#315d50}.trace .datum p{color:#465b4f}
+.prooflane .card{border-top:3px solid #60907a}.prooflane .card:nth-child(2){border-top-color:#bc9d6c}
+.search,.select{background:#fffefa;color:#283f35;border:1px solid #c5d4c9;border-radius:6px}
+.search::placeholder{color:#7c8980}
+.listpanel{background:#f3f4ef}.listpanel button{color:#3a5348}.listpanel button small{color:#74887a}
+.listpanel button:hover{background:#e6eee5}
+.listpanel button.active{background:#dcebe0;border-color:#a4c1ac;color:#255344}
+.detail{background:#fffefa}.detail .title{color:#25392e}.datum span{color:#3f5448}
+.stat b{color:#2b6356}
+.bartrack{background:#e0e8df!important}
+.bartrack .fill{background:#75a691!important}
+.barlabel,.barvalue{color:#45594e}
+.cellpicker button{background:#fffefa;color:#3a6251;border-color:#cedccf;border-radius:6px}
+.cellpicker button:hover,.cellpicker button.active{background:#dcebe0;border-color:#77a88e;color:#244f41}
+.cellpicker button small{color:#6c8577}
+.thresholds input[type=range]{accent-color:#2b6356}.epsout{color:#8e6636}
+.equationrow{border-left-color:#b6cfbe}.equationrow .bubble{background:#e7f0e7;border-color:#aec9b5;color:#315d50}
+.equationrow p,.mathblock small{color:#485e52}
+.kicker{color:#2b6356}
+.tablewrap{border-color:#d9e0d7}
+th{background:#e8ede7;color:#355b4d}
+td,th{border-bottom:1px solid #e0e5dc}td{color:#41594d}tr:hover td{background:#f1f6ed}
+.reportlink{color:#2c6655;border-color:#97b4a0}
+.footer{color:#697b70;border-top:1px solid #dbe2d7}
+/* Source graph's inline palette must not reintroduce neon in the parchment room. */
+.baritem .bartrack[style]{background:linear-gradient(90deg,#e6ece3 0,#cfdcd1 52%,#e6ece3 52%)!important}
+.baritem .bartrack span[style*="background"]{background:#709989!important}
+.baritem .bartrack span:first-child[style*="background"]{background:#8e9b8e!important}
+/* A single scholarly provenance panel appears below the original Selvara card. */
+.provenance{margin:24px 0 4px;border:1px solid #c9d9cb;border-left:3px solid #557b67;border-radius:7px;background:#f7f8f2;padding:18px 20px}
+.provenance h3{font:normal 22px/1.22 Georgia,serif;margin:3px 0 13px;color:#2a4939}
+.provenance .lead-note{font:12px/1.55 system-ui,sans-serif;color:#64776b}
+.credit-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.credit-field{background:#fffefa;border:1px solid #e1e7de;border-radius:6px;padding:12px 14px;min-width:0}
+.credit-field b{display:block;font:700 10px/1.5 system-ui,sans-serif;letter-spacing:.09em;text-transform:uppercase;color:#69766d;margin-bottom:6px}
+.credit-field p{font:13px/1.6 Georgia,serif;color:#3c4f44;margin:0}
+.credit-field a{font-weight:600;overflow-wrap:anywhere}
+.credit-field code{font-size:11px}
+.source-open{margin:5px 0 13px;font:11px/1.6 system-ui,sans-serif}
+.source-open a{font-weight:690}
+.atlas-bridge{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 21px}
+.atlas-bridge a{font:700 12px/1.5 system-ui,sans-serif;display:inline-block;text-decoration:none;padding:9px 12px;border:1px solid #c8dacd;border-radius:5px;background:#fffefa}
+.atlas-bridge a:hover{background:#e7f0e8}
+.atlas-bridge a.primary{background:#2b6356;border-color:#2b6356;color:#fffefa}
+.spotlight{border-left:3px solid #a88d61;background:#f7f1e6;padding:16px 18px;border-radius:4px;font-size:13px;color:#4e5e50}
+.atlas-summary{padding:14px 20px;background:#eef2ea;border:1px solid #d7e0d5;border-radius:7px;font:12px/1.65 system-ui,sans-serif;color:#4f6557;margin-bottom:23px}
+@media(max-width:760px){.integrated-utility{padding:10px 15px;gap:6px}.main{padding-top:31px}.credit-grid{grid-template-columns:1fr}.provenance{padding:15px}.topbar .status{display:none}}
+@media(max-width:430px){.rail .navs{scrollbar-width:thin}.topbar{padding:0 14px}.topbar .toplabel{font-size:10px}.display{font-size:clamp(35px,10vw,45px)}.baritem{grid-template-columns:58px minmax(0,1fr) 62px;gap:7px}.barvalue{font-size:10px}.flowrow{grid-template-columns:1fr}.mathblock{padding:14px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+/* Reflow earlier than the original atlas's narrow breakpoint, for tablet/zoom accessibility. */
+@media(max-width:900px){
+.app{display:block}.rail{position:relative;height:auto;overflow:visible;padding:13px 15px 9px;border-right:0;border-bottom:1px solid #d8dfd6}
+.brand{margin:0 2px 11px}.logo{height:40px;width:40px}.rail .cap,.railfooter{display:none}
+.navs{display:flex;gap:6px;overflow-x:auto;overscroll-behavior-x:contain;padding:3px 1px 10px;scrollbar-width:thin}
+.rail button.nav{display:flex;white-space:nowrap;width:auto;margin:0;flex-shrink:0;padding:8px 12px;font-size:12px}
+.topbar{padding:0 18px}.main{padding:25px 18px 66px}
+}
+@media(max-width:600px){.main{padding:25px 17px 57px}.layout2,.layout3,.prooflane,.splitpanel,.compare,.twocolnotes{grid-template-columns:1fr}.trace{grid-template-columns:1fr}.detailgrid{grid-template-columns:1fr}.flowrow{grid-template-columns:repeat(2,1fr)}.cellpicker{grid-template-columns:repeat(3,minmax(0,1fr))}.source{min-width:0}.source .linecode{max-width:100%}}

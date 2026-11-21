@@ -1,0 +1,1482 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · Orienne/Publication/F01PrintedLiteralBridgeR0001.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>Orienne/Publication/F01PrintedLiteralBridgeR0001.lean</h1><p class="meta">LEAN/Orienne/Publication/F01PrintedLiteralBridgeR0001.lean · 1481 lines · SHA-256 5e7e4a353867fd418eafe510bff89a9e3f99437d3f7e700fc2f0eb5a09050d6f</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import PaperB.FixedQ.SourceBridge</span>
+<span class="l" id="L2"><span class="n">2</span>import PaperB.FixedQ.PrincipalOneDimensionalCancellation</span>
+<span class="l" id="L3"><span class="n">3</span>import PaperB.Closure</span>
+<span class="l" id="L4"><span class="n">4</span>import PaperB.FixedQ.EtaReciprocalTail</span>
+<span class="l" id="L5"><span class="n">5</span>import Mathlib.NumberTheory.EulerProduct.Basic</span>
+<span class="l" id="L6"><span class="n">6</span></span>
+<span class="l" id="L7"><span class="n">7</span>/-! F-01 direct printed Euler factors; no reuse of printed A/B kernel names. -/</span>
+<span class="l" id="L8"><span class="n">8</span>open scoped BigOperators</span>
+<span class="l" id="L9"><span class="n">9</span>set_option maxHeartbeats 1500000</span>
+<span class="l" id="L10"><span class="n">10</span>namespace Merivelle.F01</span>
+<span class="l" id="L11"><span class="n">11</span>open PaperB.FixedQ</span>
+<span class="l" id="L12"><span class="n">12</span></span>
+<span class="l" id="L13"><span class="n">13</span>def occupiedResidues (p : ℕ) (H : Finset ℕ) : Finset ℕ :=</span>
+<span class="l" id="L14"><span class="n">14</span>  H.image (fun x =&gt; x % p)</span>
+<span class="l" id="L15"><span class="n">15</span></span>
+<span class="l" id="L16"><span class="n">16</span>noncomputable def printedLocal (p : ℕ) (H : Finset ℕ) : ℝ :=</span>
+<span class="l" id="L17"><span class="n">17</span>  (1 - (occupiedResidues p H).card / (p : ℝ)) /</span>
+<span class="l" id="L18"><span class="n">18</span>    ((1 - 1 / (p : ℝ)) ^ H.card)</span>
+<span class="l" id="L19"><span class="n">19</span></span>
+<span class="l" id="L20"><span class="n">20</span>noncomputable def printedRestrictedSingularSeries (q : ℕ) (H : Finset ℕ) : ℝ :=</span>
+<span class="l" id="L21"><span class="n">21</span>  ∏&#x27; p : ℕ, if Nat.Prime p ∧ ¬ p ∣ q then printedLocal p H else 1</span>
+<span class="l" id="L22"><span class="n">22</span></span>
+<span class="l" id="L23"><span class="n">23</span>theorem occupied_pair_card (p h : ℕ) :</span>
+<span class="l" id="L24"><span class="n">24</span>    (occupiedResidues p ({0,h} : Finset ℕ)).card =</span>
+<span class="l" id="L25"><span class="n">25</span>      endpointOccupiedCount p h := by</span>
+<span class="l" id="L26"><span class="n">26</span>  simp [occupiedResidues, endpointOccupiedCount]</span>
+<span class="l" id="L27"><span class="n">27</span></span>
+<span class="l" id="L28"><span class="n">28</span>theorem occupied_triple_card (p h y : ℕ) :</span>
+<span class="l" id="L29"><span class="n">29</span>    (occupiedResidues p ({0,y,h} : Finset ℕ)).card =</span>
+<span class="l" id="L30"><span class="n">30</span>      tripleOccupiedCount p h y := by</span>
+<span class="l" id="L31"><span class="n">31</span>  simp [occupiedResidues, tripleOccupiedCount]</span>
+<span class="l" id="L32"><span class="n">32</span></span>
+<span class="l" id="L33"><span class="n">33</span>theorem printedLocal_pair_eq_free (p h : ℕ) (hh : 0 &lt; h) :</span>
+<span class="l" id="L34"><span class="n">34</span>    printedLocal p ({0,h} : Finset ℕ) =</span>
+<span class="l" id="L35"><span class="n">35</span>      freeLocalFactorRatio p h := by</span>
+<span class="l" id="L36"><span class="n">36</span>  have hc : ({0,h} : Finset ℕ).card = 2 :=</span>
+<span class="l" id="L37"><span class="n">37</span>    card_pair_zero_of_ne_zero (Nat.ne_of_gt hh)</span>
+<span class="l" id="L38"><span class="n">38</span>  unfold printedLocal freeLocalFactorRatio</span>
+<span class="l" id="L39"><span class="n">39</span>  rw [hc, occupied_pair_card]</span>
+<span class="l" id="L40"><span class="n">40</span></span>
+<span class="l" id="L41"><span class="n">41</span>theorem printedLocal_pair_eq_baseline</span>
+<span class="l" id="L42"><span class="n">42</span>    (q h p : ℕ) (hh : 0 &lt; h)</span>
+<span class="l" id="L43"><span class="n">43</span>    (hp5 : 5 ≤ p) (hnh : ¬ p ∣ h) :</span>
+<span class="l" id="L44"><span class="n">44</span>    (if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L45"><span class="n">45</span>      printedLocal p ({0,h} : Finset ℕ) else 1) =</span>
+<span class="l" id="L46"><span class="n">46</span>      normalizationBaseline q 0 p := by</span>
+<span class="l" id="L47"><span class="n">47</span>  have hc : endpointOccupiedCount p h = 2 := by</span>
+<span class="l" id="L48"><span class="n">48</span>    unfold endpointOccupiedCount</span>
+<span class="l" id="L49"><span class="n">49</span>    have hm : h % p ≠ 0 := Nat.dvd_iff_mod_eq_zero.not.mp hnh</span>
+<span class="l" id="L50"><span class="n">50</span>    exact Finset.card_pair hm.symm</span>
+<span class="l" id="L51"><span class="n">51</span>  by_cases ha : Nat.Prime p ∧ ¬ p ∣ q</span>
+<span class="l" id="L52"><span class="n">52</span>  · have hacc : Nat.Prime p ∧ 5 ≤ p ∧ ¬ p ∣ q :=</span>
+<span class="l" id="L53"><span class="n">53</span>      ⟨ha.1, hp5, ha.2⟩</span>
+<span class="l" id="L54"><span class="n">54</span>    rw [if_pos ha, printedLocal_pair_eq_free p h hh]</span>
+<span class="l" id="L55"><span class="n">55</span>    simp only [freeLocalFactorRatio, hc, normalizationBaseline,</span>
+<span class="l" id="L56"><span class="n">56</span>      if_pos hacc, dvd_zero, if_pos]</span>
+<span class="l" id="L57"><span class="n">57</span>    have hp0 : (p : ℝ) ≠ 0 := by</span>
+<span class="l" id="L58"><span class="n">58</span>      exact_mod_cast (show p ≠ 0 by omega)</span>
+<span class="l" id="L59"><span class="n">59</span>    have hp1 : (p : ℝ) - 1 ≠ 0 := by</span>
+<span class="l" id="L60"><span class="n">60</span>      exact sub_ne_zero.mpr</span>
+<span class="l" id="L61"><span class="n">61</span>        (by exact_mod_cast (show p ≠ 1 by omega))</span>
+<span class="l" id="L62"><span class="n">62</span>    field_simp [hp0, hp1]</span>
+<span class="l" id="L63"><span class="n">63</span>    ring</span>
+<span class="l" id="L64"><span class="n">64</span>  · have hbad : ¬ (p.Prime ∧ 5 ≤ p ∧ ¬ p ∣ q) := by</span>
+<span class="l" id="L65"><span class="n">65</span>      intro hx</span>
+<span class="l" id="L66"><span class="n">66</span>      exact ha ⟨hx.1, hx.2.2⟩</span>
+<span class="l" id="L67"><span class="n">67</span>    simp [ha, normalizationBaseline, hbad]</span>
+<span class="l" id="L68"><span class="n">68</span></span>
+<span class="l" id="L69"><span class="n">69</span>/-- The literal printed endpoint product converges: beyond p &gt; max(4,h)</span>
+<span class="l" id="L70"><span class="n">70</span>its factors coincide with the already certified c1 baseline. -/</span>
+<span class="l" id="L71"><span class="n">71</span>theorem printed_pair_multipliable (q h : ℕ) (hh : 0 &lt; h) :</span>
+<span class="l" id="L72"><span class="n">72</span>    Multipliable (fun p : ℕ =&gt;</span>
+<span class="l" id="L73"><span class="n">73</span>      if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L74"><span class="n">74</span>        printedLocal p ({0,h} : Finset ℕ) else 1) := by</span>
+<span class="l" id="L75"><span class="n">75</span>  have heq :</span>
+<span class="l" id="L76"><span class="n">76</span>      (fun p : ℕ =&gt; normalizationBaseline q 0 p) =ᶠ[Filter.atTop]</span>
+<span class="l" id="L77"><span class="n">77</span>      (fun p : ℕ =&gt; if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L78"><span class="n">78</span>        printedLocal p ({0,h} : Finset ℕ) else 1) := by</span>
+<span class="l" id="L79"><span class="n">79</span>    filter_upwards [Filter.eventually_ge_atTop (max 5 (h + 1))] with p hp</span>
+<span class="l" id="L80"><span class="n">80</span>    have hp5 : 5 ≤ p := (le_max_left _ _).trans hp</span>
+<span class="l" id="L81"><span class="n">81</span>    have hhp : h &lt; p := by omega</span>
+<span class="l" id="L82"><span class="n">82</span>    have hnd : ¬ p ∣ h := by</span>
+<span class="l" id="L83"><span class="n">83</span>      intro hd</span>
+<span class="l" id="L84"><span class="n">84</span>      have hple : p ≤ h := Nat.le_of_dvd hh hd</span>
+<span class="l" id="L85"><span class="n">85</span>      omega</span>
+<span class="l" id="L86"><span class="n">86</span>    exact (printedLocal_pair_eq_baseline q h p hh hp5 hnd).symm</span>
+<span class="l" id="L87"><span class="n">87</span>  have hs : Summable (fun p : ℕ =&gt;</span>
+<span class="l" id="L88"><span class="n">88</span>      ‖(if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L89"><span class="n">89</span>        printedLocal p ({0,h} : Finset ℕ) else 1) - 1‖) := by</span>
+<span class="l" id="L90"><span class="n">90</span>    apply (summable_norm_normalizationBaseline_sub_one q 0).congr_atTop</span>
+<span class="l" id="L91"><span class="n">91</span>    filter_upwards [heq] with p hp</span>
+<span class="l" id="L92"><span class="n">92</span>    rw [hp]</span>
+<span class="l" id="L93"><span class="n">93</span>  have hm : Multipliable (fun p : ℕ =&gt;</span>
+<span class="l" id="L94"><span class="n">94</span>      1 + ((if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L95"><span class="n">95</span>        printedLocal p ({0,h} : Finset ℕ) else 1) - 1)) :=</span>
+<span class="l" id="L96"><span class="n">96</span>    multipliable_one_add_of_summable hs</span>
+<span class="l" id="L97"><span class="n">97</span>  exact hm.congr (fun p =&gt; by ring)</span>
+<span class="l" id="L98"><span class="n">98</span></span>
+<span class="l" id="L99"><span class="n">99</span>/-- Convergence stated directly for the independent printed Euler-product</span>
+<span class="l" id="L100"><span class="n">100</span>definition used by the F-01 literal bridge. -/</span>
+<span class="l" id="L101"><span class="n">101</span>theorem printed_pair_singularSeries_multipliable (q h : ℕ) (hh : 0 &lt; h) :</span>
+<span class="l" id="L102"><span class="n">102</span>    Multipliable (fun p : ℕ =&gt;</span>
+<span class="l" id="L103"><span class="n">103</span>      if Nat.Prime p ∧ ¬ p ∣ q then printedLocal p ({0,h} : Finset ℕ) else 1) :=</span>
+<span class="l" id="L104"><span class="n">104</span>  printed_pair_multipliable q h hh</span>
+<span class="l" id="L105"><span class="n">105</span></span>
+<span class="l" id="L106"><span class="n">106</span>/-- No Euler local obstruction at any p ≥ 3: an endpoint pair</span>
+<span class="l" id="L107"><span class="n">107</span>occupies at most two residue classes. -/</span>
+<span class="l" id="L108"><span class="n">108</span>theorem printed_pair_local_positive_high (p h : ℕ)</span>
+<span class="l" id="L109"><span class="n">109</span>    (hp : 3 ≤ p) (hh : 0 &lt; h) :</span>
+<span class="l" id="L110"><span class="n">110</span>    0 &lt; printedLocal p ({0,h} : Finset ℕ) := by</span>
+<span class="l" id="L111"><span class="n">111</span>  have hcard : (occupiedResidues p ({0,h} : Finset ℕ)).card ≤ 2 := by</span>
+<span class="l" id="L112"><span class="n">112</span>    unfold occupiedResidues</span>
+<span class="l" id="L113"><span class="n">113</span>    calc</span>
+<span class="l" id="L114"><span class="n">114</span>      (Finset.image (fun x : ℕ =&gt; x % p) ({0,h} : Finset ℕ)).card ≤</span>
+<span class="l" id="L115"><span class="n">115</span>          ({0,h} : Finset ℕ).card := Finset.card_image_le</span>
+<span class="l" id="L116"><span class="n">116</span>      _ = 2 := card_pair_zero_of_ne_zero (Nat.ne_of_gt hh)</span>
+<span class="l" id="L117"><span class="n">117</span>  have hnum : 0 &lt; (1 : ℝ) -</span>
+<span class="l" id="L118"><span class="n">118</span>      (occupiedResidues p ({0,h} : Finset ℕ)).card / (p : ℝ) := by</span>
+<span class="l" id="L119"><span class="n">119</span>    have hpR : (2 : ℝ) &lt; (p : ℝ) := by exact_mod_cast (show 2 &lt; p by omega)</span>
+<span class="l" id="L120"><span class="n">120</span>    have hnR : ((occupiedResidues p ({0,h} : Finset ℕ)).card : ℝ) ≤ 2 := by</span>
+<span class="l" id="L121"><span class="n">121</span>      exact_mod_cast hcard</span>
+<span class="l" id="L122"><span class="n">122</span>    have hpR0 : (0 : ℝ) &lt; (p : ℝ) := by positivity</span>
+<span class="l" id="L123"><span class="n">123</span>    apply sub_pos.mpr</span>
+<span class="l" id="L124"><span class="n">124</span>    apply (div_lt_one hpR0).mpr</span>
+<span class="l" id="L125"><span class="n">125</span>    linarith</span>
+<span class="l" id="L126"><span class="n">126</span>  have hbase : 0 &lt; (1 : ℝ) - 1 / (p : ℝ) := by</span>
+<span class="l" id="L127"><span class="n">127</span>    have hpR : (1 : ℝ) &lt; (p : ℝ) := by exact_mod_cast (show 1 &lt; p by omega)</span>
+<span class="l" id="L128"><span class="n">128</span>    have hpR0 : (0 : ℝ) &lt; (p : ℝ) := by positivity</span>
+<span class="l" id="L129"><span class="n">129</span>    apply sub_pos.mpr</span>
+<span class="l" id="L130"><span class="n">130</span>    exact (div_lt_one hpR0).mpr hpR</span>
+<span class="l" id="L131"><span class="n">131</span>  unfold printedLocal</span>
+<span class="l" id="L132"><span class="n">132</span>  exact div_pos hnum (pow_pos hbase _)</span>
+<span class="l" id="L133"><span class="n">133</span></span>
+<span class="l" id="L134"><span class="n">134</span>/-- The exceptional active prime 2 is positive precisely when the</span>
+<span class="l" id="L135"><span class="n">135</span>endpoint gap is even, as in the frozen manuscript&#x27;s admissible regime. -/</span>
+<span class="l" id="L136"><span class="n">136</span>theorem printed_pair_local_positive_two (h : ℕ) (heven : 2 ∣ h) :</span>
+<span class="l" id="L137"><span class="n">137</span>    0 &lt; printedLocal 2 ({0,h} : Finset ℕ) := by</span>
+<span class="l" id="L138"><span class="n">138</span>  have hm : h % 2 = 0 := Nat.mod_eq_zero_of_dvd heven</span>
+<span class="l" id="L139"><span class="n">139</span>  have hc : (occupiedResidues 2 ({0,h} : Finset ℕ)).card = 1 := by</span>
+<span class="l" id="L140"><span class="n">140</span>    simp [occupiedResidues, hm]</span>
+<span class="l" id="L141"><span class="n">141</span>  unfold printedLocal</span>
+<span class="l" id="L142"><span class="n">142</span>  rw [hc]</span>
+<span class="l" id="L143"><span class="n">143</span>  norm_num</span>
+<span class="l" id="L144"><span class="n">144</span></span>
+<span class="l" id="L145"><span class="n">145</span>/-- Summability of deviations from 1 for the independently printed pair. -/</span>
+<span class="l" id="L146"><span class="n">146</span>theorem printed_pair_summable_deviation (q h : ℕ) (hh : 0 &lt; h) :</span>
+<span class="l" id="L147"><span class="n">147</span>    Summable (fun p : ℕ =&gt;</span>
+<span class="l" id="L148"><span class="n">148</span>      ‖(if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L149"><span class="n">149</span>        printedLocal p ({0,h} : Finset ℕ) else 1) - 1‖) := by</span>
+<span class="l" id="L150"><span class="n">150</span>  apply (summable_norm_normalizationBaseline_sub_one q 0).congr_atTop</span>
+<span class="l" id="L151"><span class="n">151</span>  filter_upwards [Filter.eventually_ge_atTop (max 5 (h + 1))] with p hp</span>
+<span class="l" id="L152"><span class="n">152</span>  have hp5 : 5 ≤ p := (le_max_left _ _).trans hp</span>
+<span class="l" id="L153"><span class="n">153</span>  have hnd : ¬ p ∣ h := by</span>
+<span class="l" id="L154"><span class="n">154</span>    intro hd</span>
+<span class="l" id="L155"><span class="n">155</span>    have hple : p ≤ h := Nat.le_of_dvd hh hd</span>
+<span class="l" id="L156"><span class="n">156</span>    omega</span>
+<span class="l" id="L157"><span class="n">157</span>  rw [← printedLocal_pair_eq_baseline q h p hh hp5 hnd]</span>
+<span class="l" id="L158"><span class="n">158</span></span>
+<span class="l" id="L159"><span class="n">159</span>/-- Under the fixed-q admissible parity condition, all active printed</span>
+<span class="l" id="L160"><span class="n">160</span>endpoint Euler factors are nonzero, including the exceptional prime 2. -/</span>
+<span class="l" id="L161"><span class="n">161</span>theorem printed_pair_factor_ne_zero (q h p : ℕ)</span>
+<span class="l" id="L162"><span class="n">162</span>    (hh : 0 &lt; h) (hparity : 2 ∣ q ∨ 2 ∣ h) :</span>
+<span class="l" id="L163"><span class="n">163</span>    (if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L164"><span class="n">164</span>      printedLocal p ({0,h} : Finset ℕ) else 1) ≠ 0 := by</span>
+<span class="l" id="L165"><span class="n">165</span>  by_cases hp : Nat.Prime p ∧ ¬ p ∣ q</span>
+<span class="l" id="L166"><span class="n">166</span>  · rw [if_pos hp]</span>
+<span class="l" id="L167"><span class="n">167</span>    by_cases hp2 : p = 2</span>
+<span class="l" id="L168"><span class="n">168</span>    · subst p</span>
+<span class="l" id="L169"><span class="n">169</span>      have heven : 2 ∣ h := by</span>
+<span class="l" id="L170"><span class="n">170</span>        rcases hparity with hq | hh</span>
+<span class="l" id="L171"><span class="n">171</span>        · exact False.elim (hp.2 hq)</span>
+<span class="l" id="L172"><span class="n">172</span>        · exact hh</span>
+<span class="l" id="L173"><span class="n">173</span>      exact ne_of_gt (printed_pair_local_positive_two h heven)</span>
+<span class="l" id="L174"><span class="n">174</span>    · have hp3 : 3 ≤ p := by</span>
+<span class="l" id="L175"><span class="n">175</span>        have hpge : 2 ≤ p := hp.1.two_le</span>
+<span class="l" id="L176"><span class="n">176</span>        omega</span>
+<span class="l" id="L177"><span class="n">177</span>      exact ne_of_gt (printed_pair_local_positive_high p h hp3 hh)</span>
+<span class="l" id="L178"><span class="n">178</span>  · simp [hp]</span>
+<span class="l" id="L179"><span class="n">179</span></span>
+<span class="l" id="L180"><span class="n">180</span>/-- The literal printed pair singular series has a nonzero Euler product,</span>
+<span class="l" id="L181"><span class="n">181</span>not merely a convergent one. -/</span>
+<span class="l" id="L182"><span class="n">182</span>theorem printed_pair_tprod_ne_zero (q h : ℕ)</span>
+<span class="l" id="L183"><span class="n">183</span>    (hh : 0 &lt; h) (hparity : 2 ∣ q ∨ 2 ∣ h) :</span>
+<span class="l" id="L184"><span class="n">184</span>    (∏&#x27; p : ℕ, if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L185"><span class="n">185</span>      printedLocal p ({0,h} : Finset ℕ) else 1) ≠ 0 := by</span>
+<span class="l" id="L186"><span class="n">186</span>  have hs := printed_pair_summable_deviation q h hh</span>
+<span class="l" id="L187"><span class="n">187</span>  have hn := printed_pair_factor_ne_zero q h</span>
+<span class="l" id="L188"><span class="n">188</span>  have ht : (∏&#x27; p : ℕ,</span>
+<span class="l" id="L189"><span class="n">189</span>      (1 + ((if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L190"><span class="n">190</span>        printedLocal p ({0,h} : Finset ℕ) else 1) - 1))) ≠ 0 := by</span>
+<span class="l" id="L191"><span class="n">191</span>    apply tprod_one_add_ne_zero_of_summable</span>
+<span class="l" id="L192"><span class="n">192</span>    · intro p</span>
+<span class="l" id="L193"><span class="n">193</span>      convert hn p hh hparity using 1 &lt;;&gt; ring</span>
+<span class="l" id="L194"><span class="n">194</span>    · exact hs</span>
+<span class="l" id="L195"><span class="n">195</span>  convert ht using 1 &lt;;&gt; congr 1 &lt;;&gt; funext p &lt;;&gt; ring</span>
+<span class="l" id="L196"><span class="n">196</span></span>
+<span class="l" id="L197"><span class="n">197</span>/-- A reusable ring-level normalization identity. -/</span>
+<span class="l" id="L198"><span class="n">198</span>private theorem normalized_triple_factor</span>
+<span class="l" id="L199"><span class="n">199</span>    (A B t : ℝ) (ht : t ≠ 0) (hB : B ≠ 0) :</span>
+<span class="l" id="L200"><span class="n">200</span>    A / t ^ 3 = (B / t ^ 2) * ((A / B) / t) := by</span>
+<span class="l" id="L201"><span class="n">201</span>  field_simp [ht, hB]</span>
+<span class="l" id="L202"><span class="n">202</span></span>
+<span class="l" id="L203"><span class="n">203</span>/-- All nonexceptional triple factors agree with the pair factor times</span>
+<span class="l" id="L204"><span class="n">204</span>the native occupied anchored local ratio. The missing low primes are finite. -/</span>
+<span class="l" id="L205"><span class="n">205</span>theorem printed_triple_local_quotient (p h y : ℕ)</span>
+<span class="l" id="L206"><span class="n">206</span>    (hy0 : 0 &lt; y) (hyh : y &lt; h) (hp : 5 ≤ p) :</span>
+<span class="l" id="L207"><span class="n">207</span>    printedLocal p ({0,y,h} : Finset ℕ) =</span>
+<span class="l" id="L208"><span class="n">208</span>      printedLocal p ({0,h} : Finset ℕ) *</span>
+<span class="l" id="L209"><span class="n">209</span>        occupiedAnchoredLocalFactorRatio p h y := by</span>
+<span class="l" id="L210"><span class="n">210</span>  have hp0 : (p : ℝ) ≠ 0 := by exact_mod_cast (show p ≠ 0 by omega)</span>
+<span class="l" id="L211"><span class="n">211</span>  have hp1 : (1 : ℝ) - 1 / (p : ℝ) ≠ 0 := by</span>
+<span class="l" id="L212"><span class="n">212</span>    have : (1 : ℝ) &lt; (p : ℝ) := by exact_mod_cast (show 1 &lt; p by omega)</span>
+<span class="l" id="L213"><span class="n">213</span>    exact ne_of_gt (sub_pos.mpr ((div_lt_one (by positivity)).mpr this))</span>
+<span class="l" id="L214"><span class="n">214</span>  have hpair : ({0,h} : Finset ℕ).card = 2 :=</span>
+<span class="l" id="L215"><span class="n">215</span>    card_pair_zero_of_ne_zero (Nat.ne_of_gt (by omega))</span>
+<span class="l" id="L216"><span class="n">216</span>  have htriple : ({0,y,h} : Finset ℕ).card = 3 := by</span>
+<span class="l" id="L217"><span class="n">217</span>    have h01 : (0 : ℕ) ≠ y := Nat.ne_of_lt hy0</span>
+<span class="l" id="L218"><span class="n">218</span>    have h0h : (0 : ℕ) ≠ h := Nat.ne_of_lt (by omega)</span>
+<span class="l" id="L219"><span class="n">219</span>    have hyh&#x27; : y ≠ h := Nat.ne_of_lt hyh</span>
+<span class="l" id="L220"><span class="n">220</span>    simp [h01, h0h, hyh&#x27;]</span>
+<span class="l" id="L221"><span class="n">221</span>  have hden : (1 : ℝ) -</span>
+<span class="l" id="L222"><span class="n">222</span>      (occupiedResidues p ({0,h} : Finset ℕ)).card / (p : ℝ) ≠ 0 := by</span>
+<span class="l" id="L223"><span class="n">223</span>    have hc : (occupiedResidues p ({0,h} : Finset ℕ)).card ≤ 2 := by</span>
+<span class="l" id="L224"><span class="n">224</span>      unfold occupiedResidues</span>
+<span class="l" id="L225"><span class="n">225</span>      exact le_trans Finset.card_image_le (by simpa [hpair])</span>
+<span class="l" id="L226"><span class="n">226</span>    have hr : ((occupiedResidues p ({0,h} : Finset ℕ)).card : ℝ) ≤ 2 := by</span>
+<span class="l" id="L227"><span class="n">227</span>      exact_mod_cast hc</span>
+<span class="l" id="L228"><span class="n">228</span>    have hpr : (2 : ℝ) &lt; (p : ℝ) := by exact_mod_cast (show 2 &lt; p by omega)</span>
+<span class="l" id="L229"><span class="n">229</span>    exact ne_of_gt (sub_pos.mpr ((div_lt_one (by positivity)).mpr (by linarith)))</span>
+<span class="l" id="L230"><span class="n">230</span>  unfold printedLocal occupiedAnchoredLocalFactorRatio</span>
+<span class="l" id="L231"><span class="n">231</span>  rw [hpair, htriple, ← occupied_pair_card, ← occupied_triple_card]</span>
+<span class="l" id="L232"><span class="n">232</span>  exact normalized_triple_factor _ _ _ hp1 hden</span>
+<span class="l" id="L233"><span class="n">233</span></span>
+<span class="l" id="L234"><span class="n">234</span>/-- For every high prime, the printed triple factor factors through the</span>
+<span class="l" id="L235"><span class="n">235</span>independent printed endpoint factor and the production occupied ratio.</span>
+<span class="l" id="L236"><span class="n">236</span>The excluded-prime case is also exact. -/</span>
+<span class="l" id="L237"><span class="n">237</span>theorem printed_triple_active_factor_eq (q h y p : ℕ)</span>
+<span class="l" id="L238"><span class="n">238</span>    (hy0 : 0 &lt; y) (hyh : y &lt; h) (hp5 : 5 ≤ p) :</span>
+<span class="l" id="L239"><span class="n">239</span>    (if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L240"><span class="n">240</span>      printedLocal p ({0,y,h} : Finset ℕ) else 1) =</span>
+<span class="l" id="L241"><span class="n">241</span>    (if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L242"><span class="n">242</span>      printedLocal p ({0,h} : Finset ℕ) else 1) *</span>
+<span class="l" id="L243"><span class="n">243</span>      occupiedActiveHighLocalRatio q h y p := by</span>
+<span class="l" id="L244"><span class="n">244</span>  by_cases ha : Nat.Prime p ∧ ¬ p ∣ q</span>
+<span class="l" id="L245"><span class="n">245</span>  · have hactive : activeHighPrime q p := ⟨ha.1, hp5, ha.2⟩</span>
+<span class="l" id="L246"><span class="n">246</span>    rw [if_pos ha, if_pos ha]</span>
+<span class="l" id="L247"><span class="n">247</span>    simp only [occupiedActiveHighLocalRatio, if_pos hactive]</span>
+<span class="l" id="L248"><span class="n">248</span>    exact printed_triple_local_quotient p h y hy0 hyh hp5</span>
+<span class="l" id="L249"><span class="n">249</span>  · have hna : ¬ activeHighPrime q p := by</span>
+<span class="l" id="L250"><span class="n">250</span>      intro hh</span>
+<span class="l" id="L251"><span class="n">251</span>      exact ha ⟨hh.1, hh.2.2⟩</span>
+<span class="l" id="L252"><span class="n">252</span>    simp [ha, occupiedActiveHighLocalRatio, hna]</span>
+<span class="l" id="L253"><span class="n">253</span></span>
+<span class="l" id="L254"><span class="n">254</span>#print axioms printed_triple_active_factor_eq</span>
+<span class="l" id="L255"><span class="n">255</span></span>
+<span class="l" id="L256"><span class="n">256</span>#print axioms printed_triple_local_quotient</span>
+<span class="l" id="L257"><span class="n">257</span>#print axioms printed_pair_summable_deviation</span>
+<span class="l" id="L258"><span class="n">258</span>#print axioms printed_pair_factor_ne_zero</span>
+<span class="l" id="L259"><span class="n">259</span>#print axioms printed_pair_tprod_ne_zero</span>
+<span class="l" id="L260"><span class="n">260</span>#print axioms printed_pair_local_positive_two</span>
+<span class="l" id="L261"><span class="n">261</span>#print axioms printed_pair_local_positive_high</span>
+<span class="l" id="L262"><span class="n">262</span>#print axioms printedLocal_pair_eq_free</span>
+<span class="l" id="L263"><span class="n">263</span>#print axioms printedLocal_pair_eq_baseline</span>
+<span class="l" id="L264"><span class="n">264</span>#print axioms printed_pair_multipliable</span>
+<span class="l" id="L265"><span class="n">265</span>#print axioms printed_pair_singularSeries_multipliable</span>
+<span class="l" id="L266"><span class="n">266</span>/-- The existing local-ratio selector factorization supplies convergence of</span>
+<span class="l" id="L267"><span class="n">267</span>the actual high-prime occupied ratios, with no top-level printed identity assumed. -/</span>
+<span class="l" id="L268"><span class="n">268</span>theorem occupied_high_ratio_multipliable</span>
+<span class="l" id="L269"><span class="n">269</span>    (q h y : ℕ) (hy0 : 0 &lt; y) (hyh : y &lt; h) :</span>
+<span class="l" id="L270"><span class="n">270</span>    Multipliable (fun p : ℕ =&gt; occupiedActiveHighLocalRatio q h y p) := by</span>
+<span class="l" id="L271"><span class="n">271</span>  have hb := multipliable_activeHighBaseline q h</span>
+<span class="l" id="L272"><span class="n">272</span>  have hs := multipliable_activeHighSelectorFactor q h y hy0 hyh</span>
+<span class="l" id="L273"><span class="n">273</span>  have hm := hb.mul hs</span>
+<span class="l" id="L274"><span class="n">274</span>  apply hm.congr</span>
+<span class="l" id="L275"><span class="n">275</span>  intro p</span>
+<span class="l" id="L276"><span class="n">276</span>  rw [occupiedActiveHighLocalRatio_eq (Nat.le_of_lt hyh)]</span>
+<span class="l" id="L277"><span class="n">277</span>  exact (activeHighLocalRatio_factorization q h y p (Nat.le_of_lt hyh)).symm</span>
+<span class="l" id="L278"><span class="n">278</span></span>
+<span class="l" id="L279"><span class="n">279</span>#print axioms occupied_high_ratio_multipliable</span>
+<span class="l" id="L280"><span class="n">280</span></span>
+<span class="l" id="L281"><span class="n">281</span>/-- A finite exceptional-prime correction: only the factors below 5 occur. -/</span>
+<span class="l" id="L282"><span class="n">282</span>noncomputable def printedSmallCorrection (q h y p : ℕ) : ℝ :=</span>
+<span class="l" id="L283"><span class="n">283</span>  if p &lt; 5 then</span>
+<span class="l" id="L284"><span class="n">284</span>    (if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L285"><span class="n">285</span>      printedLocal p ({0,y,h} : Finset ℕ) else 1) /</span>
+<span class="l" id="L286"><span class="n">286</span>    (if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L287"><span class="n">287</span>      printedLocal p ({0,h} : Finset ℕ) else 1)</span>
+<span class="l" id="L288"><span class="n">288</span>  else 1</span>
+<span class="l" id="L289"><span class="n">289</span></span>
+<span class="l" id="L290"><span class="n">290</span>theorem printedSmallCorrection_multipliable (q h y : ℕ) :</span>
+<span class="l" id="L291"><span class="n">291</span>    Multipliable (printedSmallCorrection q h y) := by</span>
+<span class="l" id="L292"><span class="n">292</span>  apply multipliable_of_hasFiniteMulSupport</span>
+<span class="l" id="L293"><span class="n">293</span>  apply (Set.finite_Iio 5).subset</span>
+<span class="l" id="L294"><span class="n">294</span>  intro p hp</span>
+<span class="l" id="L295"><span class="n">295</span>  change printedSmallCorrection q h y p ≠ 1 at hp</span>
+<span class="l" id="L296"><span class="n">296</span>  by_contra h</span>
+<span class="l" id="L297"><span class="n">297</span>  have h5 : 5 ≤ p := Nat.le_of_not_gt h</span>
+<span class="l" id="L298"><span class="n">298</span>  exact hp (by simp [printedSmallCorrection, Nat.not_lt.mpr h5])</span>
+<span class="l" id="L299"><span class="n">299</span></span>
+<span class="l" id="L300"><span class="n">300</span>/-- A direct factorization of the whole independently printed triple</span>
+<span class="l" id="L301"><span class="n">301</span>Euler integrand, including p=2 and p=3. -/</span>
+<span class="l" id="L302"><span class="n">302</span>theorem printed_triple_factor_eq_full (q h y p : ℕ)</span>
+<span class="l" id="L303"><span class="n">303</span>    (hh : 0 &lt; h) (hy0 : 0 &lt; y) (hyh : y &lt; h)</span>
+<span class="l" id="L304"><span class="n">304</span>    (hparity : 2 ∣ q ∨ 2 ∣ h) :</span>
+<span class="l" id="L305"><span class="n">305</span>    (if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L306"><span class="n">306</span>      printedLocal p ({0,y,h} : Finset ℕ) else 1) =</span>
+<span class="l" id="L307"><span class="n">307</span>    ((if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L308"><span class="n">308</span>      printedLocal p ({0,h} : Finset ℕ) else 1) *</span>
+<span class="l" id="L309"><span class="n">309</span>        occupiedActiveHighLocalRatio q h y p) *</span>
+<span class="l" id="L310"><span class="n">310</span>          printedSmallCorrection q h y p := by</span>
+<span class="l" id="L311"><span class="n">311</span>  by_cases hp : p &lt; 5</span>
+<span class="l" id="L312"><span class="n">312</span>  · have hna : ¬ activeHighPrime q p := by</span>
+<span class="l" id="L313"><span class="n">313</span>      intro ha</span>
+<span class="l" id="L314"><span class="n">314</span>      exact (Nat.not_le.mpr hp) ha.2.1</span>
+<span class="l" id="L315"><span class="n">315</span>    have hden := printed_pair_factor_ne_zero q h p hh hparity</span>
+<span class="l" id="L316"><span class="n">316</span>    simp only [printedSmallCorrection, if_pos hp,</span>
+<span class="l" id="L317"><span class="n">317</span>      occupiedActiveHighLocalRatio, if_neg hna, mul_one]</span>
+<span class="l" id="L318"><span class="n">318</span>    exact (mul_div_cancel₀ _ hden).symm</span>
+<span class="l" id="L319"><span class="n">319</span>  · have hp5 : 5 ≤ p := Nat.le_of_not_gt hp</span>
+<span class="l" id="L320"><span class="n">320</span>    rw [printed_triple_active_factor_eq q h y p hy0 hyh hp5]</span>
+<span class="l" id="L321"><span class="n">321</span>    simp [printedSmallCorrection, hp]</span>
+<span class="l" id="L322"><span class="n">322</span></span>
+<span class="l" id="L323"><span class="n">323</span>theorem printed_triple_multipliable (q h y : ℕ)</span>
+<span class="l" id="L324"><span class="n">324</span>    (hh : 0 &lt; h) (hy0 : 0 &lt; y) (hyh : y &lt; h)</span>
+<span class="l" id="L325"><span class="n">325</span>    (hparity : 2 ∣ q ∨ 2 ∣ h) :</span>
+<span class="l" id="L326"><span class="n">326</span>    Multipliable (fun p : ℕ =&gt;</span>
+<span class="l" id="L327"><span class="n">327</span>      if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L328"><span class="n">328</span>        printedLocal p ({0,y,h} : Finset ℕ) else 1) := by</span>
+<span class="l" id="L329"><span class="n">329</span>  have hp := printed_pair_multipliable q h hh</span>
+<span class="l" id="L330"><span class="n">330</span>  have hr := occupied_high_ratio_multipliable q h y hy0 hyh</span>
+<span class="l" id="L331"><span class="n">331</span>  have hs := printedSmallCorrection_multipliable q h y</span>
+<span class="l" id="L332"><span class="n">332</span>  apply (hp.mul hr |&gt;.mul hs).congr</span>
+<span class="l" id="L333"><span class="n">333</span>  intro p</span>
+<span class="l" id="L334"><span class="n">334</span>  exact (printed_triple_factor_eq_full q h y p hh hy0 hyh hparity).symm</span>
+<span class="l" id="L335"><span class="n">335</span></span>
+<span class="l" id="L336"><span class="n">336</span>#print axioms printedSmallCorrection_multipliable</span>
+<span class="l" id="L337"><span class="n">337</span>#print axioms printed_triple_factor_eq_full</span>
+<span class="l" id="L338"><span class="n">338</span>#print axioms printed_triple_multipliable</span>
+<span class="l" id="L339"><span class="n">339</span></span>
+<span class="l" id="L340"><span class="n">340</span>/-- Fully discharged infinite-product quotient of the independently</span>
+<span class="l" id="L341"><span class="n">341</span>printed triple and endpoint singular series. -/</span>
+<span class="l" id="L342"><span class="n">342</span>theorem printed_triple_endpoint_quotient (q h y : ℕ)</span>
+<span class="l" id="L343"><span class="n">343</span>    (hh : 0 &lt; h) (hy0 : 0 &lt; y) (hyh : y &lt; h)</span>
+<span class="l" id="L344"><span class="n">344</span>    (hparity : 2 ∣ q ∨ 2 ∣ h) :</span>
+<span class="l" id="L345"><span class="n">345</span>    printedRestrictedSingularSeries q ({0,y,h} : Finset ℕ) /</span>
+<span class="l" id="L346"><span class="n">346</span>      printedRestrictedSingularSeries q ({0,h} : Finset ℕ) =</span>
+<span class="l" id="L347"><span class="n">347</span>    ∏&#x27; p : ℕ,</span>
+<span class="l" id="L348"><span class="n">348</span>      (if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L349"><span class="n">349</span>        printedLocal p ({0,y,h} : Finset ℕ) else 1) /</span>
+<span class="l" id="L350"><span class="n">350</span>      (if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L351"><span class="n">351</span>        printedLocal p ({0,h} : Finset ℕ) else 1) := by</span>
+<span class="l" id="L352"><span class="n">352</span>  unfold printedRestrictedSingularSeries</span>
+<span class="l" id="L353"><span class="n">353</span>  exact (Multipliable.tprod_div₀</span>
+<span class="l" id="L354"><span class="n">354</span>      (printed_triple_multipliable q h y hh hy0 hyh hparity)</span>
+<span class="l" id="L355"><span class="n">355</span>      (printed_pair_multipliable q h hh)</span>
+<span class="l" id="L356"><span class="n">356</span>      (printed_pair_tprod_ne_zero q h hh hparity)).symm</span>
+<span class="l" id="L357"><span class="n">357</span></span>
+<span class="l" id="L358"><span class="n">358</span>#print axioms printed_triple_endpoint_quotient</span>
+<span class="l" id="L359"><span class="n">359</span></span>
+<span class="l" id="L360"><span class="n">360</span></span>
+<span class="l" id="L361"><span class="n">361</span>/-- The printed triple/pair quotient agrees with the independent occupied</span>
+<span class="l" id="L362"><span class="n">362</span>ratio at EVERY active prime, including the exceptional primes 2 and 3. -/</span>
+<span class="l" id="L363"><span class="n">363</span>theorem printed_active_local_quotient_eq_occupied</span>
+<span class="l" id="L364"><span class="n">364</span>    (q h y p : ℕ) (hh : 0 &lt; h) (hy0 : 0 &lt; y) (hyh : y &lt; h)</span>
+<span class="l" id="L365"><span class="n">365</span>    (hparity : 2 ∣ q ∨ 2 ∣ h) :</span>
+<span class="l" id="L366"><span class="n">366</span>    (if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L367"><span class="n">367</span>      printedLocal p ({0,y,h} : Finset ℕ) else 1) /</span>
+<span class="l" id="L368"><span class="n">368</span>    (if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L369"><span class="n">369</span>      printedLocal p ({0,h} : Finset ℕ) else 1) =</span>
+<span class="l" id="L370"><span class="n">370</span>    if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L371"><span class="n">371</span>      occupiedAnchoredLocalFactorRatio p h y else 1 := by</span>
+<span class="l" id="L372"><span class="n">372</span>  by_cases ha : Nat.Prime p ∧ ¬ p ∣ q</span>
+<span class="l" id="L373"><span class="n">373</span>  · simp only [if_pos ha]</span>
+<span class="l" id="L374"><span class="n">374</span>    have hp2 : 2 ≤ p := ha.1.two_le</span>
+<span class="l" id="L375"><span class="n">375</span>    have hpair : ({0,h} : Finset ℕ).card = 2 :=</span>
+<span class="l" id="L376"><span class="n">376</span>      card_pair_zero_of_ne_zero (Nat.ne_of_gt hh)</span>
+<span class="l" id="L377"><span class="n">377</span>    have htriple : ({0,y,h} : Finset ℕ).card = 3 := by</span>
+<span class="l" id="L378"><span class="n">378</span>      have h01 : (0 : ℕ) ≠ y := Nat.ne_of_lt hy0</span>
+<span class="l" id="L379"><span class="n">379</span>      have h0h : (0 : ℕ) ≠ h := Nat.ne_of_lt hh</span>
+<span class="l" id="L380"><span class="n">380</span>      have hyh&#x27; : y ≠ h := Nat.ne_of_lt hyh</span>
+<span class="l" id="L381"><span class="n">381</span>      simp [h01, h0h, hyh&#x27;]</span>
+<span class="l" id="L382"><span class="n">382</span>    have hp0 : (p : ℝ) ≠ 0 := by</span>
+<span class="l" id="L383"><span class="n">383</span>      exact_mod_cast (show p ≠ 0 by omega)</span>
+<span class="l" id="L384"><span class="n">384</span>    have hp1 : (1 : ℝ) - 1 / (p : ℝ) ≠ 0 := by</span>
+<span class="l" id="L385"><span class="n">385</span>      have hpR : (1 : ℝ) &lt; (p : ℝ) := by exact_mod_cast hp2</span>
+<span class="l" id="L386"><span class="n">386</span>      exact ne_of_gt (sub_pos.mpr ((div_lt_one (by positivity)).mpr hpR))</span>
+<span class="l" id="L387"><span class="n">387</span>    have hden : (1 : ℝ) -</span>
+<span class="l" id="L388"><span class="n">388</span>        (occupiedResidues p ({0,h} : Finset ℕ)).card / (p : ℝ) ≠ 0 := by</span>
+<span class="l" id="L389"><span class="n">389</span>      by_cases hp3 : 3 ≤ p</span>
+<span class="l" id="L390"><span class="n">390</span>      · have hc : (occupiedResidues p ({0,h} : Finset ℕ)).card ≤ 2 := by</span>
+<span class="l" id="L391"><span class="n">391</span>          unfold occupiedResidues</span>
+<span class="l" id="L392"><span class="n">392</span>          exact le_trans Finset.card_image_le (by simpa [hpair])</span>
+<span class="l" id="L393"><span class="n">393</span>        have hr : ((occupiedResidues p ({0,h} : Finset ℕ)).card : ℝ) ≤ 2 := by</span>
+<span class="l" id="L394"><span class="n">394</span>          exact_mod_cast hc</span>
+<span class="l" id="L395"><span class="n">395</span>        have hpr : (2 : ℝ) &lt; (p : ℝ) := by exact_mod_cast hp3</span>
+<span class="l" id="L396"><span class="n">396</span>        exact ne_of_gt (sub_pos.mpr ((div_lt_one (by positivity)).mpr (by linarith)))</span>
+<span class="l" id="L397"><span class="n">397</span>      · have hp : p = 2 := by omega</span>
+<span class="l" id="L398"><span class="n">398</span>        subst p</span>
+<span class="l" id="L399"><span class="n">399</span>        have heven : 2 ∣ h := by</span>
+<span class="l" id="L400"><span class="n">400</span>          rcases hparity with hq | hh&#x27;</span>
+<span class="l" id="L401"><span class="n">401</span>          · exact False.elim (ha.2 hq)</span>
+<span class="l" id="L402"><span class="n">402</span>          · exact hh&#x27;</span>
+<span class="l" id="L403"><span class="n">403</span>        have hc : (occupiedResidues 2 ({0,h} : Finset ℕ)).card = 1 := by</span>
+<span class="l" id="L404"><span class="n">404</span>          simp [occupiedResidues, Nat.mod_eq_zero_of_dvd heven]</span>
+<span class="l" id="L405"><span class="n">405</span>        rw [hc]</span>
+<span class="l" id="L406"><span class="n">406</span>        norm_num</span>
+<span class="l" id="L407"><span class="n">407</span>    unfold printedLocal occupiedAnchoredLocalFactorRatio</span>
+<span class="l" id="L408"><span class="n">408</span>    rw [hpair, htriple, occupied_pair_card, occupied_triple_card]</span>
+<span class="l" id="L409"><span class="n">409</span>    field_simp [hp1, hden]</span>
+<span class="l" id="L410"><span class="n">410</span>  · simp [ha]</span>
+<span class="l" id="L411"><span class="n">411</span></span>
+<span class="l" id="L412"><span class="n">412</span>#print axioms printed_active_local_quotient_eq_occupied</span>
+<span class="l" id="L413"><span class="n">413</span></span>
+<span class="l" id="L414"><span class="n">414</span></span>
+<span class="l" id="L415"><span class="n">415</span></span>
+<span class="l" id="L416"><span class="n">416</span>/-- Only the literal exceptional active factors 2 and 3 remain here. -/</span>
+<span class="l" id="L417"><span class="n">417</span>noncomputable def printedOccupiedLowRatio (q h y p : ℕ) : ℝ :=</span>
+<span class="l" id="L418"><span class="n">418</span>  if p ∈ lowPrimeSet then</span>
+<span class="l" id="L419"><span class="n">419</span>    if p ∣ q then 1 else occupiedAnchoredLocalFactorRatio p h y</span>
+<span class="l" id="L420"><span class="n">420</span>  else 1</span>
+<span class="l" id="L421"><span class="n">421</span></span>
+<span class="l" id="L422"><span class="n">422</span>theorem printed_occupied_factor_split (q h y p : ℕ) :</span>
+<span class="l" id="L423"><span class="n">423</span>    (if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L424"><span class="n">424</span>      occupiedAnchoredLocalFactorRatio p h y else 1) =</span>
+<span class="l" id="L425"><span class="n">425</span>    printedOccupiedLowRatio q h y p * occupiedActiveHighLocalRatio q h y p := by</span>
+<span class="l" id="L426"><span class="n">426</span>  by_cases hp5 : 5 ≤ p</span>
+<span class="l" id="L427"><span class="n">427</span>  · have hnlow : p ∉ lowPrimeSet := by</span>
+<span class="l" id="L428"><span class="n">428</span>      simp [lowPrimeSet]</span>
+<span class="l" id="L429"><span class="n">429</span>      omega</span>
+<span class="l" id="L430"><span class="n">430</span>    by_cases ha : Nat.Prime p ∧ ¬ p ∣ q</span>
+<span class="l" id="L431"><span class="n">431</span>    · have hactive : activeHighPrime q p := ⟨ha.1, hp5, ha.2⟩</span>
+<span class="l" id="L432"><span class="n">432</span>      simp [printedOccupiedLowRatio, hnlow, occupiedActiveHighLocalRatio, hactive, ha]</span>
+<span class="l" id="L433"><span class="n">433</span>    · have hna : ¬ activeHighPrime q p := by</span>
+<span class="l" id="L434"><span class="n">434</span>        intro hx</span>
+<span class="l" id="L435"><span class="n">435</span>        exact ha ⟨hx.1, hx.2.2⟩</span>
+<span class="l" id="L436"><span class="n">436</span>      simp [printedOccupiedLowRatio, hnlow, occupiedActiveHighLocalRatio, hna, ha]</span>
+<span class="l" id="L437"><span class="n">437</span>  · have hp : p &lt; 5 := by omega</span>
+<span class="l" id="L438"><span class="n">438</span>    interval_cases p &lt;;&gt;</span>
+<span class="l" id="L439"><span class="n">439</span>      simp [printedOccupiedLowRatio, lowPrimeSet, occupiedActiveHighLocalRatio,</span>
+<span class="l" id="L440"><span class="n">440</span>        activeHighPrime, show ¬ Nat.Prime 0 from by decide,</span>
+<span class="l" id="L441"><span class="n">441</span>        show ¬ Nat.Prime 1 from by decide,</span>
+<span class="l" id="L442"><span class="n">442</span>        show Nat.Prime 2 from by decide,</span>
+<span class="l" id="L443"><span class="n">443</span>        show Nat.Prime 3 from by decide,</span>
+<span class="l" id="L444"><span class="n">444</span>        show ¬ Nat.Prime 4 from by decide] &lt;;&gt;</span>
+<span class="l" id="L445"><span class="n">445</span>      (by_cases hq2 : 2 ∣ q &lt;;&gt; by_cases hq3 : 3 ∣ q &lt;;&gt; simp_all [Nat.dvd_iff_mod_eq_zero])</span>
+<span class="l" id="L446"><span class="n">446</span></span>
+<span class="l" id="L447"><span class="n">447</span>#print axioms printed_occupied_factor_split</span>
+<span class="l" id="L448"><span class="n">448</span></span>
+<span class="l" id="L449"><span class="n">449</span></span>
+<span class="l" id="L450"><span class="n">450</span></span>
+<span class="l" id="L451"><span class="n">451</span>/-- The literal quotient becomes precisely the low occupied Euler factor</span>
+<span class="l" id="L452"><span class="n">452</span>and the already-native high occupied-ratio Euler product. -/</span>
+<span class="l" id="L453"><span class="n">453</span>theorem printed_quotient_eq_occupied_euler (q h y : ℕ)</span>
+<span class="l" id="L454"><span class="n">454</span>    (hh : 0 &lt; h) (hy0 : 0 &lt; y) (hyh : y &lt; h)</span>
+<span class="l" id="L455"><span class="n">455</span>    (hparity : 2 ∣ q ∨ 2 ∣ h) :</span>
+<span class="l" id="L456"><span class="n">456</span>    printedRestrictedSingularSeries q ({0,y,h} : Finset ℕ) /</span>
+<span class="l" id="L457"><span class="n">457</span>      printedRestrictedSingularSeries q ({0,h} : Finset ℕ) =</span>
+<span class="l" id="L458"><span class="n">458</span>    (∏ p ∈ lowPrimeSet,</span>
+<span class="l" id="L459"><span class="n">459</span>      if p ∣ q then 1 else occupiedAnchoredLocalFactorRatio p h y) *</span>
+<span class="l" id="L460"><span class="n">460</span>      (∏&#x27; p : ℕ, occupiedActiveHighLocalRatio q h y p) := by</span>
+<span class="l" id="L461"><span class="n">461</span>  rw [printed_triple_endpoint_quotient q h y hh hy0 hyh hparity]</span>
+<span class="l" id="L462"><span class="n">462</span>  have hlow : Multipliable (printedOccupiedLowRatio q h y) := by</span>
+<span class="l" id="L463"><span class="n">463</span>    apply multipliable_of_hasFiniteMulSupport</span>
+<span class="l" id="L464"><span class="n">464</span>    apply (Set.finite_Iio 5).subset</span>
+<span class="l" id="L465"><span class="n">465</span>    intro p hp</span>
+<span class="l" id="L466"><span class="n">466</span>    change printedOccupiedLowRatio q h y p ≠ 1 at hp</span>
+<span class="l" id="L467"><span class="n">467</span>    by_contra h</span>
+<span class="l" id="L468"><span class="n">468</span>    have h5 : 5 ≤ p := Nat.le_of_not_gt h</span>
+<span class="l" id="L469"><span class="n">469</span>    apply hp</span>
+<span class="l" id="L470"><span class="n">470</span>    simp [printedOccupiedLowRatio, lowPrimeSet]</span>
+<span class="l" id="L471"><span class="n">471</span>    omega</span>
+<span class="l" id="L472"><span class="n">472</span>  have hhigh := occupied_high_ratio_multipliable q h y hy0 hyh</span>
+<span class="l" id="L473"><span class="n">473</span>  have hprod : (∏&#x27; p : ℕ, printedOccupiedLowRatio q h y p) =</span>
+<span class="l" id="L474"><span class="n">474</span>      ∏ p ∈ lowPrimeSet,</span>
+<span class="l" id="L475"><span class="n">475</span>        if p ∣ q then 1 else occupiedAnchoredLocalFactorRatio p h y := by</span>
+<span class="l" id="L476"><span class="n">476</span>    rw [tprod_eq_prod (s := lowPrimeSet) (fun p hp =&gt; by</span>
+<span class="l" id="L477"><span class="n">477</span>      simp [printedOccupiedLowRatio, hp])]</span>
+<span class="l" id="L478"><span class="n">478</span>    apply Finset.prod_congr rfl</span>
+<span class="l" id="L479"><span class="n">479</span>    intro p hp</span>
+<span class="l" id="L480"><span class="n">480</span>    simp [printedOccupiedLowRatio, hp]</span>
+<span class="l" id="L481"><span class="n">481</span>  calc</span>
+<span class="l" id="L482"><span class="n">482</span>    (∏&#x27; p : ℕ,</span>
+<span class="l" id="L483"><span class="n">483</span>      (if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L484"><span class="n">484</span>        printedLocal p ({0,y,h} : Finset ℕ) else 1) /</span>
+<span class="l" id="L485"><span class="n">485</span>      (if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L486"><span class="n">486</span>        printedLocal p ({0,h} : Finset ℕ) else 1)) =</span>
+<span class="l" id="L487"><span class="n">487</span>      ∏&#x27; p : ℕ, (if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L488"><span class="n">488</span>        occupiedAnchoredLocalFactorRatio p h y else 1) := by</span>
+<span class="l" id="L489"><span class="n">489</span>          apply tprod_congr</span>
+<span class="l" id="L490"><span class="n">490</span>          intro p</span>
+<span class="l" id="L491"><span class="n">491</span>          exact printed_active_local_quotient_eq_occupied q h y p hh hy0 hyh hparity</span>
+<span class="l" id="L492"><span class="n">492</span>    _ = ∏&#x27; p : ℕ,</span>
+<span class="l" id="L493"><span class="n">493</span>        printedOccupiedLowRatio q h y p * occupiedActiveHighLocalRatio q h y p := by</span>
+<span class="l" id="L494"><span class="n">494</span>          apply tprod_congr</span>
+<span class="l" id="L495"><span class="n">495</span>          intro p</span>
+<span class="l" id="L496"><span class="n">496</span>          exact printed_occupied_factor_split q h y p</span>
+<span class="l" id="L497"><span class="n">497</span>    _ = (∏ p ∈ lowPrimeSet,</span>
+<span class="l" id="L498"><span class="n">498</span>          if p ∣ q then 1 else occupiedAnchoredLocalFactorRatio p h y) *</span>
+<span class="l" id="L499"><span class="n">499</span>        (∏&#x27; p : ℕ, occupiedActiveHighLocalRatio q h y p) := by</span>
+<span class="l" id="L500"><span class="n">500</span>          rw [hlow.tprod_mul hhigh, hprod]</span>
+<span class="l" id="L501"><span class="n">501</span></span>
+<span class="l" id="L502"><span class="n">502</span>#print axioms printed_quotient_eq_occupied_euler</span>
+<span class="l" id="L503"><span class="n">503</span></span>
+<span class="l" id="L504"><span class="n">504</span></span>
+<span class="l" id="L505"><span class="n">505</span></span>
+<span class="l" id="L506"><span class="n">506</span>/-- The independently printed Euler expression, summed with the exact</span>
+<span class="l" id="L507"><span class="n">507</span>admissible interior count rather than an asymptotic density. -/</span>
+<span class="l" id="L508"><span class="n">508</span>noncomputable def printedA1Weighted (q a h : ℕ) : ℝ :=</span>
+<span class="l" id="L509"><span class="n">509</span>  (∑ y ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L510"><span class="n">510</span>    (if q.Coprime (a + y) then (1 : ℝ) else 0) *</span>
+<span class="l" id="L511"><span class="n">511</span>      (printedRestrictedSingularSeries q ({0,y,h} : Finset ℕ) /</span>
+<span class="l" id="L512"><span class="n">512</span>        printedRestrictedSingularSeries q ({0,h} : Finset ℕ))) -</span>
+<span class="l" id="L513"><span class="n">513</span>    (admissibleInteriorCount q a h : ℝ)</span>
+<span class="l" id="L514"><span class="n">514</span></span>
+<span class="l" id="L515"><span class="n">515</span>/-- Top-level independent printed A Euler-product bridge into the</span>
+<span class="l" id="L516"><span class="n">516</span>manuscript&#x27;s actual occupied-ratio kernel. -/</span>
+<span class="l" id="L517"><span class="n">517</span>theorem printedA1Weighted_eq_manuscriptA1Kernel (q a h : ℕ)</span>
+<span class="l" id="L518"><span class="n">518</span>    (h2admissible : ¬ 2 ∣ q → 2 ∣ h) :</span>
+<span class="l" id="L519"><span class="n">519</span>    printedA1Weighted q a h = manuscriptA1Kernel q a h := by</span>
+<span class="l" id="L520"><span class="n">520</span>  have hparity : 2 ∣ q ∨ 2 ∣ h := by</span>
+<span class="l" id="L521"><span class="n">521</span>    by_cases hq : 2 ∣ q</span>
+<span class="l" id="L522"><span class="n">522</span>    · exact Or.inl hq</span>
+<span class="l" id="L523"><span class="n">523</span>    · exact Or.inr (h2admissible hq)</span>
+<span class="l" id="L524"><span class="n">524</span>  unfold printedA1Weighted manuscriptA1Kernel</span>
+<span class="l" id="L525"><span class="n">525</span>  apply congrArg (fun z : ℝ =&gt; z - (admissibleInteriorCount q a h : ℝ))</span>
+<span class="l" id="L526"><span class="n">526</span>  apply Finset.sum_congr rfl</span>
+<span class="l" id="L527"><span class="n">527</span>  intro y hy</span>
+<span class="l" id="L528"><span class="n">528</span>  have hyI := Finset.mem_Ioo.mp hy</span>
+<span class="l" id="L529"><span class="n">529</span>  have hh : 0 &lt; h := by omega</span>
+<span class="l" id="L530"><span class="n">530</span>  rw [printed_quotient_eq_occupied_euler q h y hh hyI.1 hyI.2 hparity]</span>
+<span class="l" id="L531"><span class="n">531</span>  unfold manuscriptAnchoredSummand occupiedFixedQLowWeight</span>
+<span class="l" id="L532"><span class="n">532</span>  ring</span>
+<span class="l" id="L533"><span class="n">533</span></span>
+<span class="l" id="L534"><span class="n">534</span>#print axioms printedA1Weighted_eq_manuscriptA1Kernel</span>
+<span class="l" id="L535"><span class="n">535</span></span>
+<span class="l" id="L536"><span class="n">536</span></span>
+<span class="l" id="L537"><span class="n">537</span></span>
+<span class="l" id="L538"><span class="n">538</span>/-- Translation by a gives the exact manuscript admissible-interior count. -/</span>
+<span class="l" id="L539"><span class="n">539</span>theorem printed_admissible_count_eq (q a h : ℕ) :</span>
+<span class="l" id="L540"><span class="n">540</span>    admissibleInteriorCount q a h =</span>
+<span class="l" id="L541"><span class="n">541</span>      ((Finset.Ioo 0 h).filter (fun y =&gt; q.Coprime (a + y))).card := by</span>
+<span class="l" id="L542"><span class="n">542</span>  unfold admissibleInteriorCount</span>
+<span class="l" id="L543"><span class="n">543</span>  have hset :</span>
+<span class="l" id="L544"><span class="n">544</span>      (Finset.Ioo a (a+h)).filter (fun x =&gt; q.Coprime x) =</span>
+<span class="l" id="L545"><span class="n">545</span>        ((Finset.Ioo 0 h).filter (fun y =&gt; q.Coprime (a+y))).image</span>
+<span class="l" id="L546"><span class="n">546</span>          (fun y =&gt; a+y) := by</span>
+<span class="l" id="L547"><span class="n">547</span>    ext x</span>
+<span class="l" id="L548"><span class="n">548</span>    constructor</span>
+<span class="l" id="L549"><span class="n">549</span>    · intro hx</span>
+<span class="l" id="L550"><span class="n">550</span>      have hx&#x27; := Finset.mem_filter.mp hx</span>
+<span class="l" id="L551"><span class="n">551</span>      have hinterval := Finset.mem_Ioo.mp hx&#x27;.1</span>
+<span class="l" id="L552"><span class="n">552</span>      have hxa : a + (x - a) = x := by omega</span>
+<span class="l" id="L553"><span class="n">553</span>      apply Finset.mem_image.mpr</span>
+<span class="l" id="L554"><span class="n">554</span>      refine ⟨x-a, ?_, hxa⟩</span>
+<span class="l" id="L555"><span class="n">555</span>      apply Finset.mem_filter.mpr</span>
+<span class="l" id="L556"><span class="n">556</span>      refine ⟨Finset.mem_Ioo.mpr ?_, ?_⟩</span>
+<span class="l" id="L557"><span class="n">557</span>      · omega</span>
+<span class="l" id="L558"><span class="n">558</span>      · simpa [hxa] using hx&#x27;.2</span>
+<span class="l" id="L559"><span class="n">559</span>    · intro hx</span>
+<span class="l" id="L560"><span class="n">560</span>      obtain ⟨y, hy, hxy⟩ := Finset.mem_image.mp hx</span>
+<span class="l" id="L561"><span class="n">561</span>      have hy&#x27; := Finset.mem_filter.mp hy</span>
+<span class="l" id="L562"><span class="n">562</span>      have hinterval := Finset.mem_Ioo.mp hy&#x27;.1</span>
+<span class="l" id="L563"><span class="n">563</span>      subst x</span>
+<span class="l" id="L564"><span class="n">564</span>      apply Finset.mem_filter.mpr</span>
+<span class="l" id="L565"><span class="n">565</span>      refine ⟨Finset.mem_Ioo.mpr ?_, hy&#x27;.2⟩</span>
+<span class="l" id="L566"><span class="n">566</span>      omega</span>
+<span class="l" id="L567"><span class="n">567</span>  rw [hset]</span>
+<span class="l" id="L568"><span class="n">568</span>  apply Finset.card_image_of_injOn</span>
+<span class="l" id="L569"><span class="n">569</span>  intro x hx y hy hxy</span>
+<span class="l" id="L570"><span class="n">570</span>  exact Nat.add_left_cancel hxy</span>
+<span class="l" id="L571"><span class="n">571</span></span>
+<span class="l" id="L572"><span class="n">572</span>/-- Exactly the manuscript&#x27;s printed A_1,q finite sum, with the independently</span>
+<span class="l" id="L573"><span class="n">573</span>defined printed singular series and the genuine admissible index predicate. -/</span>
+<span class="l" id="L574"><span class="n">574</span>noncomputable def printedA1Literal (q a h : ℕ) : ℝ :=</span>
+<span class="l" id="L575"><span class="n">575</span>  ∑ y ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L576"><span class="n">576</span>    if q.Coprime (a+y) then</span>
+<span class="l" id="L577"><span class="n">577</span>      printedRestrictedSingularSeries q ({0,y,h} : Finset ℕ) /</span>
+<span class="l" id="L578"><span class="n">578</span>        printedRestrictedSingularSeries q ({0,h} : Finset ℕ) - 1</span>
+<span class="l" id="L579"><span class="n">579</span>    else 0</span>
+<span class="l" id="L580"><span class="n">580</span></span>
+<span class="l" id="L581"><span class="n">581</span>theorem printedA1Literal_eq_weighted (q a h : ℕ) :</span>
+<span class="l" id="L582"><span class="n">582</span>    printedA1Literal q a h = printedA1Weighted q a h := by</span>
+<span class="l" id="L583"><span class="n">583</span>  have hc : (admissibleInteriorCount q a h : ℝ) =</span>
+<span class="l" id="L584"><span class="n">584</span>      ∑ y ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L585"><span class="n">585</span>        if q.Coprime (a+y) then (1 : ℝ) else 0 := by</span>
+<span class="l" id="L586"><span class="n">586</span>    rw [printed_admissible_count_eq]</span>
+<span class="l" id="L587"><span class="n">587</span>    exact (Finset.sum_boole (fun y =&gt; q.Coprime (a+y)) (Finset.Ioo 0 h)).symm</span>
+<span class="l" id="L588"><span class="n">588</span>  unfold printedA1Literal</span>
+<span class="l" id="L589"><span class="n">589</span>  calc</span>
+<span class="l" id="L590"><span class="n">590</span>    (∑ y ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L591"><span class="n">591</span>      if q.Coprime (a+y) then</span>
+<span class="l" id="L592"><span class="n">592</span>        printedRestrictedSingularSeries q ({0,y,h} : Finset ℕ) /</span>
+<span class="l" id="L593"><span class="n">593</span>          printedRestrictedSingularSeries q ({0,h} : Finset ℕ) - 1 else 0) =</span>
+<span class="l" id="L594"><span class="n">594</span>      ∑ y ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L595"><span class="n">595</span>        ((if q.Coprime (a+y) then (1 : ℝ) else 0) *</span>
+<span class="l" id="L596"><span class="n">596</span>          (printedRestrictedSingularSeries q ({0,y,h} : Finset ℕ) /</span>
+<span class="l" id="L597"><span class="n">597</span>            printedRestrictedSingularSeries q ({0,h} : Finset ℕ)) -</span>
+<span class="l" id="L598"><span class="n">598</span>        (if q.Coprime (a+y) then (1 : ℝ) else 0)) := by</span>
+<span class="l" id="L599"><span class="n">599</span>          apply Finset.sum_congr rfl</span>
+<span class="l" id="L600"><span class="n">600</span>          intro y hy</span>
+<span class="l" id="L601"><span class="n">601</span>          split_ifs &lt;;&gt; ring</span>
+<span class="l" id="L602"><span class="n">602</span>    _ = (∑ y ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L603"><span class="n">603</span>          (if q.Coprime (a+y) then (1 : ℝ) else 0) *</span>
+<span class="l" id="L604"><span class="n">604</span>          (printedRestrictedSingularSeries q ({0,y,h} : Finset ℕ) /</span>
+<span class="l" id="L605"><span class="n">605</span>           printedRestrictedSingularSeries q ({0,h} : Finset ℕ))) -</span>
+<span class="l" id="L606"><span class="n">606</span>        (∑ y ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L607"><span class="n">607</span>          if q.Coprime (a+y) then (1 : ℝ) else 0) := by</span>
+<span class="l" id="L608"><span class="n">608</span>          rw [Finset.sum_sub_distrib]</span>
+<span class="l" id="L609"><span class="n">609</span>    _ = printedA1Weighted q a h := by</span>
+<span class="l" id="L610"><span class="n">610</span>      rw [← hc]</span>
+<span class="l" id="L611"><span class="n">611</span>      rfl</span>
+<span class="l" id="L612"><span class="n">612</span></span>
+<span class="l" id="L613"><span class="n">613</span>theorem printedA1Literal_eq_manuscriptA1Kernel (q a h : ℕ)</span>
+<span class="l" id="L614"><span class="n">614</span>    (h2admissible : ¬ 2 ∣ q → 2 ∣ h) :</span>
+<span class="l" id="L615"><span class="n">615</span>    printedA1Literal q a h = manuscriptA1Kernel q a h := by</span>
+<span class="l" id="L616"><span class="n">616</span>  rw [printedA1Literal_eq_weighted]</span>
+<span class="l" id="L617"><span class="n">617</span>  exact printedA1Weighted_eq_manuscriptA1Kernel q a h h2admissible</span>
+<span class="l" id="L618"><span class="n">618</span></span>
+<span class="l" id="L619"><span class="n">619</span>#print axioms printed_admissible_count_eq</span>
+<span class="l" id="L620"><span class="n">620</span>#print axioms printedA1Literal_eq_manuscriptA1Kernel</span>
+<span class="l" id="L621"><span class="n">621</span></span>
+<span class="l" id="L622"><span class="n">622</span></span>
+<span class="l" id="L623"><span class="n">623</span></span>
+<span class="l" id="L624"><span class="n">624</span>/-- The B-side high-prime squarefree-divisor selector is deliberately</span>
+<span class="l" id="L625"><span class="n">625</span>separate from the independently printed two-point Euler local factor. -/</span>
+<span class="l" id="L626"><span class="n">626</span>noncomputable def printedFreeHighSelector (q y p : ℕ) : ℝ :=</span>
+<span class="l" id="L627"><span class="n">627</span>  if activeHighPrime q p ∧ p ∣ y then 1 + 1 / ((p : ℝ) - 2) else 1</span>
+<span class="l" id="L628"><span class="n">628</span></span>
+<span class="l" id="L629"><span class="n">629</span>/-- Literal printed pair local factor equals the native baseline multiplied</span>
+<span class="l" id="L630"><span class="n">630</span>by its elementary divisor selector, for ALL p≥5 including excluded primes. -/</span>
+<span class="l" id="L631"><span class="n">631</span>theorem printed_pair_high_eq_baseline_selector (q y p : ℕ)</span>
+<span class="l" id="L632"><span class="n">632</span>    (hy : 0 &lt; y) (hp5 : 5 ≤ p) :</span>
+<span class="l" id="L633"><span class="n">633</span>    (if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L634"><span class="n">634</span>      printedLocal p ({0,y} : Finset ℕ) else 1) =</span>
+<span class="l" id="L635"><span class="n">635</span>    normalizationBaseline q 0 p * printedFreeHighSelector q y p := by</span>
+<span class="l" id="L636"><span class="n">636</span>  by_cases ha : Nat.Prime p ∧ ¬ p ∣ q</span>
+<span class="l" id="L637"><span class="n">637</span>  · have hactive : activeHighPrime q p := ⟨ha.1, hp5, ha.2⟩</span>
+<span class="l" id="L638"><span class="n">638</span>    by_cases hpy : p ∣ y</span>
+<span class="l" id="L639"><span class="n">639</span>    · have hc : endpointOccupiedCount p y = 1 := by</span>
+<span class="l" id="L640"><span class="n">640</span>        simp [endpointOccupiedCount, Nat.mod_eq_zero_of_dvd hpy]</span>
+<span class="l" id="L641"><span class="n">641</span>      have hp0 : (p : ℝ) ≠ 0 := by</span>
+<span class="l" id="L642"><span class="n">642</span>        exact_mod_cast (show p ≠ 0 by omega)</span>
+<span class="l" id="L643"><span class="n">643</span>      have hp1 : (p : ℝ) - 1 ≠ 0 := by</span>
+<span class="l" id="L644"><span class="n">644</span>        exact sub_ne_zero.mpr (by exact_mod_cast (show p ≠ 1 by omega))</span>
+<span class="l" id="L645"><span class="n">645</span>      have hp2 : (p : ℝ) - 2 ≠ 0 := by</span>
+<span class="l" id="L646"><span class="n">646</span>        exact sub_ne_zero.mpr (by exact_mod_cast (show p ≠ 2 by omega))</span>
+<span class="l" id="L647"><span class="n">647</span>      rw [if_pos ha, printedLocal_pair_eq_free p y hy]</span>
+<span class="l" id="L648"><span class="n">648</span>      simp only [freeLocalFactorRatio, hc]</span>
+<span class="l" id="L649"><span class="n">649</span>      simp [normalizationBaseline, printedFreeHighSelector, ha, hp5,</span>
+<span class="l" id="L650"><span class="n">650</span>        hactive, hpy, dvd_zero, hp0]</span>
+<span class="l" id="L651"><span class="n">651</span>      field_simp [hp0, hp1, hp2]</span>
+<span class="l" id="L652"><span class="n">652</span>      ring</span>
+<span class="l" id="L653"><span class="n">653</span>    · have hna : ¬ (activeHighPrime q p ∧ p ∣ y) := by</span>
+<span class="l" id="L654"><span class="n">654</span>        intro hx</span>
+<span class="l" id="L655"><span class="n">655</span>        exact hpy hx.2</span>
+<span class="l" id="L656"><span class="n">656</span>      simp only [printedFreeHighSelector, if_neg hna, mul_one]</span>
+<span class="l" id="L657"><span class="n">657</span>      exact printedLocal_pair_eq_baseline q y p hy hp5 hpy</span>
+<span class="l" id="L658"><span class="n">658</span>  · have hna : ¬ activeHighPrime q p := by</span>
+<span class="l" id="L659"><span class="n">659</span>      intro hx</span>
+<span class="l" id="L660"><span class="n">660</span>      exact ha ⟨hx.1, hx.2.2⟩</span>
+<span class="l" id="L661"><span class="n">661</span>    have hbase : ¬ (Nat.Prime p ∧ 5 ≤ p ∧ ¬ p ∣ q) := by</span>
+<span class="l" id="L662"><span class="n">662</span>      intro hx</span>
+<span class="l" id="L663"><span class="n">663</span>      exact ha ⟨hx.1, hx.2.2⟩</span>
+<span class="l" id="L664"><span class="n">664</span>    simp [ha, normalizationBaseline, hbase, printedFreeHighSelector, hna]</span>
+<span class="l" id="L665"><span class="n">665</span></span>
+<span class="l" id="L666"><span class="n">666</span>#print axioms printed_pair_high_eq_baseline_selector</span>
+<span class="l" id="L667"><span class="n">667</span></span>
+<span class="l" id="L668"><span class="n">668</span></span>
+<span class="l" id="L669"><span class="n">669</span></span>
+<span class="l" id="L670"><span class="n">670</span>/-- For fixed positive y, only finitely many active primes dividing y can</span>
+<span class="l" id="L671"><span class="n">671</span>have a nontrivial B-side selector. -/</span>
+<span class="l" id="L672"><span class="n">672</span>theorem printedFreeHighSelector_multipliable (q y : ℕ) (hy : 0 &lt; y) :</span>
+<span class="l" id="L673"><span class="n">673</span>    Multipliable (printedFreeHighSelector q y) := by</span>
+<span class="l" id="L674"><span class="n">674</span>  apply multipliable_of_hasFiniteMulSupport</span>
+<span class="l" id="L675"><span class="n">675</span>  apply (Set.finite_Iic y).subset</span>
+<span class="l" id="L676"><span class="n">676</span>  intro p hp</span>
+<span class="l" id="L677"><span class="n">677</span>  change printedFreeHighSelector q y p ≠ 1 at hp</span>
+<span class="l" id="L678"><span class="n">678</span>  by_contra hle</span>
+<span class="l" id="L679"><span class="n">679</span>  have hnd : ¬ p ∣ y := by</span>
+<span class="l" id="L680"><span class="n">680</span>    intro hd</span>
+<span class="l" id="L681"><span class="n">681</span>    exact hle (Nat.le_of_dvd hy hd)</span>
+<span class="l" id="L682"><span class="n">682</span>  exact hp (by simp [printedFreeHighSelector, hnd])</span>
+<span class="l" id="L683"><span class="n">683</span></span>
+<span class="l" id="L684"><span class="n">684</span>#print axioms printedFreeHighSelector_multipliable</span>
+<span class="l" id="L685"><span class="n">685</span></span>
+<span class="l" id="L686"><span class="n">686</span></span>
+<span class="l" id="L687"><span class="n">687</span>/-- Explicit low p=2,3 factor for a printed two-point singular series. -/</span>
+<span class="l" id="L688"><span class="n">688</span>noncomputable def printedFreeLowLocal (q y p : ℕ) : ℝ :=</span>
+<span class="l" id="L689"><span class="n">689</span>  if p ∈ lowPrimeSet then</span>
+<span class="l" id="L690"><span class="n">690</span>    if p ∣ q then 1 else freeLocalFactorRatio p y</span>
+<span class="l" id="L691"><span class="n">691</span>  else 1</span>
+<span class="l" id="L692"><span class="n">692</span></span>
+<span class="l" id="L693"><span class="n">693</span>theorem printed_pair_factor_split (q y p : ℕ) (hy : 0 &lt; y) :</span>
+<span class="l" id="L694"><span class="n">694</span>    (if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L695"><span class="n">695</span>      printedLocal p ({0,y} : Finset ℕ) else 1) =</span>
+<span class="l" id="L696"><span class="n">696</span>      (printedFreeLowLocal q y p * normalizationBaseline q 0 p) *</span>
+<span class="l" id="L697"><span class="n">697</span>        printedFreeHighSelector q y p := by</span>
+<span class="l" id="L698"><span class="n">698</span>  by_cases hp5 : 5 ≤ p</span>
+<span class="l" id="L699"><span class="n">699</span>  · rw [printed_pair_high_eq_baseline_selector q y p hy hp5]</span>
+<span class="l" id="L700"><span class="n">700</span>    have hlow : p ∉ lowPrimeSet := by</span>
+<span class="l" id="L701"><span class="n">701</span>      simp [lowPrimeSet]</span>
+<span class="l" id="L702"><span class="n">702</span>      omega</span>
+<span class="l" id="L703"><span class="n">703</span>    simp [printedFreeLowLocal, hlow]</span>
+<span class="l" id="L704"><span class="n">704</span>  · have hp : p &lt; 5 := by omega</span>
+<span class="l" id="L705"><span class="n">705</span>    interval_cases p</span>
+<span class="l" id="L706"><span class="n">706</span>    · simp [printedFreeLowLocal, lowPrimeSet, normalizationBaseline,</span>
+<span class="l" id="L707"><span class="n">707</span>        printedFreeHighSelector, activeHighPrime, show ¬ Nat.Prime 0 from by decide]</span>
+<span class="l" id="L708"><span class="n">708</span>    · simp [printedFreeLowLocal, lowPrimeSet, normalizationBaseline,</span>
+<span class="l" id="L709"><span class="n">709</span>        printedFreeHighSelector, activeHighPrime, show ¬ Nat.Prime 1 from by decide]</span>
+<span class="l" id="L710"><span class="n">710</span>    · by_cases hq : 2 ∣ q</span>
+<span class="l" id="L711"><span class="n">711</span>      · simp [printedFreeLowLocal, lowPrimeSet, normalizationBaseline,</span>
+<span class="l" id="L712"><span class="n">712</span>          printedFreeHighSelector, activeHighPrime, hq]</span>
+<span class="l" id="L713"><span class="n">713</span>      · simp [printedFreeLowLocal, lowPrimeSet, normalizationBaseline,</span>
+<span class="l" id="L714"><span class="n">714</span>          printedFreeHighSelector, activeHighPrime, hq, show Nat.Prime 2 from by decide,</span>
+<span class="l" id="L715"><span class="n">715</span>          printedLocal_pair_eq_free 2 y hy]</span>
+<span class="l" id="L716"><span class="n">716</span>    · by_cases hq : 3 ∣ q</span>
+<span class="l" id="L717"><span class="n">717</span>      · simp [printedFreeLowLocal, lowPrimeSet, normalizationBaseline,</span>
+<span class="l" id="L718"><span class="n">718</span>          printedFreeHighSelector, activeHighPrime, hq]</span>
+<span class="l" id="L719"><span class="n">719</span>      · simp [printedFreeLowLocal, lowPrimeSet, normalizationBaseline,</span>
+<span class="l" id="L720"><span class="n">720</span>          printedFreeHighSelector, activeHighPrime, hq, show Nat.Prime 3 from by decide,</span>
+<span class="l" id="L721"><span class="n">721</span>          printedLocal_pair_eq_free 3 y hy]</span>
+<span class="l" id="L722"><span class="n">722</span>    · simp [printedFreeLowLocal, lowPrimeSet, normalizationBaseline,</span>
+<span class="l" id="L723"><span class="n">723</span>        printedFreeHighSelector, activeHighPrime, show ¬ Nat.Prime 4 from by decide]</span>
+<span class="l" id="L724"><span class="n">724</span></span>
+<span class="l" id="L725"><span class="n">725</span>theorem printedFreeLowLocal_multipliable (q y : ℕ) :</span>
+<span class="l" id="L726"><span class="n">726</span>    Multipliable (printedFreeLowLocal q y) := by</span>
+<span class="l" id="L727"><span class="n">727</span>  apply multipliable_of_hasFiniteMulSupport</span>
+<span class="l" id="L728"><span class="n">728</span>  apply (Set.finite_Iio 5).subset</span>
+<span class="l" id="L729"><span class="n">729</span>  intro p hp</span>
+<span class="l" id="L730"><span class="n">730</span>  change printedFreeLowLocal q y p ≠ 1 at hp</span>
+<span class="l" id="L731"><span class="n">731</span>  by_contra hn</span>
+<span class="l" id="L732"><span class="n">732</span>  have hp5 : 5 ≤ p := Nat.le_of_not_gt hn</span>
+<span class="l" id="L733"><span class="n">733</span>  exact hp (by</span>
+<span class="l" id="L734"><span class="n">734</span>    simp [printedFreeLowLocal, lowPrimeSet]</span>
+<span class="l" id="L735"><span class="n">735</span>    omega)</span>
+<span class="l" id="L736"><span class="n">736</span></span>
+<span class="l" id="L737"><span class="n">737</span>theorem printedFreeLowLocal_tprod (q y : ℕ) :</span>
+<span class="l" id="L738"><span class="n">738</span>    (∏&#x27; p : ℕ, printedFreeLowLocal q y p) = freeLowPrimeFactor q y := by</span>
+<span class="l" id="L739"><span class="n">739</span>  rw [tprod_eq_prod (s := lowPrimeSet) (fun p hp =&gt; by</span>
+<span class="l" id="L740"><span class="n">740</span>    simp [printedFreeLowLocal, hp])]</span>
+<span class="l" id="L741"><span class="n">741</span>  unfold freeLowPrimeFactor</span>
+<span class="l" id="L742"><span class="n">742</span>  apply Finset.prod_congr rfl</span>
+<span class="l" id="L743"><span class="n">743</span>  intro p hp</span>
+<span class="l" id="L744"><span class="n">744</span>  simp [printedFreeLowLocal, hp]</span>
+<span class="l" id="L745"><span class="n">745</span></span>
+<span class="l" id="L746"><span class="n">746</span>/-- Printed two-point restricted singular series splits into exact low</span>
+<span class="l" id="L747"><span class="n">747</span>factor, native positive high baseline, and FINITELY SUPPORTED selector. -/</span>
+<span class="l" id="L748"><span class="n">748</span>theorem printed_pair_tprod_factorization (q y : ℕ) (hy : 0 &lt; y) :</span>
+<span class="l" id="L749"><span class="n">749</span>    printedRestrictedSingularSeries q ({0,y} : Finset ℕ) =</span>
+<span class="l" id="L750"><span class="n">750</span>      (freeLowPrimeFactor q y * freeHighBaseline q) *</span>
+<span class="l" id="L751"><span class="n">751</span>        (∏&#x27; p : ℕ, printedFreeHighSelector q y p) := by</span>
+<span class="l" id="L752"><span class="n">752</span>  unfold printedRestrictedSingularSeries</span>
+<span class="l" id="L753"><span class="n">753</span>  have hl := printedFreeLowLocal_multipliable q y</span>
+<span class="l" id="L754"><span class="n">754</span>  have hb := multipliable_normalizationBaseline&#x27; q 0</span>
+<span class="l" id="L755"><span class="n">755</span>  have hs := printedFreeHighSelector_multipliable q y hy</span>
+<span class="l" id="L756"><span class="n">756</span>  calc</span>
+<span class="l" id="L757"><span class="n">757</span>    (∏&#x27; p : ℕ, if Nat.Prime p ∧ ¬ p ∣ q then</span>
+<span class="l" id="L758"><span class="n">758</span>      printedLocal p ({0,y} : Finset ℕ) else 1) =</span>
+<span class="l" id="L759"><span class="n">759</span>        (∏&#x27; p : ℕ,</span>
+<span class="l" id="L760"><span class="n">760</span>          (printedFreeLowLocal q y p * normalizationBaseline q 0 p) *</span>
+<span class="l" id="L761"><span class="n">761</span>            printedFreeHighSelector q y p) := by</span>
+<span class="l" id="L762"><span class="n">762</span>            apply tprod_congr</span>
+<span class="l" id="L763"><span class="n">763</span>            intro p</span>
+<span class="l" id="L764"><span class="n">764</span>            exact printed_pair_factor_split q y p hy</span>
+<span class="l" id="L765"><span class="n">765</span>    _ = ((∏&#x27; p : ℕ, printedFreeLowLocal q y p) *</span>
+<span class="l" id="L766"><span class="n">766</span>           (∏&#x27; p : ℕ, normalizationBaseline q 0 p)) *</span>
+<span class="l" id="L767"><span class="n">767</span>          (∏&#x27; p : ℕ, printedFreeHighSelector q y p) := by</span>
+<span class="l" id="L768"><span class="n">768</span>            rw [(hl.mul hb).tprod_mul hs, hl.tprod_mul hb]</span>
+<span class="l" id="L769"><span class="n">769</span>    _ = (freeLowPrimeFactor q y * freeHighBaseline q) *</span>
+<span class="l" id="L770"><span class="n">770</span>          (∏&#x27; p : ℕ, printedFreeHighSelector q y p) := by</span>
+<span class="l" id="L771"><span class="n">771</span>            rw [printedFreeLowLocal_tprod]</span>
+<span class="l" id="L772"><span class="n">772</span>            rfl</span>
+<span class="l" id="L773"><span class="n">773</span></span>
+<span class="l" id="L774"><span class="n">774</span>#print axioms printed_pair_factor_split</span>
+<span class="l" id="L775"><span class="n">775</span>#print axioms printed_pair_tprod_factorization</span>
+<span class="l" id="L776"><span class="n">776</span></span>
+<span class="l" id="L777"><span class="n">777</span></span>
+<span class="l" id="L778"><span class="n">778</span>/-- Local B divisor coefficient: zero outside active high primes. -/</span>
+<span class="l" id="L779"><span class="n">779</span>noncomputable def printedEtaPrime (q p : ℕ) : ℝ :=</span>
+<span class="l" id="L780"><span class="n">780</span>  if activeHighPrime q p then 1 / ((p : ℝ) - 2) else 0</span>
+<span class="l" id="L781"><span class="n">781</span></span>
+<span class="l" id="L782"><span class="n">782</span>/-- Finite Boolean Euler expansion of the printed B selector. The</span>
+<span class="l" id="L783"><span class="n">783</span>conversion from prime subsets to exact etaCoeff divisors is the next seam. -/</span>
+<span class="l" id="L784"><span class="n">784</span>theorem printedFreeHighSelector_powerset (q y : ℕ) (hy : 0 &lt; y) :</span>
+<span class="l" id="L785"><span class="n">785</span>    (∏&#x27; p : ℕ, printedFreeHighSelector q y p) =</span>
+<span class="l" id="L786"><span class="n">786</span>    ∑ s ∈ y.primeFactors.powerset,</span>
+<span class="l" id="L787"><span class="n">787</span>       ∏ p ∈ s, printedEtaPrime q p := by</span>
+<span class="l" id="L788"><span class="n">788</span>  have heq :</span>
+<span class="l" id="L789"><span class="n">789</span>      (∏&#x27; p : ℕ, printedFreeHighSelector q y p) =</span>
+<span class="l" id="L790"><span class="n">790</span>      ∏ p ∈ y.primeFactors, (1 + printedEtaPrime q p) := by</span>
+<span class="l" id="L791"><span class="n">791</span>    rw [tprod_eq_prod (s := y.primeFactors) (fun p hp =&gt; by</span>
+<span class="l" id="L792"><span class="n">792</span>      unfold printedFreeHighSelector</span>
+<span class="l" id="L793"><span class="n">793</span>      by_cases ha : activeHighPrime q p</span>
+<span class="l" id="L794"><span class="n">794</span>      · have hnd : ¬ p ∣ y := by</span>
+<span class="l" id="L795"><span class="n">795</span>          intro hd</span>
+<span class="l" id="L796"><span class="n">796</span>          exact hp (Nat.mem_primeFactors.mpr ⟨ha.1, hd, Nat.ne_of_gt hy⟩)</span>
+<span class="l" id="L797"><span class="n">797</span>        simp [ha, hnd]</span>
+<span class="l" id="L798"><span class="n">798</span>      · simp [ha])]</span>
+<span class="l" id="L799"><span class="n">799</span>    apply Finset.prod_congr rfl</span>
+<span class="l" id="L800"><span class="n">800</span>    intro p hp</span>
+<span class="l" id="L801"><span class="n">801</span>    have hd : p ∣ y := Nat.dvd_of_mem_primeFactors hp</span>
+<span class="l" id="L802"><span class="n">802</span>    by_cases ha : activeHighPrime q p &lt;;&gt;</span>
+<span class="l" id="L803"><span class="n">803</span>      simp [printedFreeHighSelector, printedEtaPrime, ha, hd]</span>
+<span class="l" id="L804"><span class="n">804</span>  rw [heq]</span>
+<span class="l" id="L805"><span class="n">805</span>  exact Finset.prod_one_add y.primeFactors</span>
+<span class="l" id="L806"><span class="n">806</span></span>
+<span class="l" id="L807"><span class="n">807</span>#print axioms printedFreeHighSelector_powerset</span>
+<span class="l" id="L808"><span class="n">808</span></span>
+<span class="l" id="L809"><span class="n">809</span>end Merivelle.F01</span>
+<span class="l" id="L810"><span class="n">810</span></span>
+<span class="l" id="L811"><span class="n">811</span>namespace Elarienne.F01B</span>
+<span class="l" id="L812"><span class="n">812</span>open PaperB.FixedQ</span>
+<span class="l" id="L813"><span class="n">813</span></span>
+<span class="l" id="L814"><span class="n">814</span>noncomputable def printedEtaPrime (q p : ℕ) : ℝ :=</span>
+<span class="l" id="L815"><span class="n">815</span>  if activeHighPrime q p then 1 / ((p : ℝ) - 2) else 0</span>
+<span class="l" id="L816"><span class="n">816</span></span>
+<span class="l" id="L817"><span class="n">817</span>theorem activePrime_iff_coprime_sixq (q p : ℕ)</span>
+<span class="l" id="L818"><span class="n">818</span>    (hp : Nat.Prime p) :</span>
+<span class="l" id="L819"><span class="n">819</span>    activeHighPrime q p ↔ p.Coprime (6 * q) := by</span>
+<span class="l" id="L820"><span class="n">820</span>  constructor</span>
+<span class="l" id="L821"><span class="n">821</span>  · intro ha</span>
+<span class="l" id="L822"><span class="n">822</span>    apply hp.coprime_iff_not_dvd.mpr</span>
+<span class="l" id="L823"><span class="n">823</span>    intro hd</span>
+<span class="l" id="L824"><span class="n">824</span>    rcases hp.dvd_mul.mp hd with h6 | hq</span>
+<span class="l" id="L825"><span class="n">825</span>    · have hp6 : p ∣ 2 * 3 := by simpa using h6</span>
+<span class="l" id="L826"><span class="n">826</span>      rcases hp.dvd_mul.mp hp6 with h2 | h3</span>
+<span class="l" id="L827"><span class="n">827</span>      · have : p ≤ 2 := Nat.le_of_dvd (by norm_num) h2</span>
+<span class="l" id="L828"><span class="n">828</span>        exact (by have hp5 := ha.2.1; omega)</span>
+<span class="l" id="L829"><span class="n">829</span>      · have : p ≤ 3 := Nat.le_of_dvd (by norm_num) h3</span>
+<span class="l" id="L830"><span class="n">830</span>        exact (by have hp5 := ha.2.1; omega)</span>
+<span class="l" id="L831"><span class="n">831</span>    · exact ha.2.2 hq</span>
+<span class="l" id="L832"><span class="n">832</span>  · intro hcop</span>
+<span class="l" id="L833"><span class="n">833</span>    have hp5 : 5 ≤ p := eta_rankin_five_le_of_prime_coprime_six hp hcop</span>
+<span class="l" id="L834"><span class="n">834</span>    have hpq : ¬ p ∣ q := by</span>
+<span class="l" id="L835"><span class="n">835</span>      intro hd</span>
+<span class="l" id="L836"><span class="n">836</span>      exact (hp.coprime_iff_not_dvd.mp hcop)</span>
+<span class="l" id="L837"><span class="n">837</span>        (dvd_mul_of_dvd_right hd 6)</span>
+<span class="l" id="L838"><span class="n">838</span>    exact ⟨hp, hp5, hpq⟩</span>
+<span class="l" id="L839"><span class="n">839</span></span>
+<span class="l" id="L840"><span class="n">840</span>theorem printedEtaPrime_eq_coprime (q p : ℕ)</span>
+<span class="l" id="L841"><span class="n">841</span>    (hp : Nat.Prime p) :</span>
+<span class="l" id="L842"><span class="n">842</span>    printedEtaPrime q p =</span>
+<span class="l" id="L843"><span class="n">843</span>      if p.Coprime (6 * q) then 1 / ((p : ℝ)-2) else 0 := by</span>
+<span class="l" id="L844"><span class="n">844</span>  unfold printedEtaPrime</span>
+<span class="l" id="L845"><span class="n">845</span>  by_cases ha : activeHighPrime q p</span>
+<span class="l" id="L846"><span class="n">846</span>  · have hc := (activePrime_iff_coprime_sixq q p hp).mp ha</span>
+<span class="l" id="L847"><span class="n">847</span>    simp [ha, hc]</span>
+<span class="l" id="L848"><span class="n">848</span>  · have hnc : ¬ p.Coprime (6*q) :=</span>
+<span class="l" id="L849"><span class="n">849</span>      fun hc =&gt; ha ((activePrime_iff_coprime_sixq q p hp).mpr hc)</span>
+<span class="l" id="L850"><span class="n">850</span>    simp [ha, hnc]</span>
+<span class="l" id="L851"><span class="n">851</span></span>
+<span class="l" id="L852"><span class="n">852</span>theorem printedEtaCoeff_primeSubsetProduct (q : ℕ)</span>
+<span class="l" id="L853"><span class="n">853</span>    (s : Finset ℕ) (hs : ∀ p ∈ s, Nat.Prime p) :</span>
+<span class="l" id="L854"><span class="n">854</span>    etaCoeff q (primeSubsetProduct s) =</span>
+<span class="l" id="L855"><span class="n">855</span>      ∏ p ∈ s, printedEtaPrime q p := by</span>
+<span class="l" id="L856"><span class="n">856</span>  have hs0 : primeSubsetProduct s ≠ 0 := by</span>
+<span class="l" id="L857"><span class="n">857</span>    unfold primeSubsetProduct</span>
+<span class="l" id="L858"><span class="n">858</span>    exact Finset.prod_ne_zero_iff.mpr</span>
+<span class="l" id="L859"><span class="n">859</span>      (fun p hp =&gt; (hs p hp).ne_zero)</span>
+<span class="l" id="L860"><span class="n">860</span>  have hsSq : Squarefree (primeSubsetProduct s) := by</span>
+<span class="l" id="L861"><span class="n">861</span>    unfold primeSubsetProduct</span>
+<span class="l" id="L862"><span class="n">862</span>    apply Finset.squarefree_prod_of_pairwise_isCoprime</span>
+<span class="l" id="L863"><span class="n">863</span>    · intro p hp r hr hne</span>
+<span class="l" id="L864"><span class="n">864</span>      apply Nat.coprime_iff_isRelPrime.mp</span>
+<span class="l" id="L865"><span class="n">865</span>      apply (hs p hp).coprime_iff_not_dvd.mpr</span>
+<span class="l" id="L866"><span class="n">866</span>      intro hd</span>
+<span class="l" id="L867"><span class="n">867</span>      have heq : r = p :=</span>
+<span class="l" id="L868"><span class="n">868</span>        ((hs r hr).dvd_iff_eq (hs p hp).ne_one).mp hd</span>
+<span class="l" id="L869"><span class="n">869</span>      exact hne heq.symm</span>
+<span class="l" id="L870"><span class="n">870</span>    · intro p hp</span>
+<span class="l" id="L871"><span class="n">871</span>      exact (hs p hp).squarefree</span>
+<span class="l" id="L872"><span class="n">872</span>  have hcop : (primeSubsetProduct s).Coprime (6 * q) ↔</span>
+<span class="l" id="L873"><span class="n">873</span>      ∀ p ∈ s, p.Coprime (6 * q) := by</span>
+<span class="l" id="L874"><span class="n">874</span>    rw [primeSubsetProduct_coprime_iff s hs (6*q)]</span>
+<span class="l" id="L875"><span class="n">875</span>    constructor</span>
+<span class="l" id="L876"><span class="n">876</span>    · intro h p hp</span>
+<span class="l" id="L877"><span class="n">877</span>      exact (hs p hp).coprime_iff_not_dvd.mpr (h p hp)</span>
+<span class="l" id="L878"><span class="n">878</span>    · intro h p hp</span>
+<span class="l" id="L879"><span class="n">879</span>      exact (hs p hp).coprime_iff_not_dvd.mp (h p hp)</span>
+<span class="l" id="L880"><span class="n">880</span>  have hprod :</span>
+<span class="l" id="L881"><span class="n">881</span>      (∏ p ∈ s, printedEtaPrime q p) =</span>
+<span class="l" id="L882"><span class="n">882</span>      if ∀ p ∈ s, p.Coprime (6 * q) then</span>
+<span class="l" id="L883"><span class="n">883</span>        ∏ p ∈ s, 1 / ((p : ℝ) - 2) else 0 := by</span>
+<span class="l" id="L884"><span class="n">884</span>    calc</span>
+<span class="l" id="L885"><span class="n">885</span>      (∏ p ∈ s, printedEtaPrime q p) =</span>
+<span class="l" id="L886"><span class="n">886</span>        ∏ p ∈ s, (if p.Coprime (6 * q) then 1 / ((p : ℝ)-2) else 0) := by</span>
+<span class="l" id="L887"><span class="n">887</span>          apply Finset.prod_congr rfl</span>
+<span class="l" id="L888"><span class="n">888</span>          intro p hp</span>
+<span class="l" id="L889"><span class="n">889</span>          exact printedEtaPrime_eq_coprime q p (hs p hp)</span>
+<span class="l" id="L890"><span class="n">890</span>      _ = _ := by rw [Finset.prod_ite_zero]</span>
+<span class="l" id="L891"><span class="n">891</span>  rw [hprod]</span>
+<span class="l" id="L892"><span class="n">892</span>  by_cases h : ∀ p ∈ s, p.Coprime (6*q)</span>
+<span class="l" id="L893"><span class="n">893</span>  · have hc : (primeSubsetProduct s).Coprime (6*q) := hcop.mpr h</span>
+<span class="l" id="L894"><span class="n">894</span>    unfold etaCoeff</span>
+<span class="l" id="L895"><span class="n">895</span>    rw [if_neg hs0, if_pos ⟨hsSq,hc⟩]</span>
+<span class="l" id="L896"><span class="n">896</span>    rw [primeSubsetProduct_primeFactors s hs]</span>
+<span class="l" id="L897"><span class="n">897</span>    rw [if_pos h]</span>
+<span class="l" id="L898"><span class="n">898</span>  · have hnc : ¬ (primeSubsetProduct s).Coprime (6*q) :=</span>
+<span class="l" id="L899"><span class="n">899</span>      fun hc =&gt; h (hcop.mp hc)</span>
+<span class="l" id="L900"><span class="n">900</span>    unfold etaCoeff</span>
+<span class="l" id="L901"><span class="n">901</span>    rw [if_neg hs0, if_neg (by intro hc; exact hnc hc.2)]</span>
+<span class="l" id="L902"><span class="n">902</span>    rw [if_neg h]</span>
+<span class="l" id="L903"><span class="n">903</span></span>
+<span class="l" id="L904"><span class="n">904</span>/-- Exact finite divisor identity: the squarefree eta terms are the</span>
+<span class="l" id="L905"><span class="n">905</span>prime-subset Euler coefficients, with all higher prime powers zero. -/</span>
+<span class="l" id="L906"><span class="n">906</span>theorem printed_eta_divisors_eq_powerset (q y : ℕ) (hy : 0 &lt; y) :</span>
+<span class="l" id="L907"><span class="n">907</span>    (∑ e ∈ y.divisors, etaCoeff q e) =</span>
+<span class="l" id="L908"><span class="n">908</span>    ∑ s ∈ y.primeFactors.powerset,</span>
+<span class="l" id="L909"><span class="n">909</span>      ∏ p ∈ s, printedEtaPrime q p := by</span>
+<span class="l" id="L910"><span class="n">910</span>  have hfilter :</span>
+<span class="l" id="L911"><span class="n">911</span>      (∑ e ∈ y.divisors, etaCoeff q e) =</span>
+<span class="l" id="L912"><span class="n">912</span>      (∑ e ∈ y.divisors with Squarefree e, etaCoeff q e) := by</span>
+<span class="l" id="L913"><span class="n">913</span>    symm</span>
+<span class="l" id="L914"><span class="n">914</span>    apply Finset.sum_subset (Finset.filter_subset _ _)</span>
+<span class="l" id="L915"><span class="n">915</span>    intro e he hn</span>
+<span class="l" id="L916"><span class="n">916</span>    have hnsq : ¬ Squarefree e := by</span>
+<span class="l" id="L917"><span class="n">917</span>      intro hs</span>
+<span class="l" id="L918"><span class="n">918</span>      exact hn (Finset.mem_filter.mpr ⟨he, hs⟩)</span>
+<span class="l" id="L919"><span class="n">919</span>    simp [etaCoeff, hnsq]</span>
+<span class="l" id="L920"><span class="n">920</span>  calc</span>
+<span class="l" id="L921"><span class="n">921</span>    (∑ e ∈ y.divisors, etaCoeff q e) =</span>
+<span class="l" id="L922"><span class="n">922</span>        (∑ e ∈ y.divisors with Squarefree e, etaCoeff q e) := hfilter</span>
+<span class="l" id="L923"><span class="n">923</span>    _ = ∑ s ∈ y.primeFactors.powerset,</span>
+<span class="l" id="L924"><span class="n">924</span>          etaCoeff q (primeSubsetProduct s) := by</span>
+<span class="l" id="L925"><span class="n">925</span>          rw [Nat.sum_divisors_filter_squarefree (Nat.ne_of_gt hy), Nat.factors_eq]</span>
+<span class="l" id="L926"><span class="n">926</span>          have hpf : (y.primeFactorsList : Multiset ℕ).toFinset = y.primeFactors := by</span>
+<span class="l" id="L927"><span class="n">927</span>            ext p</span>
+<span class="l" id="L928"><span class="n">928</span>            simpa using (Nat.mem_primeFactors_iff_mem_primeFactorsList (n := y) (p := p)).symm</span>
+<span class="l" id="L929"><span class="n">929</span>          rw [hpf]</span>
+<span class="l" id="L930"><span class="n">930</span>          simp [primeSubsetProduct]</span>
+<span class="l" id="L931"><span class="n">931</span>    _ = ∑ s ∈ y.primeFactors.powerset,</span>
+<span class="l" id="L932"><span class="n">932</span>          ∏ p ∈ s, printedEtaPrime q p := by</span>
+<span class="l" id="L933"><span class="n">933</span>          apply Finset.sum_congr rfl</span>
+<span class="l" id="L934"><span class="n">934</span>          intro s hs</span>
+<span class="l" id="L935"><span class="n">935</span>          have hprime : ∀ p ∈ s, Nat.Prime p := by</span>
+<span class="l" id="L936"><span class="n">936</span>            intro p hp</span>
+<span class="l" id="L937"><span class="n">937</span>            exact Nat.prime_of_mem_primeFactors ((Finset.mem_powerset.mp hs) hp)</span>
+<span class="l" id="L938"><span class="n">938</span>          exact printedEtaCoeff_primeSubsetProduct q s hprime</span>
+<span class="l" id="L939"><span class="n">939</span></span>
+<span class="l" id="L940"><span class="n">940</span>#print axioms printed_eta_divisors_eq_powerset</span>
+<span class="l" id="L941"><span class="n">941</span></span>
+<span class="l" id="L942"><span class="n">942</span>#print axioms activePrime_iff_coprime_sixq</span>
+<span class="l" id="L943"><span class="n">943</span>#print axioms printedEtaCoeff_primeSubsetProduct</span>
+<span class="l" id="L944"><span class="n">944</span>end Elarienne.F01B</span>
+<span class="l" id="L945"><span class="n">945</span></span>
+<span class="l" id="L946"><span class="n">946</span></span>
+<span class="l" id="L947"><span class="n">947</span></span>
+<span class="l" id="L948"><span class="n">948</span>namespace Elarienne.F01B</span>
+<span class="l" id="L949"><span class="n">949</span>open PaperB.FixedQ</span>
+<span class="l" id="L950"><span class="n">950</span>open Merivelle.F01</span>
+<span class="l" id="L951"><span class="n">951</span></span>
+<span class="l" id="L952"><span class="n">952</span>theorem printedFreeHighSelector_divisors (q y : ℕ) (hy : 0 &lt; y) :</span>
+<span class="l" id="L953"><span class="n">953</span>    (∏&#x27; p : ℕ, printedFreeHighSelector q y p) =</span>
+<span class="l" id="L954"><span class="n">954</span>      ∑ e ∈ y.divisors, etaCoeff q e := by</span>
+<span class="l" id="L955"><span class="n">955</span>  rw [printedFreeHighSelector_powerset q y hy,</span>
+<span class="l" id="L956"><span class="n">956</span>    printed_eta_divisors_eq_powerset q y hy]</span>
+<span class="l" id="L957"><span class="n">957</span>  apply Finset.sum_congr rfl</span>
+<span class="l" id="L958"><span class="n">958</span>  intro s hs</span>
+<span class="l" id="L959"><span class="n">959</span>  apply Finset.prod_congr rfl</span>
+<span class="l" id="L960"><span class="n">960</span>  intro p hp</span>
+<span class="l" id="L961"><span class="n">961</span>  rfl</span>
+<span class="l" id="L962"><span class="n">962</span></span>
+<span class="l" id="L963"><span class="n">963</span>/-- Full literal B two-point Euler-product / finite divisor expansion. -/</span>
+<span class="l" id="L964"><span class="n">964</span>theorem printed_pair_divisorExpansion (q y : ℕ) (hy : 0 &lt; y) :</span>
+<span class="l" id="L965"><span class="n">965</span>    printedRestrictedSingularSeries q ({0,y} : Finset ℕ) =</span>
+<span class="l" id="L966"><span class="n">966</span>      (freeLowPrimeFactor q y * freeHighBaseline q) *</span>
+<span class="l" id="L967"><span class="n">967</span>        (∑ e ∈ y.divisors, etaCoeff q e) := by</span>
+<span class="l" id="L968"><span class="n">968</span>  rw [printed_pair_tprod_factorization q y hy,</span>
+<span class="l" id="L969"><span class="n">969</span>    printedFreeHighSelector_divisors q y hy]</span>
+<span class="l" id="L970"><span class="n">970</span></span>
+<span class="l" id="L971"><span class="n">971</span>#print axioms printedFreeHighSelector_divisors</span>
+<span class="l" id="L972"><span class="n">972</span>#print axioms printed_pair_divisorExpansion</span>
+<span class="l" id="L973"><span class="n">973</span>end Elarienne.F01B</span>
+<span class="l" id="L974"><span class="n">974</span></span>
+<span class="l" id="L975"><span class="n">975</span>namespace Elarienne.F01B</span>
+<span class="l" id="L976"><span class="n">976</span>open PaperB.FixedQ</span>
+<span class="l" id="L977"><span class="n">977</span></span>
+<span class="l" id="L978"><span class="n">978</span>noncomputable def etaReciprocalArithmeticF01 (q : ℕ) : ArithmeticFunction ℝ :=</span>
+<span class="l" id="L979"><span class="n">979</span>  ⟨etaReciprocalTerm q, etaReciprocalTerm_zero q⟩</span>
+<span class="l" id="L980"><span class="n">980</span></span>
+<span class="l" id="L981"><span class="n">981</span>theorem etaReciprocalArithmeticF01_multiplicative (q : ℕ) :</span>
+<span class="l" id="L982"><span class="n">982</span>    (etaReciprocalArithmeticF01 q).IsMultiplicative := by</span>
+<span class="l" id="L983"><span class="n">983</span>  constructor</span>
+<span class="l" id="L984"><span class="n">984</span>  · exact etaReciprocalTerm_one q</span>
+<span class="l" id="L985"><span class="n">985</span>  · intro m n hcop</span>
+<span class="l" id="L986"><span class="n">986</span>    exact etaReciprocalTerm_mul_of_coprime q hcop</span>
+<span class="l" id="L987"><span class="n">987</span></span>
+<span class="l" id="L988"><span class="n">988</span>theorem etaReciprocalArithmeticF01_norm_summable (q : ℕ) :</span>
+<span class="l" id="L989"><span class="n">989</span>    Summable (fun n : ℕ =&gt; ‖etaReciprocalArithmeticF01 q n‖) := by</span>
+<span class="l" id="L990"><span class="n">990</span>  have heq : (fun n : ℕ =&gt; ‖etaReciprocalArithmeticF01 q n‖) =</span>
+<span class="l" id="L991"><span class="n">991</span>      etaReciprocalTerm q := by</span>
+<span class="l" id="L992"><span class="n">992</span>    funext n</span>
+<span class="l" id="L993"><span class="n">993</span>    change ‖etaReciprocalTerm q n‖ = etaReciprocalTerm q n</span>
+<span class="l" id="L994"><span class="n">994</span>    rw [Real.norm_eq_abs, abs_of_nonneg (etaReciprocalTerm_nonneg q n)]</span>
+<span class="l" id="L995"><span class="n">995</span>  rw [heq]</span>
+<span class="l" id="L996"><span class="n">996</span>  exact summable_etaReciprocalTerm q</span>
+<span class="l" id="L997"><span class="n">997</span></span>
+<span class="l" id="L998"><span class="n">998</span>theorem baseline_inv_eq_etaLocal (q p : ℕ) :</span>
+<span class="l" id="L999"><span class="n">999</span>    (normalizationBaseline q 0 p)⁻¹ = 1 + normalizationCorrection q 0 p := by</span>
+<span class="l" id="L1000"><span class="n">1000</span>  have hb := normalizationBaseline_ne_zero q 0 p</span>
+<span class="l" id="L1001"><span class="n">1001</span>  have hlocal := normalizationBaseline_mul_one_add_correction q 0 p</span>
+<span class="l" id="L1002"><span class="n">1002</span>  calc</span>
+<span class="l" id="L1003"><span class="n">1003</span>    (normalizationBaseline q 0 p)⁻¹ =</span>
+<span class="l" id="L1004"><span class="n">1004</span>        (normalizationBaseline q 0 p)⁻¹ * 1 := by ring</span>
+<span class="l" id="L1005"><span class="n">1005</span>    _ = (normalizationBaseline q 0 p)⁻¹ *</span>
+<span class="l" id="L1006"><span class="n">1006</span>          (normalizationBaseline q 0 p * (1 + normalizationCorrection q 0 p)) := by</span>
+<span class="l" id="L1007"><span class="n">1007</span>        rw [hlocal]</span>
+<span class="l" id="L1008"><span class="n">1008</span>    _ = 1 + normalizationCorrection q 0 p := by</span>
+<span class="l" id="L1009"><span class="n">1009</span>        rw [← mul_assoc, inv_mul_cancel₀ hb, one_mul]</span>
+<span class="l" id="L1010"><span class="n">1010</span></span>
+<span class="l" id="L1011"><span class="n">1011</span>theorem etaReciprocal_tsum_eq_inv_baseline (q : ℕ) :</span>
+<span class="l" id="L1012"><span class="n">1012</span>    (∑&#x27; n : ℕ, etaReciprocalTerm q n) =</span>
+<span class="l" id="L1013"><span class="n">1013</span>    (∏&#x27; p : ℕ, (normalizationBaseline q 0 p)⁻¹) := by</span>
+<span class="l" id="L1014"><span class="n">1014</span>  have heuler :=</span>
+<span class="l" id="L1015"><span class="n">1015</span>    (etaReciprocalArithmeticF01_multiplicative q).eulerProduct_tprod</span>
+<span class="l" id="L1016"><span class="n">1016</span>      (etaReciprocalArithmeticF01_norm_summable q)</span>
+<span class="l" id="L1017"><span class="n">1017</span>  have hprime : (∏&#x27; p : Nat.Primes,</span>
+<span class="l" id="L1018"><span class="n">1018</span>      ∑&#x27; k : ℕ, etaReciprocalTerm q ((p : ℕ) ^ k)) =</span>
+<span class="l" id="L1019"><span class="n">1019</span>      (∏&#x27; p : Nat.Primes, (normalizationBaseline q 0 (p : ℕ))⁻¹) := by</span>
+<span class="l" id="L1020"><span class="n">1020</span>    apply tprod_congr</span>
+<span class="l" id="L1021"><span class="n">1021</span>    intro p</span>
+<span class="l" id="L1022"><span class="n">1022</span>    rw [tsum_etaReciprocalTerm_prime_pow q p.2]</span>
+<span class="l" id="L1023"><span class="n">1023</span>    exact (baseline_inv_eq_etaLocal q p).symm</span>
+<span class="l" id="L1024"><span class="n">1024</span>  have hsub :</span>
+<span class="l" id="L1025"><span class="n">1025</span>      (∏&#x27; p : Nat.Primes, (normalizationBaseline q 0 (p : ℕ))⁻¹) =</span>
+<span class="l" id="L1026"><span class="n">1026</span>      (∏&#x27; p : ℕ, (normalizationBaseline q 0 p)⁻¹) := by</span>
+<span class="l" id="L1027"><span class="n">1027</span>    change (∏&#x27; p : {p : ℕ // Nat.Prime p},</span>
+<span class="l" id="L1028"><span class="n">1028</span>      (normalizationBaseline q 0 (p : ℕ))⁻¹) =</span>
+<span class="l" id="L1029"><span class="n">1029</span>      (∏&#x27; p : ℕ, (normalizationBaseline q 0 p)⁻¹)</span>
+<span class="l" id="L1030"><span class="n">1030</span>    apply tprod_subtype_eq_of_mulSupport_subset</span>
+<span class="l" id="L1031"><span class="n">1031</span>      (s := {p : ℕ | Nat.Prime p})</span>
+<span class="l" id="L1032"><span class="n">1032</span>      (f := fun p : ℕ =&gt; (normalizationBaseline q 0 p)⁻¹)</span>
+<span class="l" id="L1033"><span class="n">1033</span>    intro p hp</span>
+<span class="l" id="L1034"><span class="n">1034</span>    by_contra hn</span>
+<span class="l" id="L1035"><span class="n">1035</span>    change ¬ Nat.Prime p at hn</span>
+<span class="l" id="L1036"><span class="n">1036</span>    have hbase : normalizationBaseline q 0 p = 1 := by</span>
+<span class="l" id="L1037"><span class="n">1037</span>      simp [normalizationBaseline, hn]</span>
+<span class="l" id="L1038"><span class="n">1038</span>    exact hp (by simp [hbase])</span>
+<span class="l" id="L1039"><span class="n">1039</span>  calc</span>
+<span class="l" id="L1040"><span class="n">1040</span>    (∑&#x27; n : ℕ, etaReciprocalTerm q n) =</span>
+<span class="l" id="L1041"><span class="n">1041</span>        (∏&#x27; p : Nat.Primes, ∑&#x27; k : ℕ, etaReciprocalTerm q ((p : ℕ)^k)) := by</span>
+<span class="l" id="L1042"><span class="n">1042</span>      simpa [etaReciprocalArithmeticF01] using heuler.symm</span>
+<span class="l" id="L1043"><span class="n">1043</span>    _ = (∏&#x27; p : Nat.Primes, (normalizationBaseline q 0 (p : ℕ))⁻¹) := hprime</span>
+<span class="l" id="L1044"><span class="n">1044</span>    _ = (∏&#x27; p : ℕ, (normalizationBaseline q 0 p)⁻¹) := hsub</span>
+<span class="l" id="L1045"><span class="n">1045</span></span>
+<span class="l" id="L1046"><span class="n">1046</span>/-- F-01 B: the exact free high-prime baseline normalizes the *actual*</span>
+<span class="l" id="L1047"><span class="n">1047</span>eta_q(e)/e divisor coefficient system, independently of a logarithmic residue. -/</span>
+<span class="l" id="L1048"><span class="n">1048</span>theorem printed_free_eta_normalization (q : ℕ) :</span>
+<span class="l" id="L1049"><span class="n">1049</span>    freeHighBaseline q *</span>
+<span class="l" id="L1050"><span class="n">1050</span>      (∑&#x27; e : ℕ, etaCoeff q e / (e : ℝ)) = 1 := by</span>
+<span class="l" id="L1051"><span class="n">1051</span>  have hsum : (∑&#x27; e : ℕ, etaCoeff q e / (e : ℝ)) =</span>
+<span class="l" id="L1052"><span class="n">1052</span>      (∑&#x27; e : ℕ, etaReciprocalTerm q e) := by</span>
+<span class="l" id="L1053"><span class="n">1053</span>    apply tsum_congr</span>
+<span class="l" id="L1054"><span class="n">1054</span>    intro e</span>
+<span class="l" id="L1055"><span class="n">1055</span>    exact (etaReciprocalTerm_eq_etaCoeff_div q e).symm</span>
+<span class="l" id="L1056"><span class="n">1056</span>  rw [hsum, etaReciprocal_tsum_eq_inv_baseline q]</span>
+<span class="l" id="L1057"><span class="n">1057</span>  change (∏&#x27; p : ℕ, normalizationBaseline q 0 p) *</span>
+<span class="l" id="L1058"><span class="n">1058</span>    (∏&#x27; p : ℕ, (normalizationBaseline q 0 p)⁻¹) = 1</span>
+<span class="l" id="L1059"><span class="n">1059</span>  rw [(multipliable_normalizationBaseline&#x27; q 0).tprod_inv₀</span>
+<span class="l" id="L1060"><span class="n">1060</span>    (tprod_normalizationBaseline_ne_zero q 0)]</span>
+<span class="l" id="L1061"><span class="n">1061</span>  exact mul_inv_cancel₀ (tprod_normalizationBaseline_ne_zero q 0)</span>
+<span class="l" id="L1062"><span class="n">1062</span></span>
+<span class="l" id="L1063"><span class="n">1063</span>#print axioms etaReciprocalArithmeticF01_multiplicative</span>
+<span class="l" id="L1064"><span class="n">1064</span>#print axioms etaReciprocalArithmeticF01_norm_summable</span>
+<span class="l" id="L1065"><span class="n">1065</span>#print axioms etaReciprocal_tsum_eq_inv_baseline</span>
+<span class="l" id="L1066"><span class="n">1066</span>#print axioms printed_free_eta_normalization</span>
+<span class="l" id="L1067"><span class="n">1067</span></span>
+<span class="l" id="L1068"><span class="n">1068</span>end Elarienne.F01B</span>
+<span class="l" id="L1069"><span class="n">1069</span></span>
+<span class="l" id="L1070"><span class="n">1070</span></span>
+<span class="l" id="L1071"><span class="n">1071</span>namespace Elarienne.F01B</span>
+<span class="l" id="L1072"><span class="n">1072</span>open PaperB.FixedQ</span>
+<span class="l" id="L1073"><span class="n">1073</span></span>
+<span class="l" id="L1074"><span class="n">1074</span>theorem eta_divisors_eq_bounded (q y h : ℕ)</span>
+<span class="l" id="L1075"><span class="n">1075</span>    (hy0 : 0 &lt; y) (hyh : y &lt; h) :</span>
+<span class="l" id="L1076"><span class="n">1076</span>    (∑ e ∈ y.divisors, etaCoeff q e) =</span>
+<span class="l" id="L1077"><span class="n">1077</span>      ∑ e ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L1078"><span class="n">1078</span>        if e ∣ y then etaCoeff q e else 0 := by</span>
+<span class="l" id="L1079"><span class="n">1079</span>  have hfin : y.divisors =</span>
+<span class="l" id="L1080"><span class="n">1080</span>      (Finset.Ioo 0 h).filter (fun e =&gt; e ∣ y) := by</span>
+<span class="l" id="L1081"><span class="n">1081</span>    ext e</span>
+<span class="l" id="L1082"><span class="n">1082</span>    rw [Nat.mem_divisors, Finset.mem_filter, Finset.mem_Ioo]</span>
+<span class="l" id="L1083"><span class="n">1083</span>    constructor</span>
+<span class="l" id="L1084"><span class="n">1084</span>    · rintro ⟨hd, hyne⟩</span>
+<span class="l" id="L1085"><span class="n">1085</span>      have he0 : 0 &lt; e := by</span>
+<span class="l" id="L1086"><span class="n">1086</span>        by_contra hz</span>
+<span class="l" id="L1087"><span class="n">1087</span>        have he : e = 0 := by omega</span>
+<span class="l" id="L1088"><span class="n">1088</span>        subst e</span>
+<span class="l" id="L1089"><span class="n">1089</span>        simp at hd</span>
+<span class="l" id="L1090"><span class="n">1090</span>        omega</span>
+<span class="l" id="L1091"><span class="n">1091</span>      have hey : e ≤ y := Nat.le_of_dvd hy0 hd</span>
+<span class="l" id="L1092"><span class="n">1092</span>      exact ⟨⟨he0, by omega⟩, hd⟩</span>
+<span class="l" id="L1093"><span class="n">1093</span>    · rintro ⟨⟨he0, heh⟩, hd⟩</span>
+<span class="l" id="L1094"><span class="n">1094</span>      exact ⟨hd, Nat.ne_of_gt hy0⟩</span>
+<span class="l" id="L1095"><span class="n">1095</span>  rw [hfin, Finset.sum_filter]</span>
+<span class="l" id="L1096"><span class="n">1096</span></span>
+<span class="l" id="L1097"><span class="n">1097</span>/-- An exact Fubini identity. For fixed h, only e&lt;h contribute:</span>
+<span class="l" id="L1098"><span class="n">1098</span>there is no infinite-interchange question on this numerator side. -/</span>
+<span class="l" id="L1099"><span class="n">1099</span>theorem printed_free_weighted_divisor_swap (q r h : ℕ) :</span>
+<span class="l" id="L1100"><span class="n">1100</span>    (∑ y ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L1101"><span class="n">1101</span>      freeFixedQLowWeight q r y *</span>
+<span class="l" id="L1102"><span class="n">1102</span>        (∑ e ∈ y.divisors, etaCoeff q e)) =</span>
+<span class="l" id="L1103"><span class="n">1103</span>    ∑ e ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L1104"><span class="n">1104</span>      etaCoeff q e * rowConstrainedMass (freeFixedQLowWeight q r) h e 1 := by</span>
+<span class="l" id="L1105"><span class="n">1105</span>  have hinner :</span>
+<span class="l" id="L1106"><span class="n">1106</span>      (∑ y ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L1107"><span class="n">1107</span>        freeFixedQLowWeight q r y *</span>
+<span class="l" id="L1108"><span class="n">1108</span>          (∑ e ∈ y.divisors, etaCoeff q e)) =</span>
+<span class="l" id="L1109"><span class="n">1109</span>      (∑ y ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L1110"><span class="n">1110</span>        freeFixedQLowWeight q r y *</span>
+<span class="l" id="L1111"><span class="n">1111</span>          (∑ e ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L1112"><span class="n">1112</span>            if e ∣ y then etaCoeff q e else 0)) := by</span>
+<span class="l" id="L1113"><span class="n">1113</span>    apply Finset.sum_congr rfl</span>
+<span class="l" id="L1114"><span class="n">1114</span>    intro y hy</span>
+<span class="l" id="L1115"><span class="n">1115</span>    have hyI := Finset.mem_Ioo.mp hy</span>
+<span class="l" id="L1116"><span class="n">1116</span>    rw [eta_divisors_eq_bounded q y h hyI.1 hyI.2]</span>
+<span class="l" id="L1117"><span class="n">1117</span>  rw [hinner]</span>
+<span class="l" id="L1118"><span class="n">1118</span>  simp_rw [Finset.mul_sum]</span>
+<span class="l" id="L1119"><span class="n">1119</span>  rw [Finset.sum_comm]</span>
+<span class="l" id="L1120"><span class="n">1120</span>  apply Finset.sum_congr rfl</span>
+<span class="l" id="L1121"><span class="n">1121</span>  intro e he</span>
+<span class="l" id="L1122"><span class="n">1122</span>  unfold rowConstrainedMass</span>
+<span class="l" id="L1123"><span class="n">1123</span>  rw [Finset.mul_sum]</span>
+<span class="l" id="L1124"><span class="n">1124</span>  apply Finset.sum_congr rfl</span>
+<span class="l" id="L1125"><span class="n">1125</span>  intro y hy</span>
+<span class="l" id="L1126"><span class="n">1126</span>  by_cases hd : e ∣ y</span>
+<span class="l" id="L1127"><span class="n">1127</span>  · simp [hd, mul_comm]</span>
+<span class="l" id="L1128"><span class="n">1128</span>  · simp [hd]</span>
+<span class="l" id="L1129"><span class="n">1129</span></span>
+<span class="l" id="L1130"><span class="n">1130</span>theorem printed_free_row_tsum_eq_finite (q r h : ℕ) :</span>
+<span class="l" id="L1131"><span class="n">1131</span>    (∑&#x27; e : ℕ,</span>
+<span class="l" id="L1132"><span class="n">1132</span>      etaCoeff q e * rowConstrainedMass (freeFixedQLowWeight q r) h e 1) =</span>
+<span class="l" id="L1133"><span class="n">1133</span>    ∑ e ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L1134"><span class="n">1134</span>      etaCoeff q e * rowConstrainedMass (freeFixedQLowWeight q r) h e 1 := by</span>
+<span class="l" id="L1135"><span class="n">1135</span>  apply tsum_eq_sum (s := Finset.Ioo 0 h)</span>
+<span class="l" id="L1136"><span class="n">1136</span>  intro e he</span>
+<span class="l" id="L1137"><span class="n">1137</span>  by_cases he0 : e = 0</span>
+<span class="l" id="L1138"><span class="n">1138</span>  · subst e</span>
+<span class="l" id="L1139"><span class="n">1139</span>    simp</span>
+<span class="l" id="L1140"><span class="n">1140</span>  · have hege : h ≤ e := by</span>
+<span class="l" id="L1141"><span class="n">1141</span>      simp only [Finset.mem_Ioo] at he</span>
+<span class="l" id="L1142"><span class="n">1142</span>      omega</span>
+<span class="l" id="L1143"><span class="n">1143</span>    have hr : rowConstrainedMass (freeFixedQLowWeight q r) h e 1 = 0 := by</span>
+<span class="l" id="L1144"><span class="n">1144</span>      unfold rowConstrainedMass</span>
+<span class="l" id="L1145"><span class="n">1145</span>      apply Finset.sum_eq_zero</span>
+<span class="l" id="L1146"><span class="n">1146</span>      intro y hy</span>
+<span class="l" id="L1147"><span class="n">1147</span>      have hyI := Finset.mem_Ioo.mp hy</span>
+<span class="l" id="L1148"><span class="n">1148</span>      have hn : ¬e ∣ y := by</span>
+<span class="l" id="L1149"><span class="n">1149</span>        intro hd</span>
+<span class="l" id="L1150"><span class="n">1150</span>        have hey : e ≤ y := Nat.le_of_dvd hyI.1 hd</span>
+<span class="l" id="L1151"><span class="n">1151</span>        omega</span>
+<span class="l" id="L1152"><span class="n">1152</span>      simp [hn]</span>
+<span class="l" id="L1153"><span class="n">1153</span>    simp [hr]</span>
+<span class="l" id="L1154"><span class="n">1154</span></span>
+<span class="l" id="L1155"><span class="n">1155</span>#print axioms eta_divisors_eq_bounded</span>
+<span class="l" id="L1156"><span class="n">1156</span>#print axioms printed_free_weighted_divisor_swap</span>
+<span class="l" id="L1157"><span class="n">1157</span>#print axioms printed_free_row_tsum_eq_finite</span>
+<span class="l" id="L1158"><span class="n">1158</span>end Elarienne.F01B</span>
+<span class="l" id="L1159"><span class="n">1159</span></span>
+<span class="l" id="L1160"><span class="n">1160</span></span>
+<span class="l" id="L1161"><span class="n">1161</span>namespace Elarienne.F01B</span>
+<span class="l" id="L1162"><span class="n">1162</span>open PaperB.FixedQ</span>
+<span class="l" id="L1163"><span class="n">1163</span></span>
+<span class="l" id="L1164"><span class="n">1164</span>theorem printed_free_row_term_zero_outside</span>
+<span class="l" id="L1165"><span class="n">1165</span>    (q r h e : ℕ) (he : e ∉ Finset.Ioo 0 h) :</span>
+<span class="l" id="L1166"><span class="n">1166</span>    etaCoeff q e * rowConstrainedMass (freeFixedQLowWeight q r) h e 1 = 0 := by</span>
+<span class="l" id="L1167"><span class="n">1167</span>  by_cases he0 : e = 0</span>
+<span class="l" id="L1168"><span class="n">1168</span>  · subst e</span>
+<span class="l" id="L1169"><span class="n">1169</span>    simp</span>
+<span class="l" id="L1170"><span class="n">1170</span>  · have hege : h ≤ e := by</span>
+<span class="l" id="L1171"><span class="n">1171</span>      simp only [Finset.mem_Ioo] at he</span>
+<span class="l" id="L1172"><span class="n">1172</span>      omega</span>
+<span class="l" id="L1173"><span class="n">1173</span>    have hr : rowConstrainedMass (freeFixedQLowWeight q r) h e 1 = 0 := by</span>
+<span class="l" id="L1174"><span class="n">1174</span>      unfold rowConstrainedMass</span>
+<span class="l" id="L1175"><span class="n">1175</span>      apply Finset.sum_eq_zero</span>
+<span class="l" id="L1176"><span class="n">1176</span>      intro y hy</span>
+<span class="l" id="L1177"><span class="n">1177</span>      have hyI := Finset.mem_Ioo.mp hy</span>
+<span class="l" id="L1178"><span class="n">1178</span>      have hn : ¬ e ∣ y := by</span>
+<span class="l" id="L1179"><span class="n">1179</span>        intro hd</span>
+<span class="l" id="L1180"><span class="n">1180</span>        have hey : e ≤ y := Nat.le_of_dvd hyI.1 hd</span>
+<span class="l" id="L1181"><span class="n">1181</span>        omega</span>
+<span class="l" id="L1182"><span class="n">1182</span>      simp [hn]</span>
+<span class="l" id="L1183"><span class="n">1183</span>    simp [hr]</span>
+<span class="l" id="L1184"><span class="n">1184</span></span>
+<span class="l" id="L1185"><span class="n">1185</span>theorem summable_printed_free_row_term (q r h : ℕ) :</span>
+<span class="l" id="L1186"><span class="n">1186</span>    Summable (fun e : ℕ =&gt;</span>
+<span class="l" id="L1187"><span class="n">1187</span>      etaCoeff q e * rowConstrainedMass (freeFixedQLowWeight q r) h e 1) := by</span>
+<span class="l" id="L1188"><span class="n">1188</span>  exact summable_of_ne_finset_zero (s := Finset.Ioo 0 h)</span>
+<span class="l" id="L1189"><span class="n">1189</span>    (fun e he =&gt; printed_free_row_term_zero_outside q r h e he)</span>
+<span class="l" id="L1190"><span class="n">1190</span></span>
+<span class="l" id="L1191"><span class="n">1191</span>theorem summable_etaCoeff_div (q : ℕ) :</span>
+<span class="l" id="L1192"><span class="n">1192</span>    Summable (fun e : ℕ =&gt; etaCoeff q e / (e : ℝ)) := by</span>
+<span class="l" id="L1193"><span class="n">1193</span>  have h := summable_etaReciprocalTerm q</span>
+<span class="l" id="L1194"><span class="n">1194</span>  convert h using 1</span>
+<span class="l" id="L1195"><span class="n">1195</span>  funext e</span>
+<span class="l" id="L1196"><span class="n">1196</span>  exact (etaReciprocalTerm_eq_etaCoeff_div q e).symm</span>
+<span class="l" id="L1197"><span class="n">1197</span></span>
+<span class="l" id="L1198"><span class="n">1198</span>theorem printed_free_centered_sum (q r h : ℕ)</span>
+<span class="l" id="L1199"><span class="n">1199</span>    (hnorm : freeHighBaseline q *</span>
+<span class="l" id="L1200"><span class="n">1200</span>      (∑&#x27; e : ℕ, etaCoeff q e / (e : ℝ)) = 1) :</span>
+<span class="l" id="L1201"><span class="n">1201</span>    freeHighBaseline q *</span>
+<span class="l" id="L1202"><span class="n">1202</span>        (∑&#x27; e : ℕ,</span>
+<span class="l" id="L1203"><span class="n">1203</span>          etaCoeff q e * rowConstrainedMass (freeFixedQLowWeight q r) h e 1)</span>
+<span class="l" id="L1204"><span class="n">1204</span>      - (admissibleInteriorCount q r h : ℝ) =</span>
+<span class="l" id="L1205"><span class="n">1205</span>    freeHighBaseline q *</span>
+<span class="l" id="L1206"><span class="n">1206</span>      (∑&#x27; e : ℕ,</span>
+<span class="l" id="L1207"><span class="n">1207</span>        etaCoeff q e *</span>
+<span class="l" id="L1208"><span class="n">1208</span>          (rowConstrainedMass (freeFixedQLowWeight q r) h e 1 -</span>
+<span class="l" id="L1209"><span class="n">1209</span>            (admissibleInteriorCount q r h : ℝ) / (e : ℝ))) := by</span>
+<span class="l" id="L1210"><span class="n">1210</span>  let N : ℝ := (admissibleInteriorCount q r h : ℝ)</span>
+<span class="l" id="L1211"><span class="n">1211</span>  let C : ℝ := freeHighBaseline q</span>
+<span class="l" id="L1212"><span class="n">1212</span>  have hf := summable_printed_free_row_term q r h</span>
+<span class="l" id="L1213"><span class="n">1213</span>  have hg := summable_etaCoeff_div q</span>
+<span class="l" id="L1214"><span class="n">1214</span>  have hgN : Summable (fun e : ℕ =&gt;</span>
+<span class="l" id="L1215"><span class="n">1215</span>      etaCoeff q e * (N / (e : ℝ))) := by</span>
+<span class="l" id="L1216"><span class="n">1216</span>    convert hg.mul_left N using 1</span>
+<span class="l" id="L1217"><span class="n">1217</span>    funext e</span>
+<span class="l" id="L1218"><span class="n">1218</span>    ring</span>
+<span class="l" id="L1219"><span class="n">1219</span>  have hsplit :</span>
+<span class="l" id="L1220"><span class="n">1220</span>      (∑&#x27; e : ℕ, etaCoeff q e *</span>
+<span class="l" id="L1221"><span class="n">1221</span>        (rowConstrainedMass (freeFixedQLowWeight q r) h e 1 - N / (e : ℝ))) =</span>
+<span class="l" id="L1222"><span class="n">1222</span>      (∑&#x27; e : ℕ,</span>
+<span class="l" id="L1223"><span class="n">1223</span>        etaCoeff q e * rowConstrainedMass (freeFixedQLowWeight q r) h e 1) -</span>
+<span class="l" id="L1224"><span class="n">1224</span>      (∑&#x27; e : ℕ, etaCoeff q e * (N / (e : ℝ))) := by</span>
+<span class="l" id="L1225"><span class="n">1225</span>    rw [← hf.tsum_sub hgN]</span>
+<span class="l" id="L1226"><span class="n">1226</span>    apply tsum_congr</span>
+<span class="l" id="L1227"><span class="n">1227</span>    intro e</span>
+<span class="l" id="L1228"><span class="n">1228</span>    ring</span>
+<span class="l" id="L1229"><span class="n">1229</span>  have hgNsum :</span>
+<span class="l" id="L1230"><span class="n">1230</span>      (∑&#x27; e : ℕ, etaCoeff q e * (N / (e : ℝ))) =</span>
+<span class="l" id="L1231"><span class="n">1231</span>      N * (∑&#x27; e : ℕ, etaCoeff q e / (e : ℝ)) := by</span>
+<span class="l" id="L1232"><span class="n">1232</span>    rw [← tsum_mul_left]</span>
+<span class="l" id="L1233"><span class="n">1233</span>    apply tsum_congr</span>
+<span class="l" id="L1234"><span class="n">1234</span>    intro e</span>
+<span class="l" id="L1235"><span class="n">1235</span>    ring</span>
+<span class="l" id="L1236"><span class="n">1236</span>  change C *</span>
+<span class="l" id="L1237"><span class="n">1237</span>      (∑&#x27; e : ℕ, etaCoeff q e *</span>
+<span class="l" id="L1238"><span class="n">1238</span>        rowConstrainedMass (freeFixedQLowWeight q r) h e 1) - N =</span>
+<span class="l" id="L1239"><span class="n">1239</span>      C * (∑&#x27; e : ℕ, etaCoeff q e *</span>
+<span class="l" id="L1240"><span class="n">1240</span>        (rowConstrainedMass (freeFixedQLowWeight q r) h e 1 - N / (e : ℝ)))</span>
+<span class="l" id="L1241"><span class="n">1241</span>  rw [hsplit, hgNsum]</span>
+<span class="l" id="L1242"><span class="n">1242</span>  have hn : C * (∑&#x27; e : ℕ, etaCoeff q e / (e : ℝ)) = 1 := hnorm</span>
+<span class="l" id="L1243"><span class="n">1243</span>  calc</span>
+<span class="l" id="L1244"><span class="n">1244</span>    C * (∑&#x27; e : ℕ,</span>
+<span class="l" id="L1245"><span class="n">1245</span>      etaCoeff q e * rowConstrainedMass (freeFixedQLowWeight q r) h e 1) - N =</span>
+<span class="l" id="L1246"><span class="n">1246</span>      C * (∑&#x27; e : ℕ,</span>
+<span class="l" id="L1247"><span class="n">1247</span>        etaCoeff q e * rowConstrainedMass (freeFixedQLowWeight q r) h e 1) -</span>
+<span class="l" id="L1248"><span class="n">1248</span>        (C * (∑&#x27; e : ℕ, etaCoeff q e / (e : ℝ))) * N := by</span>
+<span class="l" id="L1249"><span class="n">1249</span>        rw [hn]</span>
+<span class="l" id="L1250"><span class="n">1250</span>        ring</span>
+<span class="l" id="L1251"><span class="n">1251</span>    _ = C * ((∑&#x27; e : ℕ,</span>
+<span class="l" id="L1252"><span class="n">1252</span>      etaCoeff q e * rowConstrainedMass (freeFixedQLowWeight q r) h e 1) -</span>
+<span class="l" id="L1253"><span class="n">1253</span>      N * (∑&#x27; e : ℕ, etaCoeff q e / (e : ℝ))) := by ring</span>
+<span class="l" id="L1254"><span class="n">1254</span></span>
+<span class="l" id="L1255"><span class="n">1255</span>#print axioms summable_printed_free_row_term</span>
+<span class="l" id="L1256"><span class="n">1256</span>#print axioms summable_etaCoeff_div</span>
+<span class="l" id="L1257"><span class="n">1257</span>#print axioms printed_free_centered_sum</span>
+<span class="l" id="L1258"><span class="n">1258</span>end Elarienne.F01B</span>
+<span class="l" id="L1259"><span class="n">1259</span></span>
+<span class="l" id="L1260"><span class="n">1260</span></span>
+<span class="l" id="L1261"><span class="n">1261</span></span>
+<span class="l" id="L1262"><span class="n">1262</span>namespace Elarienne.F01B</span>
+<span class="l" id="L1263"><span class="n">1263</span>open PaperB.FixedQ</span>
+<span class="l" id="L1264"><span class="n">1264</span>open Merivelle.F01</span>
+<span class="l" id="L1265"><span class="n">1265</span></span>
+<span class="l" id="L1266"><span class="n">1266</span>/-- The independently printed first anchor contribution for the</span>
+<span class="l" id="L1267"><span class="n">1267</span>frozen B_{1,q} expression. -/</span>
+<span class="l" id="L1268"><span class="n">1268</span>noncomputable def printedS1Literal (q r h : ℕ) : ℝ :=</span>
+<span class="l" id="L1269"><span class="n">1269</span>  ∑ y ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L1270"><span class="n">1270</span>    if q.Coprime (r + y) then</span>
+<span class="l" id="L1271"><span class="n">1271</span>      printedRestrictedSingularSeries q ({0,y} : Finset ℕ) - 1</span>
+<span class="l" id="L1272"><span class="n">1272</span>    else 0</span>
+<span class="l" id="L1273"><span class="n">1273</span></span>
+<span class="l" id="L1274"><span class="n">1274</span>/-- Literal single-anchor B sum equals the exact centered η-divisor</span>
+<span class="l" id="L1275"><span class="n">1275</span>kernel, with no approximation of the admissible interior count. -/</span>
+<span class="l" id="L1276"><span class="n">1276</span>theorem printedS1Literal_eq_manuscriptS1Kernel (q r h : ℕ) :</span>
+<span class="l" id="L1277"><span class="n">1277</span>    printedS1Literal q r h =</span>
+<span class="l" id="L1278"><span class="n">1278</span>      PaperB.Closure.manuscriptS1Kernel q r h := by</span>
+<span class="l" id="L1279"><span class="n">1279</span>  have hterm : ∀ y ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L1280"><span class="n">1280</span>      (if q.Coprime (r+y) then</span>
+<span class="l" id="L1281"><span class="n">1281</span>        printedRestrictedSingularSeries q ({0,y} : Finset ℕ) - 1</span>
+<span class="l" id="L1282"><span class="n">1282</span>       else 0) =</span>
+<span class="l" id="L1283"><span class="n">1283</span>      freeHighBaseline q *</span>
+<span class="l" id="L1284"><span class="n">1284</span>        (freeFixedQLowWeight q r y *</span>
+<span class="l" id="L1285"><span class="n">1285</span>          (∑ e ∈ y.divisors, etaCoeff q e)) -</span>
+<span class="l" id="L1286"><span class="n">1286</span>        (if q.Coprime (r+y) then (1 : ℝ) else 0) := by</span>
+<span class="l" id="L1287"><span class="n">1287</span>    intro y hy</span>
+<span class="l" id="L1288"><span class="n">1288</span>    have hy0 := (Finset.mem_Ioo.mp hy).1</span>
+<span class="l" id="L1289"><span class="n">1289</span>    by_cases hc : q.Coprime (r+y)</span>
+<span class="l" id="L1290"><span class="n">1290</span>    · rw [if_pos hc, printed_pair_divisorExpansion q y hy0]</span>
+<span class="l" id="L1291"><span class="n">1291</span>      rw [freeFixedQLowWeight_eq_indicator_mul_factor]</span>
+<span class="l" id="L1292"><span class="n">1292</span>      simp only [if_pos hc, one_mul]</span>
+<span class="l" id="L1293"><span class="n">1293</span>      ring</span>
+<span class="l" id="L1294"><span class="n">1294</span>    · rw [if_neg hc]</span>
+<span class="l" id="L1295"><span class="n">1295</span>      rw [freeFixedQLowWeight_eq_indicator_mul_factor]</span>
+<span class="l" id="L1296"><span class="n">1296</span>      simp [hc]</span>
+<span class="l" id="L1297"><span class="n">1297</span>  have hN : (∑ y ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L1298"><span class="n">1298</span>      if q.Coprime (r+y) then (1 : ℝ) else 0) =</span>
+<span class="l" id="L1299"><span class="n">1299</span>      (admissibleInteriorCount q r h : ℝ) := by</span>
+<span class="l" id="L1300"><span class="n">1300</span>    rw [printed_admissible_count_eq]</span>
+<span class="l" id="L1301"><span class="n">1301</span>    exact Finset.sum_boole (fun y =&gt; q.Coprime (r+y)) (Finset.Ioo 0 h)</span>
+<span class="l" id="L1302"><span class="n">1302</span>  calc</span>
+<span class="l" id="L1303"><span class="n">1303</span>    printedS1Literal q r h =</span>
+<span class="l" id="L1304"><span class="n">1304</span>        ∑ y ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L1305"><span class="n">1305</span>          (freeHighBaseline q *</span>
+<span class="l" id="L1306"><span class="n">1306</span>            (freeFixedQLowWeight q r y * (∑ e ∈ y.divisors, etaCoeff q e)) -</span>
+<span class="l" id="L1307"><span class="n">1307</span>            (if q.Coprime (r+y) then (1 : ℝ) else 0)) := by</span>
+<span class="l" id="L1308"><span class="n">1308</span>        unfold printedS1Literal</span>
+<span class="l" id="L1309"><span class="n">1309</span>        exact Finset.sum_congr rfl hterm</span>
+<span class="l" id="L1310"><span class="n">1310</span>    _ = freeHighBaseline q *</span>
+<span class="l" id="L1311"><span class="n">1311</span>        (∑ y ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L1312"><span class="n">1312</span>            freeFixedQLowWeight q r y * (∑ e ∈ y.divisors, etaCoeff q e)) -</span>
+<span class="l" id="L1313"><span class="n">1313</span>        (admissibleInteriorCount q r h : ℝ) := by</span>
+<span class="l" id="L1314"><span class="n">1314</span>        rw [Finset.sum_sub_distrib, ← Finset.mul_sum, hN]</span>
+<span class="l" id="L1315"><span class="n">1315</span>    _ = freeHighBaseline q *</span>
+<span class="l" id="L1316"><span class="n">1316</span>        (∑ e ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L1317"><span class="n">1317</span>            etaCoeff q e * rowConstrainedMass (freeFixedQLowWeight q r) h e 1) -</span>
+<span class="l" id="L1318"><span class="n">1318</span>        (admissibleInteriorCount q r h : ℝ) := by</span>
+<span class="l" id="L1319"><span class="n">1319</span>        rw [printed_free_weighted_divisor_swap]</span>
+<span class="l" id="L1320"><span class="n">1320</span>    _ = freeHighBaseline q *</span>
+<span class="l" id="L1321"><span class="n">1321</span>        (∑&#x27; e : ℕ,</span>
+<span class="l" id="L1322"><span class="n">1322</span>            etaCoeff q e * rowConstrainedMass (freeFixedQLowWeight q r) h e 1) -</span>
+<span class="l" id="L1323"><span class="n">1323</span>        (admissibleInteriorCount q r h : ℝ) := by</span>
+<span class="l" id="L1324"><span class="n">1324</span>        rw [printed_free_row_tsum_eq_finite]</span>
+<span class="l" id="L1325"><span class="n">1325</span>    _ = freeHighBaseline q *</span>
+<span class="l" id="L1326"><span class="n">1326</span>        (∑&#x27; e : ℕ, etaCoeff q e *</span>
+<span class="l" id="L1327"><span class="n">1327</span>          (rowConstrainedMass (freeFixedQLowWeight q r) h e 1 -</span>
+<span class="l" id="L1328"><span class="n">1328</span>            (admissibleInteriorCount q r h : ℝ) / (e : ℝ))) := by</span>
+<span class="l" id="L1329"><span class="n">1329</span>        exact printed_free_centered_sum q r h (printed_free_eta_normalization q)</span>
+<span class="l" id="L1330"><span class="n">1330</span>    _ = PaperB.Closure.manuscriptS1Kernel q r h := rfl</span>
+<span class="l" id="L1331"><span class="n">1331</span></span>
+<span class="l" id="L1332"><span class="n">1332</span>#print axioms printedS1Literal_eq_manuscriptS1Kernel</span>
+<span class="l" id="L1333"><span class="n">1333</span>end Elarienne.F01B</span>
+<span class="l" id="L1334"><span class="n">1334</span></span>
+<span class="l" id="L1335"><span class="n">1335</span></span>
+<span class="l" id="L1336"><span class="n">1336</span>namespace Elarienne.F01B</span>
+<span class="l" id="L1337"><span class="n">1337</span>open PaperB.FixedQ</span>
+<span class="l" id="L1338"><span class="n">1338</span>open Merivelle.F01</span>
+<span class="l" id="L1339"><span class="n">1339</span></span>
+<span class="l" id="L1340"><span class="n">1340</span>theorem printed_pair_occupied_translate (p h y : ℕ) (hy : y &lt; h) :</span>
+<span class="l" id="L1341"><span class="n">1341</span>    (occupiedResidues p ({h,y} : Finset ℕ)).card =</span>
+<span class="l" id="L1342"><span class="n">1342</span>      (occupiedResidues p ({0,h-y} : Finset ℕ)).card := by</span>
+<span class="l" id="L1343"><span class="n">1343</span>  have hleft : (occupiedResidues p ({h,y} : Finset ℕ)).card =</span>
+<span class="l" id="L1344"><span class="n">1344</span>      ({h%p,y%p} : Finset ℕ).card := by simp [occupiedResidues]</span>
+<span class="l" id="L1345"><span class="n">1345</span>  have hright : (occupiedResidues p ({0,h-y} : Finset ℕ)).card =</span>
+<span class="l" id="L1346"><span class="n">1346</span>      ({0,(h-y)%p} : Finset ℕ).card := by simp [occupiedResidues]</span>
+<span class="l" id="L1347"><span class="n">1347</span>  rw [hleft, hright]</span>
+<span class="l" id="L1348"><span class="n">1348</span>  by_cases hd : p ∣ h-y</span>
+<span class="l" id="L1349"><span class="n">1349</span>  · have hmod : y%p = h%p :=</span>
+<span class="l" id="L1350"><span class="n">1350</span>        (Nat.modEq_iff_dvd&#x27; (Nat.le_of_lt hy)).mpr hd</span>
+<span class="l" id="L1351"><span class="n">1351</span>    have hz : (h-y)%p = 0 := Nat.mod_eq_zero_of_dvd hd</span>
+<span class="l" id="L1352"><span class="n">1352</span>    simp [hmod, hz]</span>
+<span class="l" id="L1353"><span class="n">1353</span>  · have hmod : y%p ≠ h%p :=</span>
+<span class="l" id="L1354"><span class="n">1354</span>        (Nat.modEq_iff_dvd&#x27; (Nat.le_of_lt hy)).not.mpr hd</span>
+<span class="l" id="L1355"><span class="n">1355</span>    have hz : (h-y)%p ≠ 0 :=</span>
+<span class="l" id="L1356"><span class="n">1356</span>        Nat.dvd_iff_mod_eq_zero.not.mp hd</span>
+<span class="l" id="L1357"><span class="n">1357</span>    rw [Finset.card_pair hmod.symm, Finset.card_pair hz.symm]</span>
+<span class="l" id="L1358"><span class="n">1358</span></span>
+<span class="l" id="L1359"><span class="n">1359</span>theorem printed_pair_local_translate (p h y : ℕ) (hy : y &lt; h) :</span>
+<span class="l" id="L1360"><span class="n">1360</span>    printedLocal p ({h,y} : Finset ℕ) =</span>
+<span class="l" id="L1361"><span class="n">1361</span>      printedLocal p ({0,h-y} : Finset ℕ) := by</span>
+<span class="l" id="L1362"><span class="n">1362</span>  have hleft : ({h,y}:Finset ℕ).card = 2 :=</span>
+<span class="l" id="L1363"><span class="n">1363</span>    Finset.card_pair (by omega)</span>
+<span class="l" id="L1364"><span class="n">1364</span>  have hright : ({0,h-y}:Finset ℕ).card = 2 :=</span>
+<span class="l" id="L1365"><span class="n">1365</span>    Finset.card_pair (by omega)</span>
+<span class="l" id="L1366"><span class="n">1366</span>  unfold printedLocal</span>
+<span class="l" id="L1367"><span class="n">1367</span>  rw [hleft, hright, printed_pair_occupied_translate p h y hy]</span>
+<span class="l" id="L1368"><span class="n">1368</span></span>
+<span class="l" id="L1369"><span class="n">1369</span>theorem printed_pair_singularSeries_translate (q h y : ℕ) (hy : y &lt; h) :</span>
+<span class="l" id="L1370"><span class="n">1370</span>    printedRestrictedSingularSeries q ({h,y} : Finset ℕ) =</span>
+<span class="l" id="L1371"><span class="n">1371</span>      printedRestrictedSingularSeries q ({0,h-y} : Finset ℕ) := by</span>
+<span class="l" id="L1372"><span class="n">1372</span>  unfold printedRestrictedSingularSeries</span>
+<span class="l" id="L1373"><span class="n">1373</span>  apply tprod_congr</span>
+<span class="l" id="L1374"><span class="n">1374</span>  intro p</span>
+<span class="l" id="L1375"><span class="n">1375</span>  by_cases ha : Nat.Prime p ∧ ¬ p ∣ q</span>
+<span class="l" id="L1376"><span class="n">1376</span>  · simp only [if_pos ha]</span>
+<span class="l" id="L1377"><span class="n">1377</span>    exact printed_pair_local_translate p h y hy</span>
+<span class="l" id="L1378"><span class="n">1378</span>  · simp [ha]</span>
+<span class="l" id="L1379"><span class="n">1379</span></span>
+<span class="l" id="L1380"><span class="n">1380</span>#print axioms printed_pair_occupied_translate</span>
+<span class="l" id="L1381"><span class="n">1381</span>#print axioms printed_pair_local_translate</span>
+<span class="l" id="L1382"><span class="n">1382</span>#print axioms printed_pair_singularSeries_translate</span>
+<span class="l" id="L1383"><span class="n">1383</span>end Elarienne.F01B</span>
+<span class="l" id="L1384"><span class="n">1384</span></span>
+<span class="l" id="L1385"><span class="n">1385</span></span>
+<span class="l" id="L1386"><span class="n">1386</span>namespace Elarienne.F01B</span>
+<span class="l" id="L1387"><span class="n">1387</span>open PaperB.FixedQ</span>
+<span class="l" id="L1388"><span class="n">1388</span>open Merivelle.F01</span>
+<span class="l" id="L1389"><span class="n">1389</span></span>
+<span class="l" id="L1390"><span class="n">1390</span>/-- The second printed boundary term is the free one-anchor term under</span>
+<span class="l" id="L1391"><span class="n">1391</span>the exact endpoint congruence a+h=b (mod q). -/</span>
+<span class="l" id="L1392"><span class="n">1392</span>theorem printed_reflected_anchor_eq_S1 (q a b h : ℕ)</span>
+<span class="l" id="L1393"><span class="n">1393</span>    (hq : 0 &lt; q) (hcompat : Nat.ModEq q (a+h) b) :</span>
+<span class="l" id="L1394"><span class="n">1394</span>    (∑ y ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L1395"><span class="n">1395</span>      if q.Coprime (a+y) then</span>
+<span class="l" id="L1396"><span class="n">1396</span>        printedRestrictedSingularSeries q ({h,y} : Finset ℕ) - 1</span>
+<span class="l" id="L1397"><span class="n">1397</span>      else 0) =</span>
+<span class="l" id="L1398"><span class="n">1398</span>      printedS1Literal q (PaperB.Closure.reflectedResidue q b) h := by</span>
+<span class="l" id="L1399"><span class="n">1399</span>  let lambda : ℕ → ℝ := fun y =&gt;</span>
+<span class="l" id="L1400"><span class="n">1400</span>    if q.Coprime (a+y) then</span>
+<span class="l" id="L1401"><span class="n">1401</span>      printedRestrictedSingularSeries q ({h,y} : Finset ℕ) - 1</span>
+<span class="l" id="L1402"><span class="n">1402</span>    else 0</span>
+<span class="l" id="L1403"><span class="n">1403</span>  have hreflect :</span>
+<span class="l" id="L1404"><span class="n">1404</span>      (∑ y ∈ Finset.Ioo 0 h, lambda y) =</span>
+<span class="l" id="L1405"><span class="n">1405</span>      ∑ z ∈ Finset.Ioo 0 h, lambda (h-z) := by</span>
+<span class="l" id="L1406"><span class="n">1406</span>    have hmass := rowConstrainedMass_reflect lambda h 1 1</span>
+<span class="l" id="L1407"><span class="n">1407</span>    simpa [rowConstrainedMass] using hmass</span>
+<span class="l" id="L1408"><span class="n">1408</span>  change (∑ y ∈ Finset.Ioo 0 h, lambda y) =</span>
+<span class="l" id="L1409"><span class="n">1409</span>    printedS1Literal q (PaperB.Closure.reflectedResidue q b) h</span>
+<span class="l" id="L1410"><span class="n">1410</span>  rw [hreflect]</span>
+<span class="l" id="L1411"><span class="n">1411</span>  unfold printedS1Literal</span>
+<span class="l" id="L1412"><span class="n">1412</span>  apply Finset.sum_congr rfl</span>
+<span class="l" id="L1413"><span class="n">1413</span>  intro z hz</span>
+<span class="l" id="L1414"><span class="n">1414</span>  have hzI := Finset.mem_Ioo.mp hz</span>
+<span class="l" id="L1415"><span class="n">1415</span>  have hy : h-z &lt; h := by omega</span>
+<span class="l" id="L1416"><span class="n">1416</span>  have hseries :</span>
+<span class="l" id="L1417"><span class="n">1417</span>      printedRestrictedSingularSeries q ({h,h-z} : Finset ℕ) =</span>
+<span class="l" id="L1418"><span class="n">1418</span>      printedRestrictedSingularSeries q ({0,z} : Finset ℕ) := by</span>
+<span class="l" id="L1419"><span class="n">1419</span>    rw [printed_pair_singularSeries_translate q h (h-z) hy]</span>
+<span class="l" id="L1420"><span class="n">1420</span>    rw [Nat.sub_sub_self hzI.2.le]</span>
+<span class="l" id="L1421"><span class="n">1421</span>  have hr := PaperB.Closure.reflected_coprime_equiv hq hcompat z hz</span>
+<span class="l" id="L1422"><span class="n">1422</span>  by_cases ha : q.Coprime (a+(h-z))</span>
+<span class="l" id="L1423"><span class="n">1423</span>  · have hb := hr.mp ha</span>
+<span class="l" id="L1424"><span class="n">1424</span>    simp only [lambda, if_pos ha, if_pos hb]</span>
+<span class="l" id="L1425"><span class="n">1425</span>    rw [hseries]</span>
+<span class="l" id="L1426"><span class="n">1426</span>  · have hb : ¬ q.Coprime (PaperB.Closure.reflectedResidue q b + z) :=</span>
+<span class="l" id="L1427"><span class="n">1427</span>      fun hb =&gt; ha (hr.mpr hb)</span>
+<span class="l" id="L1428"><span class="n">1428</span>    simp [lambda, ha, hb]</span>
+<span class="l" id="L1429"><span class="n">1429</span></span>
+<span class="l" id="L1430"><span class="n">1430</span>/-- The frozen manuscript&#x27;s actual two-anchor B_{1,q} definition,</span>
+<span class="l" id="L1431"><span class="n">1431</span>written from the independently defined printed singular series. -/</span>
+<span class="l" id="L1432"><span class="n">1432</span>noncomputable def printedB1Literal (q a b h : ℕ) : ℝ :=</span>
+<span class="l" id="L1433"><span class="n">1433</span>  (∑ y ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L1434"><span class="n">1434</span>    if q.Coprime (a+y) then</span>
+<span class="l" id="L1435"><span class="n">1435</span>      printedRestrictedSingularSeries q ({0,y} : Finset ℕ) - 1</span>
+<span class="l" id="L1436"><span class="n">1436</span>    else 0) +</span>
+<span class="l" id="L1437"><span class="n">1437</span>  (∑ y ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L1438"><span class="n">1438</span>    if q.Coprime (a+y) then</span>
+<span class="l" id="L1439"><span class="n">1439</span>      printedRestrictedSingularSeries q ({h,y} : Finset ℕ) - 1</span>
+<span class="l" id="L1440"><span class="n">1440</span>    else 0)</span>
+<span class="l" id="L1441"><span class="n">1441</span></span>
+<span class="l" id="L1442"><span class="n">1442</span>/-- Complete F-01 B certification: the exact printed two-anchor singular</span>
+<span class="l" id="L1443"><span class="n">1443</span>series is the existing paper-facing one-dimensional boundary kernel. -/</span>
+<span class="l" id="L1444"><span class="n">1444</span>theorem printedB1Literal_eq_manuscriptB1Kernel (q a b h : ℕ)</span>
+<span class="l" id="L1445"><span class="n">1445</span>    (hq : 0 &lt; q) (hcompat : Nat.ModEq q (a+h) b) :</span>
+<span class="l" id="L1446"><span class="n">1446</span>    printedB1Literal q a b h = PaperB.Closure.manuscriptB1Kernel q a b h := by</span>
+<span class="l" id="L1447"><span class="n">1447</span>  unfold printedB1Literal PaperB.Closure.manuscriptB1Kernel</span>
+<span class="l" id="L1448"><span class="n">1448</span>  rw [← printedS1Literal_eq_manuscriptS1Kernel q a h,</span>
+<span class="l" id="L1449"><span class="n">1449</span>    ← printedS1Literal_eq_manuscriptS1Kernel q</span>
+<span class="l" id="L1450"><span class="n">1450</span>      (PaperB.Closure.reflectedResidue q b) h]</span>
+<span class="l" id="L1451"><span class="n">1451</span>  have hfirst : (∑ y ∈ Finset.Ioo 0 h,</span>
+<span class="l" id="L1452"><span class="n">1452</span>    if q.Coprime (a+y) then</span>
+<span class="l" id="L1453"><span class="n">1453</span>      printedRestrictedSingularSeries q ({0,y} : Finset ℕ) - 1</span>
+<span class="l" id="L1454"><span class="n">1454</span>    else 0) = printedS1Literal q a h := rfl</span>
+<span class="l" id="L1455"><span class="n">1455</span>  rw [hfirst, printed_reflected_anchor_eq_S1 q a b h hq hcompat]</span>
+<span class="l" id="L1456"><span class="n">1456</span></span>
+<span class="l" id="L1457"><span class="n">1457</span>#print axioms printed_reflected_anchor_eq_S1</span>
+<span class="l" id="L1458"><span class="n">1458</span>#print axioms printedB1Literal_eq_manuscriptB1Kernel</span>
+<span class="l" id="L1459"><span class="n">1459</span>end Elarienne.F01B</span>
+<span class="l" id="L1460"><span class="n">1460</span></span>
+<span class="l" id="L1461"><span class="n">1461</span></span>
+<span class="l" id="L1462"><span class="n">1462</span></span>
+<span class="l" id="L1463"><span class="n">1463</span>namespace Elarienne.F01B</span>
+<span class="l" id="L1464"><span class="n">1464</span>open PaperB.FixedQ</span>
+<span class="l" id="L1465"><span class="n">1465</span>open Merivelle.F01</span>
+<span class="l" id="L1466"><span class="n">1466</span></span>
+<span class="l" id="L1467"><span class="n">1467</span>/-- Both exact independently printed quantities transport simultaneously</span>
+<span class="l" id="L1468"><span class="n">1468</span>to their already-certified manuscript-facing Lean kernels. This is the</span>
+<span class="l" id="L1469"><span class="n">1469</span>source-fidelity adapter; it is NOT a new proof of the analytic terminal. -/</span>
+<span class="l" id="L1470"><span class="n">1470</span>theorem printedA_sub_printedB_eq_manuscriptKernels (q a b h : ℕ)</span>
+<span class="l" id="L1471"><span class="n">1471</span>    (hq : 0 &lt; q) (hcompat : Nat.ModEq q (a+h) b)</span>
+<span class="l" id="L1472"><span class="n">1472</span>    (h2admissible : ¬ 2 ∣ q → 2 ∣ h) :</span>
+<span class="l" id="L1473"><span class="n">1473</span>    printedA1Literal q a h - printedB1Literal q a b h =</span>
+<span class="l" id="L1474"><span class="n">1474</span>      manuscriptA1Kernel q a h -</span>
+<span class="l" id="L1475"><span class="n">1475</span>        PaperB.Closure.manuscriptB1Kernel q a b h := by</span>
+<span class="l" id="L1476"><span class="n">1476</span>  rw [printedA1Literal_eq_manuscriptA1Kernel q a h h2admissible,</span>
+<span class="l" id="L1477"><span class="n">1477</span>    printedB1Literal_eq_manuscriptB1Kernel q a b h hq hcompat]</span>
+<span class="l" id="L1478"><span class="n">1478</span></span>
+<span class="l" id="L1479"><span class="n">1479</span>#print axioms printedA_sub_printedB_eq_manuscriptKernels</span>
+<span class="l" id="L1480"><span class="n">1480</span></span>
+<span class="l" id="L1481"><span class="n">1481</span>end Elarienne.F01B</span></pre></div></body></html>

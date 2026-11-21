@@ -1,0 +1,140 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · VPWStepanov/StepanovPrimeWeil.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>VPWStepanov/StepanovPrimeWeil.lean</h1><p class="meta">LEAN/VPWStepanov/StepanovPrimeWeil.lean · 139 lines · SHA-256 590da964dfacde9d4ccf9d3dc159ff9196adea1098a17b99c5367705683186e0</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import VPWStepanov.StepanovSpectralBound</span>
+<span class="l" id="L2"><span class="n">2</span>import PaperB.FixedQ.FixedConductorCompletion</span>
+<span class="l" id="L3"><span class="n">3</span></span>
+<span class="l" id="L4"><span class="n">4</span>namespace PaperB.Stepanov</span>
+<span class="l" id="L5"><span class="n">5</span></span>
+<span class="l" id="L6"><span class="n">6</span>open PaperB.Carlitz</span>
+<span class="l" id="L7"><span class="n">7</span>open PaperB.FixedQ</span>
+<span class="l" id="L8"><span class="n">8</span></span>
+<span class="l" id="L9"><span class="n">9</span>theorem carlitzAlpha_norm_eq_sqrt_prime</span>
+<span class="l" id="L10"><span class="n">10</span>    (p : ℕ) [Fact p.Prime] (hpodd : Odd p)</span>
+<span class="l" id="L11"><span class="n">11</span>    (c : ZMod p) (hc : c ≠ 0)</span>
+<span class="l" id="L12"><span class="n">12</span>    (m : {m : ZMod p // m ≠ 0}) :</span>
+<span class="l" id="L13"><span class="n">13</span>    ‖carlitzAlpha p (m.1 ^ 2 * c)‖ = Real.sqrt p := by</span>
+<span class="l" id="L14"><span class="n">14</span>  let A := carlitzAlpha p (m.1 ^ 2 * c)</span>
+<span class="l" id="L15"><span class="n">15</span>  let B := carlitzBeta p (m.1 ^ 2 * c)</span>
+<span class="l" id="L16"><span class="n">16</span>  have hAsq : ‖A‖ ^ 2 ≤ (p : ℝ) :=</span>
+<span class="l" id="L17"><span class="n">17</span>    carlitzAlpha_norm_sq_le_prime p hpodd c hc m</span>
+<span class="l" id="L18"><span class="n">18</span>  have hBsq : ‖B‖ ^ 2 ≤ (p : ℝ) :=</span>
+<span class="l" id="L19"><span class="n">19</span>    carlitzBeta_norm_sq_le_prime p hpodd c hc m</span>
+<span class="l" id="L20"><span class="n">20</span>  have hpR : (0 : ℝ) &lt; p := by</span>
+<span class="l" id="L21"><span class="n">21</span>    exact_mod_cast (show 0 &lt; p from (show p.Prime from Fact.out).pos)</span>
+<span class="l" id="L22"><span class="n">22</span>  have hsqrtSq : Real.sqrt (p : ℝ) ^ 2 = p :=</span>
+<span class="l" id="L23"><span class="n">23</span>    Real.sq_sqrt hpR.le</span>
+<span class="l" id="L24"><span class="n">24</span>  have hA : ‖A‖ ≤ Real.sqrt p :=</span>
+<span class="l" id="L25"><span class="n">25</span>    (sq_le_sq₀ (norm_nonneg A) (Real.sqrt_nonneg _)).mp (by</span>
+<span class="l" id="L26"><span class="n">26</span>      rw [hsqrtSq]</span>
+<span class="l" id="L27"><span class="n">27</span>      exact hAsq)</span>
+<span class="l" id="L28"><span class="n">28</span>  have hB : ‖B‖ ≤ Real.sqrt p :=</span>
+<span class="l" id="L29"><span class="n">29</span>    (sq_le_sq₀ (norm_nonneg B) (Real.sqrt_nonneg _)).mp (by</span>
+<span class="l" id="L30"><span class="n">30</span>      rw [hsqrtSq]</span>
+<span class="l" id="L31"><span class="n">31</span>      exact hBsq)</span>
+<span class="l" id="L32"><span class="n">32</span>  have ht : m.1 ^ 2 * c ≠ 0 :=</span>
+<span class="l" id="L33"><span class="n">33</span>    mul_ne_zero (pow_ne_zero 2 m.2) hc</span>
+<span class="l" id="L34"><span class="n">34</span>  have hAB : ‖A‖ * ‖B‖ = (p : ℝ) := by</span>
+<span class="l" id="L35"><span class="n">35</span>    rw [← norm_mul]</span>
+<span class="l" id="L36"><span class="n">36</span>    simpa [A, B] using congrArg norm</span>
+<span class="l" id="L37"><span class="n">37</span>      (carlitzAlpha_mul_beta p ht)</span>
+<span class="l" id="L38"><span class="n">38</span>  have hp_le : (p : ℝ) ≤ ‖A‖ * Real.sqrt p := by</span>
+<span class="l" id="L39"><span class="n">39</span>    calc</span>
+<span class="l" id="L40"><span class="n">40</span>      (p : ℝ) = ‖A‖ * ‖B‖ := hAB.symm</span>
+<span class="l" id="L41"><span class="n">41</span>      _ ≤ ‖A‖ * Real.sqrt p :=</span>
+<span class="l" id="L42"><span class="n">42</span>        mul_le_mul_of_nonneg_left hB (norm_nonneg A)</span>
+<span class="l" id="L43"><span class="n">43</span>  have hsqrt_le : Real.sqrt p ≤ ‖A‖ := by</span>
+<span class="l" id="L44"><span class="n">44</span>    have hmul :</span>
+<span class="l" id="L45"><span class="n">45</span>        Real.sqrt p * Real.sqrt p ≤ ‖A‖ * Real.sqrt p := by</span>
+<span class="l" id="L46"><span class="n">46</span>      rw [show Real.sqrt p * Real.sqrt p = (p : ℝ) by</span>
+<span class="l" id="L47"><span class="n">47</span>        rw [← pow_two]</span>
+<span class="l" id="L48"><span class="n">48</span>        exact hsqrtSq]</span>
+<span class="l" id="L49"><span class="n">49</span>      exact hp_le</span>
+<span class="l" id="L50"><span class="n">50</span>    exact le_of_mul_le_mul_right hmul (Real.sqrt_pos.2 hpR)</span>
+<span class="l" id="L51"><span class="n">51</span>  exact le_antisymm hA hsqrt_le</span>
+<span class="l" id="L52"><span class="n">52</span></span>
+<span class="l" id="L53"><span class="n">53</span>theorem carlitzBeta_norm_eq_sqrt_prime</span>
+<span class="l" id="L54"><span class="n">54</span>    (p : ℕ) [Fact p.Prime] (hpodd : Odd p)</span>
+<span class="l" id="L55"><span class="n">55</span>    (c : ZMod p) (hc : c ≠ 0)</span>
+<span class="l" id="L56"><span class="n">56</span>    (m : {m : ZMod p // m ≠ 0}) :</span>
+<span class="l" id="L57"><span class="n">57</span>    ‖carlitzBeta p (m.1 ^ 2 * c)‖ = Real.sqrt p := by</span>
+<span class="l" id="L58"><span class="n">58</span>  let A := carlitzAlpha p (m.1 ^ 2 * c)</span>
+<span class="l" id="L59"><span class="n">59</span>  let B := carlitzBeta p (m.1 ^ 2 * c)</span>
+<span class="l" id="L60"><span class="n">60</span>  have hA := carlitzAlpha_norm_eq_sqrt_prime p hpodd c hc m</span>
+<span class="l" id="L61"><span class="n">61</span>  have ht : m.1 ^ 2 * c ≠ 0 :=</span>
+<span class="l" id="L62"><span class="n">62</span>    mul_ne_zero (pow_ne_zero 2 m.2) hc</span>
+<span class="l" id="L63"><span class="n">63</span>  have hAB : ‖A‖ * ‖B‖ = (p : ℝ) := by</span>
+<span class="l" id="L64"><span class="n">64</span>    rw [← norm_mul]</span>
+<span class="l" id="L65"><span class="n">65</span>    simpa [A, B] using congrArg norm</span>
+<span class="l" id="L66"><span class="n">66</span>      (carlitzAlpha_mul_beta p ht)</span>
+<span class="l" id="L67"><span class="n">67</span>  have hsqrtpos : 0 &lt; Real.sqrt (p : ℝ) := Real.sqrt_pos.2 (by</span>
+<span class="l" id="L68"><span class="n">68</span>    exact_mod_cast (show 0 &lt; p from (show p.Prime from Fact.out).pos))</span>
+<span class="l" id="L69"><span class="n">69</span>  rw [show ‖A‖ = Real.sqrt p by simpa [A] using hA] at hAB</span>
+<span class="l" id="L70"><span class="n">70</span>  have hsqrtSq : Real.sqrt (p : ℝ) * Real.sqrt p = p := by</span>
+<span class="l" id="L71"><span class="n">71</span>    rw [← pow_two]</span>
+<span class="l" id="L72"><span class="n">72</span>    exact Real.sq_sqrt (by</span>
+<span class="l" id="L73"><span class="n">73</span>      exact_mod_cast (show 0 ≤ p from Nat.zero_le p))</span>
+<span class="l" id="L74"><span class="n">74</span>  apply (mul_left_cancel₀ hsqrtpos.ne&#x27;)</span>
+<span class="l" id="L75"><span class="n">75</span>  rw [hAB, hsqrtSq]</span>
+<span class="l" id="L76"><span class="n">76</span></span>
+<span class="l" id="L77"><span class="n">77</span>theorem oneParameterPrimeWeil_odd</span>
+<span class="l" id="L78"><span class="n">78</span>    (p : ℕ) [Fact p.Prime] (hpodd : Odd p)</span>
+<span class="l" id="L79"><span class="n">79</span>    (a : ZMod p) (ha : a ≠ 0) :</span>
+<span class="l" id="L80"><span class="n">80</span>    ‖kloostermanSumPrime p a 1‖ ≤ 2 * Real.sqrt p := by</span>
+<span class="l" id="L81"><span class="n">81</span>  let m : {m : ZMod p // m ≠ 0} := ⟨1, one_ne_zero⟩</span>
+<span class="l" id="L82"><span class="n">82</span>  have hA := carlitzAlpha_norm_eq_sqrt_prime p hpodd a ha m</span>
+<span class="l" id="L83"><span class="n">83</span>  have hB := carlitzBeta_norm_eq_sqrt_prime p hpodd a ha m</span>
+<span class="l" id="L84"><span class="n">84</span>  have hadd := carlitzAlpha_add_beta p ha</span>
+<span class="l" id="L85"><span class="n">85</span>  have hk : Kext p 1 a =</span>
+<span class="l" id="L86"><span class="n">86</span>      -(carlitzAlpha p a + carlitzBeta p a) := by</span>
+<span class="l" id="L87"><span class="n">87</span>    have hneg := congrArg Neg.neg hadd</span>
+<span class="l" id="L88"><span class="n">88</span>    simpa using hneg.symm</span>
+<span class="l" id="L89"><span class="n">89</span>  rw [← Kext_one_eq_paperB] </span>
+<span class="l" id="L90"><span class="n">90</span>  rw [hk]</span>
+<span class="l" id="L91"><span class="n">91</span>  rw [norm_neg]</span>
+<span class="l" id="L92"><span class="n">92</span>  calc</span>
+<span class="l" id="L93"><span class="n">93</span>    ‖carlitzAlpha p a + carlitzBeta p a‖</span>
+<span class="l" id="L94"><span class="n">94</span>        ≤ ‖carlitzAlpha p a‖ + ‖carlitzBeta p a‖ := norm_add_le _ _</span>
+<span class="l" id="L95"><span class="n">95</span>    _ = 2 * Real.sqrt p := by</span>
+<span class="l" id="L96"><span class="n">96</span>      have hsum :</span>
+<span class="l" id="L97"><span class="n">97</span>          ‖carlitzAlpha p a‖ + ‖carlitzBeta p a‖ =</span>
+<span class="l" id="L98"><span class="n">98</span>            Real.sqrt p + Real.sqrt p := by</span>
+<span class="l" id="L99"><span class="n">99</span>        simpa [m] using congrArg₂ (fun x y : ℝ =&gt; x + y) hA hB</span>
+<span class="l" id="L100"><span class="n">100</span>      rw [hsum]</span>
+<span class="l" id="L101"><span class="n">101</span>      ring</span>
+<span class="l" id="L102"><span class="n">102</span></span>
+<span class="l" id="L103"><span class="n">103</span>theorem oneParameterPrimeWeil_two</span>
+<span class="l" id="L104"><span class="n">104</span>    (a : ZMod 2) :</span>
+<span class="l" id="L105"><span class="n">105</span>    ‖kloostermanSumPrime 2 a 1‖ ≤ 2 * Real.sqrt 2 := by</span>
+<span class="l" id="L106"><span class="n">106</span>  unfold kloostermanSumPrime</span>
+<span class="l" id="L107"><span class="n">107</span>  calc</span>
+<span class="l" id="L108"><span class="n">108</span>    ‖∑ x : ZMod 2,</span>
+<span class="l" id="L109"><span class="n">109</span>        if x = 0 then 0 else</span>
+<span class="l" id="L110"><span class="n">110</span>          ZMod.stdAddChar (1 * x + a * x⁻¹)‖</span>
+<span class="l" id="L111"><span class="n">111</span>        ≤ ∑ x : ZMod 2,</span>
+<span class="l" id="L112"><span class="n">112</span>            ‖if x = 0 then (0 : ℂ) else</span>
+<span class="l" id="L113"><span class="n">113</span>              ZMod.stdAddChar (1 * x + a * x⁻¹)‖ := norm_sum_le _ _</span>
+<span class="l" id="L114"><span class="n">114</span>    _ ≤ ∑ _x : ZMod 2, (1 : ℝ) := by</span>
+<span class="l" id="L115"><span class="n">115</span>      apply Finset.sum_le_sum</span>
+<span class="l" id="L116"><span class="n">116</span>      intro x hx</span>
+<span class="l" id="L117"><span class="n">117</span>      by_cases h0 : x = 0</span>
+<span class="l" id="L118"><span class="n">118</span>      · simp [h0]</span>
+<span class="l" id="L119"><span class="n">119</span>      · simp [h0]</span>
+<span class="l" id="L120"><span class="n">120</span>    _ = 2 := by norm_num [ZMod.card]</span>
+<span class="l" id="L121"><span class="n">121</span>    _ ≤ 2 * Real.sqrt 2 := by</span>
+<span class="l" id="L122"><span class="n">122</span>      nlinarith [Real.sq_sqrt (by norm_num : (0 : ℝ) ≤ 2),</span>
+<span class="l" id="L123"><span class="n">123</span>        Real.sqrt_nonneg (2 : ℝ)]</span>
+<span class="l" id="L124"><span class="n">124</span></span>
+<span class="l" id="L125"><span class="n">125</span>/-- Exact Paper-B one-parameter prime Weil socket, now kernel-paid. -/</span>
+<span class="l" id="L126"><span class="n">126</span>theorem OneParameterPrimeWeil_kernel_green :</span>
+<span class="l" id="L127"><span class="n">127</span>    OneParameterPrimeWeil := by</span>
+<span class="l" id="L128"><span class="n">128</span>  intro p hp a ha</span>
+<span class="l" id="L129"><span class="n">129</span>  rcases (show p.Prime from Fact.out).eq_two_or_odd&#x27; with rfl | hpodd</span>
+<span class="l" id="L130"><span class="n">130</span>  · exact oneParameterPrimeWeil_two a</span>
+<span class="l" id="L131"><span class="n">131</span>  · exact oneParameterPrimeWeil_odd p hpodd a ha</span>
+<span class="l" id="L132"><span class="n">132</span></span>
+<span class="l" id="L133"><span class="n">133</span>#print axioms carlitzAlpha_norm_eq_sqrt_prime</span>
+<span class="l" id="L134"><span class="n">134</span>#print axioms carlitzBeta_norm_eq_sqrt_prime</span>
+<span class="l" id="L135"><span class="n">135</span>#print axioms oneParameterPrimeWeil_odd</span>
+<span class="l" id="L136"><span class="n">136</span>#print axioms oneParameterPrimeWeil_two</span>
+<span class="l" id="L137"><span class="n">137</span>#print axioms OneParameterPrimeWeil_kernel_green</span>
+<span class="l" id="L138"><span class="n">138</span></span>
+<span class="l" id="L139"><span class="n">139</span>end PaperB.Stepanov</span></pre></div></body></html>

@@ -1,0 +1,1546 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1.05in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage[nameinlink,noabbrev]{cleveref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\SSer}{\mathfrak S}
+\newcommand{\Mob}{\mathsf M}
+\newcommand{\ZE}{\mathsf Z_E}
+\newcommand{\evE}{\operatorname{ev}_E}
+\newcommand{\1}{\mathbf 1}
+\newcommand{\e}{\mathrm e}
+\newcommand{\ph}{\varphi}
+\newcommand{\Om}{\Omega}
+\newcommand{\Dcal}{\mathcal D}
+\newcommand{\Fcal}{\mathcal F}
+\newcommand{\Kcal}{\mathcal K}
+\newcommand{\Lcal}{\mathcal L}
+\newcommand{\Zmod}{\mathbb Z}
+\newcommand{\eps}{\varepsilon}
+
+\title{An Exact Contraction Dictionary and a Fixed-Modulus Anchored Transfer Theorem for Singular Series}
+\author{Charlie Dorsey}
+\date{September 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Fix a squarefree modulus $q$ and compatible reduced endpoint classes $a,b\pmod q$.  We organize the endpoint-anchored and free connected singular-series coordinates by a common Boolean contraction calculus, identify the completed endpoint coordinate exactly with the free-label connected coordinate, and isolate the anchored-to-free defect as the top two-anchor connected contraction residual.  We then prove, pointwise along compatible heights,
+\[
+A_{1,q}(a,b;h)-B_{1,q}(a,b;h)=o_q(\log h).
+\]
+The fixed-$q$ proof isolates the finite-period changes in the pointwise $q=1$ argument: the low-prime and admissibility data form a fixed periodic decoration, the high-prime Boolean Fourier coefficients have unchanged absolute value, the exterior completion and reciprocal estimates incur only fixed-conductor constants, and the one-dimensional logarithmic main terms cancel before the nonprincipal periodic corrections.  We also record a finite-cutoff arithmetic diagonal-contraction identity for the active high-prime coefficient system.  No rank-uniform conclusion is asserted.
+\end{abstract}
+
+\section{Introduction and scope}\label{sec:intro}
+
+For a finite set $H\subset\Zmod$ and a squarefree integer $q\ge1$, define the $q$-restricted singular series
+\begin{equation}\label{eq:S_q}
+\SSer_q(H)
+=\prod_{p\nmid q}
+\left(1-\frac{\nu_p(H)}p\right)
+\left(1-\frac1p\right)^{-|H|},
+\end{equation}
+where $\nu_p(H)$ is the number of residue classes occupied by $H$ modulo $p$.  As usual, the product is zero when the tuple is inadmissible at an active prime.  Let
+\begin{equation}\label{eq:S_q0}
+\SSer_{q,0}(H)
+=\sum_{J\subseteq H}(-1)^{|H|-|J|}\SSer_q(J)
+\end{equation}
+be its Boolean M\"obius transform.
+
+The purpose of this note is narrow.  First, we give an exact finite dictionary between endpoint completion and free-label connected coordinates.  Second, we prove the fixed-squarefree-$q$ pointwise level-one anchored-to-free transfer theorem.  Third, we record a finite-cutoff arithmetic diagonal-contraction identity for the active high-prime coefficient system.  We do not address an all-orders tail, a growing-rank theorem, or any resummation problem.
+
+At level one, the two quantities compared by the theorem have simple roles.  The sum $A_{1,q}$ measures the connected contribution of one admissible interior point relative to the two fixed endpoints, while $B_{1,q}$ is the sum of the two one-anchor connected boundary contributions.  Their exact formulas appear in \eqref{eq:A1q}--\eqref{eq:B1q}; the theorem proves that their difference is $o_q(\log h)$ for every compatible height progression.
+
+The proof has four stages.  The Boolean contraction identity in \cref{sec:dictionary} first identifies the correct connected coordinate exactly.  The fixed-period reduction in \cref{sec:fixed-period} then isolates the only changes caused by the modulus $q$: a bounded low-period decoration and the deletion of finitely many Euler factors.  The analytic work is concentrated in two places: the Boolean small box, where the companion $q=1$ argument imports Shiu's short-interval estimate, and the exterior, where weighted completion, reciprocity, and Karatsuba's trigonometric-sum estimate are used.  The remaining one-dimensional terms are matched by a fixed-conductor P\'etermann estimate.  Each imported result is stated below with the specific estimate and hypotheses used; the complete $q=1$ derivations are carried by the companion manuscript \cite{DorseyPointwise2026} rather than repeated here.
+
+Fixed physical anchors and the conditional fixed-gap Poisson factor have established antecedents in the consecutive-prime literature \cite{GoldstonLedoan2011,LOS}; congruence-restricted singular-series sums likewise have substantial prior art \cite{Kuperberg2025}.  So do Boolean M\"obius inversion and generic connected/cumulant language.  No novelty claim for those ingredients is made here.  The priority posture of the present theorem is stated separately in \cref{sec:priority}; mathematical statements below do not depend on that posture.
+
+\section{The connected contraction dictionary}\label{sec:dictionary}
+
+Fix the endpoint set
+\[
+E=\{0,h\}.
+\]
+Let $T$ be any finite set of free labels disjoint from $E$.  For $A\subseteq E$ and $U\subseteq T$, put
+\[
+f_q(A,U)=\SSer_q(A\cup U).
+\]
+Define partial Boolean M\"obius operators
+\begin{align}
+(\Mob_E f)(A,U)
+&=\sum_{B\subseteq A}(-1)^{|A|-|B|}f(B,U),\label{eq:ME}\\
+(\Mob_T f)(A,U)
+&=\sum_{V\subseteq U}(-1)^{|U|-|V|}f(A,V).\label{eq:MT}
+\end{align}
+They commute, and
+\[
+(\Mob_E\Mob_Tf_q)(A,U)=\SSer_{q,0}(A\cup U).
+\]
+Let endpoint-fiber contraction be
+\[
+(\ZE g)(U)=\sum_{A\subseteq E}g(A,U),
+\]
+and let $\evE$ denote evaluation at the full endpoint set $A=E$.
+
+\begin{proposition}[Endpoint contraction identity]\label{prop:endpoint-contraction}
+For every $q$, every endpoint pair $E$, and every finite free set $T$,
+\begin{equation}\label{eq:commuting-identity}
+\boxed{\ZE\Mob_E\Mob_T=\Mob_T\evE.}
+\end{equation}
+Equivalently,
+\begin{equation}\label{eq:F_E}
+\Fcal_{E,q}(T)
+:=\sum_{A\subseteq E}\SSer_{q,0}(A\cup T)
+=\Mob_T[\SSer_q(E\cup\cdot)](T).
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+For fixed $U\subseteq T$,
+\[
+\sum_{A\subseteq E}\sum_{B\subseteq A}
+(-1)^{|A|-|B|}f_q(B,U)
+=f_q(E,U),
+\]
+which is the Boolean zeta--M\"obius identity on the endpoint fiber.  Since $\Mob_E$ and $\Mob_T$ commute, \eqref{eq:commuting-identity} follows.
+\end{proof}
+
+Assume $\SSer_q(E)>0$ and define
+\begin{equation}\label{eq:Rq}
+R_q(U)=\frac{\SSer_q(E\cup U)}{\SSer_q(E)},
+\qquad
+R_q^\circ(T)=\sum_{V\subseteq T}(-1)^{|T|-|V|}R_q(V).
+\end{equation}
+Then \cref{prop:endpoint-contraction} gives the pointwise identity
+\begin{equation}\label{eq:F-Rcirc}
+\boxed{\Fcal_{E,q}(T)=\SSer_q(E)R_q^\circ(T).}
+\end{equation}
+If $I$ is a finite interior set and
+\[
+C_{k,q}^{\mathrm{comp}}
+=\sum_{\substack{T\subseteq I\\|T|=k}}\Fcal_{E,q}(T),
+\qquad
+A_{k,q}^{\circ}
+=\sum_{\substack{T\subseteq I\\|T|=k}}R_q^\circ(T),
+\]
+then
+\begin{equation}\label{eq:C-A-dictionary}
+\boxed{C_{k,q}^{\mathrm{comp}}=\SSer_q(E)A_{k,q}^{\circ}.}
+\end{equation}
+At $q=1$ this is the exact normalization dictionary between the completed endpoint coordinate and the anchored free-label connected coordinate.
+
+\subsection{Anchor subtraction}
+
+Write
+\[
+c_q(A,T)=\SSer_{q,0}(A\cup T),
+\]
+and define the lower-anchor sum and the top-anchor sector by
+\begin{align}
+b_q(T)&=c_q(\varnothing,T)+c_q(\{0\},T)+c_q(\{h\},T),\label{eq:bq}\\
+g_q(T)&=c_q(E,T)=\SSer_{q,0}(E\cup T).\label{eq:gq}
+\end{align}
+Then $\Fcal_{E,q}(T)=b_q(T)+g_q(T)$.  Since singleton singular series are one,
+\[
+\SSer_{q,0}(E)=\SSer_q(E)-1.
+\]
+Combining this with \eqref{eq:F-Rcirc} gives the exact residual identity
+\begin{equation}\label{eq:anchor-residual}
+\boxed{
+R_q^\circ(T)-b_q(T)
+=\frac{g_q(T)-\SSer_{q,0}(E)b_q(T)}{\SSer_q(E)}.
+}
+\end{equation}
+Thus the anchored-to-free transfer defect is the normalized failure of the top two-anchor connected sector to contract onto the lower anchor sectors.
+
+\subsection{The same transform at one prime}
+
+At one active prime, write
+\[
+L_p(H)=\mathbf E_z\prod_{x\in H}\phi_z(x),
+\]
+where $\phi_z(x)$ is the normalized local avoidance factor.  If a coordinate value is repeated, $H$ is read as a labeled multiset and the product is over coordinate occurrences.  Boolean connectedization gives
+\begin{equation}\label{eq:local-connected}
+\sum_{J\subseteq H}(-1)^{|H|-|J|}L_p(J)
+=\mathbf E_z\prod_{x\in H}(\phi_z(x)-1).
+\end{equation}
+This is the local-prime image of the same connected transform: every free Fourier frequency is forced away from zero after connectedization.
+
+\section{Fixed squarefree modulus and the level-one theorem}\label{sec:fixed-q-setup}
+
+Fix squarefree $q\ge1$ and endpoint classes
+\[
+a,b\in(\Zmod/q\Zmod)^\times,
+\qquad h\equiv b-a\pmod q.
+\]
+Assume the endpoint pair is $q$-restricted admissible,
+\[
+\SSer_q(E)>0,
+\qquad E=\{0,h\}.
+\]
+Every legal height is even: if $2\nmid q$, admissibility at the active prime $2$ forces $h$ even; if $2\mid q$, the unit classes $a,b$ are both odd and hence their difference is even modulo $2$, so $h\equiv b-a\equiv0\pmod2$.
+
+Define the admissible interior and its exact size by
+\begin{equation}\label{eq:IqNq}
+I_q(a;h)=\{0<t<h:(a+t,q)=1\},
+\qquad N_q(a;h)=|I_q(a;h)|.
+\end{equation}
+The level-one connected and lower-anchor sums are
+\begin{align}
+A_{1,q}(a,b;h)
+&=\sum_{t\in I_q(a;h)}R_q^\circ(\{t\})\notag\\
+&=\sum_{t\in I_q(a;h)}
+\left(
+\frac{\SSer_q(\{0,t,h\})}{\SSer_q(\{0,h\})}-1
+\right),\label{eq:A1q}\\
+B_{1,q}(a,b;h)
+&=\sum_{t\in I_q(a;h)}b_q(\{t\})\notag\\
+&=\sum_{t\in I_q(a;h)}
+\left[\SSer_{q,0}(\{t\})
++\SSer_{q,0}(\{0,t\})
++\SSer_{q,0}(\{h,t\})\right].\label{eq:B1q}
+\end{align}
+Since $\SSer_{q,0}(\{t\})=0$,
+\begin{equation}\label{eq:B1q-simple}
+B_{1,q}
+=\sum_{t\in I_q(a;h)}(\SSer_q(\{0,t\})-1)
++\sum_{t\in I_q(a;h)}(\SSer_q(\{h,t\})-1).
+\end{equation}
+By \eqref{eq:anchor-residual},
+\begin{equation}\label{eq:AminusB-connected}
+A_{1,q}-B_{1,q}
+=\frac1{\SSer_q(E)}
+\sum_{t\in I_q(a;h)}
+\left[g_q(\{t\})-\SSer_{q,0}(E)b_q(\{t\})\right].
+\end{equation}
+
+\begin{theorem}[Fixed-squarefree-$q$ pointwise level-one transfer]\label{thm:fixed-q}
+For every fixed squarefree $q$, uniformly over the finitely many compatible admissible endpoint residue pairs $(a,b)$,
+\begin{equation}\label{eq:main-theorem}
+\boxed{A_{1,q}(a,b;h)-B_{1,q}(a,b;h)=o_q(\log h)}
+\end{equation}
+as $h\to\infty$ through positive compatible heights.
+\end{theorem}
+
+There is no density-one restriction in $h$.
+
+\subsection{Exact density normalization}
+
+The admissible count is exactly periodic.
+
+\begin{lemma}[Exact periodic count]\label{lem:Nq}
+For each compatible pair $(a,b)$,
+\begin{equation}\label{eq:Nq-periodic}
+\boxed{N_q(a;h)=\frac{\ph(q)}q h+\eps_q(a,b),}
+\end{equation}
+where $\eps_q(a,b)$ depends only on the fixed compatible residue data, not on the positive representative of the gap class.
+\end{lemma}
+
+\begin{proof}
+If $h$ is increased by $q$ while preserving its residue class, the interval gains one complete period of $q$ translates and hence exactly $\ph(q)$ admissible interior positions.  Therefore $N_q(a;h)-\ph(q)h/q$ is constant on each compatible height progression.
+\end{proof}
+
+For the completed Lemke Oliver--Soundararajan normalization, the fixed-modulus density parameter is
+\begin{equation}\label{eq:deltaq}
+\delta_q(x)=\frac{q}{\ph(q)\log x}.
+\end{equation}
+Consequently
+\[
+\delta_q(x)\frac{\ph(q)}q=\frac1{\log x}.
+\]
+The $q/\ph(q)$ factor belongs to the ambient admissible-point density; it does not appear as an additional multiplier inside the transfer kernel \eqref{eq:main-theorem}.  We use $\Delta\mu_0$ only as notation for the completed level-one coefficient per admissible interior site,
+\[
+\Delta\mu_0:=\frac{C_{1,q}^{\mathrm{comp}}}{N_q(a;h)}.
+\]
+Thus \eqref{eq:F-Rcirc} gives at level one
+\begin{equation}\label{eq:LOS-level-one}
+C_{1,q}^{\mathrm{comp}}=\SSer_q(E)A_{1,q},
+\qquad
+\Delta\mu_0=\frac{\SSer_q(E)}{N_q(a;h)}A_{1,q}.
+\end{equation}
+
+\section{Exact fixed-period reduction}\label{sec:fixed-period}
+
+The pointwise $q=1$ proof is carried by the companion estimate
+\begin{equation}\label{eq:q1-input}
+\sum_{0<t<h}\left(
+\frac{\SSer(\{0,t,h\})}{\SSer(\{0,h\})}-1
+\right)
+-2\sum_{0<t<h}(\SSer(\{0,t\})-1)
+=o(\log h)
+\end{equation}
+for even $h$.  We now isolate every change caused by fixed $q$ before invoking its analytic bounds.
+
+Put
+\[
+\Lambda_q=\operatorname{lcm}(6,q),
+\qquad
+\operatorname{rad}_{\ge5}(n):=\prod_{\substack{p\mid n\\p\ge5}}p.
+\]
+We write $\e(t):=\exp(2\pi i t)$ and, for an integer modulus $M\ge1$,
+$\e_M(x):=\e(x/M)$.  For the anchored ratio, collect all admissibility and active low-prime data into the bounded $\Lambda_q$-periodic weight
+\begin{equation}\label{eq:lambdaq}
+\lambda_{q,a,h}(y)
+=\1_{(a+y,q)=1}
+\prod_{\substack{p\in\{2,3\}\\p\nmid q}}
+\frac{L_p(\{0,y,h\})}{L_p(\{0,h\})}.
+\end{equation}
+All remaining divisor variables are supported on primes $p\ge5$ with $p\nmid q$.
+
+For $p\ge5$ set
+\begin{equation}\label{eq:c0c1}
+c_0(p)=\frac{p(p-3)}{(p-1)(p-2)},
+\qquad
+c_1(p)=\frac{p(p-2)}{(p-1)^2}.
+\end{equation}
+Define squarefree coefficient systems
+\begin{align}
+\omega_q(e)
+&=\mu^2(e)\1_{(e,6q)=1}\prod_{p\mid e}\frac1{p-3},\label{eq:omegaq}\\
+\eta_q(e)
+&=\mu^2(e)\1_{(e,6q)=1}\prod_{p\mid e}\frac1{p-2},\label{eq:etaq}\\
+v_{q,h}(e)
+&=\mu^2(e)\1_{(e,6q)=1}
+\prod_{\substack{p\mid e\\p\nmid h}}\frac1{p-3}
+\prod_{\substack{p\mid e\\p\mid h}}\frac1{p-2},\label{eq:vqh}\\
+C_q^*(h)
+&=\prod_{\substack{p\ge5\\p\nmid qh}}c_0(p)
+\prod_{\substack{p\ge5\\p\nmid q,\ p\mid h}}c_1(p).\label{eq:Cqstar}
+\end{align}
+For coprime high divisors, put
+\begin{align}
+N_{q,a}(h;e_1,e_2)
+&=\sum_{\substack{0<y<h\\e_1\mid y,\ e_2\mid h-y}}
+\lambda_{q,a,h}(y),\label{eq:Nqea}\\
+\Delta_{q,a}(h;e_1,e_2)
+&=N_{q,a}(h;e_1,e_2)-\frac{N_q(a;h)}{e_1e_2}.\label{eq:Deltaqea}
+\end{align}
+
+\begin{proposition}[Exact divisor expansion]\label{prop:divisor-expansion}
+The anchored level-one sum admits the exact identity
+\begin{equation}\label{eq:Tq-expansion}
+\boxed{
+A_{1,q}(a,b;h)
+=C_q^*(h)
+\sum_{\substack{e_1,e_2\ge1\\(e_1,e_2)=1,\ (e_2,h)=1}}
+v_{q,h}(e_1)\omega_q(e_2)
+\Delta_{q,a}(h;e_1,e_2).
+}
+\end{equation}
+Every divisor on the right is supported on primes $p\ge5$ with $p\nmid q$.
+\end{proposition}
+
+\begin{proof}
+Expand the active high-prime local ratio prime by prime.  Keep the fixed low-prime and admissibility factor \eqref{eq:lambdaq} unexpanded.  At each active high prime, the formal baseline together with its permitted selector or selectors sums to one.  Primes dividing $q$ occur in neither local singular-series factor nor the high divisor systems.  Thus insertion of the exact baseline $N_q(a;h)/(e_1e_2)$ reconstructs the literal subtraction $-N_q(a;h)$ in \eqref{eq:A1q}; no asymptotic density replacement is used.
+\end{proof}
+
+\subsection{Rowwise normalization}\label{sec:row-contract}
+The two-dimensional estimates are applied row by row, and the actual row
+height must remain visible.  We write $H$ for the parity-reduced kernel
+height: $H=h/2$ on an ordinary row and $H=h/(2d)$ on a row carrying a
+deterministic high divisor $d\mid h$.  Every progression root and oscillatory
+phase in that row uses this $H$.  Let
+$R\mid\operatorname{rad}_{\ge5}(h)$ be the squarefree product of additional
+forbidden high height primes inherited from the row reduction, kept separate
+from the fixed modulus $q$; active fixed-product moduli satisfy $(m,HqR)=1$.
+
+For one exact low-period row, let $\lambda$ be its bounded periodic weight,
+with period dividing $\Lambda_q$, and define
+\begin{align}
+N_\lambda(H)&=\sum_{0<y<H}\lambda(y),\label{eq:Nlambda}\\
+D_\lambda(e_1,e_2;H)
+&=\sum_{\substack{0<y<H\\e_1\mid y,\ e_2\mid H-y}}\lambda(y)
+ -\frac{N_\lambda(H)}{e_1e_2}.\label{eq:Dlambda}
+\end{align}
+
+\begin{lemma}[Exact fixed-$q$ row reduction]\label{lem:fixed-q-row-reduction}
+For a row of \eqref{eq:Tq-expansion}, write
+\[
+d=(e_1,h),\qquad r=e_1/d.
+\]
+Thus $d$ is either $1$ or a squarefree divisor of
+$\operatorname{rad}_{\ge5}(h)$ supported away from $q$, and put
+\[
+h_d=\frac hd=2H_d,
+\qquad
+ a_d\equiv d^{-1}a\pmod q,
+\]
+and define the reduced low-period weight
+\begin{equation}\label{eq:reduced-low-weight-q}
+\lambda^{[d]}_{q,a,h}(z):=\lambda_{q,a_d,h_d}(2z).
+\end{equation}
+For every such row one has the exact identity
+\begin{equation}\label{eq:fixed-q-row-reduction}
+\boxed{
+\Delta_{q,a}(h;dr,e_2)
+=D_{\lambda^{[d]}_{q,a,h}}(r,e_2;H_d)
++\frac{\delta^{\rm per}_{q,a,h}(d)}{r e_2},
+}
+\end{equation}
+where
+\begin{equation}\label{eq:periodic-density-delta-q}
+\delta^{\rm per}_{q,a,h}(d)
+:=N_{\lambda^{[d]}_{q,a,h}}(H_d)-\frac{N_q(a;h)}d
+=O_q(1)
+\end{equation}
+uniformly in the permitted $d$ and compatible heights.  Consequently the
+periodic-density term in \eqref{eq:fixed-q-row-reduction} contributes
+$O_q(1)$ on the ordinary two-dimensional family and
+$O_q(\log\log h)$ after the outer decorated-row sum.
+\end{lemma}
+
+\begin{proof}
+Write $y=dz$.  Since every prime of $d$ is at least $5$ and $d$ is a unit
+modulo $6q$, multiplication by $d$ preserves the active $2,3$ local ratio and
+sends the admissibility condition to $(a_d+z,q)=1$.  Hence, literally,
+\[
+\lambda_{q,a,h}(dz)=\lambda_{q,a_d,h_d}(z).
+\]
+The legal height $h_d$ is even.  If $2\nmid q$, its active $p=2$ factor kills
+odd $z$; if $2\mid q$, the unit residue $a_d$ is odd and the admissibility
+indicator does the same.  Thus $z=2x$ and, because $r,e_2$ are odd,
+\[
+\sum_{\substack{0<y<h\\dr\mid y,\ e_2\mid h-y}}
+\lambda_{q,a,h}(y)
+=
+\sum_{\substack{0<x<H_d\\r\mid x,\ e_2\mid H_d-x}}
+\lambda^{[d]}_{q,a,h}(x).
+\]
+Subtracting $N_q(a;h)/(dr e_2)$ on the left and
+$N_{\lambda^{[d]}_{q,a,h}}(H_d)/(r e_2)$ on the right proves
+\eqref{eq:fixed-q-row-reduction}.
+
+For the bound, one complete $\Lambda_q$-period of
+$z\mapsto\lambda_{q,a_d,h_d}(2z)$ has mean $2\ph(q)/q$: the admissibility
+indicator contributes $\ph(q)/q$, and each active low-prime local ratio has
+complete-period mean one before the parity compression.  Hence
+\[
+N_{\lambda^{[d]}_{q,a,h}}(H_d)
+=\frac{\ph(q)}q h_d+O_q(1).
+\]
+By \eqref{eq:Nq-periodic},
+$N_q(a;h)/d=(\ph(q)/q)h_d+O_q(1)$, proving
+\eqref{eq:periodic-density-delta-q}.  For a fixed product $m=r e_2$, the
+correction is independent of its Boolean partition and therefore costs at
+most a constant multiple of
+\[
+\sum_m \omega_q(m)\frac{2^{\Om(m)}}m<\infty.
+\]
+On decorated rows the remaining outer factor is bounded by
+\[
+\sum_{d\mid \operatorname{rad}_{\ge5}(h),\ (d,q)=1}v_{q,h}(d)
+=\prod_{\substack{p\mid h\\p\ge5,\ p\nmid q}}
+\left(1+\frac1{p-2}\right)
+\ll_q\log\log h.
+\]
+This gives the stated correction ledger.
+\end{proof}
+
+For squarefree $m$ put
+\begin{equation}\label{eq:Dcal-row}
+\boxed{
+\Dcal_{m,q}^{(\lambda)}(H)
+=2^{-\Om(m)}\sum_{e_1e_2=m}D_\lambda(e_1,e_2;H).
+}
+\end{equation}
+There are only $O_q(1)$ low rows, and all estimates below are uniform over
+that finite family, so the superscript $(\lambda)$ may be suppressed after
+this declaration.  Deleting the improper endpoint partitions contributes a
+separate endpoint correction and is not part of the definition
+\eqref{eq:Dcal-row}.  The high-prime weight used with this object is always
+$\omega_q$ from \eqref{eq:omegaq}.
+
+\subsection{Boolean fixed-product fibers}
+
+Let $m=e_1e_2$ be squarefree, coprime to $\Lambda_q$, and let $u\bmod m$ be the CRT idempotent selecting the ordered partition $(e_1,e_2)$.  For a fixed low residue $c\bmod\Lambda_q$, the combined progression root is the unique class $t_{u,c}\bmod \Lambda_qm$ satisfying
+\begin{equation}\label{eq:crt-root}
+t_{u,c}\equiv Hu\pmod m,
+\qquad
+t_{u,c}\equiv c\pmod{\Lambda_q},
+\end{equation}
+where $H$ denotes the current reduced kernel height.  Write $\bar\Lambda$ for the inverse of $\Lambda_q\pmod m$ and $\bar m$ for the inverse of $m\pmod{\Lambda_q}$, and define
+\[
+W(t;m)=\frac1{2^{\Om(m)}}
+\sum_{u^2\equiv u\ (m)}\e\!\left(\frac{tu}{m}\right).
+\]
+CRT gives the exact factorization
+\begin{equation}\label{eq:fixed-q-fourier-factorization}
+\boxed{
+\frac1{2^{\Om(m)}}
+\sum_{u^2\equiv u\ (m)}
+\e\!\left(\frac{jt_{u,c}}{\Lambda_qm}\right)
+=\e\!\left(\frac{jc\bar m}{\Lambda_q}\right)
+W(jH\bar\Lambda;m).
+}
+\end{equation}
+Hence
+\begin{equation}\label{eq:absolute-fourier}
+\left|
+\frac1{2^{\Om(m)}}
+\sum_u\e\!\left(\frac{jt_{u,c}}{\Lambda_qm}\right)
+\right|
+=|W(jH\bar\Lambda;m)|.
+\end{equation}
+The low residue contributes only a unit phase and multiplication by $\bar\Lambda$ permutes the high unit classes.
+
+Passing from idempotents to sign roots $x=2u-1$, define
+\[
+V(t;m)=\frac1{2^{\Om(m)}}
+\sum_{x^2\equiv1\ (m)}\e\!\left(\frac{tx}{m}\right).
+\]
+The complete-unit second moment from the $q=1$ proof therefore survives unchanged:
+\begin{equation}\label{eq:second-moment}
+\frac1{\ph(s)}
+\sum_{x\in(\Zmod/s\Zmod)^\times}|V(Hjx;s)|^2
+=\prod_{\substack{p\mid s\\p\nmid j}}
+\frac{p-2}{2(p-1)}.
+\end{equation}
+This is the key fixed-period observation: fixed $q$ changes the phases, but not the absolute Boolean Fourier coefficients seen by the small box.
+
+\section{Fixed-modulus analytic estimates}\label{sec:analytic-port}
+
+The exact divisor expansion has now reduced the theorem to three analytic estimates.  The small box must retain the Boolean gain that makes its logarithmic exponent strictly less than one; the exterior must preserve the weighted-completion and reciprocal savings after the fixed conductor is adjoined; and the one-dimensional rows must have matching logarithmic main terms.  The complete $q=1$ arguments are proved in the companion manuscript \cite{DorseyPointwise2026}.  Here we state the precise fixed-$q$ changes needed to reuse those arguments.  Throughout, $q$ is fixed, so implicit constants may depend on it.
+
+\subsection{The Boolean small box}
+
+The $q=1$ proof splits a squarefree fixed product $m=sr$ into a smooth part and a rough part, applies Shiu's short-interval Brun--Titchmarsh theorem for nonnegative multiplicative functions \cite[Chapter~3, Theorem~1]{ShiuThesis1980} to the rough factor in a reduced class modulo $s$, and combines \eqref{eq:second-moment} with weighted Cauchy.  In the range used here, Shiu supplies an upper bound for a nonnegative multiplicative function on a dyadic interval in one reduced class modulo $s$, with $s<y^{3/4}$ and interval length $y>x^{1/4}$; the moving rough functions have uniformly bounded prime values and vanish on higher prime powers.  Those are the only features of the theorem used below.
+
+The fixed period $\Lambda_q$ does not enlarge the moving Shiu modulus.  To see this explicitly, expand the bounded periodic weight $\lambda$ by the finitely many residue classes $c\pmod{\Lambda_q}$.  For a dyadic product block $m\asymp M$, write uniquely $m=sr$, with every prime of $s$ at most
+\[
+Y=\exp((\log M)^{0.99})
+\]
+and every prime of $r$ larger than $Y$.  On the good range $s\le M^{0.01}$, \eqref{eq:fixed-q-fourier-factorization} and multiplicativity of the Boolean transform give
+\begin{equation}\label{eq:fixed-q-shiu-factor}
+|W(jH\bar\Lambda;sr)|^2
+=|W(jH\bar\Lambda\bar r;s)|^2
+ |W(jH\bar\Lambda\bar s;r)|^2
+\le |W(jH\bar\Lambda\bar r;s)|^2.
+\end{equation}
+Grouping the rough factor by its reduced residue class $r\pmod s$ therefore produces exactly the same progression problem modulo $s$ as in the companion Shiu calculation: multiplication by the fixed unit $\bar\Lambda$ merely permutes those classes.  The residue $c\pmod{\Lambda_q}$ contributes only the unit phase in \eqref{eq:fixed-q-fourier-factorization}, and there are $O_q(1)$ such residues.  Thus the rough-factor estimate, the complete-unit second moment \eqref{eq:second-moment}, and the weighted-Cauchy exponent are unchanged.  Deleting the finitely many primes dividing $q$ only removes nonnegative terms from the Shiu majorants.
+
+The only additional counting error comes from replacing the exact weighted root count in \eqref{eq:Dlambda} by its complete-period mean.  For each fixed product and low residue this endpoint error is $O_q(1)$; after the Boolean weights are summed it contributes
+\[
+O_q(1)+O_q(\log Z),
+\]
+as recorded in \eqref{eq:periodic-defect-cost}.  This is $o(\log h)$ at the chosen scale.  We may therefore import the companion small-box exponent without any hidden moving-modulus cost.
+
+With the same parameter choices
+\[
+\sigma=\frac23+0.01,
+\qquad
+\log Z=4(\log h)^\sigma(1+o(1)),
+\]
+the fixed-$q$ small-box bound is, for a fixed exponent $K_q$,
+\begin{equation}\label{eq:fixed-q-smallbox}
+\sum_{\substack{1<m\le Z\\(m,HqR)=1}}
+\omega_q(m)2^{\Om(m)}|\Dcal_{m,q}(H)|
+\ll_q
+(\log\log Z)^{K_q}(\log Z)^{2\sqrt{0.505}}
++O_q(\log Z),
+\end{equation}
+where $\Dcal_{m,q}$ is the corresponding centered Boolean discrepancy.  Since
+\begin{equation}\label{eq:exponent}
+\sigma\,2\sqrt{0.505}
+=0.9617240306403449\ldots<1,
+\end{equation}
+the centered fixed-$q$ small box is $o_q(\log h)$ pointwise.
+
+The exact use of $N_q(a;h)$ instead of its mean is the correction isolated in
+\cref{lem:fixed-q-row-reduction}; together with the endpoint deletion it costs only
+\begin{equation}\label{eq:periodic-defect-cost}
+O_q(1)+O_q(\log Z)=o(\log h),
+\end{equation}
+because the fixed-product endpoint defect is $O_q(1)$ and
+\[
+\sum_m\omega_q(m)\frac{2^{\Om(m)}}m<\infty.
+\]
+
+\subsection{Exterior completion and reciprocity}
+
+For each low class $c\bmod\Lambda_q$, the extra factor
+\[
+\e_{\Lambda_q}(jc\bar m)
+\]
+is a fixed-conductor periodic function of the high modulus.  On the unit classes modulo $\Lambda_q$ it decomposes into finitely many fixed character/additive-frequency components.
+
+The weighted-completion input uses a unit-preserving squarefree-removal split.
+The divisor $d$ comes from the companion coefficient $\gamma(d)$, so $d$ is
+squarefree and $(d,6)=1$; the active support further gives $(d,qR)=1$.  Under
+precisely these conditions,
+\begin{equation}\label{eq:fixed-q-squarefree-removal}
+\boxed{
+ \mu^2(dn)\1_{(dn,6R)=1}\1_{(dn,q)=1}
+ =\1_{(n,6q)=1}\mu^2(n)\1_{(n,dR)=1}
+}\qquad
+\bigl[d\ \text{squarefree},\ (d,6qR)=1\bigr].
+\end{equation}
+Only the high-prime factor $dR$ is expanded by inclusion--exclusion:
+\[
+ \1_{(n,6q)=1}\mu^2(n)\1_{(n,dR)=1}
+ =\1_{(n,6q)=1}
+ \left(\sum_{\substack{c\mid dR\\c\mid n}}\mu(c)\right)
+ \left(\sum_{\substack{f^2\mid n\\(f,dR)=1}}\mu(f)\right).
+\]
+After writing $n=cf^2\ell$, every nonzero channel therefore has
+\[
+ c\mid dR,\qquad (f,dR)=1,\qquad
+ (f,6q)=1,\qquad(\ell,6q)=1.
+\]
+In particular $d,c,f,\ell$ are units modulo $\Lambda_q$ wherever an inverse
+modulo $\Lambda_q$ is evaluated.  If a moving reciprocal modulus is present,
+its unit restriction is retained as a separate outside indicator through the
+same split; it likewise forces every factor that is inverted modulo that moving
+modulus to be a unit.  No inclusion--exclusion channel containing a factor $2$
+or $3$ is ever asked to carry a $\Lambda_q$-reciprocal phase.
+
+The next statement makes the fixed-conductor completion step explicit without
+suppressing the zero Fourier mode of the reciprocal phase.  Let
+$\Lambda=\Lambda_q$, let $r$ be a squarefree high modulus with
+$(r,\Lambda)=1$, and let $I\subset(U,2U]$ be an interval.  For fixed integers
+$A,B$ set
+\begin{equation}\label{eq:fixed-conductor-sigma}
+\Sigma_{r,\Lambda}^{B}(I;A,R)
+=\sum_{\substack{\ell\in I\\(\ell,rR)=1}}
+ \omega_q(\ell)\,
+ \e_r(A\bar\ell)\,
+ \e_{\Lambda}(B\bar\ell).
+\end{equation}
+The support of $\omega_q$ already forces $(\ell,\Lambda)=1$.
+
+\begin{lemma}[Centered fixed-conductor weighted completion]\label{lem:fixed-conductor-completion}
+Put
+\[
+Q=r\Lambda,
+\qquad C=A\Lambda+Br,
+\qquad \rho=\frac{Q}{(C,Q)},
+\qquad
+\mathfrak m_Q(C)=\frac{\mu(\rho)}{\ph(\rho)},
+\]
+and
+\[
+M_{r,R}(I)=\sum_{\substack{\ell\in I\\(\ell,rR)=1}}\omega_q(\ell).
+\]
+Then
+\begin{equation}\label{eq:combined-reciprocal-phase}
+\e_r(A\bar\ell)\e_{\Lambda}(B\bar\ell)
+=\e_Q(C\bar\ell)
+\end{equation}
+for every supported $\ell$, and
+\begin{equation}\label{eq:fixed-conductor-completion}
+\boxed{
+\Sigma_{r,\Lambda}^{B}(I;A,R)
+=\mathfrak m_Q(C)M_{r,R}(I)
++O_q\!\left(
+\mathcal E(R)2^{\Om(r)/2}\rho^{1/4}U^{-1/2}(\log 2r)^{1/2}
+\right),
+}
+\end{equation}
+where
+\[
+\mathcal E(R)=\prod_{p\mid R}(1+p^{-1/2}),
+\qquad M_{r,R}(I)\ll_q1.
+\]
+The implied constant is uniform in the endpoints of $I$.  Since $Q$ is
+squarefree, the displayed main coefficient is the exact normalized Ramanujan
+mean of the reciprocal phase.  Full resonance is exactly
+\begin{equation}\label{eq:fixed-conductor-resonance}
+\rho=1
+\Longleftrightarrow
+r\mid A\ \text{and}\ \Lambda\mid B.
+\end{equation}
+In particular, $\rho>1$ does not by itself imply decay: the Ramanujan-mean
+term in \eqref{eq:fixed-conductor-completion} must first be removed or summed.
+\end{lemma}
+
+\begin{proof}
+Because $(r,\Lambda)=1$, CRT gives
+\eqref{eq:combined-reciprocal-phase}.  The phase on the unit group modulo $Q$
+has complete mean
+\[
+\frac1{\ph(Q)}\sum_{x\bmod Q}^{*}\e_Q(C\bar x)
+=\frac{c_Q(C)}{\ph(Q)}
+=\frac{\mu(\rho)}{\ph(\rho)}.
+\]
+Subtract this constant before completing an interval.  The centered periodic
+function has zero sum on every complete $Q$-period, so only one incomplete
+period remains.  Inclusion--exclusion over the resonant prime factors and
+completion of that remainder on the reduced modulus $\rho$ give the same
+squarefree Kloosterman bound as in the companion argument, now with the zero
+Fourier mode absent.  Apply the unit-preserving split
+\eqref{eq:fixed-q-squarefree-removal}: only divisors of the high-prime factor
+$dR$ enter the $c$-sum, while $\1_{(n,6q)=1}$ stays outside the split.  Thus the
+inner $\ell$-sum is always over units modulo $\Lambda$, and $c$ and $f$ are
+units modulo $\Lambda$ as well.  Any moving reciprocal unit condition is kept
+outside in the same way.  The centered incomplete Kloosterman estimate and the
+finite $f$-balance are therefore exactly the companion estimates on each legal
+unit channel, with at most an $O_q(1)$ fixed-period factor; this gives the error
+term in \eqref{eq:fixed-conductor-completion}.  The untwisted dyadic mass
+satisfies $M_{r,R}(I)\ll_q1$ by the elementary logarithmic mean for $\omega_q$,
+and restrictions only delete nonnegative terms.  Finally, reducing
+$C=A\Lambda+Br$ modulo $r$ and modulo $\Lambda$ proves
+\eqref{eq:fixed-conductor-resonance}.
+\end{proof}
+
+Thus this fixed-$q$ port uses the companion squarefree-removal and finite
+$f$-split architecture only after the reciprocal phase has been centered; it
+does not invoke an arbitrary-interval estimate for the uncentered phase.
+
+We use here exactly the companion exterior parameters
+\[
+L=\log h,
+\qquad \sigma=\frac23+0.01,
+\qquad K=L^{10},
+\qquad W=\exp(L^\sigma),
+\]
+\[
+T_{\rm comp}=\exp(L^{0.60}),
+\qquad X=T_{\rm comp}^{3}W^2.
+\]
+We now record the mean-term ledger that is used in the exterior.  Write
+\[
+r_A=\frac r{(A,r)},
+\qquad
+\rho_\Lambda=\frac{\Lambda}{(B,\Lambda)}.
+\]
+Then $\rho=r_A\rho_\Lambda$ and hence
+\begin{equation}\label{eq:fixed-conductor-mean-bound}
+|\mathfrak m_Q(C)|\ll_q\frac1{\ph(r_A)}.
+\end{equation}
+In every actual nonzero Vaaler completion channel, the unit scalings introduced
+by squarefree removal do not change the gcd with the moving modulus, and the
+moving numerator is $jH$ times such a unit.  Since active moving moduli are
+coprime to $H$ and $1\le |j|\le K$, one has
+\[
+r_A=\frac r{(r,j)}.
+\]
+For $Y\ge K$, Rankin's trick at exponent $1/2$ gives, uniformly in
+$1\le|j|\le K$,
+\begin{align}
+\sum_{r>Y}\frac{\omega_q(r)}{\ph(r/(r,j))}
+&\ll_q
+Y^{-1/2}
+\sum_{d\mid\operatorname{rad}(j)}\omega_q(d)d^{1/2}\notag\\
+&\ll_q
+Y^{-1/2}
+\prod_{\substack{p\mid j\\p\ge5,\ p\nmid q}}
+\left(1+\frac{\sqrt p}{p-3}\right)
+=Y^{-1/2}K^{o(1)}.
+\label{eq:ramanujan-mean-tail}
+\end{align}
+Indeed, after $r=ds$ with $d=(r,j)$, the remaining tail is bounded by
+\[
+\sum_{s>Y/d}\frac{\omega_q(s)}{\ph(s)}
+\le
+\left(\frac dY\right)^{1/2}
+\prod_{\substack{p\ge5\\p\nmid q}}
+\left(1+\frac{\sqrt p}{(p-3)(p-1)}\right).
+\]
+The Euler product is convergent.  Since the other high-modulus mass up to
+$h^2$ is $O_q(L)$, the main Vaaler frequencies have total $\ell^1$ mass
+$O(\log K)$, and the fixed-period expansion has $O_q(1)$ terms, the aggregate
+Ramanujan means from all moving moduli $r>K$ contribute
+\begin{equation}\label{eq:ramanujan-mean-global}
+O_q\!\left(L\log K\,K^{-1/2+o(1)}\right)=o(1).
+\end{equation}
+For direct completion the moving modulus is in fact $>X$, so
+\eqref{eq:ramanujan-mean-tail} is stronger still.
+
+No modewise completion is used for a moving modulus at most $K$.  In the
+direct orientation we return, before expanding the fixed-period factor, to the
+underlying sawtooth $\psi(x)=x-\lfloor x\rfloor-\tfrac12$ on the combined modulus $Q=r\Lambda$.  For every
+nonconstant sawtooth channel its numerator $C_0$ is nonzero modulo $Q$, and
+inversion permutes the units; pairing $x$ with $-x$ therefore gives the exact
+complete-period identity
+\begin{equation}\label{eq:fixed-conductor-sawtooth-zero}
+\sum_{x\bmod Q}^{*}\psi(C_0\bar x/Q)=0.
+\end{equation}
+The constant channel is the already separated deterministic/full-resonance
+piece.  The finite $f$-split applied to the remaining incomplete $Q$-period
+then gives, with only a fixed-$q$ change in the constant,
+\begin{equation}\label{eq:fixed-conductor-small-modulus}
+\ll_q
+\mathcal E(R)(\log 2K)^{C_1}(K/U)^{1/2},
+\end{equation}
+for a fixed absolute $C_1$.  This is super-logarithmically small in the exterior range $U>X$.  Thus the
+nonzero Fourier modes are never charged individually for their nonzero
+Ramanujan means when the moving modulus is small.
+
+In the reciprocal orientation the companion geometric carve-out already
+removes the whole region with moving modulus $u\le K$ before slow/moderate
+completion.  We retain that whole carve-out for every fixed-period frequency,
+not only for the principal one.  Its band and tail remain respectively
+\[
+O_q(L^\sigma\log L)=o(L),
+\qquad O_q(1),
+\]
+because the fixed-conductor factors are bounded.  Outside the carve-out the
+centered error in \eqref{eq:fixed-conductor-completion} passes through the same
+weighted-completion and reciprocal estimates as before; the fixed factor
+changes only $O_q(1)$ constants.  The fast reciprocal channels are unchanged:
+finite Fourier expansion of the fixed-period decoration adds only linear prime
+phases, and Karatsuba's derivative tests used here \cite[Theorem~1]{Karatsuba1971} begin at order at least two.
+The Rankin tail and inherited forbidden-prime surcharge likewise change only
+by fixed-$q$ constants.
+
+Combining the centered completion error, the exact small-modulus sawtooth
+cancellation, the retained reciprocal carve-out, and the negligible global
+Ramanujan-mean ledger \eqref{eq:ramanujan-mean-global}, the complete hyperbolic
+exterior, including the Vaaler remainder frequencies and the slow
+moving-resonance contribution, is
+\begin{equation}\label{eq:exterior-q}
+\boxed{o_q(\log h)}
+\end{equation}
+pointwise.
+
+\subsection{Decorated rows}
+
+These rows carry a deterministic divisor of the height.  For a height-divisor
+row write $e_1=dr$ with $d\mid h$ and $(d,r)=1$.  All active high primes are
+coprime to $q$, so $(d,q)=1$.  Under the exact change of variables $y=dz$,
+\begin{equation}\label{eq:decorated-residue}
+(a+y,q)=1
+\Longleftrightarrow
+(d^{-1}a+z,q)=1.
+\end{equation}
+The low $2,3$ ratio is invariant when both the height and the free coordinate
+are multiplied by a high unit modulo $6$.  Therefore a decorated row makes only
+the finite residue permutation
+\begin{equation}\label{eq:decorated-map}
+(a,h)\longmapsto(d^{-1}a,h/d)
+\end{equation}
+inside the fixed family of endpoint classes.
+
+The exterior estimate at this reduced height is run with the centered
+completion just proved, not with an uncentered companion estimate.  The actual
+row height changes only the factor $H$ in the moving numerator.  Active moving
+moduli remain coprime to that height, so in every Vaaler channel
+$r_A=r/(r,j)$ exactly as in \eqref{eq:ramanujan-mean-tail}.  Hence the direct
+orientation uses \eqref{eq:fixed-conductor-completion} together with the mean
+ledger \eqref{eq:ramanujan-mean-global}; the reciprocal orientation retains the
+whole moving-modulus-$\le K$ carve-out and uses the same centered estimate and
+mean ledger outside it.  Both statements are uniform for actual row heights at
+most the ambient $h$.  The outer decoration norm is $O(\log\log h)$, while
+\eqref{eq:ramanujan-mean-global} is $O_q(L\log K\,K^{-1/2+o(1)})=o_q(1)$ and
+the centered nonzero-frequency saving is arbitrarily logarithmic.  Therefore
+summing all decorated rows still gives $o_q(\log h)$.
+
+\subsection{One-dimensional boundary terms}
+
+The two boundary families are matched before they are estimated.  Exact reflection turns the right boundary into a left boundary with residue $-b$; at divisor-family level, the same reflection leaves only the subfamily supported entirely on active primes dividing $h$, which is smaller by an $O_q(\log\log h)$ estimate.  Define the left free one-anchor sum
+\begin{equation}\label{eq:Sqa}
+S_{q,a}(h)=\sum_{t\in I_q(a;h)}(\SSer_q(\{0,t\})-1).
+\end{equation}
+Reflection is exact.  If $u=h-t$, then
+\[
+(a+t,q)=1
+\Longleftrightarrow
+(b-u,q)=1
+\Longleftrightarrow
+(-b+u,q)=1,
+\]
+and $\SSer_q(\{h,t\})=\SSer_q(\{0,u\})$.  Hence
+\begin{equation}\label{eq:reflection-q}
+\boxed{
+\sum_{t\in I_q(a;h)}(\SSer_q(\{h,t\})-1)
+=S_{q,-b}(h).
+}
+\end{equation}
+
+The divisor families require the corresponding row-level reflection, not only
+this free-boundary identity.  For a unit residue $r\pmod q$, write
+$\lambda_{q,r,h}$, $N_q(r;h)$, and $\Delta_{q,r}$ for
+\eqref{eq:lambdaq}, \eqref{eq:IqNq}, and \eqref{eq:Deltaqea} with
+$a$ replaced by $r$, and put
+\[
+R_{q,h}:=\prod_{\substack{p\mid h\\p\ge5,\ p\nmid q}}p.
+\]
+Define the residue-sensitive pure-one family
+\begin{equation}\label{eq:P1-residue-q}
+P_{1,q}^{(r)}(h)
+:=C_q^*(h)\sum_{f>1}v_{q,h}(f)\Delta_{q,r}(h;f,1),
+\end{equation}
+and its pure-height-prime support subfamily
+\begin{equation}\label{eq:P1-support-q}
+P_{1,q,h}^{\mathrm{supp}}(r)
+:=C_q^*(h)
+\sum_{\substack{f>1\\f\mid R_{q,h}}}
+v_{q,h}(f)\Delta_{q,r}(h;f,1).
+\end{equation}
+Here $P_{2,q}$ denotes the contribution to \eqref{eq:Tq-expansion} with
+$e_1=1<e_2$, and $D_{1,q}$ denotes the contribution with
+$e_1=d>1$, $d\mid R_{q,h}$, $e_2>1$, and $(e_2,h)=1$.
+
+\begin{lemma}[Fixed-$q$ divisor-family reflection]\label{lem:reflection-family-q}
+Let $d\mid R_{q,h}$ and let $e$ lie on the support of $\omega_q$ with
+$(e,h)=1$.  Then
+\begin{equation}\label{eq:reflection-row-q}
+\boxed{\Delta_{q,a}(h;d,e)=\Delta_{q,-b}(h;de,1),}
+\end{equation}
+and
+\begin{equation}\label{eq:reflection-weight-q}
+\boxed{v_{q,h}(d)\omega_q(e)=v_{q,h}(de).}
+\end{equation}
+Consequently the one-dimensional divisor families satisfy the exact identity
+\begin{equation}\label{eq:reflection-assembly-q}
+\boxed{
+P_{2,q}+D_{1,q}
+=P_{1,q}^{(-b)}-P_{1,q,h}^{\mathrm{supp}}(-b),
+}
+\end{equation}
+with
+\begin{equation}\label{eq:support-bound-q}
+P_{1,q,h}^{\mathrm{supp}}(r)=O_q(\log\log h)
+\end{equation}
+uniformly over the finitely many compatible unit residues $r\pmod q$.
+\end{lemma}
+
+\begin{proof}
+Put $z=h-y$.  Reflection is an affine bijection modulo every active low
+prime, so
+$L_p(\{0,y,h\})=L_p(\{0,z,h\})$ for every active
+$p\in\{2,3\}$.
+Compatibility $h\equiv b-a\pmod q$ gives
+\[
+(a+y,q)=1
+\Longleftrightarrow (b-z,q)=1
+\Longleftrightarrow (-b+z,q)=1.
+\]
+Hence
+$\lambda_{q,a,h}(y)=\lambda_{q,-b,h}(z)$.
+The same reflection bijects $I_q(a;h)$ with $I_q(-b;h)$, so
+$N_q(a;h)=N_q(-b;h)$ exactly.  If $d\mid h$, then
+$d\mid y$ if and only if $d\mid z$; the condition $e\mid h-y$
+is exactly $e\mid z$.  Since $(d,e)=1$, these are together equivalent
+to $de\mid z$.  Subtracting the identical exact density denominator
+therefore proves \eqref{eq:reflection-row-q}.  On the coefficient side,
+all primes of $d$ divide $h$ while all primes of $e$ do not, so the local
+definitions \eqref{eq:omegaq} and \eqref{eq:vqh} give
+\eqref{eq:reflection-weight-q} prime by prime.
+
+The family $P_{2,q}$ is the case $d=1$, $e>1$; $D_{1,q}$ is the case
+$d>1$, $e>1$.  After reflection these are exactly the pure-one indices
+$f=de>1$ having at least one active high prime not dividing $h$.  The
+indices missing from $P_{1,q}^{(-b)}$ are therefore precisely the
+$f>1$ supported on $R_{q,h}$, which proves
+\eqref{eq:reflection-assembly-q}.
+
+It remains to estimate this support family.  If $f\mid R_{q,h}$ and $H=h/f$,
+then $f$ is a unit modulo $\Lambda_q$.  Along the progression $y=fx$,
+the low/admissibility weight is a bounded $\Lambda_q$-periodic sequence
+whose complete-period mean is $\ph(q)/q$: multiplication by $f$ merely
+permutes the residue classes modulo $q$, $2$, and $3$, while the active
+low-prime local tables have mean one.  Thus
+\[
+N_{q,r}(h;f,1)=\frac{\ph(q)}q H+O_q(1).
+\]
+By the exact periodic count \eqref{eq:Nq-periodic},
+$N_q(r;h)/f=(\ph(q)/q)H+O_q(1)$, uniformly in $f$, and hence
+\[
+\Delta_{q,r}(h;f,1)=O_q(1)
+\qquad(f\mid R_{q,h}).
+\]
+The product $C_q^*(h)$ is bounded for fixed $q$, uniformly in $h$, and on
+this support
+$v_{q,h}(f)=\prod_{p\mid f}(p-2)^{-1}$.  Therefore
+\[
+|P_{1,q,h}^{\mathrm{supp}}(r)|
+\ll_q
+\sum_{f\mid R_{q,h}}v_{q,h}(f)
+=\prod_{p\mid R_{q,h}}\left(1+\frac1{p-2}\right)
+\ll_q\log\log h,
+\]
+by the standard Mertens bound, proving \eqref{eq:support-bound-q}.
+\end{proof}
+
+For a one-dimensional row let $H$ again be the actual parity-reduced kernel
+height and set
+\begin{equation}\label{eq:X0-contract}
+\boxed{X_0=H-1.}
+\end{equation}
+The symbol $X$ below is only the current upper limit in an $e$-sum,
+$1\le X\le X_0$; it is not a second height.  In the P\'etermann split put
+\[
+ z=X_0/\Lambda_q,
+ \qquad
+ Y=z\exp\!\left(- (\log z)^b\right).
+\]
+The coefficient $v(e)$ in any row is explicitly one of $\omega_q(e)$,
+$\eta_q(e)$, or $v_{q,h}(e)$ from
+\eqref{eq:omegaq}, \eqref{eq:etaq}, and \eqref{eq:vqh}.
+
+After splitting a one-dimensional root count by $c\bmod\Lambda_q$ and then
+by a unit class modulo $\Lambda_q$, character orthogonality reduces every
+nonprincipal periodic contribution to a finite linear combination of sums
+\begin{equation}\label{eq:petermann-periodic}
+\sum_{e\le X}\chi(e)v(e)
+\psi\!\left(\frac{X_0}{\Lambda_q e}+\frac r{\Lambda_q}\right),
+\end{equation}
+where $\chi$ is a fixed character modulo $\Lambda_q$, $r$ is fixed, and
+\[\psi(x)=x-\lfloor x\rfloor-\tfrac12.\]
+
+\begin{lemma}[Fixed-conductor character/rational-shift P\'etermann estimate]\label{lem:fixed-conductor-petermann}
+Fix $\Lambda\ge1$.  Let $v$ be one of the squarefree nonnegative base
+coefficients occurring in the one-dimensional argument after deleting finitely
+many primes, and suppose the ordinary $\alpha=0$ P\'etermann hypotheses hold.
+For a fixed Dirichlet character $\chi\pmod\Lambda$, fixed integer $r$,
+$0<b<1$, and a real reciprocal numerator $T\ge2\Lambda$, put
+\[
+ Y_T=\frac{T}{\Lambda}
+ \exp\!\left(-\bigl(\log(T/\Lambda)\bigr)^b\right).
+\]
+Then
+\[
+ \sum_{e\le Y_T}\chi(e)v(e)
+ \psi\!\left(\frac{T}{\Lambda e}+\frac r\Lambda\right)
+ \ll_{\Lambda,b}
+ (\log T)^{2/3}(\log\log(3T))^{4/3}+\log\log(3T).
+\]
+For $b=3/4$ the same endpoint splitting as in the ordinary P\'etermann argument
+gives, uniformly for the partial sums used below,
+\begin{equation}\label{eq:petermann-real-numerator}
+ \sum_{e\le X}\chi(e)v(e)
+ \psi\!\left(\frac{T}{\Lambda e}+\frac r\Lambda\right)
+ \ll_{\Lambda}
+ (\log(3T))^{3/4}
+ +(\log(3T))^{2/3}(\log\log(3T))^{4/3}
+ +\log\log(3T)+1
+\end{equation}
+for $1\le X\le T$.  If $T<2\Lambda$, the corresponding sum has
+$O_\Lambda(1)$ terms and is $O_\Lambda(1)$.
+\end{lemma}
+
+\begin{proof}
+On the supported unit integers, expand the fixed character by finite additive
+Fourier inversion,
+\[
+ \chi(n)=\sum_{a\bmod\Lambda}\widehat\chi(a)\e(an/\Lambda),
+ \qquad \sum_a|\widehat\chi(a)|=O_\Lambda(1).
+\]
+Thus each prime phase in the P\'etermann exponential-sum stage is changed from
+$F(p)$ to $F(p)+ap/\Lambda$.  Every derivative test used there starts at order
+at least two, so all such derivative hypotheses are unchanged.  The monotone
+positive coefficient $pv(p)$ remains outside Abel summation and the character
+remains in the already controlled oscillatory prime partial sum; prime powers
+$\nu\ge2$ vanish by squarefree support.  Absolute and Cauchy steps are
+unchanged.  The reciprocal parameter $T$ is allowed to be real throughout
+those derivative estimates.
+
+The rational shift multiplies every nonzero sawtooth Fourier mode by the unit
+factor $\e(jr/\Lambda)$ and rescales the reciprocal parameter by the fixed
+factor $1/\Lambda$.  With smoothing width $1/T$, a jump crossing for
+$e<T/\Lambda$ would require
+\[
+ T+re<\Lambda e n\le T+re+\frac{\Lambda e}{T}.
+\]
+The last interval has length less than one.  Since
+$\Lambda e n-re=e(\Lambda n-r)$ is an integer, any crossing must satisfy
+\[
+ e(\Lambda n-r)=\lceil T\rceil.
+\]
+Thus every crossing index $e$ divides $\lceil T\rceil$ (and obeys one fixed
+congruence for the complementary factor).  For either base coefficient used
+here,
+\[
+ \sum_{e\mid\lceil T\rceil}v(e)
+ \ll_\Lambda
+ \prod_{\substack{p\mid\lceil T\rceil\\p\ge5}}
+ \left(1+\frac1{p-3}\right)
+ \ll_\Lambda\log\log(3T),
+\]
+with the same or smaller bound for the $1/(p-2)$ local factor.  This is the
+entire crossing bill.  The complementary range $T/\Lambda\le e\le T$ has
+$O_\Lambda(1)$ absolute coefficient mass by the ordinary mean formula, and the
+usual strip from $Y_T$ to $T/\Lambda$ has mass
+$O_\Lambda((\log T)^b)$.  Adding the divisor-supported crossing bill proves the
+claims.
+\end{proof}
+
+For the moving coefficient, the convolution used below is local and exact.
+At each active high prime $p\mid h$ put
+\[
+ a_p=\frac1{p-3},\qquad b_p=\frac1{p-2},
+\]
+and define the multiplicative correction $c_{q,h}$ by the Euler factors
+\begin{equation}\label{eq:cqh-definition}
+\frac{1+b_pz}{1+a_pz}
+=1+\sum_{\nu\ge1}c_{q,h}(p^\nu)z^\nu,
+\qquad
+c_{q,h}(p^\nu)=(b_p-a_p)(-a_p)^{\nu-1},
+\end{equation}
+at primes $p\ge5$ with $p\nmid q$ and $p\mid h$, and by the factor $1$
+at every other prime.  Comparing local generating functions gives exactly
+\[
+ v_{q,h}=\omega_q*c_{q,h}.
+\]
+Moreover
+\[
+1+\sum_{\nu\ge1}|c_{q,h}(p^\nu)|
+=1+\frac1{(p-2)(p-4)},
+\qquad
+\sum_{\nu\ge1}|c_{q,h}(p^\nu)|\,\nu\log p
+\ll\frac{\log p}{p^2},
+\]
+so the convergent product over active high primes gives
+\begin{equation}\label{eq:fixed-q-convolution-transfer}
+ \sup_h\sum_s|c_{q,h}(s)|(1+\log s)<\infty.
+\end{equation}
+Deleting the fixed primes dividing $q$ can only decrease these local norms.
+
+For $v=v_{q,h}$ expand the convolution inside the partial sum.  Since every
+$s$ in the support of $c_{q,h}$ is a unit modulo $\Lambda_q$,
+\begin{align*}
+&\sum_{e\le X}\chi(e)v_{q,h}(e)
+\psi\!\left(\frac{X_0}{\Lambda_q e}+\frac r{\Lambda_q}\right)\\
+&\qquad=\sum_{s\le X}c_{q,h}(s)\chi(s)
+\sum_{m\le X/s}\chi(m)\omega_q(m)
+\psi\!\left(\frac{X_0/s}{\Lambda_q m}+\frac r{\Lambda_q}\right).
+\end{align*}
+Apply \cref{lem:fixed-conductor-petermann} to the inner base sum with the real
+reciprocal numerator $T=X_0/s$.  When $T<2\Lambda_q$ the inner sum is
+$O_q(1)$; otherwise \eqref{eq:petermann-real-numerator} applies.  Its right-hand
+side is bounded by the same increasing majorant with $T$ replaced by $X_0$.
+The uniform $\ell^1$ bound \eqref{eq:fixed-q-convolution-transfer} therefore
+transfers that majorant without any integrality assumption on $X_0/s$.
+For $\omega_q$ and $\eta_q$ take $s=1$.  Hence, for every coefficient
+$v\in\{\omega_q,\eta_q,v_{q,h}\}$,
+\begin{equation}\label{eq:petermann-q}
+\begin{aligned}
+&\sum_{e\le X}\chi(e)v(e)
+\psi\!\left(\frac{X_0}{\Lambda_q e}+\frac r{\Lambda_q}\right)\\
+&\qquad=O_q\!\left(
+(\log X_0)^{3/4}
++(\log X_0)^{2/3}(\log\log X_0)^{4/3}
++\log\log X_0+1
+\right)
+=o_q(\log X_0).
+\end{aligned}
+\end{equation}
+uniformly for $1\le X\le X_0$.
+
+The principal periodic coefficient can also be checked locally.  For a residue
+$r\pmod q$ define the free one-anchor low-period weight
+\begin{equation}\label{eq:rho-free-q}
+\rho_{q,r}(y)
+=\1_{(r+y,q)=1}
+\prod_{\substack{p\in\{2,3\}\\p\nmid q}}L_p(\{0,y\}).
+\end{equation}
+
+Put $h=2H$, $X_0=H-1$, and $\Lambda=\Lambda_q$.  The exact finite-period
+floor decomposition needed for the one-dimensional bracket is as follows.
+Define the two parity-reduced low weights
+\begin{equation}\label{eq:one-d-reduced-weights-q}
+w^{A}_{r,h}(z):=\lambda_{q,r,h}(2z),
+\qquad
+w^{F}_{r}(z):=\rho_{q,r}(2z),
+\end{equation}
+viewed as $\Lambda$-periodic functions.  For
+$u\in(\mathbb Z/\Lambda\mathbb Z)^\times$ and $c\bmod\Lambda$, let
+$\alpha_u(c)\in\{1,\ldots,\Lambda\}$ be the positive representative of
+$c u^{-1}\pmod\Lambda$, with the zero class represented by $\Lambda$, and set
+\begin{align}
+W(w)&:=\sum_{c\bmod\Lambda}w(c),\label{eq:one-d-W}\\
+B_w(u)&:=\sum_{c\bmod\Lambda}w(c)
+\left(\frac12-\frac{\alpha_u(c)}\Lambda\right),\label{eq:one-d-B}\\
+\Psi_w(u;t)&:=\sum_{c\bmod\Lambda}w(c)
+\psi\!\left(\frac t\Lambda+1-\frac{\alpha_u(c)}\Lambda\right).
+\label{eq:one-d-Psi}
+\end{align}
+Then, for every $e$ on the support of the high coefficients and
+$u_e\equiv e\pmod\Lambda$,
+\begin{equation}\label{eq:exact-periodic-floor-count}
+\boxed{
+\sum_{1\le n\le X_0/e}w(en)
+=\frac{W(w)}\Lambda\frac{X_0}{e}
++B_w(u_e)-\Psi_w(u_e;X_0/e).
+}
+\end{equation}
+Indeed the contribution of the residue $c$ is exactly
+\[
+w(c)\left\lfloor
+\frac{X_0}{\Lambda e}+1-\frac{\alpha_{u_e}(c)}\Lambda
+\right\rfloor,
+\]
+and \eqref{eq:exact-periodic-floor-count} is just
+$\lfloor x\rfloor=x-\psi(x)-\tfrac12$ summed over $c$.
+
+Let
+\[
+N^F_{q,r}(h;e):=
+\sum_{\substack{0<y<h\\e\mid y}}\rho_{q,r}(y),
+\qquad
+\Delta^F_{q,r}(h;e):=N^F_{q,r}(h;e)-\frac{N_q(r;h)}e,
+\]
+and define the residue-$r$ corner and the free high-prime baseline by
+\[
+C_q^{(r)}:=C_q^*(h)\Delta_{q,r}(h;1,1),
+\qquad
+C_{f,q}:=\prod_{\substack{p\ge5\\p\nmid q}}c_1(p).
+\]
+The exact high-prime Euler expansions give
+\begin{align}
+Q_{1,q}^{(r)}&:=C_q^{(r)}+P_{1,q}^{(r)}
+=C_q^*(h)\sum_{e\ge1}v_{q,h}(e)\Delta_{q,r}(h;e,1),
+\label{eq:exact-Q1q}\\
+S_{q,r}&=C_{f,q}\sum_{e\ge1}\eta_q(e)\Delta^F_{q,r}(h;e).
+\label{eq:exact-Sq}
+\end{align}
+For \eqref{eq:exact-Sq}, the subtraction is exact because primewise
+\[
+c_1(p)\left(1+\frac1{p(p-2)}\right)=1,
+\]
+so $C_{f,q}\sum_e\eta_q(e)/e=1$.  Also
+$C_q^{(r)}=O_q(1)$ by the same complete-period mean used in
+\cref{lem:fixed-q-row-reduction}.
+
+Substituting \eqref{eq:exact-periodic-floor-count} into
+\eqref{eq:exact-Q1q}--\eqref{eq:exact-Sq} gives the literal formulas
+\begin{align}
+Q_{1,q}^{(r)}
+={}&C_q^*(h)\sum_{e\le X_0}v_{q,h}(e)
+\left\{
+\frac{X_0W(w^A_{r,h})/\Lambda-N_q(r;h)}e
++B_{w^A_{r,h}}(u_e)-\Psi_{w^A_{r,h}}(u_e;X_0/e)
+\right\}\notag\\
+&-C_q^*(h)N_q(r;h)\sum_{e>X_0}\frac{v_{q,h}(e)}e,
+\label{eq:exact-Q1-floor-sawtooth}\\
+S_{q,r}
+={}&C_{f,q}\sum_{e\le X_0}\eta_q(e)
+\left\{
+\frac{X_0W(w^F_r)/\Lambda-N_q(r;h)}e
++B_{w^F_r}(u_e)-\Psi_{w^F_r}(u_e;X_0/e)
+\right\}\notag\\
+&-C_{f,q}N_q(r;h)\sum_{e>X_0}\frac{\eta_q(e)}e.
+\label{eq:exact-S-floor-sawtooth}
+\end{align}
+These are identities, not asymptotic replacements.
+
+For completeness, they decompose into exactly the analytic pieces bounded
+above.  On the unit group,
+\[
+\1_{u_e=u}=\frac1{\ph(\Lambda)}
+\sum_{\chi\bmod\Lambda}\overline{\chi(u)}\chi(e),
+\]
+so the $B$-terms are a finite family of fixed-character coefficient sums and
+the $\Psi$-terms are a finite family of the sawtooth sums
+\eqref{eq:petermann-periodic}.  The nonprincipal fixed-character coefficient
+sums are $O_q(1)$; the principal one has
+\[
+\sum_{e\le X}\chi_0(e)v(e)=F_0(v)\log X+O_q(1)
+\]
+for $v=\eta_q$ and, uniformly in $h$, for $v=v_{q,h}$ by the exact convolution
+\eqref{eq:fixed-q-convolution-transfer}.  The density terms in braces are
+$O_q(1)/e$, since
+\[
+\frac{W(w^A_{r,h})}{\Lambda}
+=\frac{W(w^F_r)}{\Lambda}=\frac{2\ph(q)}q,
+\qquad
+N_q(r;h)=\frac{2\ph(q)}qH+O_q(1),
+\]
+and the two tails in
+\eqref{eq:exact-Q1-floor-sawtooth}--\eqref{eq:exact-S-floor-sawtooth} are
+$O_q(1)$ by the corresponding logarithmic mean and partial summation.
+
+It remains only to identify the complete principal boundary coefficient.  Put
+\[
+\overline B(w):=\frac1{\ph(\Lambda)}
+\sum_{u\in(\mathbb Z/\Lambda\mathbb Z)^\times}B_w(u).
+\]
+For $c\ne0\pmod\Lambda$, the orbit of $cu^{-1}$ is the unit group modulo
+$\Lambda/(c,\Lambda)$; pairing $x$ with its negative shows that the average of
+$\alpha_u(c)/\Lambda$ is $1/2$.  For $c=0$ it is identically $1$.  Therefore
+\begin{equation}\label{eq:Bbar-zero-residue}
+\boxed{\overline B(w)=-\frac12w(0).}
+\end{equation}
+At the zero low residue the anchored and free weights agree exactly:
+for every active $p\in\{2,3\}$,
+\[
+\frac{L_p(\{0,0,h\})}{L_p(\{0,h\})}
+=(1-1/p)^{-1}=L_p(\{0,0\}),
+\]
+and the $q$-admissibility indicator is $1$.  Hence
+\begin{equation}\label{eq:Bbar-anchored-free}
+\overline B(w^A_{r,h})=\overline B(w^F_r).
+\end{equation}
+CRT and the low-prime local tables give the exact complete-period means
+\begin{equation}\label{eq:principal-low-mean}
+\frac1{\Lambda_q}\sum_{c\bmod\Lambda_q}\lambda_{q,r,h}(c)
+=\frac1{\Lambda_q}\sum_{c\bmod\Lambda_q}\rho_{q,r}(c)
+=\frac{\ph(q)}q.
+\end{equation}
+Indeed every prime $p\mid q$ contributes the common factor $1-1/p$; at an
+active prime $2$ the two local weights have values $(2,0)$ and mean one; at
+an active prime $3$ the free values are $(3/2,3/4,3/4)$, while the anchored
+values are the same when $3\mid h$ and, when $3\nmid h$, are a permutation
+of $(3/2,3/2,0)$.  Each active low-prime mean is therefore one.
+
+For a squarefree coefficient $u$ occurring here, write its logarithmic Euler
+residue as
+\[
+F_0(u):=\prod_p\left(1-\frac1p\right)(1+u(p)),
+\]
+and recall the free high-prime baseline $C_{f,q}$ defined above.
+The active high-prime identities
+\[
+ c_0(p)\left(1-\frac1p\right)\left(1+\frac1{p-3}\right)=1,
+ \qquad
+ c_1(p)\left(1-\frac1p\right)\left(1+\frac1{p-2}\right)=1
+\]
+then give the literal coefficient equality
+\begin{equation}\label{eq:principal-high-coefficient}
+C_q^*(h)F_0(v_{q,h})
+=C_{f,q}F_0(\eta_q)
+=\prod_{p\mid6q}\left(1-\frac1p\right)
+=\frac{\ph(\Lambda_q)}{\Lambda_q}.
+\end{equation}
+The exact floor/sawtooth decompositions
+\eqref{eq:exact-Q1-floor-sawtooth}--\eqref{eq:exact-S-floor-sawtooth} now leave
+no unassigned one-dimensional term.  Their finite sawtooth character families, including the principal character,
+are $o_q(\log h)$ by \eqref{eq:petermann-q}; the nonprincipal
+constant-character pieces and all density, endpoint, and tail terms are
+$O_q(1)$.  The only logarithmic principal terms are
+\[
+C_q^*(h)F_0(v_{q,h})\overline B(w^A_{r,h})\log X_0
+\quad\text{and}\quad
+C_{f,q}F_0(\eta_q)\overline B(w^F_r)\log X_0.
+\]
+They are equal by \eqref{eq:principal-high-coefficient} and
+\eqref{eq:Bbar-anchored-free}.  Thus
+$Q_{1,q}^{(r)}-S_{q,r}=o_q(\log h)$; since
+$C_q^{(r)}=O_q(1)$, the residue-sensitive notation
+\eqref{eq:P1-residue-q} gives
+\begin{equation}\label{eq:pure-one-uniform-q}
+P_{1,q}^{(r)}-S_{q,r}=o_q(\log h)
+\end{equation}
+for every compatible unit residue $r\pmod q$ occurring in the reflected pair.
+Taking $r=a$ proves the first bracket.  Taking $r=-b$ and then applying the
+exact family reflection \eqref{eq:reflection-assembly-q} and support bound
+\eqref{eq:support-bound-q} proves the second.  Explicitly,
+\begin{equation}\label{eq:one-dimensional-q}
+P_{1,q}^{(a)}-S_{q,a}=o_q(\log h),
+\qquad
+P_{2,q}+D_{1,q}-S_{q,-b}
+=\bigl[P_{1,q}^{(-b)}-S_{q,-b}\bigr]
+-P_{1,q,h}^{\mathrm{supp}}(-b)
+=o_q(\log h).
+\end{equation}
+
+\section{Proof of the fixed-modulus theorem}\label{sec:proof-main}
+
+Only assembly remains.  The exact divisor expansion \eqref{eq:Tq-expansion} has four geometrically different pieces: the corner, two one-dimensional boundary families, the ordinary two-dimensional rows, and the rows decorated by height primes.  Let $C_q$ be the corner $(e_1,e_2)=(1,1)$; let $P_{1,q}=P_{1,q}^{(a)}$ and $P_{2,q}$ denote respectively the rows $e_2=1<e_1$ and $e_1=1<e_2$; let $G_q$ denote the genuinely two-dimensional rows $e_1,e_2>1$ with $(e_1,h)=1$; and let $D_q$ denote those with $(e_1,h)>1$.  Write $e_1=dr$, where $d=(e_1,h)$.  Split
+\[
+D_q=D_{1,q}+D_{2D,q}
+\]
+according as $r=1$ or $r>1$.  Only $D_{1,q}$ is one-dimensional; $D_{2D,q}$ is a decorated two-dimensional family handled by \eqref{eq:decorated-map}.
+
+The exact family assembly is
+\begin{equation}\label{eq:final-assembly-q}
+\boxed{
+A_{1,q}-B_{1,q}
+=[P_{1,q}-S_{q,a}]
++[P_{2,q}+D_{1,q}-S_{q,-b}]
++C_q+[G_q+D_{2D,q}].
+}
+\end{equation}
+The corner and the exact periodic-density corrections from
+\eqref{eq:fixed-q-row-reduction} contribute
+\[
+O_q(1)+O_q(\log\log h).
+\]
+The two one-dimensional brackets are $o_q(\log h)$ by \eqref{eq:one-dimensional-q}.  The centered two-dimensional small box is $o_q(\log h)$ by \eqref{eq:fixed-q-smallbox}--\eqref{eq:exponent}; its hyperbolic fill and the full exterior are $o_q(\log h)$ by \eqref{eq:exterior-q}; and the decorated rows remain $o_q(\log h)$ by \eqref{eq:decorated-map}.  Inserting these estimates into \eqref{eq:final-assembly-q} proves \cref{thm:fixed-q}.
+
+\begin{remark}[Asymptotic character]\label{rem:asymptotic}
+The strict Boolean margin is inherited from the $q=1$ proof and is numerically small.  The reciprocal argument also uses a superlogarithmic but very slowly emerging saving.  The theorem is therefore asymptotic; no computationally useful finite-height threshold is asserted.
+\end{remark}
+
+\section{Finite-cutoff arithmetic diagonal contraction}\label{sec:collision}
+
+The level-one transfer theorem is already proved.  This section records a separate finite-cutoff identity for the active high-prime coefficient system.  Boolean M\"obius inversion is an incidence-algebra operation; by contrast, averaging a repeated free coordinate after connectedization produces an arithmetic operator on the modulus coefficients.
+
+Fix a finite active high-prime set $\mathcal P$ and an admissible anchor pattern
+$A'\subseteq E$.  Free coordinates remain labeled even when two coordinate
+values coincide.  For $p\in\mathcal P$ define
+\begin{equation}\label{eq:collision-local}
+\phi_{p,z}(x)=\frac{\1_{x\not\equiv z\ (p)}}{1-1/p},
+\qquad
+L_p(\mathbf x)=\frac1p\sum_{z\bmod p}\prod_j\phi_{p,z}(x_j),
+\end{equation}
+and
+\begin{equation}\label{eq:collision-gw}
+g_p^{A'}(\mathbf x)=\frac{L_p(A'\cup\mathbf x)}{L_p(A')},
+\qquad
+w_p^{A'}(\mathbf x)=g_p^{A'}(\mathbf x)-1.
+\end{equation}
+For squarefree $m\mid\prod_{p\in\mathcal P}p$ set
+\begin{equation}\label{eq:collision-u}
+u_1^{A'}=1,
+\qquad
+u_m^{A'}(\mathbf x)=\prod_{p\mid m}w_p^{A'}(\mathbf x).
+\end{equation}
+Then the truncated relative Euler product is reconstructed exactly by
+\begin{equation}\label{eq:collision-euler-reconstruction}
+\sum_{m\mid\prod_{p\in\mathcal P}p}u_m^{A'}(\mathbf x)
+=\prod_{p\in\mathcal P}g_p^{A'}(\mathbf x).
+\end{equation}
+For a labeled set $J$ define
+\begin{equation}\label{eq:collision-mob}
+\operatorname{Mob}_JF
+=\sum_{V\subseteq J}(-1)^{|J|-|V|}F(\mathbf x_V).
+\end{equation}
+For a doubled block $B=\{1,2\}$ define diagonal contraction at modulus $m$ by
+\begin{equation}\label{eq:collision-D}
+(\mathsf D_BF)_m(\mathbf y)
+=\frac1m\sum_{x\bmod m}F_m(x,x,\mathbf y).
+\end{equation}
+Finally put
+\begin{equation}\label{eq:L-operator}
+(\Kcal f)_m=\frac1{\ph(m)}\sum_{d\mid m}d f_d,
+\qquad
+\Lcal=\Kcal-I.
+\end{equation}
+
+\begin{proposition}[Finite-cutoff collision intertwiner]\label{prop:collision-intertwiner}
+For every squarefree finite-cutoff modulus $m$,
+\begin{equation}\label{eq:collision-intertwiner}
+\boxed{
+\mathsf D_B\operatorname{Mob}_{B\cup U}u_m^{A'}
+=\operatorname{Mob}_U(\Lcal u^{A'})_m.
+}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Write
+\[
+G_d^{A'}(\mathbf x)=\prod_{p\mid d}g_p^{A'}(\mathbf x).
+\]
+Then inclusion--exclusion in the active prime set gives
+\begin{equation}\label{eq:collision-uG}
+u_m^{A'}
+=\sum_{d\mid m}(-1)^{\Om(m/d)}G_d^{A'}.
+\end{equation}
+Under the anchor-conditioned product measure, $G_d^{A'}$ is an expectation
+of products of
+\[
+\Phi_{d,\mathbf z}(x)=\prod_{p\mid d}\phi_{p,z_p}(x).
+\]
+Boolean connectedization therefore produces a product of
+$\Phi_{d,\mathbf z}-1$.  CRT gives the exact diagonal second moment
+\begin{equation}\label{eq:collision-second-moment}
+\frac1d\sum_{x\bmod d}(\Phi_{d,\mathbf z}(x)-1)^2
+=\frac d{\ph(d)}-1,
+\end{equation}
+independently of the anchor-conditioned $\mathbf z$.  Hence
+\begin{equation}\label{eq:collision-G}
+\mathsf D_B\operatorname{Mob}_{B\cup U}G_d^{A'}
+=\left(\frac d{\ph(d)}-1\right)\operatorname{Mob}_UG_d^{A'}.
+\end{equation}
+Substituting \eqref{eq:collision-uG} into \eqref{eq:L-operator}, the coefficient
+of $G_d^{A'}$ in $(\Lcal u^{A'})_m$ is exactly
+\[
+(-1)^{\Om(m/d)}\left(\frac d{\ph(d)}-1\right).
+\]
+Comparison with \eqref{eq:collision-G} proves
+\eqref{eq:collision-intertwiner}.
+\end{proof}
+
+Define the anchor-combined rank-$r$ transfer kernel by
+\begin{equation}\label{eq:collision-Dr}
+D_m^{(r)}(\mathbf x)
+=\operatorname{Mob}_{[r]}
+\sum_{A'\subseteq E}(-1)^{|E|-|A'|}u_m^{A'}(\mathbf x).
+\end{equation}
+Because $\Lcal$ is independent of the anchor pattern, it commutes with this
+anchor combination and gives
+\begin{equation}\label{eq:collision-one}
+\frac1m\sum_{x\bmod m}D_m^{(r+2)}(x,x,\mathbf y)
+=(\Lcal D^{(r)})_m(\mathbf y).
+\end{equation}
+Iterating disjoint doubled blocks gives
+\begin{equation}\label{eq:collision-iterate}
+\frac1{m^j}\sum_{x_1,\ldots,x_j\bmod m}
+D_m^{(2j+1)}(x_1,x_1,\ldots,x_j,x_j,y)
+=(\Lcal^jD^{(1)})_m(y).
+\end{equation}
+
+Equations \eqref{eq:collision-intertwiner}--\eqref{eq:collision-iterate} are
+finite-cutoff identities for the active high-prime system alone.  They are not
+used in the proof of \cref{thm:fixed-q}, and no asymptotic or rank-uniform
+statement is attached to them here.
+
+\section{Relation to the completed fixed-gap density}\label{sec:los}
+
+The contraction identity \eqref{eq:F-Rcirc} is the exact bridge to the completed endpoint coordinates used in the fixed-gap consecutive-prime residue formalism.  At level one,
+\[
+C_{1,q}^{\mathrm{comp}}=\SSer_q(E)A_{1,q},
+\]
+while the transfer theorem controls the connected defect between this anchored coordinate and the sum of the two one-anchor connected boundaries.  The ambient modulus density is carried separately by \eqref{eq:deltaq}; because $\delta_q\ph(q)/q=1/\log x$, there is no hidden $q/\ph(q)$ renormalization inside the connected transfer kernel.  Nothing in this note supplies a rank-uniform tail estimate or rederives a Poisson survival factor.
+
+\section{Source and priority note}\label{sec:priority}
+
+The mathematical assertions of \cref{prop:endpoint-contraction,thm:fixed-q} are established by the proofs above.  Priority standing is separate; proof standing is not used as evidence of novelty or priority.
+
+We prove the exact contraction dictionary and the fixed-$q$ pointwise connected transfer theorem stated above. A 2026 preprint of Hamed Ebadi, referenced by a public Zenodo verification record \cite{Ebadi2026}, studies the same fixed-two-anchor raw coefficient hierarchy at $q=1$. The manuscript proof was not available to us for inspection at the time of this version, so we make no claim here about priority relative to proof-level lemmas in that preprint beyond the literal distinctions supported by its public theorem statement.
+
+For the same reason, this note makes no novelty claim for fixed anchors, congruence restrictions, Boolean M\"obius inversion, generic connected/cumulant language, or the conditional fixed-gap Poisson factor.  Those issues belong to the prior-art record rather than to the proof of \cref{thm:fixed-q}.
+
+\begin{thebibliography}{9}
+
+\bibitem{DorseyPointwise2026}
+C.~Dorsey,
+\emph{Boolean CRT Fibers and Pointwise Anchor Contraction},
+preprint manuscript, September 2026.
+
+\bibitem{ShiuThesis1980}
+P.~M.-K.~Shiu,
+\emph{Studies in Multiplicative Number Theory},
+Ph.D. thesis, University of Nottingham, May 1980, Chapter~3.
+
+\bibitem{Karatsuba1971}
+A.~A.~Karatsuba,
+\emph{Estimates for trigonometric sums by Vinogradov's method, and some applications},
+Proc. Steklov Inst. Math. 112 (1971), 251--265
+(English translation, American Mathematical Society, 1973).
+
+\bibitem{Petermann1998}
+Y.-F.~S.~P\'etermann,
+\emph{On an estimate of Walfisz and Saltykov for an error term related to the Euler function},
+J. Th\'eor. Nombres Bordeaux 10 (1998), no.~1, 203--236.
+
+\bibitem{GoldstonLedoan2011}
+D.~A.~Goldston and A.~H.~Ledoan,
+\emph{On the differences between consecutive prime numbers, I},
+arXiv:1111.3380.
+
+\bibitem{LOS}
+R.~J.~Lemke Oliver and K.~Soundararajan,
+\emph{Unexpected biases in the distribution of consecutive primes},
+preprint manuscript.
+
+\bibitem{Kuperberg2025}
+V.~Kuperberg,
+\emph{Sums of singular series along arithmetic progressions and with smooth weights},
+arXiv:2301.06095v1 (2023).
+
+\bibitem{Ebadi2026}
+H.~Ebadi,
+2026 preprint referenced by Zenodo verification record 21534407.
+Manuscript proof unavailable to the author of this version at the time of writing.
+
+\end{thebibliography}
+
+\end{document}

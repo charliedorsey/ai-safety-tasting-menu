@@ -1,0 +1,27 @@
+consumer,supplier,standing,explanation
+T00,T01,direct,rw [printedA_sub_printedB_eq_manuscriptKernels]
+T00,T04,direct,obtain h0 from paperB_terminal_via_empty_low
+T01,T02,direct,exact A equality in the printed-difference rewrite
+T01,T03,direct,exact B equality in the printed-difference rewrite
+T04,T05,direct,source specialization at Jlow=0 and delta=1/4
+T05,T06,direct,LONG source rate given at physical high cutoff
+T05,T10,direct,LOW/LONG conditional native terminal
+T06,T07,direct,Quillon long_sublog with quillon_weilHyp
+T06,T13,via,WeilHyp discharged through norm_quillon_K_weil
+T09,T08,direct,native CORE source rate via copied-rate equality
+T10,T09,via,native CORE supplied through CorePaidTerminalConsumer
+T10,T14,direct,native HIGH sector rate
+T10,T12,via,Middle LONG+CORE assembly in native conditional consumer
+T10,T11,via,three-sector source identity in eventual terminal assembly
+T07,CELL-WL,method,physical LONG cell assembled in long_pair_le
+T07,CELL-CL,method,physical LONG cell assembled in long_pair_le
+T07,CELL-RL,method,physical LONG cell assembled in long_pair_le
+T07,CELL-ManyL,method,physical LONG cell assembled in long_pair_le
+T07,CELL-EdgeL,method,physical LONG cell assembled in long_pair_le
+T07,CELL-ResL,method,physical LONG cell assembled in long_pair_le
+T07,CELL-WRL,method,physical LONG cell assembled in long_pair_le
+T08,CELL-W,method,physical CORE cell assembled in core_pair_le
+T08,CELL-C,method,physical CORE cell assembled in core_pair_le
+T08,CELL-R,method,physical CORE cell assembled in core_pair_le
+T08,CELL-ResA,method,physical CORE cell assembled in core_pair_le
+T08,CELL-Band,method,physical CORE cell assembled in core_pair_le

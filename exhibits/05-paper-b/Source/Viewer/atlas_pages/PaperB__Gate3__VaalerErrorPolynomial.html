@@ -1,0 +1,65 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · PaperB/Gate3/VaalerErrorPolynomial.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>PaperB/Gate3/VaalerErrorPolynomial.lean</h1><p class="meta">LEAN/PaperB/Gate3/VaalerErrorPolynomial.lean · 64 lines · SHA-256 7e422f2a5dc3039957b8e6a6db6357bc94f44ea3130e5e4c034ae3cc061e7166</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import PaperB.Gate3.VaalerFejerModes</span>
+<span class="l" id="L2"><span class="n">2</span></span>
+<span class="l" id="L3"><span class="n">3</span>open Finset</span>
+<span class="l" id="L4"><span class="n">4</span>namespace OrielUpper</span>
+<span class="l" id="L5"><span class="n">5</span>open PaperB.FixedQ</span>
+<span class="l" id="L6"><span class="n">6</span></span>
+<span class="l" id="L7"><span class="n">7</span>theorem yevorin_vaaler_error_eq_dirichlet (J : ℕ) (t : ℝ) :</span>
+<span class="l" id="L8"><span class="n">8</span>    (1 : ℝ) / ((J + 1 : ℕ) : ℝ) +</span>
+<span class="l" id="L9"><span class="n">9</span>      (∑ j ∈ Finset.Icc 1 J,</span>
+<span class="l" id="L10"><span class="n">10</span>        (yevorin_vaalerErrorCoeff J j * realVaalerMode j t).re) =</span>
+<span class="l" id="L11"><span class="n">11</span>      (1 : ℝ) / (2 * ((J + 1 : ℕ) : ℝ)) +</span>
+<span class="l" id="L12"><span class="n">12</span>        ‖h3RealDirichletSum J t‖ ^ 2 /</span>
+<span class="l" id="L13"><span class="n">13</span>          (2 * (((J + 1 : ℕ) : ℝ)^2)) := by</span>
+<span class="l" id="L14"><span class="n">14</span>  let D : ℝ := ((J + 1 : ℕ) : ℝ)</span>
+<span class="l" id="L15"><span class="n">15</span>  let z : ℂ := Complex.exp</span>
+<span class="l" id="L16"><span class="n">16</span>    (Complex.I * (((2 * Real.pi * t : ℝ) : ℂ)))</span>
+<span class="l" id="L17"><span class="n">17</span>  let S : ℝ := ∑ k ∈ Finset.range J,</span>
+<span class="l" id="L18"><span class="n">18</span>    ((J : ℝ) - (k : ℝ)) / D^2 * (z^(k+1)).re</span>
+<span class="l" id="L19"><span class="n">19</span>  have hDpos : 0 &lt; D := by dsimp [D]; positivity</span>
+<span class="l" id="L20"><span class="n">20</span>  have hDne : D ≠ 0 := ne_of_gt hDpos</span>
+<span class="l" id="L21"><span class="n">21</span>  have hz : ‖z‖ = 1 := by</span>
+<span class="l" id="L22"><span class="n">22</span>    dsimp [z]</span>
+<span class="l" id="L23"><span class="n">23</span>    rw [mul_comm]</span>
+<span class="l" id="L24"><span class="n">24</span>    exact Complex.norm_exp_ofReal_mul_I _</span>
+<span class="l" id="L25"><span class="n">25</span>  have hgeom : yevorin_geom z J = h3RealDirichletSum J t := rfl</span>
+<span class="l" id="L26"><span class="n">26</span>  have hMode (k : ℕ) :</span>
+<span class="l" id="L27"><span class="n">27</span>      (z ^ (k+1)).re = (realVaalerMode (k+1) t).re := by</span>
+<span class="l" id="L28"><span class="n">28</span>    congr 1</span>
+<span class="l" id="L29"><span class="n">29</span>    dsimp [z]</span>
+<span class="l" id="L30"><span class="n">30</span>    exact yevorin_phase_pow_eq_realVaalerMode (k+1) t</span>
+<span class="l" id="L31"><span class="n">31</span>  have hsum :</span>
+<span class="l" id="L32"><span class="n">32</span>      (∑ j ∈ Finset.Icc 1 J,</span>
+<span class="l" id="L33"><span class="n">33</span>        (yevorin_vaalerErrorCoeff J j * realVaalerMode j t).re) = S := by</span>
+<span class="l" id="L34"><span class="n">34</span>    rw [yevorin_sum_Icc_one_eq_range]</span>
+<span class="l" id="L35"><span class="n">35</span>    dsimp [S]</span>
+<span class="l" id="L36"><span class="n">36</span>    apply Finset.sum_congr rfl</span>
+<span class="l" id="L37"><span class="n">37</span>    intro k hk</span>
+<span class="l" id="L38"><span class="n">38</span>    rw [yevorin_error_mode_triangle]</span>
+<span class="l" id="L39"><span class="n">39</span>    rw [← hMode]</span>
+<span class="l" id="L40"><span class="n">40</span>  have hscale :</span>
+<span class="l" id="L41"><span class="n">41</span>      (∑ k ∈ Finset.range J,</span>
+<span class="l" id="L42"><span class="n">42</span>        2 * ((J : ℝ) - (k : ℝ)) * (z ^ (k+1)).re) =</span>
+<span class="l" id="L43"><span class="n">43</span>        2 * D^2 * S := by</span>
+<span class="l" id="L44"><span class="n">44</span>    rw [Finset.mul_sum]</span>
+<span class="l" id="L45"><span class="n">45</span>    apply Finset.sum_congr rfl</span>
+<span class="l" id="L46"><span class="n">46</span>    intro k hk</span>
+<span class="l" id="L47"><span class="n">47</span>    field_simp [hDne]</span>
+<span class="l" id="L48"><span class="n">48</span>  have htriangle := yevorin_fejer_real_triangle z hz J</span>
+<span class="l" id="L49"><span class="n">49</span>  rw [hgeom, hscale] at htriangle</span>
+<span class="l" id="L50"><span class="n">50</span>  have htriangle&#x27; :</span>
+<span class="l" id="L51"><span class="n">51</span>      ‖h3RealDirichletSum J t‖ ^ 2 = D + 2 * D^2 * S := by</span>
+<span class="l" id="L52"><span class="n">52</span>    simpa [D] using htriangle</span>
+<span class="l" id="L53"><span class="n">53</span>  have hAlgebra (T : ℝ) :</span>
+<span class="l" id="L54"><span class="n">54</span>      1/D + T = 1/(2*D) + (D + 2*D^2*T)/(2*D^2) := by</span>
+<span class="l" id="L55"><span class="n">55</span>    field_simp [hDne]</span>
+<span class="l" id="L56"><span class="n">56</span>    ring</span>
+<span class="l" id="L57"><span class="n">57</span>  rw [hsum]</span>
+<span class="l" id="L58"><span class="n">58</span>  change 1/D + S =</span>
+<span class="l" id="L59"><span class="n">59</span>    1/(2*D) + ‖h3RealDirichletSum J t‖^2/(2*D^2)</span>
+<span class="l" id="L60"><span class="n">60</span>  rw [htriangle&#x27;]</span>
+<span class="l" id="L61"><span class="n">61</span>  exact hAlgebra S</span>
+<span class="l" id="L62"><span class="n">62</span></span>
+<span class="l" id="L63"><span class="n">63</span>#print axioms yevorin_vaaler_error_eq_dirichlet</span>
+<span class="l" id="L64"><span class="n">64</span>end OrielUpper</span></pre></div></body></html>

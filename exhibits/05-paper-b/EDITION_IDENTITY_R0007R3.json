@@ -1,0 +1,16 @@
+{
+  "edition": "R0007R3",
+  "assembled_utc": "2026-11-03",
+  "source_edition": "R0007R2",
+  "paper_b_pdf_sha256": "7900d5fdd14828c3bd70b77da07de4872b93eb8048df94eb6d3d78eb45c3f908",
+  "paper_b_tex_sha256": "c9d2a4eb35dba8fca7327913457c41f8d69ad15656c0949d4321bf14ba1446d3",
+  "k1_tex_sha256": "844cf5553097a2fc0a79857ab62813b745d33fb37b27c130848bf18e79296a60",
+  "k1_pdf_sha256": "c7eca025ed9a9a1bb3c2625625a6811769969cbe11fdfceafa157ba69eee3556",
+  "k1_bibliography_needs_signoff": true,
+  "alex_independent_paperb_lean_replay": "pass",
+  "source_archive_sha256": "e8bccaf4c607a3b2458a47833bdd98f598a59229f7af0175927b994318d7b2a1",
+  "document_rights": "CC-BY-4.0 for author-controlled scholarly text upon publication",
+  "source_software_rights": "separate provenance/Apache-2.0 decision pending",
+  "oral_history_consents": "exact-edition publication clearance pending",
+  "released_publicly": false
+}

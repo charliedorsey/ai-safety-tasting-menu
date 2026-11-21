@@ -1,0 +1,237 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LEAN/GoldC/QuillonLongFinal.lean</title><style>body{background:#f9f8f4;color:#27332d;font:16px/1.5 Georgia,serif;margin:0}a{color:#2d6255}.wrap{max-width:1160px;margin:0 auto;padding:30px 24px}header{border-bottom:1px solid #d8ded7;margin-bottom:22px}h1{font-size:29px;font-weight:normal;overflow-wrap:anywhere}.meta,nav,th{font:13px/1.5 system-ui,sans-serif;color:#5b6b63}nav a{margin-right:18px}.tblwrap{overflow-x:auto}table{border-collapse:collapse;width:100%}td,th{padding:9px 12px;border-bottom:1px solid #e0e3de;text-align:left;vertical-align:top}td code{overflow-wrap:anywhere}code,pre{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}pre{font-size:12.5px;white-space:pre;overflow-x:auto;line-height:1.6;background:#fff;padding:12px;border:1px solid #e2e4df}.ln{color:#8b968e;padding-right:15px;user-select:none}.line{display:block}.focus{background:#e9f1ec}.line:target{outline:2px solid #276b54;outline-offset:1px;background:#f6f4e7}.legend{padding:12px 15px;background:#fff;border-left:2px solid #629280;margin:24px 0}@media(max-width:640px){.wrap{padding:18px 12px}h1{font-size:21px}td,th{padding:8px}.meta{font-size:11px}pre{font-size:11px}}</style></head><body><div class="wrap"><header><nav><a href="../source_index.html">All source waypoints</a><a href="../../../Docs/companion/reading_room/index.html">Reading room</a></nav><h1>LEAN/GoldC/QuillonLongFinal.lean</h1><p class="meta">Exact archived source · SHA-256 105dbc896b2269f9fbd006150e780b78fdb031f652ab6e434fc1dcc38fd3277e · Original line numbers · Not a new Lean replay</p></header><p class="meta">Deep source proof text is reproduced verbatim for inspection; this page does not assert a compiler-derived proof-dependency graph.</p><pre><span class="line" id="L1"><span class="ln">    1</span>import GoldC.QuillonLRP</span>
+<span class="line" id="L2"><span class="ln">    2</span></span>
+<span class="line" id="L3"><span class="ln">    3</span>/-!</span>
+<span class="line" id="L4"><span class="ln">    4</span># Quillon LONG L10: **LONG end to end** — `SourceUniformSublog (signedLongMiddle Jlow Jhigh δ)`</span>
+<span class="line" id="L5"><span class="ln">    5</span></span>
+<span class="line" id="L6"><span class="ln">    6</span>* `split7`: exact seven-way split of a masked summand (instance-agnostic).</span>
+<span class="line" id="L7"><span class="ln">    7</span>* `long_pair_decomp`: for every decoration `d`, with `P = longEither δ`,</span>
+<span class="line" id="L8"><span class="ln">    8</span></span>
+<span class="line" id="L9"><span class="ln">    9</span>      regionPairSumMiddleWhere (LONG) d (foldRow …)</span>
+<span class="line" id="L10"><span class="ln">   10</span>        = WL + CL + RL + ManyL + EdgeL + ResL + WRL           (exact, `pairSum_eq_double` + `split7`)</span>
+<span class="line" id="L11"><span class="ln">   11</span></span>
+<span class="line" id="L12"><span class="ln">   12</span>  LONG-left (`s^{1+δ} &lt; r`):  W′ (`WL ≤ Λ^{−80}`), region C (`CL ≤ Λ^{−15}`);</span>
+<span class="line" id="L13"><span class="ln">   13</span>  LONG-right (`r^{1+δ} &lt; s`): R (`RL ≤ Λ^{−75}`), many factors (`ManyL ≤ Λ^{−50}`),</span>
+<span class="line" id="L14"><span class="ln">   14</span>  edge (`EdgeL ≤ Λ^{19/20}`), rough×rough (`ResL ≤ Λ^{7/10}`), Weil W′ (`WRL ≤ Λ^{−80}`).</span>
+<span class="line" id="L15"><span class="ln">   15</span>* `long_pair_le`: `|LONG pair sum at d| ≤ 7Λ^{19/20}`, eventually, uniformly in `a, d ⊆ primeFactors h,</span>
+<span class="line" id="L16"><span class="ln">   16</span>  Jlow, Jhigh`.</span>
+<span class="line" id="L17"><span class="ln">   17</span>* **`long_sublog`** `(hW : WeilHyp)`: `SourceUniformSublog (signedLongMiddle Jlow Jhigh δ)` for</span>
+<span class="line" id="L18"><span class="ln">   18</span>  `0 &lt; δ &lt; 1/3`, arbitrary cutoffs. Lemma G controls the decoration mass.</span>
+<span class="line" id="L19"><span class="ln">   19</span></span>
+<span class="line" id="L20"><span class="ln">   20</span>The ONLY input beyond the copied source and Mathlib is the named hypothesis `WeilHyp`, which is the</span>
+<span class="line" id="L21"><span class="ln">   21</span>exact statement of the GREEN `Orienne.CSC3.norm_quillon_K_weil`. No axiom, no `sorry`.</span>
+<span class="line" id="L22"><span class="ln">   22</span>-/</span>
+<span class="line" id="L23"><span class="ln">   23</span></span>
+<span class="line" id="L24"><span class="ln">   24</span>open scoped BigOperators</span>
+<span class="line" id="L25"><span class="ln">   25</span>open Finset</span>
+<span class="line" id="L26"><span class="ln">   26</span></span>
+<span class="line" id="L27"><span class="ln">   27</span>namespace GoldC.QuillonLongFinal</span>
+<span class="line" id="L28"><span class="ln">   28</span></span>
+<span class="line" id="L29"><span class="ln">   29</span>open Classical</span>
+<span class="line" id="L30"><span class="ln">   30</span>open GoldC.QuillonEv GoldC.QuillonSetup GoldC.QuillonLam GoldC.QuillonCEv GoldC.QuillonCFinal</span>
+<span class="line" id="L31"><span class="ln">   31</span>  GoldC.QuillonREv GoldC.QuillonWContext GoldC.QuillonRPhysical GoldC.QuillonResPhysical</span>
+<span class="line" id="L32"><span class="ln">   32</span>  GoldC.QuillonCPhysical GoldC.QuillonLSetup GoldC.QuillonLW GoldC.QuillonLC GoldC.QuillonLR</span>
+<span class="line" id="L33"><span class="ln">   33</span>  GoldC.QuillonLWR GoldC.QuillonLRes GoldC.QuillonLRP GoldC.QuillonLWeil</span>
+<span class="line" id="L34"><span class="ln">   34</span>open GoldC.QuillonCopyS GoldC.QuillonCopyF GoldC.QuillonCopyM GoldC.QuillonWPhysical</span>
+<span class="line" id="L35"><span class="ln">   35</span></span>
+<span class="line" id="L36"><span class="ln">   36</span>lemma split7 {e1 e2 e3 m L W J Km Ed WR : Prop} (f : ℝ) (i0 : Decidable (e1 ∧ e2 ∧ e3 ∧ m))</span>
+<span class="line" id="L37"><span class="ln">   37</span>    (i1 : Decidable (e1 ∧ e2 ∧ e3 ∧ (m ∧ (L ∧ W))))</span>
+<span class="line" id="L38"><span class="ln">   38</span>    (i2 : Decidable (e1 ∧ e2 ∧ e3 ∧ (m ∧ (L ∧ ¬ W))))</span>
+<span class="line" id="L39"><span class="ln">   39</span>    (i3 : Decidable (e1 ∧ e2 ∧ e3 ∧ (m ∧ (¬ L ∧ J))))</span>
+<span class="line" id="L40"><span class="ln">   40</span>    (i4 : Decidable (e1 ∧ e2 ∧ e3 ∧ (m ∧ (¬ L ∧ ¬ J ∧ Km))))</span>
+<span class="line" id="L41"><span class="ln">   41</span>    (i5 : Decidable (e1 ∧ e2 ∧ e3 ∧ (m ∧ (¬ L ∧ ¬ J ∧ ¬ Km ∧ Ed))))</span>
+<span class="line" id="L42"><span class="ln">   42</span>    (i6 : Decidable (e1 ∧ e2 ∧ e3 ∧ (m ∧ (¬ L ∧ ¬ J ∧ ¬ Km ∧ ¬ Ed ∧ ¬ WR))))</span>
+<span class="line" id="L43"><span class="ln">   43</span>    (i7 : Decidable (e1 ∧ e2 ∧ e3 ∧ (m ∧ (¬ L ∧ ¬ J ∧ ¬ Km ∧ ¬ Ed ∧ WR)))) :</span>
+<span class="line" id="L44"><span class="ln">   44</span>    @ite _ (e1 ∧ e2 ∧ e3 ∧ m) i0 f 0 =</span>
+<span class="line" id="L45"><span class="ln">   45</span>      @ite _ _ i1 f 0 + @ite _ _ i2 f 0 + @ite _ _ i3 f 0 + @ite _ _ i4 f 0 +</span>
+<span class="line" id="L46"><span class="ln">   46</span>        @ite _ _ i5 f 0 + @ite _ _ i6 f 0 + @ite _ _ i7 f 0 := by</span>
+<span class="line" id="L47"><span class="ln">   47</span>  by_cases ha : e1 ∧ e2 ∧ e3 ∧ m</span>
+<span class="line" id="L48"><span class="ln">   48</span>  · obtain ⟨h1, h2, h3, hm⟩ := ha</span>
+<span class="line" id="L49"><span class="ln">   49</span>    by_cases hL : L</span>
+<span class="line" id="L50"><span class="ln">   50</span>    · by_cases hW : W</span>
+<span class="line" id="L51"><span class="ln">   51</span>      · simp [h1, h2, h3, hm, hL, hW]</span>
+<span class="line" id="L52"><span class="ln">   52</span>      · simp [h1, h2, h3, hm, hL, hW]</span>
+<span class="line" id="L53"><span class="ln">   53</span>    by_cases hJ : J</span>
+<span class="line" id="L54"><span class="ln">   54</span>    · simp [h1, h2, h3, hm, hL, hJ]</span>
+<span class="line" id="L55"><span class="ln">   55</span>    by_cases hK : Km</span>
+<span class="line" id="L56"><span class="ln">   56</span>    · simp [h1, h2, h3, hm, hL, hJ, hK]</span>
+<span class="line" id="L57"><span class="ln">   57</span>    by_cases hE : Ed</span>
+<span class="line" id="L58"><span class="ln">   58</span>    · simp [h1, h2, h3, hm, hL, hJ, hK, hE]</span>
+<span class="line" id="L59"><span class="ln">   59</span>    by_cases hR : WR</span>
+<span class="line" id="L60"><span class="ln">   60</span>    · simp [h1, h2, h3, hm, hL, hJ, hK, hE, hR]</span>
+<span class="line" id="L61"><span class="ln">   61</span>    · simp [h1, h2, h3, hm, hL, hJ, hK, hE, hR]</span>
+<span class="line" id="L62"><span class="ln">   62</span>  · have n1 : ¬ (e1 ∧ e2 ∧ e3 ∧ (m ∧ (L ∧ W))) := fun ⟨a, b, c, d, _⟩ =&gt; ha ⟨a, b, c, d⟩</span>
+<span class="line" id="L63"><span class="ln">   63</span>    have n2 : ¬ (e1 ∧ e2 ∧ e3 ∧ (m ∧ (L ∧ ¬ W))) := fun ⟨a, b, c, d, _⟩ =&gt; ha ⟨a, b, c, d⟩</span>
+<span class="line" id="L64"><span class="ln">   64</span>    have n3 : ¬ (e1 ∧ e2 ∧ e3 ∧ (m ∧ (¬ L ∧ J))) := fun ⟨a, b, c, d, _⟩ =&gt; ha ⟨a, b, c, d⟩</span>
+<span class="line" id="L65"><span class="ln">   65</span>    have n4 : ¬ (e1 ∧ e2 ∧ e3 ∧ (m ∧ (¬ L ∧ ¬ J ∧ Km))) := fun ⟨a, b, c, d, _⟩ =&gt; ha ⟨a, b, c, d⟩</span>
+<span class="line" id="L66"><span class="ln">   66</span>    have n5 : ¬ (e1 ∧ e2 ∧ e3 ∧ (m ∧ (¬ L ∧ ¬ J ∧ ¬ Km ∧ Ed))) := fun ⟨a, b, c, d, _⟩ =&gt; ha ⟨a, b, c, d⟩</span>
+<span class="line" id="L67"><span class="ln">   67</span>    have n6 : ¬ (e1 ∧ e2 ∧ e3 ∧ (m ∧ (¬ L ∧ ¬ J ∧ ¬ Km ∧ ¬ Ed ∧ ¬ WR))) :=</span>
+<span class="line" id="L68"><span class="ln">   68</span>      fun ⟨a, b, c, d, _⟩ =&gt; ha ⟨a, b, c, d⟩</span>
+<span class="line" id="L69"><span class="ln">   69</span>    have n7 : ¬ (e1 ∧ e2 ∧ e3 ∧ (m ∧ (¬ L ∧ ¬ J ∧ ¬ Km ∧ ¬ Ed ∧ WR))) :=</span>
+<span class="line" id="L70"><span class="ln">   70</span>      fun ⟨a, b, c, d, _⟩ =&gt; ha ⟨a, b, c, d⟩</span>
+<span class="line" id="L71"><span class="ln">   71</span>    rw [if_neg ha, if_neg n1, if_neg n2, if_neg n3, if_neg n4, if_neg n5, if_neg n6, if_neg n7]; ring</span>
+<span class="line" id="L72"><span class="ln">   72</span></span>
+<span class="line" id="L73"><span class="ln">   73</span>/-- **Exact seven-cell decomposition of the LONG pair sum at decoration `d`.** -/</span>
+<span class="line" id="L74"><span class="ln">   74</span>theorem long_pair_decomp (Jlow Jhigh q a h : ℕ) (δ : ℝ) (d : Finset ℕ) :</span>
+<span class="line" id="L75"><span class="ln">   75</span>    regionPairSumMiddleWhere Jlow Jhigh q h (centralGate h) (longEither δ) d</span>
+<span class="line" id="L76"><span class="ln">   76</span>        (foldRow q a (primeSetProduct d)) =</span>
+<span class="line" id="L77"><span class="ln">   77</span>      WLPart Jlow Jhigh q a h δ d + CLPart Jlow Jhigh q a h δ d + RLPart Jlow Jhigh q a h δ d +</span>
+<span class="line" id="L78"><span class="ln">   78</span>        ManyLPart Jlow Jhigh q a h δ d + EdgeLPart Jlow Jhigh q a h δ d +</span>
+<span class="line" id="L79"><span class="ln">   79</span>        ResLPart Jlow Jhigh q a h δ d + WRLPart Jlow Jhigh q a h δ d := by</span>
+<span class="line" id="L80"><span class="ln">   80</span>  rw [pairSum_eq_double]</span>
+<span class="line" id="L81"><span class="ln">   81</span>  unfold WLPart CLPart RLPart ManyLPart EdgeLPart ResLPart WRLPart RMR Tsrc</span>
+<span class="line" id="L82"><span class="ln">   82</span>  simp only [← sum_add_distrib]</span>
+<span class="line" id="L83"><span class="ln">   83</span>  refine sum_congr rfl fun B _ =&gt; sum_congr rfl fun C _ =&gt; ?_</span>
+<span class="line" id="L84"><span class="ln">   84</span>  unfold pairTerm</span>
+<span class="line" id="L85"><span class="ln">   85</span>  exact split7 _ _ _ _ _ _ _ _ _</span>
+<span class="line" id="L86"><span class="ln">   86</span></span>
+<span class="line" id="L87"><span class="ln">   87</span>/-- **The LONG pair sum at any decoration is `≤ 7Λ^{19/20}`** (given `WeilHyp`). -/</span>
+<span class="line" id="L88"><span class="ln">   88</span>theorem long_pair_le (hW : WeilHyp) (q : ℕ) (hq : 0 &lt; q) (δ : ℝ) (hδ0 : 0 &lt; δ) (hδ1 : δ &lt; 1 / 3) :</span>
+<span class="line" id="L89"><span class="ln">   89</span>    ∃ Λ₀ : ℝ, 2 ≤ Λ₀ ∧ ∀ (Jlow Jhigh a h : ℕ) (d : Finset ℕ), Λ₀ ≤ Real.log h → 2 ≤ h →</span>
+<span class="line" id="L90"><span class="ln">   90</span>      d ⊆ h.primeFactors →</span>
+<span class="line" id="L91"><span class="ln">   91</span>      |regionPairSumMiddleWhere Jlow Jhigh q h (centralGate h) (longEither δ) d</span>
+<span class="line" id="L92"><span class="ln">   92</span>          (foldRow q a (primeSetProduct d))| ≤ 7 * (Real.log h) ^ (19 / 20 : ℝ) := by</span>
+<span class="line" id="L93"><span class="ln">   93</span>  obtain ⟨Λ₁, hΛ₁, h1⟩ := WL_physical q hq δ hδ0 hδ1</span>
+<span class="line" id="L94"><span class="ln">   94</span>  obtain ⟨Λ₂, hΛ₂, h2⟩ := CL_physical q hq δ hδ0 hδ1</span>
+<span class="line" id="L95"><span class="ln">   95</span>  obtain ⟨Λ₃, hΛ₃, h3⟩ := RL_physical q hq δ hδ0 hδ1</span>
+<span class="line" id="L96"><span class="ln">   96</span>  obtain ⟨Λ₄, hΛ₄, h4⟩ := ManyL_physical q hq δ</span>
+<span class="line" id="L97"><span class="ln">   97</span>  obtain ⟨Λ₅, hΛ₅, h5⟩ := EdgeL_physical q hq δ hδ0</span>
+<span class="line" id="L98"><span class="ln">   98</span>  obtain ⟨Λ₆, hΛ₆, h6⟩ := ResL_physical q hq δ hδ0</span>
+<span class="line" id="L99"><span class="ln">   99</span>  obtain ⟨Λ₇, hΛ₇, h7⟩ := WRL_physical hW q hq δ hδ0 hδ1</span>
+<span class="line" id="L100"><span class="ln">  100</span>  refine ⟨max Λ₁ (max Λ₂ (max Λ₃ (max Λ₄ (max Λ₅ (max Λ₆ Λ₇))))), le_trans hΛ₁ (le_max_left _ _), ?_⟩</span>
+<span class="line" id="L101"><span class="ln">  101</span>  intro Jlow Jhigh a h d hΛ hh hd</span>
+<span class="line" id="L102"><span class="ln">  102</span>  have L1 : Λ₁ ≤ Real.log h := le_trans (by simp) hΛ</span>
+<span class="line" id="L103"><span class="ln">  103</span>  have L2 : Λ₂ ≤ Real.log h := le_trans (by simp) hΛ</span>
+<span class="line" id="L104"><span class="ln">  104</span>  have L3 : Λ₃ ≤ Real.log h := le_trans (by simp) hΛ</span>
+<span class="line" id="L105"><span class="ln">  105</span>  have L4 : Λ₄ ≤ Real.log h := le_trans (by simp) hΛ</span>
+<span class="line" id="L106"><span class="ln">  106</span>  have L5 : Λ₅ ≤ Real.log h := le_trans (by simp) hΛ</span>
+<span class="line" id="L107"><span class="ln">  107</span>  have L6 : Λ₆ ≤ Real.log h := le_trans (by simp) hΛ</span>
+<span class="line" id="L108"><span class="ln">  108</span>  have L7 : Λ₇ ≤ Real.log h := le_trans (by simp) hΛ</span>
+<span class="line" id="L109"><span class="ln">  109</span>  have hΛ1 : 1 ≤ Real.log h := by linarith</span>
+<span class="line" id="L110"><span class="ln">  110</span>  rw [long_pair_decomp]</span>
+<span class="line" id="L111"><span class="ln">  111</span>  have c1 := h1 Jlow Jhigh a h d L1 hh</span>
+<span class="line" id="L112"><span class="ln">  112</span>  have c2 := h2 Jlow Jhigh a h d L2 hh hd</span>
+<span class="line" id="L113"><span class="ln">  113</span>  have c3 := h3 Jlow Jhigh a h d L3 hh</span>
+<span class="line" id="L114"><span class="ln">  114</span>  have c4 := h4 Jlow Jhigh a h d L4 hh</span>
+<span class="line" id="L115"><span class="ln">  115</span>  have c5 := h5 Jlow Jhigh a h d L5 hh</span>
+<span class="line" id="L116"><span class="ln">  116</span>  have c6 := h6 Jlow Jhigh a h d L6 hh</span>
+<span class="line" id="L117"><span class="ln">  117</span>  have c7 := h7 Jlow Jhigh a h d L7 hh</span>
+<span class="line" id="L118"><span class="ln">  118</span>  have m1 : (Real.log h) ^ (-(80 : ℝ)) ≤ (Real.log h) ^ (19 / 20 : ℝ) :=</span>
+<span class="line" id="L119"><span class="ln">  119</span>    Real.rpow_le_rpow_of_exponent_le hΛ1 (by norm_num)</span>
+<span class="line" id="L120"><span class="ln">  120</span>  have m2 : (Real.log h) ^ (-(15 : ℝ)) ≤ (Real.log h) ^ (19 / 20 : ℝ) :=</span>
+<span class="line" id="L121"><span class="ln">  121</span>    Real.rpow_le_rpow_of_exponent_le hΛ1 (by norm_num)</span>
+<span class="line" id="L122"><span class="ln">  122</span>  have m3 : (Real.log h) ^ (-(75 : ℝ)) ≤ (Real.log h) ^ (19 / 20 : ℝ) :=</span>
+<span class="line" id="L123"><span class="ln">  123</span>    Real.rpow_le_rpow_of_exponent_le hΛ1 (by norm_num)</span>
+<span class="line" id="L124"><span class="ln">  124</span>  have m4 : (Real.log h) ^ (-(50 : ℝ)) ≤ (Real.log h) ^ (19 / 20 : ℝ) :=</span>
+<span class="line" id="L125"><span class="ln">  125</span>    Real.rpow_le_rpow_of_exponent_le hΛ1 (by norm_num)</span>
+<span class="line" id="L126"><span class="ln">  126</span>  have m6 : (Real.log h) ^ (7 / 10 : ℝ) ≤ (Real.log h) ^ (19 / 20 : ℝ) :=</span>
+<span class="line" id="L127"><span class="ln">  127</span>    Real.rpow_le_rpow_of_exponent_le hΛ1 (by norm_num)</span>
+<span class="line" id="L128"><span class="ln">  128</span>  set A1 := WLPart Jlow Jhigh q a h δ d</span>
+<span class="line" id="L129"><span class="ln">  129</span>  set A2 := CLPart Jlow Jhigh q a h δ d</span>
+<span class="line" id="L130"><span class="ln">  130</span>  set A3 := RLPart Jlow Jhigh q a h δ d</span>
+<span class="line" id="L131"><span class="ln">  131</span>  set A4 := ManyLPart Jlow Jhigh q a h δ d</span>
+<span class="line" id="L132"><span class="ln">  132</span>  set A5 := EdgeLPart Jlow Jhigh q a h δ d</span>
+<span class="line" id="L133"><span class="ln">  133</span>  set A6 := ResLPart Jlow Jhigh q a h δ d</span>
+<span class="line" id="L134"><span class="ln">  134</span>  set A7 := WRLPart Jlow Jhigh q a h δ d</span>
+<span class="line" id="L135"><span class="ln">  135</span>  have t : |A1 + A2 + A3 + A4 + A5 + A6 + A7| ≤ |A1| + |A2| + |A3| + |A4| + |A5| + |A6| + |A7| := by</span>
+<span class="line" id="L136"><span class="ln">  136</span>    have := abs_add_le (A1 + A2 + A3 + A4 + A5 + A6) A7</span>
+<span class="line" id="L137"><span class="ln">  137</span>    have := abs_add_le (A1 + A2 + A3 + A4 + A5) A6</span>
+<span class="line" id="L138"><span class="ln">  138</span>    have := abs_add_le (A1 + A2 + A3 + A4) A5</span>
+<span class="line" id="L139"><span class="ln">  139</span>    have := abs_add_le (A1 + A2 + A3) A4</span>
+<span class="line" id="L140"><span class="ln">  140</span>    have := abs_add_le (A1 + A2) A3</span>
+<span class="line" id="L141"><span class="ln">  141</span>    have := abs_add_le A1 A2</span>
+<span class="line" id="L142"><span class="ln">  142</span>    linarith</span>
+<span class="line" id="L143"><span class="ln">  143</span>  linarith</span>
+<span class="line" id="L144"><span class="ln">  144</span></span>
+<span class="line" id="L145"><span class="ln">  145</span>open GoldC.QuillonCopyM in</span>
+<span class="line" id="L146"><span class="ln">  146</span>/-- **LONG (δ &lt; 1/3) end to end, given `WeilHyp`.** `signedLongMiddle Jlow Jhigh δ` is uniformly sublogarithmic,</span>
+<span class="line" id="L147"><span class="ln">  147</span>for arbitrary cutoff functions `Jlow` and `Jhigh`. -/</span>
+<span class="line" id="L148"><span class="ln">  148</span>theorem long_sublog (hW : WeilHyp) (Jlow Jhigh : ℕ → ℕ) (δ : ℝ) (hδ0 : 0 &lt; δ) (hδ1 : δ &lt; 1 / 3) :</span>
+<span class="line" id="L149"><span class="ln">  149</span>    SourceUniformSublog (signedLongMiddle Jlow Jhigh δ) := by</span>
+<span class="line" id="L150"><span class="ln">  150</span>  intro q hq _hsq eps heps</span>
+<span class="line" id="L151"><span class="ln">  151</span>  obtain ⟨Λ₁, hΛ₁, hP⟩ := long_pair_le hW q hq δ hδ0 hδ1</span>
+<span class="line" id="L152"><span class="ln">  152</span>  obtain ⟨Λ₂, hΛ₂, hpl⟩ := polylog_le 8 (1 / 1000) (by norm_num)</span>
+<span class="line" id="L153"><span class="ln">  153</span>  obtain ⟨Λ₃, hΛ₃, hK⟩ := const_le_rpow (1792 * Real.exp 10 / eps) (49 / 1000) (by norm_num)</span>
+<span class="line" id="L154"><span class="ln">  154</span>  set Λs := max Λ₁ (max Λ₂ Λ₃) with hΛs</span>
+<span class="line" id="L155"><span class="ln">  155</span>  refine ⟨⌈Real.exp Λs⌉₊ + 16, ?_⟩</span>
+<span class="line" id="L156"><span class="ln">  156</span>  intro a h _ha _hh0 _hpar hH0</span>
+<span class="line" id="L157"><span class="ln">  157</span>  have hh16 : 16 ≤ h := by omega</span>
+<span class="line" id="L158"><span class="ln">  158</span>  have hh0 : (0 : ℝ) &lt; h := by exact_mod_cast (show 0 &lt; h by omega)</span>
+<span class="line" id="L159"><span class="ln">  159</span>  have hlog : Λs ≤ Real.log h := by</span>
+<span class="line" id="L160"><span class="ln">  160</span>    have h1 : Real.exp Λs ≤ h := by</span>
+<span class="line" id="L161"><span class="ln">  161</span>      have : (⌈Real.exp Λs⌉₊ : ℝ) ≤ h := by exact_mod_cast (show ⌈Real.exp Λs⌉₊ ≤ h by omega)</span>
+<span class="line" id="L162"><span class="ln">  162</span>      exact le_trans (Nat.le_ceil _) this</span>
+<span class="line" id="L163"><span class="ln">  163</span>    calc Λs = Real.log (Real.exp Λs) := (Real.log_exp _).symm</span>
+<span class="line" id="L164"><span class="ln">  164</span>      _ ≤ Real.log h := Real.log_le_log (Real.exp_pos _) h1</span>
+<span class="line" id="L165"><span class="ln">  165</span>  have L1 : Λ₁ ≤ Real.log h := le_trans (by simp [hΛs]) hlog</span>
+<span class="line" id="L166"><span class="ln">  166</span>  have L2 : Λ₂ ≤ Real.log h := le_trans (by simp [hΛs]) hlog</span>
+<span class="line" id="L167"><span class="ln">  167</span>  have L3 : Λ₃ ≤ Real.log h := le_trans (by simp [hΛs]) hlog</span>
+<span class="line" id="L168"><span class="ln">  168</span>  set Λ := Real.log h with hΛdef</span>
+<span class="line" id="L169"><span class="ln">  169</span>  have hΛ2 : 2 ≤ Λ := le_trans hΛ₁ L1</span>
+<span class="line" id="L170"><span class="ln">  170</span>  have hΛ0 : 0 &lt; Λ := by linarith</span>
+<span class="line" id="L171"><span class="ln">  171</span>  have hΛ1 : 1 ≤ Λ := by linarith</span>
+<span class="line" id="L172"><span class="ln">  172</span>  -- unfold the CORE sum</span>
+<span class="line" id="L173"><span class="ln">  173</span>  show |signedLongMiddle Jlow Jhigh δ q a h| ≤ eps * Λ</span>
+<span class="line" id="L174"><span class="ln">  174</span>  unfold signedLongMiddle regionSumMiddleWhere regionDecorations</span>
+<span class="line" id="L175"><span class="ln">  175</span>  set P := GoldC.QuillonCopyG.decoratedHeightPrimeSet q h with hPdef</span>
+<span class="line" id="L176"><span class="ln">  176</span>  have hV0 : ∀ d ∈ P.powerset, 0 ≤ GoldC.QuillonCopyG.decorationWeight h d := by</span>
+<span class="line" id="L177"><span class="ln">  177</span>    intro d hd</span>
+<span class="line" id="L178"><span class="ln">  178</span>    unfold GoldC.QuillonCopyG.decorationWeight</span>
+<span class="line" id="L179"><span class="ln">  179</span>    refine prod_nonneg fun p hp =&gt; ?_</span>
+<span class="line" id="L180"><span class="ln">  180</span>    have h5 := (GoldC.QuillonCopyG.mem_P (mem_powerset.1 hd hp)).2.2.1</span>
+<span class="line" id="L181"><span class="ln">  181</span>    have : (5 : ℝ) ≤ p := by exact_mod_cast h5</span>
+<span class="line" id="L182"><span class="ln">  182</span>    split_ifs</span>
+<span class="line" id="L183"><span class="ln">  183</span>    · exact div_nonneg zero_le_one (by linarith)</span>
+<span class="line" id="L184"><span class="ln">  184</span>    · exact div_nonneg zero_le_one (by linarith)</span>
+<span class="line" id="L185"><span class="ln">  185</span>  have hdpf : ∀ d ∈ P.powerset, d ⊆ h.primeFactors := by</span>
+<span class="line" id="L186"><span class="ln">  186</span>    intro d hd p hp</span>
+<span class="line" id="L187"><span class="ln">  187</span>    obtain ⟨hpp, hph, -, hh0&#x27;⟩ := GoldC.QuillonCopyG.mem_P (mem_powerset.1 hd hp)</span>
+<span class="line" id="L188"><span class="ln">  188</span>    exact Nat.mem_primeFactors.2 ⟨hpp, hph, hh0&#x27;⟩</span>
+<span class="line" id="L189"><span class="ln">  189</span>  have hG := GoldC.QuillonCopyG.decoration_mass_le_loglog_pow q h hh16</span>
+<span class="line" id="L190"><span class="ln">  190</span>  rw [← hPdef] at hG</span>
+<span class="line" id="L191"><span class="ln">  191</span>  have hll : (Real.log Λ / Real.log 2 + 1) ^ 8 ≤ 256 * (1 + Real.log Λ) ^ 8 := by</span>
+<span class="line" id="L192"><span class="ln">  192</span>    have hl2 : (1 / 2 : ℝ) &lt; Real.log 2 := GoldC.QuillonLam.log2_gt_half</span>
+<span class="line" id="L193"><span class="ln">  193</span>    have hlΛ : 0 ≤ Real.log Λ := Real.log_nonneg hΛ1</span>
+<span class="line" id="L194"><span class="ln">  194</span>    have h1 : Real.log Λ / Real.log 2 + 1 ≤ 2 * (1 + Real.log Λ) := by</span>
+<span class="line" id="L195"><span class="ln">  195</span>      have : Real.log Λ / Real.log 2 ≤ 2 * Real.log Λ := by</span>
+<span class="line" id="L196"><span class="ln">  196</span>        rw [div_le_iff₀ (by linarith)]; nlinarith</span>
+<span class="line" id="L197"><span class="ln">  197</span>      linarith</span>
+<span class="line" id="L198"><span class="ln">  198</span>    calc (Real.log Λ / Real.log 2 + 1) ^ 8 ≤ (2 * (1 + Real.log Λ)) ^ 8 :=</span>
+<span class="line" id="L199"><span class="ln">  199</span>          pow_le_pow_left₀ (by positivity) h1 8</span>
+<span class="line" id="L200"><span class="ln">  200</span>      _ = 256 * (1 + Real.log Λ) ^ 8 := by ring</span>
+<span class="line" id="L201"><span class="ln">  201</span>  have hpl&#x27; := hpl Λ L2</span>
+<span class="line" id="L202"><span class="ln">  202</span>  have hK&#x27; := hK Λ L3</span>
+<span class="line" id="L203"><span class="ln">  203</span>  calc |∑ d ∈ P.powerset, GoldC.QuillonCopyG.decorationWeight h d *</span>
+<span class="line" id="L204"><span class="ln">  204</span>          regionPairSumMiddleWhere (Jlow h) (Jhigh h) q h (centralGate h) (longEither δ) d</span>
+<span class="line" id="L205"><span class="ln">  205</span>            (foldRow q a (primeSetProduct d))|</span>
+<span class="line" id="L206"><span class="ln">  206</span>      ≤ ∑ d ∈ P.powerset, GoldC.QuillonCopyG.decorationWeight h d * (7 * Λ ^ (19 / 20 : ℝ)) := by</span>
+<span class="line" id="L207"><span class="ln">  207</span>        refine le_trans (abs_sum_le_sum_abs _ _) (sum_le_sum fun d hd =&gt; ?_)</span>
+<span class="line" id="L208"><span class="ln">  208</span>        rw [abs_mul, abs_of_nonneg (hV0 d hd)]</span>
+<span class="line" id="L209"><span class="ln">  209</span>        exact mul_le_mul_of_nonneg_left (hP (Jlow h) (Jhigh h) a h d L1 (by omega) (hdpf d hd)) (hV0 d hd)</span>
+<span class="line" id="L210"><span class="ln">  210</span>    _ = (∑ d ∈ P.powerset, GoldC.QuillonCopyG.decorationWeight h d) * (7 * Λ ^ (19 / 20 : ℝ)) := by</span>
+<span class="line" id="L211"><span class="ln">  211</span>        rw [sum_mul]</span>
+<span class="line" id="L212"><span class="ln">  212</span>    _ ≤ (Real.exp 10 * (256 * Λ ^ (1 / 1000 : ℝ))) * (7 * Λ ^ (19 / 20 : ℝ)) := by</span>
+<span class="line" id="L213"><span class="ln">  213</span>        apply mul_le_mul_of_nonneg_right _ (by positivity)</span>
+<span class="line" id="L214"><span class="ln">  214</span>        refine le_trans hG ?_</span>
+<span class="line" id="L215"><span class="ln">  215</span>        apply mul_le_mul_of_nonneg_left _ (Real.exp_pos _).le</span>
+<span class="line" id="L216"><span class="ln">  216</span>        exact le_trans hll (by linarith)</span>
+<span class="line" id="L217"><span class="ln">  217</span>    _ = 1792 * Real.exp 10 * Λ ^ (951 / 1000 : ℝ) := by</span>
+<span class="line" id="L218"><span class="ln">  218</span>        rw [show Λ ^ (951 / 1000 : ℝ) = Λ ^ (1 / 1000 : ℝ) * Λ ^ (19 / 20 : ℝ) by</span>
+<span class="line" id="L219"><span class="ln">  219</span>          rw [← Real.rpow_add hΛ0]; norm_num]</span>
+<span class="line" id="L220"><span class="ln">  220</span>        ring</span>
+<span class="line" id="L221"><span class="ln">  221</span>    _ ≤ eps * Λ := by</span>
+<span class="line" id="L222"><span class="ln">  222</span>        have e : Λ = Λ ^ (49 / 1000 : ℝ) * Λ ^ (951 / 1000 : ℝ) := by</span>
+<span class="line" id="L223"><span class="ln">  223</span>          rw [← Real.rpow_add hΛ0]; norm_num</span>
+<span class="line" id="L224"><span class="ln">  224</span>        have hp : 0 ≤ Λ ^ (951 / 1000 : ℝ) := by positivity</span>
+<span class="line" id="L225"><span class="ln">  225</span>        have h1 : 1792 * Real.exp 10 ≤ eps * Λ ^ (49 / 1000 : ℝ) := by</span>
+<span class="line" id="L226"><span class="ln">  226</span>          rw [div_le_iff₀ heps] at hK&#x27;; linarith</span>
+<span class="line" id="L227"><span class="ln">  227</span>        calc 1792 * Real.exp 10 * Λ ^ (951 / 1000 : ℝ) ≤ eps * Λ ^ (49 / 1000 : ℝ) * Λ ^ (951 / 1000 : ℝ) :=</span>
+<span class="line" id="L228"><span class="ln">  228</span>              mul_le_mul_of_nonneg_right h1 hp</span>
+<span class="line" id="L229"><span class="ln">  229</span>          _ = eps * Λ := by rw [mul_assoc, ← e]</span>
+<span class="line" id="L230"><span class="ln">  230</span></span>
+<span class="line" id="L231"><span class="ln">  231</span>end GoldC.QuillonLongFinal</span>
+<span class="line" id="L232"><span class="ln">  232</span></span>
+<span class="line" id="L233"><span class="ln">  233</span>#print axioms GoldC.QuillonLongFinal.split7</span>
+<span class="line" id="L234"><span class="ln">  234</span>#print axioms GoldC.QuillonLongFinal.long_pair_decomp</span>
+<span class="line" id="L235"><span class="ln">  235</span>#print axioms GoldC.QuillonLongFinal.long_pair_le</span>
+<span class="line" id="L236"><span class="ln">  236</span>#print axioms GoldC.QuillonLongFinal.long_sublog</span>
+</pre></div></body></html>

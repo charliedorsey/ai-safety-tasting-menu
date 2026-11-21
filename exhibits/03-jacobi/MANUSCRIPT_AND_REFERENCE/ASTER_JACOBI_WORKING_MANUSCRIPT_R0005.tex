@@ -1,0 +1,1759 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+  11pt,
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Certified spectral distance for finite Jacobi matrices},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Certified spectral distance for finite Jacobi matrices}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{1. Introduction}\label{introduction}
+
+Consider the symmetric tridiagonal matrix
+
+\[
+J=\begin{pmatrix}0&1&0\\1&0&1\\0&1&0\end{pmatrix},
+\qquad \tau=\frac75.
+\]
+
+The polynomial identity \(\det(\tau I-J)\ne0\) already decides whether
+\(J-\tau I\) is invertible. It does not quantify how close the matrix is
+to singularity. For solving a shifted linear system, that quantitative
+question is often the consequential one: how strongly can the inverse
+amplify an input error or a residual, and how much perturbation can the
+conclusion tolerate?
+
+A finite exact-rational computation answers it here. The characteristic
+continuants show that \((139/100,141/100]\) contains no eigenvalue,
+while \((141/100,71/50]\) contains at least one. Those two finite
+counting facts imply
+
+\[
+\boxed{\frac1{100}\le
+\operatorname{dist}\!\left(\frac75,\sigma(J)\right)
+\le\frac1{50}.}
+\tag{1.1}
+\]
+
+The first inequality proves that \(J-\tau I\) is invertible and that its
+Euclidean inverse norm is at most \(100\). If \(x\) solves
+\((J-\tau I)x=f\) and a proposed \(\widehat x\) has a separately
+certified residual \(\|f-(J-\tau I)\widehat x\|_2\le\delta\), then
+\(\|x-\widehat x\|_2\le100\delta\). Thus the certificate is not
+principally an eigenvalue-finding device: it is finite evidence for a
+\emph{quantitative safety margin}.
+
+For an arbitrary finite real symmetric matrix, put
+
+\[
+\Delta(J,\tau)=\operatorname{dist}(\tau,\sigma(J))
+=\min_{\lambda\in\sigma(J)}|\lambda-\tau|.
+\tag{1.2}
+\]
+
+Whenever \(\Delta(J,\tau)>0\), the spectral theorem gives
+
+\[
+\|(J-\tau I)^{-1}\|_2=\Delta(J,\tau)^{-1}.
+\tag{1.3}
+\]
+
+Our central problem is therefore to furnish rational numbers
+\(0<L\le U\) and evidence establishing \(L\le\Delta(J,\tau)\le U\), with
+the additional property that a \textbf{separate verifier}, using the
+same exact input and the requested tolerance \(\varepsilon>0\), can
+check \(U-L\le\varepsilon\). This last comparison cannot be replaced by
+a producer's assurance that it ran enough iterations. Likewise, a proof
+of termination is distinct from a demonstration that the implementation
+is economical at numerically relevant tolerances.
+
+We study unreduced finite Jacobi matrices with \emph{rational}
+coefficients and a rational target energy. The natural matrix is
+represented by its \(n\) diagonal entries and \(n-1\) nonzero
+off-diagonal entries; any extension to infinite indexing in the proof
+development is an implementation convention, not new input data.
+Rationality makes every continuant sign and Sturm-count comparison
+decidable without floating-point assumptions. It is not a claim that
+general real coefficients or irrational phase energies are executable
+inputs to the same exact-data producer.
+
+The key construction brackets the \textbf{distance from the target},
+rather than identifying a nearest eigenvalue. An inner symmetric
+interval with equal Sturm counts at its endpoints certifies spectral
+absence; a larger symmetric interval with a strict count drop certifies
+presence. Count-preserving rational bisection halves the width of the
+resulting distance enclosure. The inner and outer radii are computed
+directly from continuant bounds and a finite coefficient budget. The
+mathematical certificate is checked independently of that construction.
+
+The ingredients of this scheme have substantial prior art. Sturm counts
+and guaranteed tridiagonal eigenvalue enclosures are classical;
+Fernando's exact-inertia algorithm gives rigorous eigenvalue inclusions
+{[}1{]}. Untrusted production followed by formally verified checking is
+likewise established in real-algebraic computation {[}2{]}, and Lean's
+\texttt{hex-real-roots} implements certified half-open Sturm root
+isolation with stronger general polynomial functionality {[}3{]}. We
+neither claim a first Sturm certificate nor propose a general
+replacement for such root isolators. The specific question addressed
+here is how a directly checkable \emph{target-centered Jacobi witness}
+can be constructed from the three-term recurrence and consumed as a
+quantitative spectral-distance, inverse-norm, and stability margin.
+Section 7 describes this distinction and its limitations in more detail.
+
+The exposition separates a mathematical assertion from evidence that a
+particular implementation meets it. Sections 2 and 3 state the exact
+counting convention and the certificate's semantics. Section 4 proves
+constructive initialization and finite refinement. Section 5 deduces
+standard perturbation and residual bounds with explicitly represented
+uncertainties. Section 6 examines arithmetic resonance in an exactly
+solvable chain; it explains the demand for narrow margins without
+asserting a universal algorithmic lower bound. Finally, Section 7
+compares the certificate with existing inclusion and root-isolation
+methods, and records the limits of its computational trust boundary.
+
+\section{2. Jacobi data and exact spectral
+counting}\label{jacobi-data-and-exact-spectral-counting}
+
+\subsection{2.1. The finite unreduced
+matrix}\label{the-finite-unreduced-matrix}
+
+Fix an integer \(n\ge1\), rational numbers
+
+\[
+d_0,\ldots,d_{n-1}\in\mathbb Q,
+\qquad b_0,\ldots,b_{n-2}\in\mathbb Q\setminus\{0\},
+\tag{2.1}
+\]
+
+and define the real symmetric Jacobi matrix
+\(J_n=J_n(d,b)\in\mathbb R^{n\times n}\) by
+
+\[
+(J_n)_{ij}=
+\begin{cases}
+ d_i,&i=j,\\
+ b_i,&j=i+1,\\
+ b_j,&i=j+1,\\
+ 0,&|i-j|\ge2.
+\end{cases}
+\tag{2.2}
+\]
+
+The condition \(b_i\ne0\) makes the matrix \emph{unreduced}. No sign
+restriction is imposed on \(b_i\); in the continuant recurrence only
+\(b_i^2\) occurs. For \(n=1\) there are no off-diagonal conditions. We
+write the real eigenvalues of \(J_n\), repeated according to
+multiplicity, as \(\lambda_1,\ldots,\lambda_n\). In the unreduced Jacobi
+case they are in fact simple, but simplicity is not used in the
+elementary deduction from a certified exclusion interval to a distance
+bound.
+
+All rational data are henceforth regarded as real numbers when used in
+matrix or spectral expressions. This embedding is exact. In particular,
+a theorem about \(\mathbb Q\)-valued computation need not assume that an
+arbitrary real eigenvalue has a rational representation.
+
+The formal recurrence is parameterized by functions
+\(d,b:\mathbb N\to\mathbb Q\). For an \(n\)-site matrix, only the finite
+prefixes in (2.1) are consulted. A practical serialized input may
+therefore be represented by two finite arrays without altering the
+mathematical object; that serialization itself is not part of the
+spectral theorem proved here.
+
+We consider a target \(\tau\in\mathbb Q\). The exact singularity
+question is whether \(\tau\in\sigma(J_n)\); in the nonsingular case the
+object to enclose is
+
+\[
+\Delta_n(\tau):=\min_{1\le j\le n}|\lambda_j-\tau|>0.
+\tag{2.3}
+\]
+
+\subsection{2.2. Characteristic
+continuants}\label{characteristic-continuants}
+
+Let \(J_k\) denote the leading \(k\times k\) principal submatrix of
+\(J_n\), with \(J_0\) the empty matrix. Set
+
+\[
+q_0(x)=1,\qquad q_1(x)=x-d_0,
+\tag{2.4}
+\]
+
+and, for \(0\le k\le n-2\), define
+
+\[
+q_{k+2}(x)
+=(x-d_{k+1})q_{k+1}(x)-b_k^{\,2}q_k(x).
+\tag{2.5}
+\]
+
+Expanding a tridiagonal determinant along its final row or column gives
+
+\[
+q_k(x)=\det(xI_k-J_k),\qquad 0\le k\le n.
+\tag{2.6}
+\]
+
+In particular, \(q_k\in\mathbb Q[x]\) is monic of degree \(k\). The
+target \(\tau\) belongs to \(\sigma(J_n)\) exactly when \(q_n(\tau)=0\).
+This exact rational equality is decidable; it is not a test involving a
+numerical singular-value threshold.
+
+For \(x\in\mathbb Q\), each value \(q_k(x)\) is rational and can be
+computed from (2.4)--(2.5) using additions and multiplications alone.
+There is no division by \(q_k(x)\). This matters when an intermediate
+continuant vanishes: the recurrence remains defined, and its zero is
+handled by the sign-count convention below rather than by a perturbation
+of the test energy.
+
+\subsection{2.3. A strict spectral-count
+convention}\label{a-strict-spectral-count-convention}
+
+For a finite list of real numbers, let \(\operatorname{var}\) be the
+number of changes of sign after deleting all zero entries. At a rational
+test energy \(x\), define
+
+\[
+N_n(x):=
+\operatorname{var}\bigl(q_0(x),q_1(x),\ldots,q_n(x)\bigr).
+\tag{2.7}
+\]
+
+Thus the list \((1,0,-2,3,3)\) has two variations. The deletion of zero
+terms is part of the definition, not an informal convention that may be
+altered by an implementation.
+
+\textbf{Theorem 2.1 (finite Jacobi Sturm count).} \emph{For the
+unreduced Jacobi matrix (2.2) and every real \(x\), the sign variation
+count of the real continuants satisfies}
+
+\[
+N_n(x)=\#\{j\in\{1,\ldots,n\}:\lambda_j>x\}.
+\tag{2.8}
+\]
+
+\emph{In particular, for rational \(a\le b\),}
+
+\[
+N_n(a)-N_n(b)
+=\#\{j:a<\lambda_j\le b\}.
+\tag{2.9}
+\]
+
+Here (2.8) denotes the corresponding real-variable sign count; (2.7) is
+its exact rational restriction. The equality is the finite Sturm
+oscillation theorem in the strict-greater-than convention used
+throughout this paper.
+
+\emph{Proof.} The Sturm oscillation theorem for an unreduced Jacobi
+chain identifies the number of sign changes in its
+leading-principal-minor continuant sequence, with zero values discarded,
+with the number of eigenvalues strictly above the test energy. Applying
+this fact at \(a\) and \(b\), and subtracting the two finite
+cardinalities, leaves precisely the eigenvalues satisfying
+\(a<\lambda_j\le b\). \(\square\)
+
+Two consequences deserve emphasis. First, \(N_n\) is nonincreasing: if
+\(a\le b\), then \(N_n(b)\le N_n(a)\). Second, equality of the counts at
+two ordered endpoints means that the \emph{half-open} interval \((a,b]\)
+contains no eigenvalue. A zero of \(q_n\) at \(b\) is included in that
+interval, whereas a zero at \(a\) is excluded. These precise endpoints
+will be retained in the certificate theorem; replacing \((a,b]\) by
+\([a,b]\) or \((a,b)\) without adjusting the conclusion would change its
+meaning.
+
+\textbf{Proposition 2.2 (rational evaluation fidelity).} \emph{Evaluate
+(2.4)--(2.5) over \(\mathbb Q\) at a rational \(x\), delete the zero
+entries, and count their sign variations. The result agrees with the
+sign variation count obtained by evaluating the corresponding real
+characteristic polynomials at the image of \(x\) in \(\mathbb R\).}
+
+\emph{Proof.} The embeddings \(\mathbb Q\hookrightarrow\mathbb R\)
+preserve addition, multiplication, order, and the distinction between
+zero and nonzero. A two-step induction on (2.5) therefore shows equality
+of every rational continuant after casting with its real-polynomial
+counterpart. The sign list is preserved entry by entry, and hence so is
+its variation count. \(\square\)
+
+Proposition 2.2 is the essential computational bridge: a checker can
+work entirely with rationals and still invoke Theorem 2.1 about the
+spectrum of a real matrix. It has no need to approximate an eigenvalue
+or to compute a floating-point determinant.
+
+\section{3. Certificates for spectral
+distance}\label{certificates-for-spectral-distance}
+
+\subsection{3.1. Exclusion and occupation as finite
+evidence}\label{exclusion-and-occupation-as-finite-evidence}
+
+A \emph{spectral-distance witness} for \((J_n,\tau)\) consists of four
+rational endpoints
+
+\[
+W=(a_-,a_+;c_-,c_+)\in\mathbb Q^4.
+\tag{3.1}
+\]
+
+The first pair is meant to describe an interval around the target that
+contains no eigenvalue. The second pair describes an interval that does
+contain an eigenvalue. The checker accepts \(W\) precisely when the
+following rational conditions hold:
+
+\[
+\begin{aligned}
+&n\ge1,\quad b_i\ne0\quad(0\le i<n-1),\\
+&a_-<\tau<a_+,\qquad N_n(a_-)=N_n(a_+),\\
+&c_-<c_+,\qquad N_n(c_-)>N_n(c_+).
+\end{aligned}
+\tag{3.2}
+\]
+
+We write \(\operatorname{Check}(J_n,\tau,W)=\mathrm{true}\) for this
+condition. Every comparison in (3.2) is decidable by exact rational
+arithmetic and the finite recurrence (2.4)--(2.5). The matrix
+admissibility condition is checked, not assumed on the honor of the
+witness producer.
+
+Associated to \(W\) are two rational values,
+
+\[
+L(W,\tau)=\min\{\tau-a_-,a_+-\tau\},
+\qquad
+U(W,\tau)=\max\{|c_--\tau|,|c_+-\tau|\}.
+\tag{3.3}
+\]
+
+The purpose of using two intervals rather than a putative nearest
+eigenvalue is that the checker need establish only two finite counting
+facts: \emph{absence} in one interval and \emph{presence} in another.
+The latter may contain more than one eigenvalue, and need not lie on the
+same side of \(\tau\) as the former. Neither fact depends on the method
+by which the endpoints were proposed.
+
+\textbf{Theorem 3.1 (soundness of a spectral-distance witness).}
+\emph{Let \(n\ge1\), let \(J_n\) be unreduced with rational
+coefficients, and let \(\tau\in\mathbb Q\). If the checker accepts a
+witness \(W\), then}
+
+\[
+0<L(W,\tau)
+\le\Delta_n(\tau)
+\le U(W,\tau).
+\tag{3.4}
+\]
+
+\emph{In particular \(\tau\notin\sigma(J_n)\), and the shifted matrix
+\(J_n-\tau I\) is invertible.}
+
+\emph{Proof.} The equality \(N_n(a_-)=N_n(a_+)\), together with (2.9),
+says that no eigenvalue belongs to \((a_-,a_+]\). Hence every eigenvalue
+\(\lambda_j\) lies either at or to the left of \(a_-\), or strictly to
+the right of \(a_+\). In the first case,
+
+\[
+|\lambda_j-\tau|=\tau-\lambda_j\ge\tau-a_-\ge L(W,\tau),
+\]
+
+and in the second,
+
+\[
+|\lambda_j-\tau|=\lambda_j-\tau>a_+-\tau\ge L(W,\tau).
+\]
+
+Thus the lower bound holds for \emph{every} eigenvalue. Since
+\(a_-<\tau<a_+\), both terms in the minimum defining \(L\) are positive.
+
+The strict count drop \(N_n(c_-)>N_n(c_+)\) gives, by (2.9), some
+eigenvalue \(\lambda_{j_0}\in(c_-,c_+]\). For any point of that
+interval, its distance from \(\tau\) is no greater than the larger
+distance of the two endpoints from \(\tau\); consequently,
+
+\[
+|\lambda_{j_0}-\tau|
+\le\max\{|c_--\tau|,|c_+-\tau|\}
+=U(W,\tau).
+\]
+
+Taking the minimum over the finite spectrum proves (3.4). Its strict
+positive lower bound excludes \(\tau\) from the spectrum and proves
+invertibility. \(\square\)
+
+A further inequality, \(L(W,\tau)\le U(W,\tau)\), follows automatically
+from (3.4); it need not be presumed of an arbitrary candidate witness. A
+defensive verifier may nonetheless check this elementary rational
+relation explicitly, both to specify its accepted format and to guard
+against mistakes outside the formal core.
+
+\textbf{Corollary 3.2 (resolvent and residual bounds).} \emph{Under the
+hypotheses of Theorem 3.1, the Euclidean operator norm satisfies}
+
+\[
+\frac1{U(W,\tau)}
+\le\|(J_n-\tau I)^{-1}\|_2
+\le\frac1{L(W,\tau)}.
+\tag{3.5}
+\]
+
+\emph{If \(x\) solves \((J_n-\tau I)x=f\) and an approximate solution
+\(\widehat x\) has a separately established residual bound
+\(\|f-(J_n-\tau I)\widehat x\|_2\le\delta\), then}
+
+\[
+\|x-\widehat x\|_2\le\frac{\delta}{L(W,\tau)}.
+\tag{3.6}
+\]
+
+\emph{Proof.} Since \(J_n\) is real symmetric and \(\tau\) is outside
+its spectrum, the spectral theorem yields
+\(\|(J_n-\tau I)^{-1}\|_2=1/\Delta_n(\tau)\). Apply (3.4), taking
+reciprocals of strictly positive numbers, to obtain (3.5). The error
+satisfies \(x-\widehat x=(J_n-\tau I)^{-1}(f-(J_n-\tau I)\widehat x)\);
+(3.6) follows by submultiplicativity. \(\square\)
+
+The residual in (3.6) is assumed to have been bounded independently. It
+is not an additional object constructed by the spectral-distance
+certificate.
+
+\subsection{3.2. Accuracy belongs to the checker
+contract}\label{accuracy-belongs-to-the-checker-contract}
+
+Theorem 3.1 establishes two-sided enclosure, but acceptance as defined
+in (3.2) does not by itself say that the enclosure meets a caller's
+requested tolerance. For a rational \(\varepsilon>0\), define an
+\emph{accuracy-qualified} witness by the stronger condition
+
+\[
+\operatorname{Check}_{\varepsilon}(J_n,\tau,W)
+\quad:\Longleftrightarrow\quad
+\operatorname{Check}(J_n,\tau,W)
+\ \wedge\ 0<L(W,\tau)\le U(W,\tau)
+\ \wedge\ U(W,\tau)-L(W,\tau)\le\varepsilon.
+\tag{3.7}
+\]
+
+The extra tests involve only rational quantities already present in the
+witness. They therefore belong naturally to the \emph{independent
+verifier}: a producer's claim that it refined far enough is not evidence
+of accuracy until the returned endpoints satisfy (3.7). This separation
+is conceptual as well as computational. The producer may be changed or
+optimized while the meaning of an accepted certificate remains fixed.
+
+\textbf{Corollary 3.3 (requested-accuracy certification).} \emph{If
+\(\operatorname{Check}_{\varepsilon}(J_n,\tau,W)\) holds, then}
+
+\[
+0<L(W,\tau)\le\Delta_n(\tau)\le U(W,\tau),
+\qquad U(W,\tau)-L(W,\tau)\le\varepsilon.
+\tag{3.8}
+\]
+
+\emph{Proof.} The distance enclosure is Theorem 3.1; the width bound is
+an explicitly checked rational inequality. \(\square\)
+
+For an accuracy-requesting computational interface, the appropriate
+acceptance criterion is (3.7), rather than (3.2) alone. The independent
+rational width comparison is part of the certificate semantics, not an
+unverified assertion by its producer. The width comparison is
+deliberately made by the verifier from the returned rational endpoints,
+rather than accepted as a producer assertion.
+
+\subsection{3.3. Bracketing the distance
+itself}\label{bracketing-the-distance-itself}
+
+The preceding witness may have quite general intervals. A particularly
+economical producer uses \emph{symmetric intervals about the target}.
+For \(r>0\), put
+
+\[
+D_\tau(r):=N_n(\tau-r)-N_n(\tau+r)
+=\#\{j:\tau-r<\lambda_j\le\tau+r\}.
+\tag{3.9}
+\]
+
+By Theorem 2.1, \(D_\tau(r)\ge0\), and it is nondecreasing in \(r\). Its
+exact value can be found by two rational Sturm-count evaluations. In
+particular,
+
+\[
+\begin{array}{rcl}
+D_\tau(r)=0&\Longrightarrow&\Delta_n(\tau)\ge r,\\
+D_\tau(r)>0&\Longrightarrow&\Delta_n(\tau)\le r.
+\end{array}
+\tag{3.10}
+\]
+
+The weak inequalities in (3.10) are intentional. An eigenvalue at the
+left endpoint \(\tau-r\) belongs to neither the half-open interval nor
+its count, but its distance from \(\tau\) is exactly \(r\); no erroneous
+strict inequality is inferred.
+
+Suppose we have rational radii \(0<\ell<u\) satisfying
+
+\[
+D_\tau(\ell)=0,
+\qquad D_\tau(u)>0.
+\tag{3.11}
+\]
+
+They determine a witness of the type (3.1) by setting
+
+\[
+(a_-,a_+)=(\tau-\ell,\tau+\ell),
+\qquad
+(c_-,c_+)=(\tau-u,\tau+u).
+\tag{3.12}
+\]
+
+The corresponding endpoints simplify to
+
+\[
+L(W,\tau)=\ell,
+\qquad U(W,\tau)=u.
+\tag{3.13}
+\]
+
+This is why we bisect radii rather than eigenvalues: the \emph{width of
+the distance certificate} is exactly \(u-\ell\).
+
+\textbf{Proposition 3.4 (count-preserving radial bisection).}
+\emph{Assume (3.11) and put \(m=(\ell+u)/2\). Define}
+
+\[
+(\ell',u')=
+\begin{cases}
+(\ell,m),&D_\tau(m)>0,\\
+(m,u),&D_\tau(m)=0.
+\end{cases}
+\tag{3.14}
+\]
+
+\emph{Then \(0<\ell'<u'\), \(D_\tau(\ell')=0\), \(D_\tau(u')>0\), and}
+
+\[
+u'-\ell'=\frac{u-\ell}{2}.
+\tag{3.15}
+\]
+
+\emph{After exactly \(k\) successive steps,}
+
+\[
+u_k-\ell_k=\frac{u_0-\ell_0}{2^k}.
+\tag{3.16}
+\]
+
+\emph{Proof.} Since \(0<\ell<m<u\), either branch of (3.14) preserves
+strict ordering and positivity. If \(D_\tau(m)>0\), the new outer
+endpoint is occupied and the old inner endpoint remains empty. Otherwise
+the count difference is zero (it cannot be negative, by (2.9)), so the
+new inner endpoint is empty and the outer endpoint remains occupied.
+Both branches have width \((u-\ell)/2\); induction gives (3.16).
+\(\square\)
+
+No special branch is required when \(m\) itself belongs to the spectrum.
+The strict spectral count is defined at such a point, and the half-open
+convention determines exactly which radius statement remains valid.
+
+It follows from (3.16) that any pre-existing valid pair can be refined
+to width at most a given \(\varepsilon>0\). But (3.16) is an exact width
+identity, not a bit-complexity estimate. A terminating implementation
+may still take many unnecessary steps, and the intermediate rational
+numerators and denominators may grow. Numerical usefulness therefore
+requires both a sensible finite stopping budget and measurements of
+exact-arithmetic cost.
+
+\subsection{3.4. The three-site certificate
+revisited}\label{the-three-site-certificate-revisited}
+
+For the matrix in the introduction, \(q_0(x)=1\), \(q_1(x)=x\),
+\(q_2(x)=x^2-1\), and \(q_3(x)=x^3-2x\). Direct rational evaluation
+gives:
+
+\begin{longtable}[]{@{}lcr@{}}
+\toprule\noalign{}
+Test energy \(x\) & Signs of \((q_0,q_1,q_2,q_3)(x)\) & \(N_3(x)\) \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\(139/100\) & \((+,+,+,-)\) & 1 \\
+\(141/100\) & \((+,+,+,-)\) & 1 \\
+\(71/50\) & \((+,+,+,+)\) & 0 \\
+\end{longtable}
+
+Hence the exclusion condition holds on \((139/100,141/100]\), and the
+occupied condition holds on \((141/100,71/50]\). With \(\tau=7/5\),
+equations (3.3) and (3.4) give
+
+\[
+L=\frac1{100},\qquad U=\frac1{50},\qquad
+\frac1{100}\le\Delta_3(7/5)\le\frac1{50}.
+\tag{3.17}
+\]
+
+The certified interval has width \(1/100\). The consequent resolvent
+enclosure is
+
+\[
+50\le\|(J-\tfrac75 I)^{-1}\|_2\le100.
+\tag{3.18}
+\]
+
+This example demonstrates the meaning of an accepted certificate; it is
+not a benchmark for the asymptotic efficiency of a producer. The
+relevant claim is a theorem about actual eigenvalues, not merely the
+successful execution of an arithmetic test.
+
+\subsection{3.5. The separation of production and
+verification}\label{the-separation-of-production-and-verification}
+
+The mathematical soundness argument above does not use an eigenvalue
+approximation, an iteration count, or the internal structure of the
+algorithm that proposed \(W\). A producer is free to exploit exact
+bisection, continuant perturbation bounds, or other methods; acceptance
+depends only on the data and the finite checks in (3.2) and, for
+requested accuracy, (3.7). This is the intended trust division of the
+accompanying formal development.
+
+This division of trust does not by itself verify serialization, the
+surrounding runtime, or the cost of exact arithmetic. Its significance
+is more precise: \textbf{the implication from accepted rational evidence
+to a true spectral-distance bound can be proved independently of its
+producer.}
+
+The next section will explain how to construct the initial empty and
+occupied radii without knowing an eigenvalue in advance. The present
+sections have established what evidence those radii must provide---and
+what, exactly, may be concluded when it is accepted.
+
+\section{4. Constructing the
+certificate}\label{constructing-the-certificate}
+
+The preceding section asks for two rational radii: a positive radius
+whose neighborhood is empty of eigenvalues, and a larger radius whose
+neighborhood is occupied. Neither radius may be supplied by an
+approximate eigenvalue whose accuracy is taken on trust. In this section
+we construct both directly from the Jacobi coefficients, then show how
+finitely many rational Sturm tests yield an arbitrarily narrow distance
+enclosure.
+
+Throughout, the data satisfy (2.1), the target \(\tau\) is rational, and
+\(\varepsilon>0\) is rational. We begin with the exact test
+\(q_n(\tau)=0\). By (2.6), a zero is already a certificate that \(\tau\)
+is an eigenvalue. The nonzero case is more interesting: continuity
+guarantees some neighborhood free of eigenvalues, but a terminating
+exact algorithm needs to \emph{calculate} a positive radius for that
+neighborhood.
+
+\subsection{4.1. A computable root-free
+neighborhood}\label{a-computable-root-free-neighborhood}
+
+Set \(C_0=1\), \(C_1=|\tau-d_0|+1\) and \(S_0=0\), \(S_1=1\). For
+\(0\le k\le n-2\) define the rational sequences
+
+\[
+\begin{aligned}
+C_{k+2}&=(|\tau-d_{k+1}|+1)C_{k+1}+b_k^2C_k,\\
+S_{k+2}&=C_{k+1}+|\tau-d_{k+1}|S_{k+1}+b_k^2S_k.
+\end{aligned}
+\tag{4.1}
+\]
+
+Both sequences are nonnegative and are computed by the same forward
+traversal of the coefficients as the characteristic continuant. The two
+sequences have different roles: \(C_k\) bounds the value of \(q_k\)
+throughout a unit neighborhood of \(\tau\), while \(S_k\) bounds its
+variation with the energy. These are intentionally coarse majorants, not
+estimates of the nearest eigenvalue.
+
+\textbf{Lemma 4.1 (continuant perturbation bound).} \emph{For every
+\(0\le k\le n\) and every real \(x\) satisfying \(|x|\le1\),}
+
+\[
+|q_k(\tau+x)|\le C_k,
+\qquad
+|q_k(\tau+x)-q_k(\tau)|\le |x|S_k.
+\tag{4.2}
+\]
+
+\emph{Proof.} We prove both inequalities simultaneously by induction
+through the two preceding continuants. For \(k=0\), \(q_0=1\) and both
+assertions are immediate. For \(k=1\),
+
+\[
+|\tau+x-d_0|\le|\tau-d_0|+|x|\le C_1,
+\qquad
+|q_1(\tau+x)-q_1(\tau)|=|x|=|x|S_1.
+\]
+
+Suppose (4.2) holds at indices \(k\) and \(k+1\). Write
+\(a=\tau-d_{k+1}\) and \(B=b_k^2\ge0\). The recurrence (2.5) and the
+triangle inequality give
+
+\[
+\begin{aligned}
+|q_{k+2}(\tau+x)|
+&\le (|a|+|x|)|q_{k+1}(\tau+x)|
+       +B|q_k(\tau+x)|\\
+&\le (|a|+1)C_{k+1}+BC_k=C_{k+2}.
+\end{aligned}
+\]
+
+For the difference, subtract the recurrence at \(\tau\) from that at
+\(\tau+x\):
+
+\[
+\begin{aligned}
+q_{k+2}(\tau+x)-q_{k+2}(\tau)
+={}&xq_{k+1}(\tau+x)\\
+&+a\bigl(q_{k+1}(\tau+x)-q_{k+1}(\tau)\bigr)\\
+&-B\bigl(q_k(\tau+x)-q_k(\tau)\bigr).
+\end{aligned}
+\]
+
+Applying the induction hypotheses to these three terms yields
+
+\[
+|q_{k+2}(\tau+x)-q_{k+2}(\tau)|
+\le |x|\bigl(C_{k+1}+|a|S_{k+1}+BS_k\bigr)
+=|x|S_{k+2}.
+\]
+
+This completes the induction. The argument is over \emph{real} shifts
+\(x\), even though its coefficients and majorants are rational.
+\(\square\)
+
+Assume now that \(q_n(\tau)\ne0\), and define
+
+\[
+\boxed{
+ r_{\mathrm{in}}=
+ \min\left\{\frac12,
+ \frac{|q_n(\tau)|}{2(S_n+1)}\right\}.}
+\tag{4.3}
+\]
+
+Every quantity in (4.3) is rational and computed from the supplied
+matrix and target. In particular, \(S_n\ge0\) and \(q_n(\tau)\ne0\)
+imply \(r_{\mathrm{in}}>0\).
+
+\textbf{Proposition 4.2 (constructive spectral exclusion).} \emph{If
+\(q_n(\tau)\ne0\), then \(q_n(t)\ne0\) for every real \(t\) with
+\(|t-\tau|\le r_{\mathrm{in}}\). Consequently,}
+
+\[
+N_n(\tau-r_{\mathrm{in}})
+=N_n(\tau+r_{\mathrm{in}}),
+\qquad
+\Delta_n(\tau)\ge r_{\mathrm{in}}>0.
+\tag{4.4}
+\]
+
+\emph{Proof.} Write \(t=\tau+x\) with \(|x|\le r_{\mathrm{in}}\le1/2\).
+From Lemma 4.1 and the definition of the radius,
+
+\[
+\begin{aligned}
+|q_n(t)-q_n(\tau)|
+&\le |x|S_n
+\le r_{\mathrm{in}}S_n\\
+&\le \frac{|q_n(\tau)|S_n}{2(S_n+1)}
+\le\frac{|q_n(\tau)|}{2}.
+\end{aligned}
+\]
+
+The reverse triangle inequality therefore gives
+
+\[
+|q_n(t)|\ge |q_n(\tau)|-|q_n(t)-q_n(\tau)|
+\ge\frac{|q_n(\tau)|}{2}>0.
+\tag{4.5}
+\]
+
+By (2.6), no eigenvalue lies in the closed real interval
+\([\tau-r_{\mathrm{in}},\tau+r_{\mathrm{in}}]\). Its half-open
+subinterval contains no eigenvalue either, and (2.9) proves the asserted
+equality of Sturm counts. The distance bound follows. \(\square\)
+
+The closed-interval conclusion is a useful strength of this
+construction. It prevents any hidden appeal to a rational-only test: the
+exact rational radius excludes \emph{all real spectral roots} in its
+neighborhood.
+
+\subsection{4.2. An occupied outer neighborhood without an eigenvalue
+search}\label{an-occupied-outer-neighborhood-without-an-eigenvalue-search}
+
+To bound the distance from above, it is enough to find a rational
+\(R>r_{\mathrm{in}}\) such that \((\tau-R,\tau+R]\) contains an
+eigenvalue. We need not approximate, select, or isolate that eigenvalue.
+
+For the next formula only, adopt the harmless finite-array convention
+\(b_{n-1}=0\). This is \emph{padding}, not an additional off-diagonal of
+\(J_n\). Define the rational budget
+
+\[
+H_n=2\sum_{k=0}^{n-1}\bigl(|d_k|+b_k^2+2\bigr),
+\qquad
+\boxed{R=r_{\mathrm{in}}+|\tau|+H_n+2.}
+\tag{4.6}
+\]
+
+The budget is deliberately larger than needed; it has the advantage of
+an elementary certificate directly in terms of the continuants. In
+particular, \(R>r_{\mathrm{in}}\).
+
+\textbf{Lemma 4.3 (explicit occupied outer radius).} \emph{For
+\(n\ge1\), the radius (4.6) satisfies}
+
+\[
+N_n(\tau+R)=0,
+\qquad N_n(\tau-R)>0.
+\tag{4.7}
+\]
+
+\emph{Proof.} Set \(x_+=\tau+R\). The coefficient budget guarantees
+
+\[
+x_+-d_0>1,
+\qquad
+x_+-d_{k+1}>1+b_k^2
+\quad(0\le k\le n-2).
+\tag{4.8}
+\]
+
+We claim that the continuants evaluated at \(x_+\) are positive and
+strictly increasing from \(q_0\) onward. Indeed, \(q_0(x_+)=1\) and
+\(q_1(x_+)=x_+-d_0>1\). If \(0<q_k(x_+)<q_{k+1}(x_+)\), then the
+recurrence and (4.8) imply
+
+\[
+\begin{aligned}
+q_{k+2}(x_+)-q_{k+1}(x_+)
+&=(x_+-d_{k+1}-1)q_{k+1}(x_+)-b_k^2q_k(x_+)\\
+&>b_k^2\bigl(q_{k+1}(x_+)-q_k(x_+)\bigr)\ge0.
+\end{aligned}
+\]
+
+Thus the entire sign list is positive, and \(N_n(x_+)=0\).
+
+On the other side put \(x_-=\tau-R\). The same budget ensures
+\(x_-<d_0\). Thus the first two continuants have opposite signs:
+
+\[
+q_0(x_-)=1>0,
+\qquad q_1(x_-)=x_--d_0<0.
+\]
+
+Whatever signs or zeros occur later in the list, they cannot erase this
+first variation. Hence \(N_n(x_-)\ge1\). \(\square\)
+
+The asymmetry of the proof is instructive. On the right we establish
+positivity of every continuant. On the left we need only the first sign
+change, not a second positivity or alternation induction. Combined with
+(2.9), (4.7) certifies that the outer neighborhood is occupied. The
+large budget buys a simple proof of existence, not a claim of numerical
+sharpness.
+
+\subsection{4.3. Exact refinement and a finite stopping
+rule}\label{exact-refinement-and-a-finite-stopping-rule}
+
+Propositions 4.2 and Lemma 4.3 initialize the radial pair
+
+\[
+\ell_0=r_{\mathrm{in}},\qquad u_0=R,
+\qquad 0<\ell_0<u_0,
+\tag{4.9}
+\]
+
+with \(D_\tau(\ell_0)=0\) and \(D_\tau(u_0)>0\), where \(D_\tau\) is the
+count difference (3.9). The bisection step (3.14) therefore applies as
+often as desired. Each step uses only rational arithmetic and two exact
+Sturm-count evaluations; its validity does not depend on whether a
+midpoint happens to be an eigenvalue.
+
+To stop at tolerance \(\varepsilon>0\), it suffices to choose an integer
+\(k\ge0\) with
+
+\[
+2^k\ge\frac{u_0-\ell_0}{\varepsilon}.
+\tag{4.10}
+\]
+
+The exact width identity (3.16) then gives
+
+\[
+0<u_k-\ell_k
+=\frac{u_0-\ell_0}{2^k}
+\le\varepsilon.
+\tag{4.11}
+\]
+
+The existence of such a finite integer is elementary and constructive.
+For example, the deliberately conservative choice
+
+\[
+k=\left\lceil\frac{u_0-\ell_0}{\varepsilon}\right\rceil+1
+\tag{4.12}
+\]
+
+suffices by \(k\le2^k\). This proves finite termination without any
+floating-point logarithm. It is, however, a poor work budget when
+\(\varepsilon\) is small: the \emph{mathematically natural} choice is
+the least \(k\) satisfying (4.10), whose size grows logarithmically with
+\((u_0-\ell_0)/\varepsilon\). The refinement theorem is independent of
+which certified sufficient budget is used. An exact implementation must
+not confuse the convenience of (4.12) in a totality proof with practical
+iteration complexity.
+
+Convert the final radii to the witness
+
+\[
+W_k=(\tau-\ell_k,\tau+\ell_k;
+      \tau-u_k,\tau+u_k).
+\tag{4.13}
+\]
+
+By (3.11)--(3.13) and (4.11), this witness passes the exact spectral
+checker and has \(L(W_k,\tau)=\ell_k\), \(U(W_k,\tau)=u_k\), and
+\(U-L\le\varepsilon\). All of these properties are rational relations
+available for independent checking.
+
+\textbf{Theorem 4.4 (constructive rational spectral-distance
+certification).} \emph{Fix an unreduced rational \(n\)-site Jacobi
+matrix with \(n\ge1\), a rational target \(\tau\), and a rational
+tolerance \(\varepsilon>0\). A finite exact procedure distinguishes the
+following cases:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \emph{If \(q_n(\tau)=0\), it certifies that \(\det(\tau I_n-J_n)=0\),
+  hence that the shifted matrix is singular.}
+\item
+  \emph{If \(q_n(\tau)\ne0\), it constructs a rational witness \(W\) for
+  which}
+\end{enumerate}
+
+\[
+\operatorname{Check}_{\varepsilon}(J_n,\tau,W)
+\quad\text{and}\quad
+0<L(W,\tau)\le\Delta_n(\tau)\le U(W,\tau),
+\quad U(W,\tau)-L(W,\tau)\le\varepsilon.
+\tag{4.14}
+\]
+
+\emph{The soundness of the second conclusion depends only on
+independently checkable properties of \(W\), not on trusting the
+construction that produced it.}
+
+\emph{Proof.} Compute \(q_n(\tau)\) exactly by (2.4)--(2.5). In the zero
+case, (2.6) establishes the stated determinant identity. Otherwise,
+compute (4.1), (4.3), and (4.6), obtaining an empty positive inner
+radius and an occupied larger outer radius by Proposition 4.2 and Lemma
+4.3. Choose the finite integer \(k\) as in (4.10), perform \(k\) exact
+count-preserving bisections, and form (4.13). Proposition 3.4 proves
+preservation of the empty/occupied invariants and (4.11) proves the
+requested width. Equations (3.2), (3.7), and (3.13) establish acceptance
+by the accuracy-qualified checker. Theorem 3.1 supplies the spectral
+conclusion independently of the producer. \(\square\)
+
+The theorem is a statement about \emph{exact rational input}. It does
+not presume rational eigenvalues. Nor does it claim a verified
+floating-point front end or an efficient bit-complexity bound. The role
+of the producer is to propose suitable rational evidence; the checker
+need only recompute the finite predicates that give that evidence its
+meaning.
+
+\subsection{4.4. What the initial radius looks like in the three-site
+example}\label{what-the-initial-radius-looks-like-in-the-three-site-example}
+
+For the matrix of Section 1 and \(\tau=7/5\), the continuant at the
+target is
+
+\[
+q_3(7/5)=(7/5)^3-2(7/5)=-\frac7{125}.
+\]
+
+The rational majorants from (4.1) are
+
+\[
+(C_0,C_1,C_2,C_3)
+=\left(1,\frac{12}{5},\frac{169}{25},\frac{2328}{125}\right),
+\qquad
+(S_0,S_1,S_2,S_3)
+=\left(0,1,\frac{19}{5},\frac{327}{25}\right).
+\tag{4.15}
+\]
+
+It follows that
+
+\[
+r_{\mathrm{in}}
+=\min\left\{\frac12,
+ \frac{7/125}{2(327/25+1)}\right\}
+=\frac7{3520}>0.
+\tag{4.16}
+\]
+
+This is substantially smaller than the actual separation near
+\(\sqrt2\), and intentionally so: it is obtained without knowing
+\(\sqrt2\) or invoking a numerical eigenvalue approximation. With the
+padded convention \(b_2=0\), the outer budget is \(H_3=16\), giving
+\(R=7/3520+97/5\). Exact bisection then narrows the rather wide initial
+enclosure to the requested rational width. The much sharper
+hand-selected witness in Section 3 illustrates what the independent
+checker can validate; it is not claimed to coincide with these
+particular producer iterates.
+
+The constructive theorem proves that suitable evidence can always be
+found in the nonsingular rational case. Its deliberately coarse
+initialization and stopping budget leave a separate question about
+efficient execution, addressed by the subsequent computational analysis
+rather than by altering the truth of the certificate.
+
+\section{5. Conditioning under represented
+uncertainty}\label{conditioning-under-represented-uncertainty}
+
+A certificate concerns an exact pair \((J_n,\tau)\). Its practical value
+extends beyond that pair if the matrix entries or target energy are
+known only within independently certified bounds. The distinction is
+important: the rational producer above does not itself validate an
+external approximation to an irrational target, and it does not certify
+uncertain matrix coefficients. The next result says precisely what
+additional bounds suffice to \emph{transport} the already certified
+conclusion.
+
+\subsection{5.1. Spectral distance is
+Lipschitz}\label{spectral-distance-is-lipschitz}
+
+Write \(\Delta(A,t)=\min_{\lambda\in\sigma(A)}|\lambda-t|\) for a real
+symmetric \(n\times n\) matrix \(A\), where \(n\ge1\). All operator
+norms below are induced by the Euclidean vector norm.
+
+\textbf{Theorem 5.1 (spectral-distance transport).} \emph{If \(A\) and
+\(B\) are real symmetric matrices of the same positive dimension and
+\(s,t\in\mathbb R\), then}
+
+\[
+\boxed{
+|\Delta(A,t)-\Delta(B,s)|
+\le\|A-B\|_2+|t-s|.}
+\tag{5.1}
+\]
+
+\emph{Proof.} Arrange the eigenvalues of \(A\) and \(B\) in
+nondecreasing order, \(\lambda_1(A)\le\cdots\le\lambda_n(A)\) and
+likewise for \(B\). Weyl's eigenvalue perturbation inequality gives
+
+\[
+|\lambda_i(A)-\lambda_i(B)|\le\|A-B\|_2
+\qquad (1\le i\le n).
+\]
+
+Therefore for each index,
+
+\[
+\bigl||\lambda_i(A)-t|-|\lambda_i(B)-s|\bigr|
+\le\|A-B\|_2+|t-s|.
+\]
+
+Taking a minimizing index first for \(A\) and then for \(B\) yields the
+two opposite one-sided estimates; together they give (5.1). \(\square\)
+
+For a nominal rational matrix \(J_n\) and rational target \(\tau\),
+suppose an accepted witness yields \(L\le\Delta(J_n,\tau)\le U\). Let a
+real symmetric matrix \(\widetilde J_n\) and real target
+\(\widetilde\tau\) satisfy \emph{independently justified} bounds
+
+\[
+\|\widetilde J_n-J_n\|_2\le\eta,
+\qquad
+|\widetilde\tau-\tau|\le\rho,
+\qquad \eta,\rho\ge0.
+\tag{5.2}
+\]
+
+Applying Theorem 5.1 gives
+
+\[
+\boxed{
+\max\{0,L-\eta-\rho\}
+\le\Delta(\widetilde J_n,\widetilde\tau)
+\le U+\eta+\rho.}
+\tag{5.3}
+\]
+
+The loss of lower-bound positivity is meaningful. If \(L\le\eta+\rho\),
+the original certificate no longer excludes singularity for every pair
+in the uncertainty set. If instead \(L>\eta+\rho\), every such shifted
+system is invertible, and
+
+\[
+\frac1{U+\eta+\rho}
+\le
+\|(\widetilde J_n-\widetilde\tau I)^{-1}\|_2
+\le
+\frac1{L-\eta-\rho}.
+\tag{5.4}
+\]
+
+This is a robustness conclusion, not a new spectral-perturbation
+inequality. The contribution of the certificate is that the initial
+margin \(L\) was established by exact finite evidence.
+
+\subsection{5.2. Converting coefficient enclosures to an operator-norm
+bound}\label{converting-coefficient-enclosures-to-an-operator-norm-bound}
+
+For tridiagonal uncertainty, the norm input in (5.2) can itself be
+bounded by elementary data. Suppose \(\widetilde J_n\) has real diagonal
+coefficients \(\widetilde d_i\) and real off-diagonal coefficients
+\(\widetilde b_i\), and nonnegative rational numbers
+\(\alpha_i,\beta_i\) have been certified to satisfy
+
+\[
+|\widetilde d_i-d_i|\le\alpha_i
+\quad(0\le i<n),
+\qquad
+|\widetilde b_i-b_i|\le\beta_i
+\quad(0\le i<n-1).
+\tag{5.5}
+\]
+
+With the endpoint convention \(\beta_{-1}=\beta_{n-1}=0\), set
+
+\[
+\eta_{\mathrm{row}}
+:=\max_{0\le i<n}\bigl(\alpha_i+\beta_{i-1}+\beta_i\bigr).
+\tag{5.6}
+\]
+
+\textbf{Corollary 5.2 (entrywise uncertainty budget).} \emph{Under
+(5.5),}
+
+\[
+\|\widetilde J_n-J_n\|_2\le\eta_{\mathrm{row}},
+\tag{5.7}
+\]
+
+\emph{so (5.3)--(5.4) hold with \(\eta=\eta_{\mathrm{row}}\).}
+
+\emph{Proof.} The symmetric difference matrix has at most three nonzero
+entries per row. By (5.5), the sum of the absolute values in row \(i\)
+is bounded by \(\alpha_i+\beta_{i-1}+\beta_i\). Its induced infinity
+norm is therefore at most \(\eta_{\mathrm{row}}\). Symmetry implies
+equality of the induced one- and infinity-norm bounds, and the standard
+inequality \(\|E\|_2\le\sqrt{\|E\|_1\|E\|_\infty}\) yields (5.7).
+\(\square\)
+
+Notice that \(\widetilde J_n\) need not be unreduced. The nonzero
+off-diagonal hypothesis is needed for the \emph{nominal exact Sturm
+certificate}; the transported bound applies to any real symmetric
+perturbation satisfying its norm estimate.
+
+\subsection{5.3. The safe-solve
+consequence}\label{the-safe-solve-consequence}
+
+Let \(\widetilde A=\widetilde J_n-\widetilde\tau I\), and suppose
+\(L>\eta+\rho\). If \(\widehat x\) is a proposed solution of
+\(\widetilde A x=f\) and a separate computation certifies a residual
+bound
+
+\[
+\|f-\widetilde A\widehat x\|_2\le\delta,
+\]
+
+then the exact solution exists uniquely and satisfies
+
+\[
+\boxed{
+\|x-\widehat x\|_2
+\le\frac{\delta}{L-\eta-\rho}.}
+\tag{5.8}
+\]
+
+Indeed, apply the upper inverse-norm bound in (5.4) to the residual
+equation. In this sense a spectral certificate answers three connected
+questions: whether the shifted system can be solved uniquely, how much
+the inverse may amplify a residual, and how much perturbation the
+certified separation can withstand.
+
+The external enclosures in (5.2) and (5.5) must themselves be valid.
+Nothing in the preceding argument promotes an unverified decimal
+approximation into a certified real interval. Likewise, the certificate
+does not generate the residual \(\delta\). Its role is to supply a
+rigorous spectral margin that can be composed with those independently
+established facts.
+
+\section{6. Arithmetic resonance and the resolution of spectral
+separation}\label{arithmetic-resonance-and-the-resolution-of-spectral-separation}
+
+The certificate of Section 3 does not require any arithmetic structure
+in the spectrum. For a constant Jacobi chain, however, its distance to a
+prescribed energy can be expressed in terms of rational approximation to
+a phase. This makes a useful stress test: the matrix entries are
+elementary, yet the separation to be certified can be exceptionally
+small. Our purpose is to identify that scale and to distinguish a
+requirement of one explicitly specified information model from the
+computational cost of the exact Sturm certificate itself.
+
+\subsection{6.1. The Dirichlet spectral
+mesh}\label{the-dirichlet-spectral-mesh}
+
+For an integer \(q\ge2\), let \(T_{q-1}(c,\beta)\) be the
+\((q-1)\times(q-1)\) Jacobi matrix with constant real diagonal \(c\) and
+nonzero constant real off-diagonal \(\beta\). Its Dirichlet eigenvalues
+are
+
+\[
+\lambda_{q,k}=c+2\beta\cos\frac{\pi k}{q},
+\qquad 1\le k\le q-1.
+\tag{6.1}
+\]
+
+Indeed, the vector with components \(v_j=\sin(\pi kj/q)\),
+\(1\le j\le q-1\), obeys the boundary conditions \(v_0=v_q=0\), and the
+identity \(v_{j-1}+v_{j+1}=2\cos(\pi k/q)v_j\) gives the eigenvalue
+equation. The values in (6.1) are distinct because cosine is strictly
+decreasing on \((0,\pi)\) and \(\beta\ne0\).
+
+Fix throughout this section an \emph{irrational} \(\alpha\in(0,1)\) and
+the real target
+
+\[
+\tau_\alpha=c+2\beta\cos(\pi\alpha).
+\tag{6.2}
+\]
+
+Irrationality ensures that \(\tau_\alpha\) is not an eigenvalue of any
+of these finite chains. With
+\(\Delta_q:=\Delta(T_{q-1}(c,\beta),\tau_\alpha)\), equation (6.1)
+yields the exact finite identity
+
+\[
+\Delta_q=2|\beta|\min_{1\le k\le q-1}
+  \left|\cos(\pi\alpha)-\cos\frac{\pi k}{q}\right|>0.
+\tag{6.3}
+\]
+
+No limit has been taken in (6.3). Since the target is nonspectral, the
+ordinary Euclidean operator norm of the inverse satisfies
+
+\[
+\left\|\bigl(T_{q-1}(c,\beta)-\tau_\alpha I\bigr)^{-1}\right\|_2
+=\Delta_q^{-1}.
+\tag{6.4}
+\]
+
+The following comparison identifies the arithmetic feature behind this
+inverse norm. Write
+
+\[
+\|x\|_{\mathbb Z}:=\min_{m\in\mathbb Z}|x-m|,
+\qquad \delta_q:=\|q\alpha\|_{\mathbb Z},
+\qquad s_\alpha:=\min\left\{\sin\frac{\pi\alpha}{2},
+\cos\frac{\pi\alpha}{2}\right\}>0.
+\tag{6.5}
+\]
+
+\textbf{Proposition 6.1 (explicit phase-to-distance comparison).}
+\emph{For fixed \(\alpha\in(0,1)\), irrational, and \(\beta\ne0\), every
+integer}
+
+\[
+q>\frac{1}{\min\{\alpha,1-\alpha\}}
+\tag{6.6}
+\]
+
+\emph{satisfies}
+
+\[
+\boxed{
+\frac{4|\beta|s_\alpha}{q}\,\delta_q
+\ \le\ \Delta_q\ \le\
+\frac{2\pi|\beta|}{q}\,\delta_q.}
+\tag{6.7}
+\]
+
+\emph{Proof.} For \(t\in[0,1]\), the cosine difference identity gives
+
+\[
+|\cos(\pi t)-\cos(\pi\alpha)|
+=2\sin\!\left(\frac{\pi(t+\alpha)}2\right)
+ \left|\sin\!\left(\frac{\pi(t-\alpha)}2\right)\right|.
+\]
+
+The first sine is positive and, by concavity of sine on \([0,\pi]\), is
+at least the smaller of its endpoint values as \(t\) ranges over
+\([0,1]\). Those values are \(\sin(\pi\alpha/2)\) and
+\(\cos(\pi\alpha/2)\), so the factor is at least \(s_\alpha\). The
+elementary estimate \(|\sin u|\ge2|u|/\pi\) for \(|u|\le\pi/2\) then
+gives
+
+\[
+|\cos(\pi t)-\cos(\pi\alpha)|\ge2s_\alpha|t-\alpha|.
+\tag{6.8}
+\]
+
+The mean-value theorem supplies the converse inequality
+\(|\cos(\pi t)-\cos(\pi\alpha)|\le\pi|t-\alpha|\).
+
+Condition (6.6) puts \(q\alpha\) strictly between \(1\) and \(q-1\);
+hence a nearest integer to \(q\alpha\) is among \(1,\ldots,q-1\).
+Therefore \(\min_{1\le k\le q-1}|k/q-\alpha|=\delta_q/q\). Apply the two
+cosine inequalities to each \(k/q\), take the minimum, and multiply by
+\(2|\beta|\). \(\square\)
+
+The constants in (6.7) are intentionally explicit rather than sharp. In
+particular, they depend on the fixed phase \(\alpha\) and coupling
+\(\beta\), but not on \(q\). Combining (6.4) and (6.7) gives
+
+\[
+\boxed{
+\frac{q}{2\pi|\beta|\delta_q}
+\ \le\
+\left\|\bigl(T_{q-1}-\tau_\alpha I\bigr)^{-1}\right\|_2
+\ \le\
+\frac{q}{4|\beta|s_\alpha\delta_q}.}
+\tag{6.9}
+\]
+
+Here and below, \(T_{q-1}\) abbreviates \(T_{q-1}(c,\beta)\). The
+familiar shorthand \(\Delta_q\asymp_{\alpha,\beta}\delta_q/q\) refers
+precisely to a comparison such as (6.7), \emph{with the phase held
+fixed}. It is not a uniform estimate as \(\alpha\) approaches an
+endpoint of \((0,1)\).
+
+\subsection{6.2. A sharp threshold in a specified interval-information
+model}\label{a-sharp-threshold-in-a-specified-interval-information-model}
+
+There are many ways to certify spectral separation. To make a precise
+statement about required resolution, we first fix one particular
+reporting format. Let a real symmetric \(n\times n\) matrix have
+eigenvalues \(\lambda_1,\ldots,\lambda_n\), let \(\tau\notin\sigma(J)\),
+and write \(d=\Delta(J,\tau)>0\). Suppose a reporting procedure returns,
+for each eigenvalue, a \emph{closed symmetric interval}
+
+\[
+I_j=[m_j-\varepsilon,m_j+\varepsilon]
+\quad\text{with}\quad
+|m_j-\lambda_j|\le\varepsilon.
+\tag{6.10}
+\]
+
+The centers \(m_j\) are allowed to be any real values satisfying these
+certified error bounds. Consider the exclusion rule which declares
+nonresonance when \(\tau\notin\bigcup_j I_j\). The rule is sound
+whenever it reports exclusion, but the error budget alone need not force
+it to succeed for every admissible set of centers.
+
+\textbf{Proposition 6.2 (sharp uniform-exclusion threshold).}
+\emph{Under the information model (6.10), the rule excludes \(\tau\) for
+\textbf{every} admissible choice of centers if and only if}
+
+\[
+\boxed{2\varepsilon<d.}
+\tag{6.11}
+\]
+
+\emph{Proof.} For any admissible center,
+\(|m_j-\tau|\ge|\lambda_j-\tau|-|m_j-\lambda_j|\ge d-\varepsilon\). If
+\(2\varepsilon<d\), then \(|m_j-\tau|>\varepsilon\) for each \(j\),
+which is exactly \(\tau\notin I_j\).
+
+Conversely, suppose \(2\varepsilon\ge d\). Choose an eigenvalue
+\(\lambda_{j_*}\) at distance \(d\) from \(\tau\), and move its reported
+center toward \(\tau\) by \(\min\{d,\varepsilon\}\). The center remains
+within \(\varepsilon\) of \(\lambda_{j_*}\), while its distance from
+\(\tau\) is \(\max\{0,d-\varepsilon\}\le\varepsilon\). Thus
+\(\tau\in I_{j_*}\) for this admissible report. At equality
+\(2\varepsilon=d\), the target can lie at the endpoint of the closed
+interval; endpoint contact is not exclusion. \(\square\)
+
+Take the absolute half-width \(\varepsilon=2^{-p}\), with \(p\) a
+nonnegative integer. For sufficiently small fixed \(d>0\), the least
+integer \(p\) guaranteeing uniform exclusion by this \emph{particular}
+rule is
+
+\[
+p_*(d)=\left\lfloor\log_2\frac2d\right\rfloor+1,
+\qquad\text{provided }d<2,
+\tag{6.12}
+\]
+
+because strict exclusion requires \(p>\log_2(2/d)\). If \(d\ge2\), the
+smallest admissible \(p\) is instead
+\(\max\{0,\lfloor\log_2(2/d)\rfloor+1\}\); thus the formula can be
+written uniformly with that maximum. This \(p\) is an \emph{absolute
+interval half-width exponent}. It is not a floating-point mantissa
+length, a bit-operation count, or a lower bound on algorithms with
+different information or certificate formats.
+
+Applying (6.12) to the constant-chain distance in (6.7), and using
+\(\Delta_q\to0\), yields the next conclusion.
+
+\textbf{Corollary 6.3 (arithmetic scale of symmetric-interval
+resolution).} \emph{For fixed irrational \(\alpha\in(0,1)\), fixed
+\(\beta\ne0\), and \(q\to\infty\), let \(p_q\) be the least half-width
+exponent for which every admissible report (6.10) excludes
+\(\tau_\alpha\) from the spectrum of \(T_{q-1}(c,\beta)\). Then}
+
+\[
+\boxed{
+ p_q=\log_2\!\left(\frac{q}{\|q\alpha\|_{\mathbb Z}}\right)
+       +O_{\alpha,\beta}(1).}
+\tag{6.13}
+\]
+
+\emph{Proof.} The two inequalities in (6.7) place \(\Delta_q\) between
+fixed positive multiples of \(\delta_q/q\). Taking
+\(\log_2(2/\Delta_q)\) changes \(\log_2(q/\delta_q)\) by a bounded
+quantity depending only on \(\alpha\) and \(\beta\). Equation (6.12)
+introduces at most one further unit through integer rounding.
+\(\square\)
+
+The qualifier \emph{uniform over admissible reports} cannot be omitted.
+The proposition describes how accurately a full list of symmetric
+eigenvalue enclosures must be reported to guarantee separation
+independently of their centers. Our Sturm certificate does not report
+such a list: it tests the occupancy of two intervals centered at the
+target. Therefore (6.13) is an illustration of arithmetic precision
+demand in one information model, not a statement that every
+spectral-distance algorithm must use \(p_q\) bits or perform at least
+\(p_q\) operations.
+
+\subsection{6.3. Two Diophantine regimes}\label{two-diophantine-regimes}
+
+If \(\alpha\) is \emph{badly approximable}, then there is a constant
+\(\kappa_\alpha>0\) such that
+
+\[
+\|q\alpha\|_{\mathbb Z}\ge\frac{\kappa_\alpha}{q}
+\qquad(q\ge1).
+\tag{6.14}
+\]
+
+By (6.7), \(\Delta_q\) is bounded below by a constant multiple of
+\(q^{-2}\), and (6.13) gives \(p_q\le2\log_2q+O_{\alpha,\beta}(1)\).
+Conversely, the denominators of continued-fraction convergents of any
+irrational \(\alpha\) include an unbounded sequence for which
+\(\|q\alpha\|_{\mathbb Z}<1/q\). Along this sequence, (6.7) gives
+\(\Delta_q=O_\beta(q^{-2})\) and the threshold is at least
+\(2\log_2q-O_\beta(1)\). Thus for a badly approximable phase the largest
+resolution demand along the denominators has quadratic spectral scale,
+up to phase-dependent constants.
+
+Quadratic irrational phases, including \(\alpha=\sqrt2-1\), are familiar
+examples of this regime. For this particular phase, \(q=12\) gives the
+exact identity
+
+\[
+\|12(\sqrt2-1)\|_{\mathbb Z}
+=17-12\sqrt2=\frac{1}{17+12\sqrt2}.
+\tag{6.15}
+\]
+
+Here the nearest integer is \(5\). This illustrates a small arithmetic
+phase mismatch without relying on a decimal cosine value. It is
+\textbf{not} presented as a completed run of the rational-input
+certificate at the real target (6.2).
+
+The contrasting regime is Liouville approximation. Recall that an
+irrational \(\alpha\) is a \emph{Liouville number} if, for every
+positive integer \(M\), there are infinitely many rational
+approximations \(a/q\) with \(q\to\infty\) and
+\(|\alpha-a/q|<q^{-(M+1)}\). At those denominators,
+
+\[
+\|q\alpha\|_{\mathbb Z}<q^{-M},
+\qquad
+\Delta_q<2\pi|\beta|q^{-(M+1)}.
+\tag{6.16}
+\]
+
+For each fixed \(M\), Corollary 6.3 therefore gives, along an unbounded
+sequence of denominators,
+
+\[
+p_q\ge(M+1)\log_2q-O_\beta(1).
+\tag{6.17}
+\]
+
+Because \(M\) is arbitrary, \(\limsup_{q\to\infty}p_q/\log_2q=+\infty\).
+Equivalently, the inverse norm in (6.9) grows faster than any prescribed
+fixed power of \(q\) along suitable subsequences. This does not mean
+that the resolvent grows monotonically with matrix size, or that every
+large denominator is resonant. The conclusion is explicitly
+\emph{subsequential}.
+
+The familiar Liouville series \(\sum_{j\ge1}10^{-j!}\) provides an exact
+mathematical example of such a phase in \((0,1)\). Its defining series
+and rational partial sums do not, by themselves, furnish a validated
+rational enclosure of the cosine target required by our executable
+certificate.
+
+\subsection{6.4. What this example establishes---and what it does
+not}\label{what-this-example-establishesand-what-it-does-not}
+
+The constant-chain analysis concerns a real phase target
+\(\tau_\alpha\), whereas the executable producer of Section 4 takes a
+rational target. A computational instance with an irrationally specified
+phase therefore needs another, independently certified input: for
+example, rational \(r\) and \(\rho\ge0\) for which
+
+\[
+|\tau_\alpha-r|\le\rho.
+\tag{6.18}
+\]
+
+If the coefficients \(c,\beta\) are rational and the rational producer
+certifies \(L\le\Delta(T_{q-1},r)\le U\), then Theorem 5.1 transports
+the conclusion to the exact phase target:
+
+\[
+\max\{0,L-\rho\}
+\le\Delta_q\le U+\rho.
+\tag{6.19}
+\]
+
+The claim (6.18) must be earned by validated bounds on the phase,
+\(\pi\), and cosine, or by another rigorous argument. An unqualified
+decimal approximation to \(\tau_\alpha\) is not such a certificate.
+Likewise, the cost of explicitly forming and processing a very large
+constant chain is separate from the closed-form phase identity (6.3).
+
+Three claims are consequently kept distinct. The identity (6.3) and
+comparison (6.7) are classical analytic properties of an exactly
+solvable chain. Proposition 6.2 is a sharp statement for the information
+model (6.10). The producer of Section 4 is a different exact-rational
+computation, whose soundness follows from the independent Sturm checker.
+The arithmetic example explains why small certified margins matter, but
+does not establish a universal lower bound on computational complexity,
+a verified floating-point eigensolver, or a completed irrational-target
+front end.
+
+This distinction returns us to the central question of the paper. At a
+resonant denominator the spectral distance may be extremely small even
+though the matrix coefficients are simple. What matters for a claim of
+safe invertibility is not that a numerical eigenvalue seems separated
+from the target, but that the proposed separation comes with evidence
+which a second computation can check.
+
+\section{7. Relation to existing certification methods and the trust
+boundary}\label{relation-to-existing-certification-methods-and-the-trust-boundary}
+
+\subsection{7.1. Why a target-specific
+witness?}\label{why-a-target-specific-witness}
+
+A finite Jacobi characteristic polynomial could be submitted to a
+general exact real-root isolator, its roots enclosed, and the nearest
+enclosing interval compared with the desired energy. The resulting
+method can be fully rigorous. There is no claim here that an exact
+target-distance certificate computes information unattainable from those
+general algorithms. Our distinction is one of \emph{question, evidence,
+and interface}: we do not seek an ordered list of all eigenvalue
+enclosures, nor do we need an index for the closest root. The checker
+requires only an eigenvalue-free target neighborhood and one occupied
+neighborhood, expressed as rational Sturm-count conditions. The output
+is the quantitative margin that the resolvent and residual inequalities
+consume directly.
+
+The tridiagonal structure supplies the characteristic continuant by a
+three-term recurrence. For a fixed rational test point, its values
+require a finite sequential computation involving rational additions and
+multiplications. The source construction uses the same recurrence to
+obtain a positive root-free seed and a finite occupied outer interval.
+None of these observations entails that rational bit lengths remain
+small or that the present producer is competitive with mature numerical
+eigensolvers. The distinction between arithmetic-operation count, exact
+integer growth, and elapsed time is maintained throughout.
+
+Fernando {[}1{]} develops guaranteed eigenvalue inclusions for symmetric
+tridiagonal matrices from an exact-inertia calculation carried out with
+suitable directed-rounding floating-point arithmetic. That is an
+important precedent for rigorous tridiagonal spectral computation. Our
+exact-rational setting has a different trust boundary: the checker
+recomputes rational signs and count comparisons and invokes a formal
+theorem tying those counts to the spectrum. We do not certify a
+floating-point inertia calculation or claim that rational arithmetic is
+preferable for the same engineering workload.
+
+Li, Passmore and Paulson {[}2{]} exemplify the separation of certificate
+production from formal verification for univariate polynomial problems
+in Isabelle/HOL. The Lean \texttt{hex-real-roots} family {[}3{]} now
+goes further in another direction: certified general integer-polynomial
+root isolation, half-open Sturm witnesses, completeness and an
+explicitly designed faster search strategy. The present paper does not
+claim novelty in that architectural separation, in zero-skipping sign
+variations, or in half-open interval conventions. Its proposed value is
+the \emph{composable specialized object}: a finite four-endpoint witness
+for a specified Jacobi spectral margin, a constructive exact-data path
+to such a witness, and a direct link to inverse norms and represented
+perturbation budgets.
+
+This specialization is useful only if its execution costs and
+source-level guarantees survive inspection. In particular, one should
+not confuse a total program with a practical one. Repeated bisection has
+width \((u_0-\ell_0)/2^k\); for a requested absolute width
+\(\varepsilon\), the natural refinement count is the least integer
+\(k\ge0\) satisfying
+
+\[
+2^k\varepsilon\ge u_0-\ell_0,
+\qquad
+k=\max\left\{0,\left\lceil
+\log_2\frac{u_0-\ell_0}{\varepsilon}\right\rceil\right\}.
+\tag{7.1}
+\]
+
+This is an iteration-count identity, \textbf{not} a bit-complexity
+theorem. The executable stopping rule can use integer ceiling and
+base-two logarithm routines to avoid floating-point evaluation of (7.1).
+The implementation must separately show that the chosen count satisfies
+the inequality and that rational costs remain manageable. A much larger
+terminating bound remains mathematically correct but should not be
+advertised as an efficient implementation.
+
+\subsection{7.2. What an accepted artifact
+establishes}\label{what-an-accepted-artifact-establishes}
+
+For a matrix encoded by finite rational diagonal and off-diagonal lists,
+a rational target \(\tau\), positive rational tolerance \(\varepsilon\),
+and a returned four-endpoint record \(W\), the verifier's mathematical
+contract is
+
+\[
+\begin{split}
+&\operatorname{Check}(J,\tau,W)=\mathrm{true},\\
+&0<L(W,\tau)\le U(W,\tau),\\
+&U(W,\tau)-L(W,\tau)\le\varepsilon.
+\end{split}
+\tag{7.2}
+\]
+
+These are checks on data, not claims about which search algorithm
+generated the data. Together with the counting theorem they establish
+the spectral-distance enclosure of Theorem 3.1. The full implementation
+should expose the results in a stable, finite-input format and make it
+possible to rerun the checker on the exact serialized output. A warm
+build of individual theorem declarations is not equivalent to such a
+released, end-to-end evidence object. Conversely, the mathematical
+theorem remains valid even if a particular producer is inefficient or
+replaced by a better search strategy.
+
+The trust boundary also does not absorb every external numerical
+statement. A residual estimate must be validated by its own computation;
+a bound on perturbation of the input coefficients must be supplied or
+checked; and an irrationally specified target requires a certified
+rational enclosure before the rational procedure can be applied to it.
+Section 5 states the analytic transport theorem with those hypotheses
+visible. Section 6's arithmetic precision threshold belongs to a
+specified reporting model; it does not impose a universal precision
+lower bound on other certificate formats.
+
+\subsection{7.3. Scope and limitations}\label{scope-and-limitations}
+
+The restriction to unreduced rational Jacobi matrices is substantive. A
+reduced chain can be decomposed into unreduced blocks, but such
+preprocessing must not silently be inferred from a checker that rejects
+zero couplings. The diagonal and off-diagonal prefixes determine the
+physical matrix; output must not depend on arbitrary coefficients at
+unused indices of an internal extension. The singular case is reported
+separately from a positive spectral margin; a totalized matrix-inverse
+operation is not an appropriate substitute for that distinction.
+
+The paper's rigorous perturbation and inverse-norm consequences are
+classical matrix theory, assembled to make the certificate useful. They
+are not offered as new Weyl-type inequalities. Its fixed-phase
+arithmetic examples reveal a demanding spectral scale, but their
+analytic asymptotics are not proof of the certificate's runtime or of a
+general model of numerical information. Such separations are essential
+to judging both the contribution and its limitations accurately.
+
+\section{References}\label{references}
+
+{[}1{]} K. V. Fernando, ``Computation of exact inertia and inclusions of
+eigenvalues (singular values) of tridiagonal (bidiagonal) matrices,''
+\emph{Linear Algebra and its Applications} \textbf{422} (2007), 77--99.
+https://doi.org/10.1016/j.laa.2006.09.008.
+
+{[}2{]} W. Li, G. O. Passmore, and L. C. Paulson, ``Deciding univariate
+polynomial problems using untrusted certificates in Isabelle/HOL,''
+\emph{Journal of Automated Reasoning} \textbf{62} (2019), 69--91.
+https://doi.org/10.1007/s10817-017-9424-6.
+
+{[}3{]} Lean development team, \emph{hex-real-roots: certified real-root
+isolation for dense integer polynomials}, open-source specification and
+Mathlib companion, https://github.com/leanprover/hex-real-roots and
+https://github.com/leanprover/hex-real-roots-mathlib (consulted October
+2026; release commit to be pinned with the final companion).
+
+{[}4{]} O. A. Marques, E. J. Riedy, and C. Vömel, ``Benefits of IEEE-754
+features in modern symmetric tridiagonal eigensolvers,'' \emph{SIAM
+Journal on Scientific Computing} \textbf{28} (2006), 1613--1633.
+https://doi.org/10.1137/050641624.
+
+\end{document}

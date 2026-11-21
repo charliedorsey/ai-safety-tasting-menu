@@ -1,0 +1,102 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · PaperB/Gate3/VaalerCoefficients.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>PaperB/Gate3/VaalerCoefficients.lean</h1><p class="meta">LEAN/PaperB/Gate3/VaalerCoefficients.lean · 101 lines · SHA-256 8f363f4c474b7613adf26e4eea29286141f0548de47dfdee306ec74bf4531e74</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import PaperB.Gate3.VaalerRealInterior</span>
+<span class="l" id="L2"><span class="n">2</span></span>
+<span class="l" id="L3"><span class="n">3</span>namespace OrielUpper</span>
+<span class="l" id="L4"><span class="n">4</span></span>
+<span class="l" id="L5"><span class="n">5</span>open PaperB.FixedQ</span>
+<span class="l" id="L6"><span class="n">6</span>open Finset</span>
+<span class="l" id="L7"><span class="n">7</span></span>
+<span class="l" id="L8"><span class="n">8</span>/-- Literal positive-frequency main coefficient in the H3 Vaaler normalization. -/</span>
+<span class="l" id="L9"><span class="n">9</span>noncomputable def yevorin_vaalerMainCoeff (J j : ℕ) : ℂ :=</span>
+<span class="l" id="L10"><span class="n">10</span>  (((h3VaalerJHat J (j : ℤ) / (Real.pi * (j : ℝ))) : ℝ) : ℂ) *</span>
+<span class="l" id="L11"><span class="n">11</span>    Complex.I</span>
+<span class="l" id="L12"><span class="n">12</span></span>
+<span class="l" id="L13"><span class="n">13</span>/-- Positive-error Fejer coefficient; its Fourier polynomial has</span>
+<span class="l" id="L14"><span class="n">14</span>constant term 1/(2*(J+1)) and these positive cosine modes. -/</span>
+<span class="l" id="L15"><span class="n">15</span>noncomputable def yevorin_vaalerErrorCoeff (J j : ℕ) : ℂ :=</span>
+<span class="l" id="L16"><span class="n">16</span>  (((1 - (j : ℝ) / ((J + 1 : ℕ) : ℝ)) /</span>
+<span class="l" id="L17"><span class="n">17</span>      ((J + 1 : ℕ) : ℝ) : ℝ) : ℂ)</span>
+<span class="l" id="L18"><span class="n">18</span></span>
+<span class="l" id="L19"><span class="n">19</span>theorem yevorin_vaalerMainCoeff_norm_le (J j : ℕ) (hj : 1 ≤ j) :</span>
+<span class="l" id="L20"><span class="n">20</span>    ‖yevorin_vaalerMainCoeff J j‖ ≤ (2 : ℝ) / j := by</span>
+<span class="l" id="L21"><span class="n">21</span>  have hjpos : (0 : ℝ) &lt; j := by exact_mod_cast (show 0 &lt; j by omega)</span>
+<span class="l" id="L22"><span class="n">22</span>  have hhat0 : 0 ≤ h3VaalerJHat J (j : ℤ) := h3VaalerJHat_nonneg J (j : ℤ)</span>
+<span class="l" id="L23"><span class="n">23</span>  have hhat1 : h3VaalerJHat J (j : ℤ) ≤ 1 := h3VaalerJHat_le_one J (j : ℤ)</span>
+<span class="l" id="L24"><span class="n">24</span>  have hpi : (1 : ℝ) ≤ Real.pi := by linarith [Real.pi_gt_three]</span>
+<span class="l" id="L25"><span class="n">25</span>  have hden : 0 &lt; Real.pi * (j : ℝ) := by positivity</span>
+<span class="l" id="L26"><span class="n">26</span>  have hsmall : h3VaalerJHat J (j : ℤ) / (Real.pi * (j : ℝ)) ≤ 2 / (j : ℝ) := by</span>
+<span class="l" id="L27"><span class="n">27</span>    apply (div_le_div_iff₀ hden hjpos).mpr</span>
+<span class="l" id="L28"><span class="n">28</span>    nlinarith [mul_nonneg (sub_nonneg.mpr hpi) (show 0 ≤ (j : ℝ) from hjpos.le)]</span>
+<span class="l" id="L29"><span class="n">29</span>  unfold yevorin_vaalerMainCoeff</span>
+<span class="l" id="L30"><span class="n">30</span>  rw [norm_mul, Complex.norm_I, mul_one, Complex.norm_real, Real.norm_eq_abs,</span>
+<span class="l" id="L31"><span class="n">31</span>    abs_of_nonneg (div_nonneg hhat0 hden.le)]</span>
+<span class="l" id="L32"><span class="n">32</span>  exact hsmall</span>
+<span class="l" id="L33"><span class="n">33</span></span>
+<span class="l" id="L34"><span class="n">34</span>theorem yevorin_vaalerErrorCoeff_norm_le</span>
+<span class="l" id="L35"><span class="n">35</span>    (J j : ℕ) (hj : j ∈ Finset.Icc 1 J) :</span>
+<span class="l" id="L36"><span class="n">36</span>    ‖yevorin_vaalerErrorCoeff J j‖ ≤ (2 : ℝ) / (J + 1) := by</span>
+<span class="l" id="L37"><span class="n">37</span>  have hjJ : j ≤ J := (Finset.mem_Icc.mp hj).2</span>
+<span class="l" id="L38"><span class="n">38</span>  have hd : (0 : ℝ) &lt; (J + 1 : ℕ) := by positivity</span>
+<span class="l" id="L39"><span class="n">39</span>  have hnr : (j : ℝ) ≤ (J : ℝ) := by exact_mod_cast hjJ</span>
+<span class="l" id="L40"><span class="n">40</span>  have hn0 : 0 ≤ 1 - (j : ℝ) / ((J + 1 : ℕ) : ℝ) := by</span>
+<span class="l" id="L41"><span class="n">41</span>    rw [sub_nonneg, div_le_one hd]</span>
+<span class="l" id="L42"><span class="n">42</span>    push_cast</span>
+<span class="l" id="L43"><span class="n">43</span>    linarith</span>
+<span class="l" id="L44"><span class="n">44</span>  have hn1 : 1 - (j : ℝ) / ((J + 1 : ℕ) : ℝ) ≤ 1 := by</span>
+<span class="l" id="L45"><span class="n">45</span>    have hp : 0 ≤ (j : ℝ) / ((J + 1 : ℕ) : ℝ) := by positivity</span>
+<span class="l" id="L46"><span class="n">46</span>    linarith</span>
+<span class="l" id="L47"><span class="n">47</span>  unfold yevorin_vaalerErrorCoeff</span>
+<span class="l" id="L48"><span class="n">48</span>  rw [Complex.norm_real, Real.norm_eq_abs,</span>
+<span class="l" id="L49"><span class="n">49</span>    abs_of_nonneg (div_nonneg hn0 hd.le)]</span>
+<span class="l" id="L50"><span class="n">50</span>  have hi : (1 - (j : ℝ) / ((J + 1 : ℕ) : ℝ)) /</span>
+<span class="l" id="L51"><span class="n">51</span>      ((J + 1 : ℕ) : ℝ) ≤ 1 / ((J + 1 : ℕ) : ℝ) :=</span>
+<span class="l" id="L52"><span class="n">52</span>    div_le_div_of_nonneg_right hn1 hd.le</span>
+<span class="l" id="L53"><span class="n">53</span>  have hcast : (((J + 1 : ℕ) : ℝ)) = (J : ℝ) + 1 := by push_cast; ring</span>
+<span class="l" id="L54"><span class="n">54</span>  rw [hcast] at hi ⊢</span>
+<span class="l" id="L55"><span class="n">55</span>  exact hi.trans (div_le_div_of_nonneg_right (by norm_num : (1 : ℝ) ≤ 2)</span>
+<span class="l" id="L56"><span class="n">56</span>    (by positivity : 0 ≤ (J : ℝ) + 1))</span>
+<span class="l" id="L57"><span class="n">57</span></span>
+<span class="l" id="L58"><span class="n">58</span>theorem yevorin_vaalerMainCoeff_mode_re</span>
+<span class="l" id="L59"><span class="n">59</span>    (J j : ℕ) (t : ℝ) :</span>
+<span class="l" id="L60"><span class="n">60</span>    (yevorin_vaalerMainCoeff J j * realVaalerMode j t).re =</span>
+<span class="l" id="L61"><span class="n">61</span>      -(h3VaalerJHat J (j : ℤ) / (Real.pi * (j : ℝ))) *</span>
+<span class="l" id="L62"><span class="n">62</span>          Real.sin (2 * Real.pi * (j : ℝ) * t) := by</span>
+<span class="l" id="L63"><span class="n">63</span>  have hmode : realVaalerMode j t =</span>
+<span class="l" id="L64"><span class="n">64</span>      Complex.exp (((2 * Real.pi * (j : ℝ) * t : ℝ) : ℂ) * Complex.I) := by</span>
+<span class="l" id="L65"><span class="n">65</span>    unfold realVaalerMode</span>
+<span class="l" id="L66"><span class="n">66</span>    congr 1</span>
+<span class="l" id="L67"><span class="n">67</span>    push_cast</span>
+<span class="l" id="L68"><span class="n">68</span>    ring</span>
+<span class="l" id="L69"><span class="n">69</span>  rw [hmode, Complex.exp_ofReal_mul_I]</span>
+<span class="l" id="L70"><span class="n">70</span>  unfold yevorin_vaalerMainCoeff</span>
+<span class="l" id="L71"><span class="n">71</span>  simp only [div_eq_mul_inv, Complex.ofReal_mul, Complex.ofReal_inv,</span>
+<span class="l" id="L72"><span class="n">72</span>    Complex.ofReal_re, Complex.ofReal_im, Complex.mul_re, Complex.mul_im,</span>
+<span class="l" id="L73"><span class="n">73</span>    Complex.add_re, Complex.add_im, Complex.I_re, Complex.I_im,</span>
+<span class="l" id="L74"><span class="n">74</span>    Complex.ofReal_natCast, Complex.ofReal_ofNat, zero_mul, mul_zero,</span>
+<span class="l" id="L75"><span class="n">75</span>    zero_add, add_zero, one_mul, mul_one, sub_zero, zero_sub]</span>
+<span class="l" id="L76"><span class="n">76</span>  have hcomplex :</span>
+<span class="l" id="L77"><span class="n">77</span>      (((Real.pi : ℂ) * (j : ℂ))⁻¹) =</span>
+<span class="l" id="L78"><span class="n">78</span>        (((Real.pi * (j : ℝ))⁻¹ : ℝ) : ℂ) := by</span>
+<span class="l" id="L79"><span class="n">79</span>    push_cast</span>
+<span class="l" id="L80"><span class="n">80</span>    rfl</span>
+<span class="l" id="L81"><span class="n">81</span>  rw [hcomplex]</span>
+<span class="l" id="L82"><span class="n">82</span>  simp only [Complex.ofReal_re, Complex.ofReal_im, mul_zero, zero_mul,</span>
+<span class="l" id="L83"><span class="n">83</span>    zero_add, sub_zero]</span>
+<span class="l" id="L84"><span class="n">84</span>  ring</span>
+<span class="l" id="L85"><span class="n">85</span></span>
+<span class="l" id="L86"><span class="n">86</span>theorem yevorin_vaalerMainCoeff_sum_eq_poly (J : ℕ) (t : ℝ) :</span>
+<span class="l" id="L87"><span class="n">87</span>    (∑ j ∈ Finset.Icc 1 J,</span>
+<span class="l" id="L88"><span class="n">88</span>      (yevorin_vaalerMainCoeff J j * realVaalerMode j t).re) =</span>
+<span class="l" id="L89"><span class="n">89</span>      (h3VaalerPolyReal J t).re := by</span>
+<span class="l" id="L90"><span class="n">90</span>  rw [h3VaalerPolyReal_eq_sineSum]</span>
+<span class="l" id="L91"><span class="n">91</span>  simp only [Complex.ofReal_re]</span>
+<span class="l" id="L92"><span class="n">92</span>  rw [← Finset.sum_neg_distrib]</span>
+<span class="l" id="L93"><span class="n">93</span>  apply Finset.sum_congr rfl</span>
+<span class="l" id="L94"><span class="n">94</span>  intro j hj</span>
+<span class="l" id="L95"><span class="n">95</span>  rw [yevorin_vaalerMainCoeff_mode_re]</span>
+<span class="l" id="L96"><span class="n">96</span>  ring</span>
+<span class="l" id="L97"><span class="n">97</span></span>
+<span class="l" id="L98"><span class="n">98</span>#print axioms yevorin_vaalerMainCoeff_norm_le</span>
+<span class="l" id="L99"><span class="n">99</span>#print axioms yevorin_vaalerErrorCoeff_norm_le</span>
+<span class="l" id="L100"><span class="n">100</span>#print axioms yevorin_vaalerMainCoeff_sum_eq_poly</span>
+<span class="l" id="L101"><span class="n">101</span>end OrielUpper</span></pre></div></body></html>

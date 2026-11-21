@@ -1,0 +1,422 @@
+[
+  {
+    "source": "GeneralKloosterman/General.lean",
+    "html": "GeneralKloosterman__General.html",
+    "lines": 145,
+    "sha256": "7c00ba1d3509f591e678b46edff69653836f024003a00b756da83e6ad30103c8"
+  },
+  {
+    "source": "GeneralKloosterman/PrimePower.lean",
+    "html": "GeneralKloosterman__PrimePower.html",
+    "lines": 194,
+    "sha256": "a3393de9b9b87b9f732a89e9b1c071a7bc84336d0ef342fb834d0c94cf508a71"
+  },
+  {
+    "source": "GeneralKloosterman/PrimePowerUnit.lean",
+    "html": "GeneralKloosterman__PrimePowerUnit.html",
+    "lines": 312,
+    "sha256": "8089b6ef2a05af71effd658ab62e4720f05d1621fad227d2bcc11d7825d59ce4"
+  },
+  {
+    "source": "GoldB/DoubleSum.lean",
+    "html": "GoldB__DoubleSum.html",
+    "lines": 246,
+    "sha256": "0518e9b37241b6aa07f788d8d4579814dfaf9d0226e2c4134ab36edf81d96a1a"
+  },
+  {
+    "source": "GoldB/Final.lean",
+    "html": "GoldB__Final.html",
+    "lines": 183,
+    "sha256": "c12e1f8741d8d1b8439e553b85a85fd00727ad2dcbc62a700be4b598a2938730"
+  },
+  {
+    "source": "GoldB/Params.lean",
+    "html": "GoldB__Params.html",
+    "lines": 182,
+    "sha256": "843f588bc58975c51fde04f96ea616f0f785a9315420af505a3cab9a267d9038"
+  },
+  {
+    "source": "GoldB/QuillonDerivativeWindow.lean",
+    "html": "GoldB__QuillonDerivativeWindow.html",
+    "lines": 84,
+    "sha256": "f4092b5574fc5e81cb51c88e3f77c261777d62ed115bf2710e4f586d79384df3"
+  },
+  {
+    "source": "GoldB/QuillonLowY.lean",
+    "html": "GoldB__QuillonLowY.html",
+    "lines": 96,
+    "sha256": "adf0b8000f9cc1542227793a12e0a0c0612a74c4d8bccc1b2436930f4c34bb94"
+  },
+  {
+    "source": "GoldB/QuillonSelectedOrders.lean",
+    "html": "GoldB__QuillonSelectedOrders.html",
+    "lines": 154,
+    "sha256": "41a14c94a97bf777ff24da086d92f779f7735453d3597b037c8ca1e67e5b446a"
+  },
+  {
+    "source": "GoldB/StepThm.lean",
+    "html": "GoldB__StepThm.html",
+    "lines": 226,
+    "sha256": "53214daa13e7ac2157d58a1d81af0abd7aef6bc9e6036cd5bf346a565a239e08"
+  },
+  {
+    "source": "GoldB/Suzuki.lean",
+    "html": "GoldB__Suzuki.html",
+    "lines": 301,
+    "sha256": "230d2ef587618cf0836b734190216a06c011ed5c7acec69675a7bb858ae249ac"
+  },
+  {
+    "source": "GoldB/VinoMain.lean",
+    "html": "GoldB__VinoMain.html",
+    "lines": 327,
+    "sha256": "915782f635b80bf7d1fe816078d5692c9b5ecadff4645e207b62babf97ad66d7"
+  },
+  {
+    "source": "GoldC/QuarterFold.lean",
+    "html": "GoldC__QuarterFold.html",
+    "lines": 1089,
+    "sha256": "6357aefc5ef5ba6d092ae862eae6727ca53a9153b946d807377f08525491f50c"
+  },
+  {
+    "source": "GoldC/QuillonAsymp.lean",
+    "html": "GoldC__QuillonAsymp.html",
+    "lines": 284,
+    "sha256": "a635a418a1bce86e183b781af9b71c123b453ab695f596f8ba29c03a0420fe25"
+  },
+  {
+    "source": "GoldC/QuillonCEv.lean",
+    "html": "GoldC__QuillonCEv.html",
+    "lines": 696,
+    "sha256": "c5ad86217104c6798fc5b54bb0f45ba9a1858ff728471d37d9ad970c04e51c7d"
+  },
+  {
+    "source": "GoldC/QuillonCPhysical.lean",
+    "html": "GoldC__QuillonCPhysical.html",
+    "lines": 693,
+    "sha256": "7581e5d8d3591ff7ceecd234d54f9200bd145abed60482dbebbfc564d8327efc"
+  },
+  {
+    "source": "GoldC/QuillonCoef.lean",
+    "html": "GoldC__QuillonCoef.html",
+    "lines": 122,
+    "sha256": "67b15a1d0265fe1c9c43c606685449ae66b23c7591f29d92870a97ddc28e5b1c"
+  },
+  {
+    "source": "GoldC/QuillonCopyF.lean",
+    "html": "GoldC__QuillonCopyF.html",
+    "lines": 362,
+    "sha256": "4c19ce932279ecde9ad4673462e4cbf63fec7fa1cfcd6f5d92042d1cd3aa39f2"
+  },
+  {
+    "source": "GoldC/QuillonCoreFinal.lean",
+    "html": "GoldC__QuillonCoreFinal.html",
+    "lines": 206,
+    "sha256": "12166b732e44da05ac520f305b93d2fe251b47b96e1f57a833dcaa8836c2d50c"
+  },
+  {
+    "source": "GoldC/QuillonDecorationGronwall.lean",
+    "html": "GoldC__QuillonDecorationGronwall.html",
+    "lines": 377,
+    "sha256": "5e0b9942e41e193f177013db4233c7265f16f9dd4a4450c26465b9a92db0e13f"
+  },
+  {
+    "source": "GoldC/QuillonEv.lean",
+    "html": "GoldC__QuillonEv.html",
+    "lines": 160,
+    "sha256": "5d1763c44879d91b8c905643ceef253bc43944c5bb656a4f5ff8f162f871de29"
+  },
+  {
+    "source": "GoldC/QuillonKlComposite.lean",
+    "html": "GoldC__QuillonKlComposite.html",
+    "lines": 279,
+    "sha256": "7618f77785ec3c6337b126b23ef5d35b149ab215951545aedeabd37f7e320b49"
+  },
+  {
+    "source": "GoldC/QuillonLC.lean",
+    "html": "GoldC__QuillonLC.html",
+    "lines": 719,
+    "sha256": "c3a1495d45ad1f6f3daa8e122ec55477c50fc28a206a1f1e569d930ee24a24c5"
+  },
+  {
+    "source": "GoldC/QuillonLR.lean",
+    "html": "GoldC__QuillonLR.html",
+    "lines": 636,
+    "sha256": "511a79a0defa1f8cd285188d26d54ff4231afc72ac78a5e9c5517665f4781a99"
+  },
+  {
+    "source": "GoldC/QuillonLRP.lean",
+    "html": "GoldC__QuillonLRP.html",
+    "lines": 573,
+    "sha256": "c02fa0907e2e5474458fc2ced96b149a965b6b0c95199eb03c20a0d2e1611f8b"
+  },
+  {
+    "source": "GoldC/QuillonLW.lean",
+    "html": "GoldC__QuillonLW.html",
+    "lines": 518,
+    "sha256": "0d7934774058e580ecc392f16c04d26af57319eb4aa3bb5ffe283e48bcb40fb8"
+  },
+  {
+    "source": "GoldC/QuillonLWR.lean",
+    "html": "GoldC__QuillonLWR.html",
+    "lines": 578,
+    "sha256": "a10d6745237df04b9198c0bc02bc3379d8c53ab4a0c90641987160d34438f63e"
+  },
+  {
+    "source": "GoldC/QuillonLWeil.lean",
+    "html": "GoldC__QuillonLWeil.html",
+    "lines": 364,
+    "sha256": "32a7513c4e3360067b351a66d0ceeff14448b5bed4028f14082e559d2cc1f975"
+  },
+  {
+    "source": "GoldC/QuillonLWeilB.lean",
+    "html": "GoldC__QuillonLWeilB.html",
+    "lines": 876,
+    "sha256": "2e1ec4f738427dc42018b855306370197815a67d1cfe1f274fac4dd13da6d9cf"
+  },
+  {
+    "source": "GoldC/QuillonLam.lean",
+    "html": "GoldC__QuillonLam.html",
+    "lines": 153,
+    "sha256": "a2928f7adffcfa70317284b475c7b6b2b41c0544d907d176ad828fe490cb1ec3"
+  },
+  {
+    "source": "GoldC/QuillonLongFinal.lean",
+    "html": "GoldC__QuillonLongFinal.html",
+    "lines": 236,
+    "sha256": "105dbc896b2269f9fbd006150e780b78fdb031f652ab6e434fc1dcc38fd3277e"
+  },
+  {
+    "source": "GoldC/QuillonREv.lean",
+    "html": "GoldC__QuillonREv.html",
+    "lines": 488,
+    "sha256": "de23b8a175f8b852408b8f9967b4a90fc0f1c606c4fa11cdf61ee0789dd0b27e"
+  },
+  {
+    "source": "GoldC/QuillonRLemma.lean",
+    "html": "GoldC__QuillonRLemma.html",
+    "lines": 216,
+    "sha256": "09c5f60043117316ebea5124aaeba692d1c4ca24fffb18eb821640f92f109d7a"
+  },
+  {
+    "source": "GoldC/QuillonRPhysical.lean",
+    "html": "GoldC__QuillonRPhysical.html",
+    "lines": 519,
+    "sha256": "0a43f81dc5f9accce521752153348b74b0d4d30ee7d977b4c36d2e2e9367f9f1"
+  },
+  {
+    "source": "GoldC/QuillonResPhysical.lean",
+    "html": "GoldC__QuillonResPhysical.html",
+    "lines": 593,
+    "sha256": "45bc8c89a8bd68c780b64164b9decbdb4619f08f7c135ae23cf78b0994c39bfc"
+  },
+  {
+    "source": "GoldC/QuillonRowNF.lean",
+    "html": "GoldC__QuillonRowNF.html",
+    "lines": 462,
+    "sha256": "6c7ea0d41965a01633c687f4933b7c458d0fb12fc521aaf9b5df30533d6d9a23"
+  },
+  {
+    "source": "GoldC/QuillonSetup.lean",
+    "html": "GoldC__QuillonSetup.html",
+    "lines": 201,
+    "sha256": "9c0b550792b34f2e79588ff148da40286f6ec029dd7766e80a12174ee9df4516"
+  },
+  {
+    "source": "GoldC/QuillonWCell.lean",
+    "html": "GoldC__QuillonWCell.html",
+    "lines": 432,
+    "sha256": "732bfa8ae9dd708079c0a22d61643a019531a2c7072e1877b28e8816fc1f8846"
+  },
+  {
+    "source": "GoldC/QuillonWPhysical.lean",
+    "html": "GoldC__QuillonWPhysical.html",
+    "lines": 169,
+    "sha256": "88ec714a1d53142d332c09d8d5bd94203fd82975e9cdba8f2014f3be83f3dea6"
+  },
+  {
+    "source": "GoldC/VKCore.lean",
+    "html": "GoldC__VKCore.html",
+    "lines": 488,
+    "sha256": "d46eb5017570192348d2fd054f44d29c88ad22fc251306b14273288667aa9b2b"
+  },
+  {
+    "source": "GoldC/VKRegimes.lean",
+    "html": "GoldC__VKRegimes.html",
+    "lines": 457,
+    "sha256": "c0c08ffcc931ae16a33772a1826cdb10b68fc0d512c358a8fbf29ba704a1a568"
+  },
+  {
+    "source": "Orienne/CSC3/CoreHighPaidConsumerR0002.lean",
+    "html": "Orienne__CSC3__CoreHighPaidConsumerR0002.html",
+    "lines": 24,
+    "sha256": "026509e33e6b87dace5f2f357d8a861fe4cb9cc3c89b87dda62d41a60c01ffa1"
+  },
+  {
+    "source": "Orienne/CSC3/CorePaidTerminalConsumerR0001.lean",
+    "html": "Orienne__CSC3__CorePaidTerminalConsumerR0001.html",
+    "lines": 44,
+    "sha256": "edbb61fc4556c8e31016a3f4f73083b96b078ab2b654da1a31365b964ca1581e"
+  },
+  {
+    "source": "Orienne/CSC3/LowZeroTerminalR0001.lean",
+    "html": "Orienne__CSC3__LowZeroTerminalR0001.html",
+    "lines": 44,
+    "sha256": "8827c16fed0ecde1e8ea45451a618ed009ef7ee088378ad8d13a7bfa1b45c051"
+  },
+  {
+    "source": "Orienne/CSC3/PhysicalCoreBridgeR0001.lean",
+    "html": "Orienne__CSC3__PhysicalCoreBridgeR0001.html",
+    "lines": 47,
+    "sha256": "8503bc48dabb2640ceeae8d347444d81ec125931026c4a5b37a2ba059ba2c4cf"
+  },
+  {
+    "source": "Orienne/CSC3/PhysicalLongBridgeQ0001.lean",
+    "html": "Orienne__CSC3__PhysicalLongBridgeQ0001.html",
+    "lines": 55,
+    "sha256": "90ba2136be23631bee65c37511fd9a84a3110203f0bd1fc5a6dda27e3fd6c8bc"
+  },
+  {
+    "source": "Orienne/CSC3/WeilQuillonBridgeR0002.lean",
+    "html": "Orienne__CSC3__WeilQuillonBridgeR0002.html",
+    "lines": 25,
+    "sha256": "6e99e4243bfc1cf00935a2bf81f092c5aa4ccf73c256bce520f3ecfa2336da48"
+  },
+  {
+    "source": "Orienne/Central/HighCardGrowingR0001.lean",
+    "html": "Orienne__Central__HighCardGrowingR0001.html",
+    "lines": 70,
+    "sha256": "7106015662f019b2a56a2037536f4d1007ddce3c6de9b3f24cc79ffc5b575f04"
+  },
+  {
+    "source": "Orienne/Central/HighCardRateR0002.lean",
+    "html": "Orienne__Central__HighCardRateR0002.html",
+    "lines": 47,
+    "sha256": "cabf0aa572601f7498ea83271f8ac4b578d360a9bee7e191f65900748dce8536"
+  },
+  {
+    "source": "Orienne/Publication/F01PrintedLiteralBridgeR0001.lean",
+    "html": "Orienne__Publication__F01PrintedLiteralBridgeR0001.html",
+    "lines": 1481,
+    "sha256": "5e7e4a353867fd418eafe510bff89a9e3f99437d3f7e700fc2f0eb5a09050d6f"
+  },
+  {
+    "source": "Orienne/Publication/PaperBPrintedTerminalR0001.lean",
+    "html": "Orienne__Publication__PaperBPrintedTerminalR0001.html",
+    "lines": 31,
+    "sha256": "5a4da763d9accf33fdc836366b2312c90aa258d36a384ad088bc55c47a24f98d"
+  },
+  {
+    "source": "PaperB/Boolean/EndpointContraction.lean",
+    "html": "PaperB__Boolean__EndpointContraction.html",
+    "lines": 173,
+    "sha256": "24712ba5b4eef8ef68af8652c67e9cd80cc0642ebf62e61e38ef75c9a34d311b"
+  },
+  {
+    "source": "PaperB/Closure.lean",
+    "html": "PaperB__Closure.html",
+    "lines": 557,
+    "sha256": "f8ef2423df662e6ed69de3bd9b97aa20b00263129c0d0862e3f4acd678cbc13d"
+  },
+  {
+    "source": "PaperB/FixedQ/DivisorExpansion.lean",
+    "html": "PaperB__FixedQ__DivisorExpansion.html",
+    "lines": 1904,
+    "sha256": "7f827eb6613e990c6ce700b21f98c0eccf49090fd1a5131a3d5294868df8e680"
+  },
+  {
+    "source": "PaperB/FixedQ/EtaReciprocalTail.lean",
+    "html": "PaperB__FixedQ__EtaReciprocalTail.html",
+    "lines": 749,
+    "sha256": "ac5b922820dda59d633d5e6d551168574779ad4845e3ccf81276d3c240622056"
+  },
+  {
+    "source": "PaperB/FixedQ/PeriodicCount.lean",
+    "html": "PaperB__FixedQ__PeriodicCount.html",
+    "lines": 141,
+    "sha256": "4e0e73a08fda87dc5abc90bf30d681a2b220c329a65672e46828618ea9b8e379"
+  },
+  {
+    "source": "PaperB/FixedQ/PetermannInterface.lean",
+    "html": "PaperB__FixedQ__PetermannInterface.html",
+    "lines": 79,
+    "sha256": "df2c8e43dffb2b77ea9b7051cb429a55a496126c1822758ccc06a3c5cb60e8fc"
+  },
+  {
+    "source": "PaperB/FixedQ/RowReflection.lean",
+    "html": "PaperB__FixedQ__RowReflection.html",
+    "lines": 84,
+    "sha256": "a89647a63a221eba80ee6ba9ac2194e9a1a0b188017373a6e2a3304f0e163a57"
+  },
+  {
+    "source": "PaperB/FixedQ/SourceBridge.lean",
+    "html": "PaperB__FixedQ__SourceBridge.html",
+    "lines": 77,
+    "sha256": "3d3342ae48908d0b8b85184c0dade533b48f167c396ff69f8448f265d3b830b4"
+  },
+  {
+    "source": "PaperB/Gate3/CentralTransfer/MiddleLongCoreConsumer.lean",
+    "html": "PaperB__Gate3__CentralTransfer__MiddleLongCoreConsumer.html",
+    "lines": 68,
+    "sha256": "7955a44eedf216199121c89853e624eee487c502113f5331e0cc36b966764f1e"
+  },
+  {
+    "source": "PaperB/Gate3/CentralTransfer/ThreeSectorConsumer.lean",
+    "html": "PaperB__Gate3__CentralTransfer__ThreeSectorConsumer.html",
+    "lines": 194,
+    "sha256": "e8502d4a400b3ef371e41b61140dc1480cadb3b934ecb55ea5c84d8df89a9ab9"
+  },
+  {
+    "source": "PaperB/Gate3/CentralTransfer/ThreeSectorTerminalAssembly.lean",
+    "html": "PaperB__Gate3__CentralTransfer__ThreeSectorTerminalAssembly.html",
+    "lines": 142,
+    "sha256": "707f87b24b736e763c97aea5d7f4149a6b08d902ba60a0442f5547f2bc549636"
+  },
+  {
+    "source": "PaperB/Gate3/ClassicalVaalerPaidTerminal.lean",
+    "html": "PaperB__Gate3__ClassicalVaalerPaidTerminal.html",
+    "lines": 30,
+    "sha256": "5628f5f589f8b2dace94c311e90f8d3af997ed60a64cfcddec200de222dc4f46"
+  },
+  {
+    "source": "PaperB/Gate3/SuzukiCentralOnly.lean",
+    "html": "PaperB__Gate3__SuzukiCentralOnly.html",
+    "lines": 23,
+    "sha256": "0bbe149fac3e27c2d78b882e23fac79d729f51c7923b2b52a8446709bd5951e5"
+  },
+  {
+    "source": "PaperB/Gate3/VaalerCoefficients.lean",
+    "html": "PaperB__Gate3__VaalerCoefficients.html",
+    "lines": 101,
+    "sha256": "8f363f4c474b7613adf26e4eea29286141f0548de47dfdee306ec74bf4531e74"
+  },
+  {
+    "source": "PaperB/Gate3/VaalerErrorPolynomial.lean",
+    "html": "PaperB__Gate3__VaalerErrorPolynomial.html",
+    "lines": 64,
+    "sha256": "7e422f2a5dc3039957b8e6a6db6357bc94f44ea3130e5e4c034ae3cc061e7166"
+  },
+  {
+    "source": "PaperB/Gate3/VaalerFullPointwise.lean",
+    "html": "PaperB__Gate3__VaalerFullPointwise.html",
+    "lines": 99,
+    "sha256": "3ca69423f8c6de0062e3e66e4303b682f3ebcbfd782361548c21be064aa2a9f7"
+  },
+  {
+    "source": "VPWStepanov/StepanovPrimeWeil.lean",
+    "html": "VPWStepanov__StepanovPrimeWeil.html",
+    "lines": 139,
+    "sha256": "590da964dfacde9d4ccf9d3dc159ff9196adea1098a17b99c5367705683186e0"
+  },
+  {
+    "source": "paper_b_frozen.canonical.tex",
+    "html": "paper_b_frozen.canonical.tex",
+    "lines": 1546,
+    "sha256": "9004c20d63218b529ea392d13914c17a347c485fd43814eb88bf8612a8512070"
+  },
+  {
+    "source": "rml/weil/prime_kloosterman.lean",
+    "html": "rml__weil__prime_kloosterman.html",
+    "lines": 22,
+    "sha256": "02aa4f011adb51741af46ae2c1a295b53047a150be260e5dd79cbcb2ff39ce27"
+  }
+]

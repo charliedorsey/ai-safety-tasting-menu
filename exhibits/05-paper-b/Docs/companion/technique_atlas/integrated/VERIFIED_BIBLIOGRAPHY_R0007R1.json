@@ -1,0 +1,83 @@
+{
+  "MontgomerySoundararajan2004": {
+    "short": "Montgomery–Soundararajan (2004)",
+    "authors": "H. L. Montgomery and K. Soundararajan",
+    "title": "Primes in short intervals",
+    "work": "Communications in Mathematical Physics 252 (2004), 589–617",
+    "url": "https://doi.org/10.1007/s00220-004-1222-4",
+    "relation": "Singular-series and prime-statistical context; not a proof of the printed Paper B identity",
+    "paper_bib": true
+  },
+  "Vaaler1985": {
+    "short": "Vaaler (1985)",
+    "authors": "J. D. Vaaler",
+    "title": "Some extremal functions in Fourier analysis",
+    "work": "Bulletin of the American Mathematical Society (N.S.) 12 (1985), 183–216",
+    "url": "https://doi.org/10.1090/S0273-0979-1985-15349-2",
+    "relation": "Pointwise Fourier approximants and controlled majorants; the local jump convention is separately checked in source",
+    "paper_bib": true
+  },
+  "Weil1948": {
+    "short": "Weil (1948)",
+    "authors": "A. Weil",
+    "title": "On some exponential sums",
+    "work": "Proceedings of the National Academy of Sciences USA 34 (1948), 204–207",
+    "url": "https://doi.org/10.1073/pnas.34.5.204",
+    "relation": "Classical prime-modulus exponential-sum bound; not by itself the source-specific general-modulus WeilHyp",
+    "paper_bib": true
+  },
+  "Estermann1961": {
+    "short": "Estermann (1961)",
+    "authors": "T. Estermann",
+    "title": "On Kloosterman's sum",
+    "work": "Mathematika 8 (1961), 83–86",
+    "url": "https://doi.org/10.1112/S0025579300002187",
+    "relation": "General Kloosterman-sum method context; arithmetic gcd/frequency transfer is a separate source obligation",
+    "paper_bib": true
+  },
+  "IwaniecKowalski2004": {
+    "short": "Iwaniec–Kowalski (2004)",
+    "authors": "H. Iwaniec and E. Kowalski",
+    "title": "Analytic Number Theory",
+    "work": "AMS Colloquium Publications 53, Providence, 2004",
+    "url": "https://doi.org/10.1090/coll/053",
+    "relation": "Modern textbook reference for classical analysis, exponential sums, sums over primes, and standard inequalities; not asserted as the original discovery",
+    "paper_bib": true
+  },
+  "Karatsuba1971": {
+    "short": "Karatsuba (1971)",
+    "authors": "A. A. Karatsuba",
+    "title": "Estimates for trigonometric sums by Vinogradov's method, and some applications",
+    "work": "Proceedings of the Steklov Institute of Mathematics 112 (1971), 251–265 (English edition)",
+    "url": "https://mi.ras.ru/index.php?c=pubs&id=8787&l=1&showall=show&showmode=groups",
+    "relation": "Selected-order derivative / shifted reciprocal trigonometric sum method ancestry, not a published source for the exact clipped weighted statement",
+    "paper_bib": true
+  },
+  "Ramare2010": {
+    "short": "Ramaré (2010)",
+    "authors": "O. Ramaré",
+    "title": "On Bombieri’s asymptotic sieve",
+    "work": "Journal of Number Theory 130 (2010), 1155–1189",
+    "url": "https://doi.org/10.1016/j.jnt.2009.10.014",
+    "relation": "Refined bilinear prime-decomposition ancestry; physical W-prime masks and every numerical threshold are separate source proofs",
+    "paper_bib": true
+  },
+  "Vaughan1980": {
+    "short": "Vaughan (1980)",
+    "authors": "R. C. Vaughan",
+    "title": "An elementary method in prime number theory",
+    "work": "Acta Arithmetica 37 (1980), 111–115",
+    "url": "https://doi.org/10.4064/aa-37-1-111-115",
+    "relation": "Prime-sum decomposition ancestry, not proof of a masked progression bound",
+    "paper_bib": true
+  },
+  "Vinogradov1954": {
+    "short": "Vinogradov (1954)",
+    "authors": "I. M. Vinogradov",
+    "title": "The Method of Trigonometrical Sums in the Theory of Numbers",
+    "work": "Interscience, London–New York, 1954 (translation of 1947 Russian edition)",
+    "url": "https://old.maa.org/press/maa-reviews/the-method-of-trigonometrical-sums-in-the-theory-of-numbers",
+    "relation": "Original broad method-family ancestry for Vinogradov mean values and polynomial exponential sums; not a certificate for the exact Paper B constants",
+    "paper_bib": false
+  }
+}

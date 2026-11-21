@@ -1,0 +1,146 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LEAN/GeneralKloosterman/General.lean</title><style>body{background:#f9f8f4;color:#27332d;font:16px/1.5 Georgia,serif;margin:0}a{color:#2d6255}.wrap{max-width:1160px;margin:0 auto;padding:30px 24px}header{border-bottom:1px solid #d8ded7;margin-bottom:22px}h1{font-size:29px;font-weight:normal;overflow-wrap:anywhere}.meta,nav,th{font:13px/1.5 system-ui,sans-serif;color:#5b6b63}nav a{margin-right:18px}.tblwrap{overflow-x:auto}table{border-collapse:collapse;width:100%}td,th{padding:9px 12px;border-bottom:1px solid #e0e3de;text-align:left;vertical-align:top}td code{overflow-wrap:anywhere}code,pre{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}pre{font-size:12.5px;white-space:pre;overflow-x:auto;line-height:1.6;background:#fff;padding:12px;border:1px solid #e2e4df}.ln{color:#8b968e;padding-right:15px;user-select:none}.line{display:block}.focus{background:#e9f1ec}.line:target{outline:2px solid #276b54;outline-offset:1px;background:#f6f4e7}.legend{padding:12px 15px;background:#fff;border-left:2px solid #629280;margin:24px 0}@media(max-width:640px){.wrap{padding:18px 12px}h1{font-size:21px}td,th{padding:8px}.meta{font-size:11px}pre{font-size:11px}}</style></head><body><div class="wrap"><header><nav><a href="../source_index.html">All source waypoints</a><a href="../../../Docs/companion/reading_room/index.html">Reading room</a></nav><h1>LEAN/GeneralKloosterman/General.lean</h1><p class="meta">Exact archived source · SHA-256 7c00ba1d3509f591e678b46edff69653836f024003a00b756da83e6ad30103c8 · Original line numbers · Not a new Lean replay</p></header><p class="meta">Deep source proof text is reproduced verbatim for inspection; this page does not assert a compiler-derived proof-dependency graph.</p><pre><span class="line" id="L1"><span class="ln">    1</span>import GeneralKloosterman.PrimePower</span>
+<span class="line" id="L2"><span class="ln">    2</span></span>
+<span class="line" id="L3"><span class="ln">    3</span>/-!</span>
+<span class="line" id="L4"><span class="ln">    4</span># General modulus: CRT assembly and the Weil–Estermann bound</span>
+<span class="line" id="L5"><span class="ln">    5</span></span>
+<span class="line" id="L6"><span class="ln">    6</span>* `kgcd_crt` — the gcd loss is multiplicative across the toolkit&#x27;s Bézout/CRT splitting</span>
+<span class="line" id="L7"><span class="ln">    7</span>  (the local coefficients are unit multiples of the reductions).</span>
+<span class="line" id="L8"><span class="ln">    8</span>* **`norm_kSum_le`** — for every modulus `N ≥ 1` and all `a, b ∈ ZMod N`:</span>
+<span class="line" id="L9"><span class="ln">    9</span></span>
+<span class="line" id="L10"><span class="ln">   10</span>    `‖S(a,b;N)‖ ≤ τ(N) · √(gcd(a,b,N) · N)`,</span>
+<span class="line" id="L11"><span class="ln">   11</span></span>
+<span class="line" id="L12"><span class="ln">   12</span>  `τ(N) = #N.divisors`. Proof: induction over coprime prime-power factorizations</span>
+<span class="line" id="L13"><span class="ln">   13</span>  (`Nat.recOnPosPrimePosCoprime`), using the local theorem `norm_kSum_primePow_le` at each prime</span>
+<span class="line" id="L14"><span class="ln">   14</span>  power and the toolkit&#x27;s exact twisted-multiplicativity identity `norm_kloostermanUnitSum_crt`.</span>
+<span class="line" id="L15"><span class="ln">   15</span>* `norm_kloostermanUnitSum_le` — the same in the toolkit&#x27;s notation.</span>
+<span class="line" id="L16"><span class="ln">   16</span>* `norm_kSum_le_of_isUnit_left/right` — a unit coefficient: `‖S‖ ≤ τ(N) √N`.</span>
+<span class="line" id="L17"><span class="ln">   17</span>-/</span>
+<span class="line" id="L18"><span class="ln">   18</span></span>
+<span class="line" id="L19"><span class="ln">   19</span>open Finset RML.ExpSum.Weil</span>
+<span class="line" id="L20"><span class="ln">   20</span></span>
+<span class="line" id="L21"><span class="ln">   21</span>namespace GenKloosterman</span>
+<span class="line" id="L22"><span class="ln">   22</span></span>
+<span class="line" id="L23"><span class="ln">   23</span>/-- `gcd(z, m)` from the canonical representative. -/</span>
+<span class="line" id="L24"><span class="ln">   24</span>def vg (m : ℕ) (z : ZMod m) : ℕ := Nat.gcd z.val m</span>
+<span class="line" id="L25"><span class="ln">   25</span></span>
+<span class="line" id="L26"><span class="ln">   26</span>theorem gcd_gcd_eq (x y m : ℕ) :</span>
+<span class="line" id="L27"><span class="ln">   27</span>    Nat.gcd (Nat.gcd x y) m = Nat.gcd (Nat.gcd x m) (Nat.gcd y m) := by</span>
+<span class="line" id="L28"><span class="ln">   28</span>  apply Nat.dvd_antisymm</span>
+<span class="line" id="L29"><span class="ln">   29</span>  · exact Nat.dvd_gcd</span>
+<span class="line" id="L30"><span class="ln">   30</span>      (Nat.dvd_gcd ((Nat.gcd_dvd_left _ _).trans (Nat.gcd_dvd_left _ _)) (Nat.gcd_dvd_right _ _))</span>
+<span class="line" id="L31"><span class="ln">   31</span>      (Nat.dvd_gcd ((Nat.gcd_dvd_left _ _).trans (Nat.gcd_dvd_right _ _)) (Nat.gcd_dvd_right _ _))</span>
+<span class="line" id="L32"><span class="ln">   32</span>  · exact Nat.dvd_gcd</span>
+<span class="line" id="L33"><span class="ln">   33</span>      (Nat.dvd_gcd ((Nat.gcd_dvd_left _ _).trans (Nat.gcd_dvd_left _ _))</span>
+<span class="line" id="L34"><span class="ln">   34</span>        ((Nat.gcd_dvd_right _ _).trans (Nat.gcd_dvd_left _ _)))</span>
+<span class="line" id="L35"><span class="ln">   35</span>      ((Nat.gcd_dvd_left _ _).trans (Nat.gcd_dvd_right _ _))</span>
+<span class="line" id="L36"><span class="ln">   36</span></span>
+<span class="line" id="L37"><span class="ln">   37</span>theorem kgcd_eq_vg (m : ℕ) (x y : ZMod m) : kgcd m x y = Nat.gcd (vg m x) (vg m y) :=</span>
+<span class="line" id="L38"><span class="ln">   38</span>  gcd_gcd_eq _ _ _</span>
+<span class="line" id="L39"><span class="ln">   39</span></span>
+<span class="line" id="L40"><span class="ln">   40</span>theorem vg_unit_mul {m : ℕ} [NeZero m] (u z : ZMod m) (hu : IsUnit u) :</span>
+<span class="line" id="L41"><span class="ln">   41</span>    vg m (u * z) = vg m z := by</span>
+<span class="line" id="L42"><span class="ln">   42</span>  obtain ⟨U, rfl⟩ := hu</span>
+<span class="line" id="L43"><span class="ln">   43</span>  unfold vg</span>
+<span class="line" id="L44"><span class="ln">   44</span>  rw [ZMod.val_mul, ← Nat.gcd_rec,</span>
+<span class="line" id="L45"><span class="ln">   45</span>    Nat.Coprime.gcd_mul_left_cancel_right _ (ZMod.val_coe_unit_coprime U), Nat.gcd_comm]</span>
+<span class="line" id="L46"><span class="ln">   46</span></span>
+<span class="line" id="L47"><span class="ln">   47</span>theorem vg_castHom {N m : ℕ} [NeZero N] [NeZero m] (h : m ∣ N) (z : ZMod N) :</span>
+<span class="line" id="L48"><span class="ln">   48</span>    vg m (ZMod.castHom h (ZMod m) z) = Nat.gcd z.val m := by</span>
+<span class="line" id="L49"><span class="ln">   49</span>  unfold vg</span>
+<span class="line" id="L50"><span class="ln">   50</span>  rw [ZMod.castHom_apply, ZMod.cast_eq_val, ZMod.val_natCast, ← Nat.gcd_rec, Nat.gcd_comm]</span>
+<span class="line" id="L51"><span class="ln">   51</span></span>
+<span class="line" id="L52"><span class="ln">   52</span>theorem crt_fst {m n : ℕ} (hcop : m.Coprime n) (z : ZMod (m * n)) :</span>
+<span class="line" id="L53"><span class="ln">   53</span>    (ZMod.chineseRemainder hcop z).1 = ZMod.castHom (dvd_mul_right m n) (ZMod m) z := by</span>
+<span class="line" id="L54"><span class="ln">   54</span>  simp [ZMod.chineseRemainder]</span>
+<span class="line" id="L55"><span class="ln">   55</span></span>
+<span class="line" id="L56"><span class="ln">   56</span>theorem crt_snd {m n : ℕ} (hcop : m.Coprime n) (z : ZMod (m * n)) :</span>
+<span class="line" id="L57"><span class="ln">   57</span>    (ZMod.chineseRemainder hcop z).2 = ZMod.castHom (dvd_mul_left n m) (ZMod n) z := by</span>
+<span class="line" id="L58"><span class="ln">   58</span>  simp [ZMod.chineseRemainder]</span>
+<span class="line" id="L59"><span class="ln">   59</span></span>
+<span class="line" id="L60"><span class="ln">   60</span>/-- The gcd loss across the CRT splitting. -/</span>
+<span class="line" id="L61"><span class="ln">   61</span>theorem kgcd_crt {m n : ℕ} [NeZero m] [NeZero n] [NeZero (m * n)] (hcop : m.Coprime n)</span>
+<span class="line" id="L62"><span class="ln">   62</span>    (a b : ZMod (m * n)) :</span>
+<span class="line" id="L63"><span class="ln">   63</span>    kgcd (m * n) a b =</span>
+<span class="line" id="L64"><span class="ln">   64</span>      kgcd m (((crtLeftCoeff m n : ℤ) : ZMod m) * (ZMod.chineseRemainder hcop a).1)</span>
+<span class="line" id="L65"><span class="ln">   65</span>          (((crtLeftCoeff m n : ℤ) : ZMod m) * (ZMod.chineseRemainder hcop b).1) *</span>
+<span class="line" id="L66"><span class="ln">   66</span>        kgcd n (((crtRightCoeff m n : ℤ) : ZMod n) * (ZMod.chineseRemainder hcop a).2)</span>
+<span class="line" id="L67"><span class="ln">   67</span>          (((crtRightCoeff m n : ℤ) : ZMod n) * (ZMod.chineseRemainder hcop b).2) := by</span>
+<span class="line" id="L68"><span class="ln">   68</span>  rw [kgcd, Nat.Coprime.gcd_mul _ hcop, kgcd_eq_vg, kgcd_eq_vg,</span>
+<span class="line" id="L69"><span class="ln">   69</span>    vg_unit_mul _ _ (crtLeftCoeff_isUnit hcop), vg_unit_mul _ _ (crtLeftCoeff_isUnit hcop),</span>
+<span class="line" id="L70"><span class="ln">   70</span>    vg_unit_mul _ _ (crtRightCoeff_isUnit hcop), vg_unit_mul _ _ (crtRightCoeff_isUnit hcop),</span>
+<span class="line" id="L71"><span class="ln">   71</span>    crt_fst, crt_fst, crt_snd, crt_snd, vg_castHom, vg_castHom, vg_castHom, vg_castHom,</span>
+<span class="line" id="L72"><span class="ln">   72</span>    gcd_gcd_eq a.val b.val m, gcd_gcd_eq a.val b.val n]</span>
+<span class="line" id="L73"><span class="ln">   73</span></span>
+<span class="line" id="L74"><span class="ln">   74</span>theorem card_divisors_prime_pow {p : ℕ} (hp : p.Prime) (k : ℕ) : #(p ^ k).divisors = k + 1 := by</span>
+<span class="line" id="L75"><span class="ln">   75</span>  rw [Nat.divisors_prime_pow hp, card_map, card_range]</span>
+<span class="line" id="L76"><span class="ln">   76</span></span>
+<span class="line" id="L77"><span class="ln">   77</span>theorem sqrt_mul_assemble (t1 t2 g1 g2 m n : ℕ) :</span>
+<span class="line" id="L78"><span class="ln">   78</span>    (t1 : ℝ) * Real.sqrt (g1 * m) * ((t2 : ℝ) * Real.sqrt (g2 * n)) =</span>
+<span class="line" id="L79"><span class="ln">   79</span>      ((t1 * t2 : ℕ) : ℝ) * Real.sqrt (((g1 * g2 : ℕ) : ℝ) * ((m * n : ℕ) : ℝ)) := by</span>
+<span class="line" id="L80"><span class="ln">   80</span>  rw [Nat.cast_mul, Nat.cast_mul, Nat.cast_mul]</span>
+<span class="line" id="L81"><span class="ln">   81</span>  have h : Real.sqrt ((g1 : ℝ) * g2 * (m * n)) = Real.sqrt (g1 * m) * Real.sqrt (g2 * n) := by</span>
+<span class="line" id="L82"><span class="ln">   82</span>    rw [← Real.sqrt_mul (by positivity)]; congr 1; ring</span>
+<span class="line" id="L83"><span class="ln">   83</span>  rw [h]; ring</span>
+<span class="line" id="L84"><span class="ln">   84</span></span>
+<span class="line" id="L85"><span class="ln">   85</span>theorem norm_kSum_le_aux : ∀ N : ℕ, ∀ (_ : NeZero N) (a b : ZMod N),</span>
+<span class="line" id="L86"><span class="ln">   86</span>    ‖kSum N a b‖ ≤ (#N.divisors : ℝ) * Real.sqrt (kgcd N a b * N) := by</span>
+<span class="line" id="L87"><span class="ln">   87</span>  refine Nat.recOnPosPrimePosCoprime ?_ ?_ ?_ ?_</span>
+<span class="line" id="L88"><span class="ln">   88</span>  · intro p k hp hk _ a b</span>
+<span class="line" id="L89"><span class="ln">   89</span>    have : Fact p.Prime := ⟨hp⟩</span>
+<span class="line" id="L90"><span class="ln">   90</span>    have := norm_kSum_primePow_le k (p ^ k) rfl hk a b</span>
+<span class="line" id="L91"><span class="ln">   91</span>    rw [card_divisors_prime_pow hp]</span>
+<span class="line" id="L92"><span class="ln">   92</span>    push_cast at this ⊢</span>
+<span class="line" id="L93"><span class="ln">   93</span>    exact this</span>
+<span class="line" id="L94"><span class="ln">   94</span>  · intro h; exact absurd rfl h.out</span>
+<span class="line" id="L95"><span class="ln">   95</span>  · intro _ a b</span>
+<span class="line" id="L96"><span class="ln">   96</span>    refine (norm_kSum_le_card a b).trans ?_</span>
+<span class="line" id="L97"><span class="ln">   97</span>    simp [kgcd]</span>
+<span class="line" id="L98"><span class="ln">   98</span>  · intro m n hm hn hcop ihm ihn _ a b</span>
+<span class="line" id="L99"><span class="ln">   99</span>    have : NeZero m := ⟨by omega⟩</span>
+<span class="line" id="L100"><span class="ln">  100</span>    have : NeZero n := ⟨by omega⟩</span>
+<span class="line" id="L101"><span class="ln">  101</span>    have h1 := ihm inferInstance (((crtLeftCoeff m n : ℤ) : ZMod m) * (ZMod.chineseRemainder hcop a).1)</span>
+<span class="line" id="L102"><span class="ln">  102</span>      (((crtLeftCoeff m n : ℤ) : ZMod m) * (ZMod.chineseRemainder hcop b).1)</span>
+<span class="line" id="L103"><span class="ln">  103</span>    have h2 := ihn inferInstance (((crtRightCoeff m n : ℤ) : ZMod n) * (ZMod.chineseRemainder hcop a).2)</span>
+<span class="line" id="L104"><span class="ln">  104</span>      (((crtRightCoeff m n : ℤ) : ZMod n) * (ZMod.chineseRemainder hcop b).2)</span>
+<span class="line" id="L105"><span class="ln">  105</span>    rw [kSum_eq_kloostermanUnitSum] at h1 h2</span>
+<span class="line" id="L106"><span class="ln">  106</span>    rw [kSum_eq_kloostermanUnitSum, norm_kloostermanUnitSum_crt hcop, kgcd_crt hcop,</span>
+<span class="line" id="L107"><span class="ln">  107</span>      Nat.Coprime.card_divisors_mul hcop]</span>
+<span class="line" id="L108"><span class="ln">  108</span>    exact (mul_le_mul h1 h2 (norm_nonneg _) (by positivity)).trans</span>
+<span class="line" id="L109"><span class="ln">  109</span>      (le_of_eq (sqrt_mul_assemble _ _ _ _ _ _))</span>
+<span class="line" id="L110"><span class="ln">  110</span></span>
+<span class="line" id="L111"><span class="ln">  111</span>/-- **General-modulus Weil–Estermann bound.** For every `N ≥ 1` and all `a, b ∈ ZMod N`,</span>
+<span class="line" id="L112"><span class="ln">  112</span>`‖S(a,b;N)‖ ≤ τ(N) · √(gcd(a,b,N) · N)`. -/</span>
+<span class="line" id="L113"><span class="ln">  113</span>theorem norm_kSum_le (N : ℕ) [NeZero N] (a b : ZMod N) :</span>
+<span class="line" id="L114"><span class="ln">  114</span>    ‖kSum N a b‖ ≤ (#N.divisors : ℝ) * Real.sqrt (kgcd N a b * N) :=</span>
+<span class="line" id="L115"><span class="ln">  115</span>  norm_kSum_le_aux N inferInstance a b</span>
+<span class="line" id="L116"><span class="ln">  116</span></span>
+<span class="line" id="L117"><span class="ln">  117</span>/-- The same bound in the toolkit&#x27;s notation `kloostermanUnitSum`. -/</span>
+<span class="line" id="L118"><span class="ln">  118</span>theorem norm_kloostermanUnitSum_le (N : ℕ) [NeZero N] (a b : ZMod N) :</span>
+<span class="line" id="L119"><span class="ln">  119</span>    ‖kloostermanUnitSum N a b‖ ≤</span>
+<span class="line" id="L120"><span class="ln">  120</span>      (#N.divisors : ℝ) * Real.sqrt (Nat.gcd (Nat.gcd a.val b.val) N * N) :=</span>
+<span class="line" id="L121"><span class="ln">  121</span>  norm_kSum_le N a b</span>
+<span class="line" id="L122"><span class="ln">  122</span></span>
+<span class="line" id="L123"><span class="ln">  123</span>theorem kgcd_eq_one_of_isUnit_left {N : ℕ} [NeZero N] (a b : ZMod N) (ha : IsUnit a) :</span>
+<span class="line" id="L124"><span class="ln">  124</span>    kgcd N a b = 1 := by</span>
+<span class="line" id="L125"><span class="ln">  125</span>  obtain ⟨U, rfl⟩ := ha</span>
+<span class="line" id="L126"><span class="ln">  126</span>  have hc := ZMod.val_coe_unit_coprime U</span>
+<span class="line" id="L127"><span class="ln">  127</span>  unfold kgcd</span>
+<span class="line" id="L128"><span class="ln">  128</span>  exact Nat.eq_one_of_dvd_one (hc ▸ Nat.dvd_gcd ((Nat.gcd_dvd_left _ _).trans</span>
+<span class="line" id="L129"><span class="ln">  129</span>    (Nat.gcd_dvd_left _ _)) (Nat.gcd_dvd_right _ _))</span>
+<span class="line" id="L130"><span class="ln">  130</span></span>
+<span class="line" id="L131"><span class="ln">  131</span>theorem kgcd_comm {N : ℕ} (a b : ZMod N) : kgcd N a b = kgcd N b a := by</span>
+<span class="line" id="L132"><span class="ln">  132</span>  unfold kgcd; rw [Nat.gcd_comm a.val]</span>
+<span class="line" id="L133"><span class="ln">  133</span></span>
+<span class="line" id="L134"><span class="ln">  134</span>/-- A unit coefficient: `‖S(a,b;N)‖ ≤ τ(N) √N`. -/</span>
+<span class="line" id="L135"><span class="ln">  135</span>theorem norm_kSum_le_of_isUnit_left {N : ℕ} [NeZero N] (a b : ZMod N) (ha : IsUnit a) :</span>
+<span class="line" id="L136"><span class="ln">  136</span>    ‖kSum N a b‖ ≤ (#N.divisors : ℝ) * Real.sqrt N := by</span>
+<span class="line" id="L137"><span class="ln">  137</span>  have := norm_kSum_le N a b</span>
+<span class="line" id="L138"><span class="ln">  138</span>  rwa [kgcd_eq_one_of_isUnit_left a b ha, Nat.cast_one, one_mul] at this</span>
+<span class="line" id="L139"><span class="ln">  139</span></span>
+<span class="line" id="L140"><span class="ln">  140</span>theorem norm_kSum_le_of_isUnit_right {N : ℕ} [NeZero N] (a b : ZMod N) (hb : IsUnit b) :</span>
+<span class="line" id="L141"><span class="ln">  141</span>    ‖kSum N a b‖ ≤ (#N.divisors : ℝ) * Real.sqrt N := by</span>
+<span class="line" id="L142"><span class="ln">  142</span>  have := norm_kSum_le N a b</span>
+<span class="line" id="L143"><span class="ln">  143</span>  rwa [kgcd_comm, kgcd_eq_one_of_isUnit_left b a hb, Nat.cast_one, one_mul] at this</span>
+<span class="line" id="L144"><span class="ln">  144</span></span>
+<span class="line" id="L145"><span class="ln">  145</span>end GenKloosterman</span>
+</pre></div></body></html>

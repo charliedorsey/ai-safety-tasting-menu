@@ -1,0 +1,142 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sealed source · PaperB/FixedQ/PeriodicCount.lean</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:#f8f7f3;color:#25342e;margin:0;font:14px/1.5 system-ui,sans-serif}.top{padding:23px max(22px,4vw);border-bottom:1px solid #d8dfd7;background:#fffefa}a{color:#2b6356}h1{font:normal clamp(24px,4vw,36px)/1.2 Georgia,serif;overflow-wrap:anywhere}.meta{font:12px/1.8 ui-monospace,monospace;color:#4b5d56;overflow-wrap:anywhere}.gate{border-left:3px solid #a66d3c;padding:12px 15px;max-width:850px;background:#f4ecdf;color:#594b39}.codewrap{overflow:auto;padding:18px max(16px,3vw)}pre{margin:0;min-width:max-content;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.l{display:block;white-space:pre}.l:target{background:#f1e4c8;outline:2px solid #b79a6b}.n{display:inline-block;min-width:56px;padding-right:14px;text-align:right;color:#7e8b83;user-select:none;border-right:1px solid #e0e5dc;margin-right:15px}:focus-visible{outline:3px solid #ad7e35}@media(max-width:600px){.codewrap{padding:12px}pre{font-size:11px}}</style></head><body><header class="top"><p><a href="../../../Docs/companion/technique_atlas/index.html">← Mathematical Machine</a> · <a href="../source_index.html">52 curated source waypoints</a></p><h1>PaperB/FixedQ/PeriodicCount.lean</h1><p class="meta">LEAN/PaperB/FixedQ/PeriodicCount.lean · 141 lines · SHA-256 4e0e73a08fda87dc5abc90bf30d681a2b220c329a65672e46828618ea9b8e379</p><p class="gate"><b>Private evidence viewer.</b> This is byte-extracted from the sealed R0003 source archive. The source excerpts do not carry a newly approved public redistribution or software license. A hash and line match are not a fresh clean Lean replay.</p></header><div class="codewrap"><pre><span class="l" id="L1"><span class="n">1</span>import Lean.Elab.Tactic.Omega</span>
+<span class="l" id="L2"><span class="n">2</span>import Mathlib.Data.Nat.Totient</span>
+<span class="l" id="L3"><span class="n">3</span>import Mathlib.Tactic.FieldSimp</span>
+<span class="l" id="L4"><span class="n">4</span>import Mathlib.Tactic.Ring</span>
+<span class="l" id="L5"><span class="n">5</span>import Mathlib.Tactic.Zify</span>
+<span class="l" id="L6"><span class="n">6</span></span>
+<span class="l" id="L7"><span class="n">7</span>/-!</span>
+<span class="l" id="L8"><span class="n">8</span># Paper B: exact periodic admissible count</span>
+<span class="l" id="L9"><span class="n">9</span></span>
+<span class="l" id="L10"><span class="n">10</span>Frozen paper source:</span>
+<span class="l" id="L11"><span class="n">11</span>* `manuscript/paper_b_frozen.tex`</span>
+<span class="l" id="L12"><span class="n">12</span>* SHA-256: `9004c20d63218b529ea392d13914c17a347c485fd43814eb88bf8612a8512070`</span>
+<span class="l" id="L13"><span class="n">13</span>* labels: `lem:Nq`, `eq:Nq-periodic`</span>
+<span class="l" id="L14"><span class="n">14</span></span>
+<span class="l" id="L15"><span class="n">15</span>Mathematical role: exact finite arithmetic only.</span>
+<span class="l" id="L16"><span class="n">16</span>No analytic or asymptotic theorem is imported or used.</span>
+<span class="l" id="L17"><span class="n">17</span>-/</span>
+<span class="l" id="L18"><span class="n">18</span></span>
+<span class="l" id="L19"><span class="n">19</span>namespace PaperB.FixedQ</span>
+<span class="l" id="L20"><span class="n">20</span></span>
+<span class="l" id="L21"><span class="n">21</span>/-- Exact admissible interior count in the translated variable `x = a + t`.</span>
+<span class="l" id="L22"><span class="n">22</span></span>
+<span class="l" id="L23"><span class="n">23</span>The frozen paper writes</span>
+<span class="l" id="L24"><span class="n">24</span>`I_q(a;h) = {0 &lt; t &lt; h : gcd(a+t,q)=1}`.</span>
+<span class="l" id="L25"><span class="n">25</span>Translation by `a` is a bijection from those `t` to the filtered interval</span>
+<span class="l" id="L26"><span class="n">26</span>`a &lt; x &lt; a+h`, so this is the same finite cardinality without introducing</span>
+<span class="l" id="L27"><span class="n">27</span>residue-class quotient types in M2.</span>
+<span class="l" id="L28"><span class="n">28</span>-/</span>
+<span class="l" id="L29"><span class="n">29</span>def admissibleInteriorCount (q a h : ℕ) : ℕ :=</span>
+<span class="l" id="L30"><span class="n">30</span>  ((Finset.Ioo a (a + h)).filter fun x =&gt; q.Coprime x).card</span>
+<span class="l" id="L31"><span class="n">31</span></span>
+<span class="l" id="L32"><span class="n">32</span>/-- A positive canonical representative of the gap class `b-a (mod q)`.</span>
+<span class="l" id="L33"><span class="n">33</span>For residue zero we choose `q` itself rather than `0`, because the paper&#x27;s</span>
+<span class="l" id="L34"><span class="n">34</span>height representatives are positive.</span>
+<span class="l" id="L35"><span class="n">35</span>-/</span>
+<span class="l" id="L36"><span class="n">36</span>def positiveGapRepresentative (q a b : ℕ) : ℕ :=</span>
+<span class="l" id="L37"><span class="n">37</span>  let r := (b % q + q - a % q) % q</span>
+<span class="l" id="L38"><span class="n">38</span>  if r = 0 then q else r</span>
+<span class="l" id="L39"><span class="n">39</span></span>
+<span class="l" id="L40"><span class="n">40</span>/-- The canonical representative is positive whenever the modulus is positive.</span>
+<span class="l" id="L41"><span class="n">41</span>-/</span>
+<span class="l" id="L42"><span class="n">42</span>theorem positiveGapRepresentative_pos</span>
+<span class="l" id="L43"><span class="n">43</span>    {q a b : ℕ} (hq : 0 &lt; q) :</span>
+<span class="l" id="L44"><span class="n">44</span>    0 &lt; positiveGapRepresentative q a b := by</span>
+<span class="l" id="L45"><span class="n">45</span>  dsimp [positiveGapRepresentative]</span>
+<span class="l" id="L46"><span class="n">46</span>  split_ifs with hr</span>
+<span class="l" id="L47"><span class="n">47</span>  · exact hq</span>
+<span class="l" id="L48"><span class="n">48</span>  · exact Nat.pos_of_ne_zero hr</span>
+<span class="l" id="L49"><span class="n">49</span></span>
+<span class="l" id="L50"><span class="n">50</span>/-- Every complete block of `q` consecutive translated positions contributes</span>
+<span class="l" id="L51"><span class="n">51</span>exactly `phi(q)` coprime residues.</span>
+<span class="l" id="L52"><span class="n">52</span>-/</span>
+<span class="l" id="L53"><span class="n">53</span>theorem completePeriodCount (q start : ℕ) :</span>
+<span class="l" id="L54"><span class="n">54</span>    ((Finset.Ico start (start + q)).filter fun x =&gt; q.Coprime x).card =</span>
+<span class="l" id="L55"><span class="n">55</span>      Nat.totient q := by</span>
+<span class="l" id="L56"><span class="n">56</span>  simpa using Nat.filter_coprime_Ico_eq_totient q start</span>
+<span class="l" id="L57"><span class="n">57</span></span>
+<span class="l" id="L58"><span class="n">58</span>/-- Increasing a positive height by one full modulus adds exactly one complete</span>
+<span class="l" id="L59"><span class="n">59</span>period and hence `phi(q)` admissible interior positions.</span>
+<span class="l" id="L60"><span class="n">60</span>-/</span>
+<span class="l" id="L61"><span class="n">61</span>theorem admissibleInteriorCount_add_period</span>
+<span class="l" id="L62"><span class="n">62</span>    (q a h : ℕ) (hh : 0 &lt; h) :</span>
+<span class="l" id="L63"><span class="n">63</span>    admissibleInteriorCount q a (h + q) =</span>
+<span class="l" id="L64"><span class="n">64</span>      admissibleInteriorCount q a h + Nat.totient q := by</span>
+<span class="l" id="L65"><span class="n">65</span>  unfold admissibleInteriorCount</span>
+<span class="l" id="L66"><span class="n">66</span>  have hUnion :</span>
+<span class="l" id="L67"><span class="n">67</span>      Finset.Ioo a (a + (h + q)) =</span>
+<span class="l" id="L68"><span class="n">68</span>        Finset.Ioo a (a + h) ∪ Finset.Ico (a + h) ((a + h) + q) := by</span>
+<span class="l" id="L69"><span class="n">69</span>    ext x</span>
+<span class="l" id="L70"><span class="n">70</span>    simp</span>
+<span class="l" id="L71"><span class="n">71</span>    omega</span>
+<span class="l" id="L72"><span class="n">72</span>  have hDisjoint :</span>
+<span class="l" id="L73"><span class="n">73</span>      Disjoint</span>
+<span class="l" id="L74"><span class="n">74</span>        ((Finset.Ioo a (a + h)).filter fun x =&gt; q.Coprime x)</span>
+<span class="l" id="L75"><span class="n">75</span>        ((Finset.Ico (a + h) ((a + h) + q)).filter fun x =&gt; q.Coprime x) := by</span>
+<span class="l" id="L76"><span class="n">76</span>    rw [Finset.disjoint_left]</span>
+<span class="l" id="L77"><span class="n">77</span>    intro x hx₁ hx₂</span>
+<span class="l" id="L78"><span class="n">78</span>    simp only [Finset.mem_filter, Finset.mem_Ioo, Finset.mem_Ico] at hx₁ hx₂</span>
+<span class="l" id="L79"><span class="n">79</span>    omega</span>
+<span class="l" id="L80"><span class="n">80</span>  rw [hUnion, Finset.filter_union, Finset.card_union_of_disjoint hDisjoint]</span>
+<span class="l" id="L81"><span class="n">81</span>  rw [completePeriodCount q (a + h)]</span>
+<span class="l" id="L82"><span class="n">82</span></span>
+<span class="l" id="L83"><span class="n">83</span>/-- Iteration of the complete-period increment.</span>
+<span class="l" id="L84"><span class="n">84</span>-/</span>
+<span class="l" id="L85"><span class="n">85</span>theorem admissibleInteriorCount_progression</span>
+<span class="l" id="L86"><span class="n">86</span>    (q a h0 n : ℕ) (hh0 : 0 &lt; h0) :</span>
+<span class="l" id="L87"><span class="n">87</span>    admissibleInteriorCount q a (h0 + n * q) =</span>
+<span class="l" id="L88"><span class="n">88</span>      admissibleInteriorCount q a h0 + n * Nat.totient q := by</span>
+<span class="l" id="L89"><span class="n">89</span>  induction n with</span>
+<span class="l" id="L90"><span class="n">90</span>  | zero =&gt; simp</span>
+<span class="l" id="L91"><span class="n">91</span>  | succ n ih =&gt;</span>
+<span class="l" id="L92"><span class="n">92</span>      calc</span>
+<span class="l" id="L93"><span class="n">93</span>        admissibleInteriorCount q a (h0 + Nat.succ n * q) =</span>
+<span class="l" id="L94"><span class="n">94</span>            admissibleInteriorCount q a ((h0 + n * q) + q) := by</span>
+<span class="l" id="L95"><span class="n">95</span>              rw [Nat.succ_mul, ← Nat.add_assoc]</span>
+<span class="l" id="L96"><span class="n">96</span>        _ = admissibleInteriorCount q a (h0 + n * q) + Nat.totient q := by</span>
+<span class="l" id="L97"><span class="n">97</span>              exact admissibleInteriorCount_add_period q a (h0 + n * q) (by omega)</span>
+<span class="l" id="L98"><span class="n">98</span>        _ = (admissibleInteriorCount q a h0 + n * Nat.totient q) +</span>
+<span class="l" id="L99"><span class="n">99</span>              Nat.totient q := by rw [ih]</span>
+<span class="l" id="L100"><span class="n">100</span>        _ = admissibleInteriorCount q a h0 + Nat.succ n * Nat.totient q := by</span>
+<span class="l" id="L101"><span class="n">101</span>              simpa [Nat.succ_mul, Nat.add_assoc]</span>
+<span class="l" id="L102"><span class="n">102</span></span>
+<span class="l" id="L103"><span class="n">103</span>/-- Frozen-paper periodic defect `epsilon_q(a,b)`, using the canonical positive</span>
+<span class="l" id="L104"><span class="n">104</span>representative of the compatible gap class.</span>
+<span class="l" id="L105"><span class="n">105</span>-/</span>
+<span class="l" id="L106"><span class="n">106</span>def periodicError (q a b : ℕ) : ℚ :=</span>
+<span class="l" id="L107"><span class="n">107</span>  let h0 := positiveGapRepresentative q a b</span>
+<span class="l" id="L108"><span class="n">108</span>  (admissibleInteriorCount q a h0 : ℚ) -</span>
+<span class="l" id="L109"><span class="n">109</span>    (Nat.totient q : ℚ) / q * h0</span>
+<span class="l" id="L110"><span class="n">110</span></span>
+<span class="l" id="L111"><span class="n">111</span>/-- Frozen paper `lem:Nq` / `eq:Nq-periodic`.</span>
+<span class="l" id="L112"><span class="n">112</span></span>
+<span class="l" id="L113"><span class="n">113</span>For every positive modulus and fixed residue data `(a,b)`, every positive</span>
+<span class="l" id="L114"><span class="n">114</span>height on the canonical compatible progression has the exact form</span>
+<span class="l" id="L115"><span class="n">115</span></span>
+<span class="l" id="L116"><span class="n">116</span>`N_q(a;h) = phi(q)/q * h + epsilon_q(a,b)`.</span>
+<span class="l" id="L117"><span class="n">117</span></span>
+<span class="l" id="L118"><span class="n">118</span>No squarefreeness or analytic hypothesis is needed for this counting identity.</span>
+<span class="l" id="L119"><span class="n">119</span>-/</span>
+<span class="l" id="L120"><span class="n">120</span>theorem exactPeriodicCount</span>
+<span class="l" id="L121"><span class="n">121</span>    {q a b : ℕ} (hq : 0 &lt; q) (n : ℕ) :</span>
+<span class="l" id="L122"><span class="n">122</span>    (admissibleInteriorCount q a</span>
+<span class="l" id="L123"><span class="n">123</span>        (positiveGapRepresentative q a b + n * q) : ℚ) =</span>
+<span class="l" id="L124"><span class="n">124</span>      (Nat.totient q : ℚ) / q *</span>
+<span class="l" id="L125"><span class="n">125</span>          (positiveGapRepresentative q a b + n * q) +</span>
+<span class="l" id="L126"><span class="n">126</span>        periodicError q a b := by</span>
+<span class="l" id="L127"><span class="n">127</span>  let h0 := positiveGapRepresentative q a b</span>
+<span class="l" id="L128"><span class="n">128</span>  have hh0 : 0 &lt; h0 := by</span>
+<span class="l" id="L129"><span class="n">129</span>    dsimp [h0]</span>
+<span class="l" id="L130"><span class="n">130</span>    exact positiveGapRepresentative_pos hq</span>
+<span class="l" id="L131"><span class="n">131</span>  rw [show positiveGapRepresentative q a b = h0 by rfl]</span>
+<span class="l" id="L132"><span class="n">132</span>  rw [admissibleInteriorCount_progression q a h0 n hh0]</span>
+<span class="l" id="L133"><span class="n">133</span>  unfold periodicError</span>
+<span class="l" id="L134"><span class="n">134</span>  rw [show positiveGapRepresentative q a b = h0 by rfl]</span>
+<span class="l" id="L135"><span class="n">135</span>  push_cast</span>
+<span class="l" id="L136"><span class="n">136</span>  have hq0 : (q : ℚ) ≠ 0 :=</span>
+<span class="l" id="L137"><span class="n">137</span>    Nat.cast_ne_zero.mpr (Nat.ne_of_gt hq)</span>
+<span class="l" id="L138"><span class="n">138</span>  field_simp [hq0]</span>
+<span class="l" id="L139"><span class="n">139</span>  ring</span>
+<span class="l" id="L140"><span class="n">140</span></span>
+<span class="l" id="L141"><span class="n">141</span>end PaperB.FixedQ</span></pre></div></body></html>

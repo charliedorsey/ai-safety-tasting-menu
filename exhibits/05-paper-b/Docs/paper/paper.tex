@@ -1,0 +1,2415 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1.05in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{longtable,array,xurl}
+\newcommand{\Lam}{\Lambda}
+\newcommand{\one}{\mathbf 1}
+\newcommand{\omegaR}{\omega}
+\newcommand{\MR}{\mathsf M}
+\newcommand{\JR}{\mathcal J_R}
+\newcommand{\F}{\mathfrak f}
+\newcommand{\R}{\mathbb R}
+\newcommand{\epsp}{\epsilon_p}
+\newcommand{\csmall}{\mathrm{CORE}}
+\newcommand{\clong}{\mathrm{LONG}}
+\usepackage[hidelinks,bookmarksopen=true,bookmarksnumbered=true]{hyperref}
+\hypersetup{pdftitle={Pointwise Transfer of Anchored Singular Series at Fixed Modulus},pdfauthor={Charlie Dorsey},pdfsubject={Mathematical article with integrated analytic proof appendices},pdfkeywords={singular series, fixed modulus, analytic number theory, formal proof}}
+
+\usepackage[nameinlink,noabbrev]{cleveref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\SSer}{\mathfrak S}
+\newcommand{\Mob}{\mathsf M}
+\newcommand{\ZE}{\mathsf Z_E}
+\newcommand{\evE}{\operatorname{ev}_E}
+\newcommand{\1}{\mathbf 1}
+\newcommand{\e}{\mathrm e}
+\newcommand{\ph}{\varphi}
+\newcommand{\Om}{\Omega}
+\newcommand{\Dcal}{\mathcal D}
+\newcommand{\Fcal}{\mathcal F}
+\newcommand{\Kcal}{\mathcal K}
+\newcommand{\Lcal}{\mathcal L}
+\newcommand{\Zmod}{\mathbb Z}
+\newcommand{\eps}{\varepsilon}
+
+\title{Pointwise Transfer of Anchored Singular Series at Fixed Modulus}
+\author{Charlie Dorsey}
+\date{October 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+For a fixed positive squarefree modulus $q$ and compatible reduced
+endpoint classes $a,b\pmod q$, we establish the pointwise level-one
+singular-series transfer
+\[
+ A_{1,q}(a,b;h)-B_{1,q}(a,b;h)=o_q(\log h),
+\]
+uniformly over eligible endpoints as the positive compatible height
+$h$ tends to infinity. A finite Boolean contraction identity gives
+an exact dictionary between completed endpoint coordinates and
+connected free-label coordinates. The analytic proof retains its
+original signed arithmetic source, partitions it into three
+cardinality sectors and five CORE/seven LONG physical regions,
+and obtains the logarithmic saving after a single decoration
+aggregation. Independent Euler-product identities connect this
+analytic estimate to the literal quantities in the theorem.
+No density-one height restriction or conjecture on actual
+consecutive-prime frequencies is used.
+\end{abstract}
+
+\section{Introduction and scope}\label{sec:intro}
+
+For a finite set $H\subset\Zmod$ and a squarefree integer $q\ge1$, define the $q$-restricted singular series
+\begin{equation}\label{eq:S_q}
+\SSer_q(H)
+=\prod_{p\nmid q}
+\left(1-\frac{\nu_p(H)}p\right)
+\left(1-\frac1p\right)^{-|H|},
+\end{equation}
+where $\nu_p(H)$ is the number of residue classes occupied by $H$ modulo $p$.  As usual, the product is zero when the tuple is inadmissible at an active prime.  Let
+\begin{equation}\label{eq:S_q0}
+\SSer_{q,0}(H)
+=\sum_{J\subseteq H}(-1)^{|H|-|J|}\SSer_q(J)
+\end{equation}
+be its Boolean M\"obius transform, in the modified singular-series tradition of Montgomery--Soundararajan \cite{MontgomerySoundararajan2004}.
+
+The central question of this paper is whether the connected
+contribution of a single interior position relative to two fixed
+endpoints can, after summation, be replaced by its two one-anchor
+boundary contributions at the logarithmic scale. These
+quantities occur naturally in fixed-gap singular-series models,
+but equality at leading scale is an arithmetic assertion about
+Euler coefficients, not an assertion about actual prime gaps.
+The theorem gives the pointwise answer for every sufficiently
+large compatible height at each fixed squarefree conductor.
+
+The first distinction is between an \emph{exact identity} and
+an \emph{analytic estimate}. The endpoint contraction formula in
+\cref{sec:dictionary} is an identity in a finite Boolean lattice;
+it says what a completed connected coordinate is. The exact
+Euler bridge in \cref{sec:euler-bridge} says that the quantities
+printed in the theorem agree with independently defined arithmetic
+kernels, including their infinite-product normalizations. The
+analytic argument in \cref{sec:signed-source,sec:cells,sec:aggregation}
+then proves a small signed difference of those kernels.
+Neither branch can be replaced by the other.
+
+The second distinction is between \emph{preserving a source} and
+\emph{estimating it}. The proof starts with a decorated signed sum
+whose coefficients depend on a moving reduced height, proper
+ordered factorizations and CRT potentials. A sequence of exact
+partitions assigns each original summand to a region on which
+one available method really applies. The difficult CORE and LONG
+sectors are then bounded through twelve disjoint physical cells.
+Some obtain oscillatory cancellation; others are sufficiently thin
+or arithmetically sparse that direct mass estimates are better.
+The full savings survive the outer decoration weights by a strict,
+though very small, exponent margin. The optional reader companion, \emph{Reading the Proof},
+provides a route from the theorem to this complete article, its
+appendices and the precise formal-source waypoints. The technical
+appendices make four especially delicate mechanisms independently
+inspectable: the CORE band, the LONG edge and its complementary
+Weil region, the two physical reciprocal-Suzuki routes, and the
+exact B-side centering tail. It states the remaining cell contracts
+without suggesting that a bound on one parent is a bound on the
+corresponding signed physical cell.
+
+The modified singular-series transform originates with Montgomery--Soundararajan \cite{MontgomerySoundararajan2004}; fixed anchors and the conditional fixed-gap framework have
+well-developed precedents in the consecutive-prime literature
+\cite{GoldstonLedoan2011,LemkeOliverSound2016}. Restricted
+singular-series sums were previously studied, for example, by
+Kuperberg \cite{Kuperberg2025}. The present contribution is a
+specific \emph{unconditional coefficient transfer at fixed
+squarefree conductor}, together with its exact source-sensitive
+proof. It is not a claim of priority for CRT, Boolean inversion,
+Vaaler approximation, Vinogradov's method or Weil bounds.
+
+\section{The connected contraction dictionary}\label{sec:dictionary}
+
+Fix the endpoint set
+\[
+E=\{0,h\}.
+\]
+Let $T$ be any finite set of free labels disjoint from $E$.  For $A\subseteq E$ and $U\subseteq T$, put
+\[
+f_q(A,U)=\SSer_q(A\cup U).
+\]
+Define partial Boolean M\"obius operators
+\begin{align}
+(\Mob_E f)(A,U)
+&=\sum_{B\subseteq A}(-1)^{|A|-|B|}f(B,U),\label{eq:ME}\\
+(\Mob_T f)(A,U)
+&=\sum_{V\subseteq U}(-1)^{|U|-|V|}f(A,V).\label{eq:MT}
+\end{align}
+They commute, and
+\[
+(\Mob_E\Mob_Tf_q)(A,U)=\SSer_{q,0}(A\cup U).
+\]
+Let endpoint-fiber contraction be
+\[
+(\ZE g)(U)=\sum_{A\subseteq E}g(A,U),
+\]
+and let $\evE$ denote evaluation at the full endpoint set $A=E$.
+
+\begin{proposition}[Endpoint contraction identity]\label{prop:endpoint-contraction}
+For every $q$, every endpoint pair $E$, and every finite free set $T$,
+\begin{equation}\label{eq:commuting-identity}
+\boxed{\ZE\Mob_E\Mob_T=\Mob_T\evE.}
+\end{equation}
+Equivalently,
+\begin{equation}\label{eq:F_E}
+\Fcal_{E,q}(T)
+:=\sum_{A\subseteq E}\SSer_{q,0}(A\cup T)
+=\Mob_T[\SSer_q(E\cup\cdot)](T).
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+For fixed $U\subseteq T$,
+\[
+\sum_{A\subseteq E}\sum_{B\subseteq A}
+(-1)^{|A|-|B|}f_q(B,U)
+=f_q(E,U),
+\]
+which is the Boolean zeta--M\"obius identity on the endpoint fiber.  Since $\Mob_E$ and $\Mob_T$ commute, \eqref{eq:commuting-identity} follows.
+\end{proof}
+
+Assume $\SSer_q(E)>0$ and define
+\begin{equation}\label{eq:Rq}
+R_q(U)=\frac{\SSer_q(E\cup U)}{\SSer_q(E)},
+\qquad
+R_q^\circ(T)=\sum_{V\subseteq T}(-1)^{|T|-|V|}R_q(V).
+\end{equation}
+Then \cref{prop:endpoint-contraction} gives the pointwise identity
+\begin{equation}\label{eq:F-Rcirc}
+\boxed{\Fcal_{E,q}(T)=\SSer_q(E)R_q^\circ(T).}
+\end{equation}
+If $I$ is a finite interior set and
+\[
+C_{k,q}^{\mathrm{comp}}
+=\sum_{\substack{T\subseteq I\\|T|=k}}\Fcal_{E,q}(T),
+\qquad
+A_{k,q}^{\circ}
+=\sum_{\substack{T\subseteq I\\|T|=k}}R_q^\circ(T),
+\]
+then
+\begin{equation}\label{eq:C-A-dictionary}
+\boxed{C_{k,q}^{\mathrm{comp}}=\SSer_q(E)A_{k,q}^{\circ}.}
+\end{equation}
+At $q=1$ this is the exact normalization dictionary between the completed endpoint coordinate and the anchored free-label connected coordinate.
+
+\subsection{Anchor subtraction}
+
+Write
+\[
+c_q(A,T)=\SSer_{q,0}(A\cup T),
+\]
+and define the lower-anchor sum and the top-anchor sector by
+\begin{align}
+b_q(T)&=c_q(\varnothing,T)+c_q(\{0\},T)+c_q(\{h\},T),\label{eq:bq}\\
+g_q(T)&=c_q(E,T)=\SSer_{q,0}(E\cup T).\label{eq:gq}
+\end{align}
+Then $\Fcal_{E,q}(T)=b_q(T)+g_q(T)$.  Since singleton singular series are one,
+\[
+\SSer_{q,0}(E)=\SSer_q(E)-1.
+\]
+Combining this with \eqref{eq:F-Rcirc} gives the exact residual identity
+\begin{equation}\label{eq:anchor-residual}
+\boxed{
+R_q^\circ(T)-b_q(T)
+=\frac{g_q(T)-\SSer_{q,0}(E)b_q(T)}{\SSer_q(E)}.
+}
+\end{equation}
+Thus the anchored-to-free transfer defect is the normalized failure of the top two-anchor connected sector to contract onto the lower anchor sectors.
+
+\subsection{The same transform at one prime}
+
+At an active prime $p$, let $z$ be uniformly distributed modulo $p$ and
+introduce the \emph{mean-one avoidance factor}
+\begin{equation}\label{eq:local-avoidance}
+ \phi_{p,z}(x)=\frac{1-\mathbf 1_{z\equiv -x\pmod p}}{1-1/p},
+ \qquad \frac1p\sum_{z\bmod p}\phi_{p,z}(x)=1.
+\end{equation}
+For a finite set $H$ (and, when coordinates are independently labeled,
+for a labeled list of occurrences), the local factor is exactly
+\[
+ L_p(H)=\frac1p\sum_{z\bmod p}\prod_{x\in H}\phi_{p,z}(x)
+       =\frac{1-\nu_p(H)/p}{(1-1/p)^{|H|}}.
+\]
+In the labeled case, $|H|$ counts coordinate occurrences even when values
+repeat; the product retains repeated factors although the numerator
+counts occupied residue classes. Boolean connectedization is thus
+\begin{equation}\label{eq:local-connected}
+ \sum_{J\subseteq H}(-1)^{|H|-|J|}L_p(J)
+    =\frac1p\sum_{z\bmod p}\prod_{x\in H}(\phi_{p,z}(x)-1).
+\end{equation}
+The centering in \eqref{eq:local-avoidance} removes the constant Fourier
+coefficient in each \emph{individual} free-coordinate factor. This
+single-prime calculation is an algebraic identity, not an estimate on
+the entire signed arithmetic sum.
+
+\section{Fixed squarefree modulus and the level-one theorem}\label{sec:fixed-q-setup}
+
+Fix squarefree $q\ge1$ and endpoint classes
+\[
+a,b\in(\Zmod/q\Zmod)^\times,
+\qquad h\equiv b-a\pmod q.
+\]
+Assume the endpoint pair is $q$-restricted admissible,
+\[
+\SSer_q(E)>0,
+\qquad E=\{0,h\}.
+\]
+Every legal height is even: if $2\nmid q$, admissibility at the active prime $2$ forces $h$ even; if $2\mid q$, the unit classes $a,b$ are both odd and hence their difference is even modulo $2$, so $h\equiv b-a\equiv0\pmod2$.
+
+Define the admissible interior and its exact size by
+\begin{equation}\label{eq:IqNq}
+I_q(a;h)=\{0<t<h:(a+t,q)=1\},
+\qquad N_q(a;h)=|I_q(a;h)|.
+\end{equation}
+The level-one connected and lower-anchor sums are
+\begin{align}
+A_{1,q}(a,b;h)
+&=\sum_{t\in I_q(a;h)}R_q^\circ(\{t\})\notag\\
+&=\sum_{t\in I_q(a;h)}
+\left(
+\frac{\SSer_q(\{0,t,h\})}{\SSer_q(\{0,h\})}-1
+\right),\label{eq:A1q}\\
+B_{1,q}(a,b;h)
+&=\sum_{t\in I_q(a;h)}b_q(\{t\})\notag\\
+&=\sum_{t\in I_q(a;h)}
+\left[\SSer_{q,0}(\{t\})
++\SSer_{q,0}(\{0,t\})
++\SSer_{q,0}(\{h,t\})\right].\label{eq:B1q}
+\end{align}
+Since $\SSer_{q,0}(\{t\})=0$,
+\begin{equation}\label{eq:B1q-simple}
+B_{1,q}
+=\sum_{t\in I_q(a;h)}(\SSer_q(\{0,t\})-1)
++\sum_{t\in I_q(a;h)}(\SSer_q(\{h,t\})-1).
+\end{equation}
+By \eqref{eq:anchor-residual},
+\begin{equation}\label{eq:AminusB-connected}
+A_{1,q}-B_{1,q}
+=\frac1{\SSer_q(E)}
+\sum_{t\in I_q(a;h)}
+\left[g_q(\{t\})-\SSer_{q,0}(E)b_q(\{t\})\right].
+\end{equation}
+
+\begin{theorem}[Fixed-squarefree-$q$ pointwise level-one transfer]\label{thm:fixed-q}
+Fix a positive squarefree integer $q$. For every $\varepsilon>0$
+there exists $h_0=h_0(q,\varepsilon)$ such that every positive
+$h\ge h_0$ and every reduced pair of endpoints $a,b\pmod q$
+with $a+h\equiv b\pmod q$ and
+$2\nmid q\Rightarrow 2\mid h$ satisfy
+$|A_{1,q}(a,b;h)-B_{1,q}(a,b;h)|\le\varepsilon\log h$.
+Equivalently, uniformly over those compatible endpoints,
+\begin{equation}\label{eq:main-theorem}
+\boxed{A_{1,q}(a,b;h)-B_{1,q}(a,b;h)=o_q(\log h)}
+\end{equation}
+as $h\to\infty$ through positive compatible heights.
+\end{theorem}
+
+There is no density-one restriction in $h$.
+
+\subsection{Exact density normalization}
+
+The admissible count is exactly periodic.
+
+\begin{lemma}[Exact periodic count]\label{lem:Nq}
+For each compatible pair $(a,b)$,
+\begin{equation}\label{eq:Nq-periodic}
+\boxed{N_q(a;h)=\frac{\ph(q)}q h+\eps_q(a,b),}
+\end{equation}
+where $\eps_q(a,b)$ depends only on the fixed compatible residue data, not on the positive representative of the gap class.
+\end{lemma}
+
+\begin{proof}
+If $h$ is increased by $q$ while preserving its residue class, the interval gains one complete period of $q$ translates and hence exactly $\ph(q)$ admissible interior positions.  Therefore $N_q(a;h)-\ph(q)h/q$ is constant on each compatible height progression.
+\end{proof}
+
+For the completed Lemke Oliver--Soundararajan normalization, the fixed-modulus density parameter is
+\begin{equation}\label{eq:deltaq}
+\delta_q(x)=\frac{q}{\ph(q)\log x}.
+\end{equation}
+Consequently
+\[
+\delta_q(x)\frac{\ph(q)}q=\frac1{\log x}.
+\]
+The $q/\ph(q)$ factor belongs to the ambient admissible-point density; it does not appear as an additional multiplier inside the transfer kernel \eqref{eq:main-theorem}.  The unconditional level-one contraction formula is
+\begin{equation}\label{eq:LOS-level-one}
+ C_{1,q}^{\mathrm{comp}}=\SSer_q(E)A_{1,q}.
+\end{equation}
+Only when $N_q(a;h)>0$ is the completed coefficient per
+admissible interior position defined by
+\begin{equation}\label{eq:LOS-level-one-per-site}
+ \Delta\mu_0:=\frac{C_{1,q}^{\mathrm{comp}}}{N_q(a;h)}
+ =\frac{\SSer_q(E)}{N_q(a;h)}A_{1,q}.
+\end{equation}
+This qualification is necessary: for $q=2$, $a=b=1$, $h=2$
+the only interior integer is not admissible, so $N_q(a;h)=0$.
+By \cref{lem:Nq}, however, for each fixed compatible residue pair
+$N_q(a;h)=(\ph(q)/q)h+\eps_q(a,b)>0$ eventually. Therefore the
+finite-height domain restriction does not affect
+\cref{thm:fixed-q}.
+
+\section{Exact representation of the Euler quantities}\label{sec:euler-bridge}
+
+The quantities in \eqref{eq:A1q} and \eqref{eq:B1q} are finite sums of
+\emph{infinite} products. Their analytic treatment starts with an exact
+identification, not an asymptotic replacement. Write
+$A^{\mathrm{src}}_{1,q}(a;h)$ and $B^{\mathrm{src}}_{1,q}(a,b;h)$ for the
+arithmetic divisor-periodic kernels defined in the accompanying source
+(see the source-obligation concordance distributed with the accompanying analytic supplement and the reader companion). We deliberately keep the
+superscript: equal numerical values do not make the two descriptions
+interchangeable without proving that the normalizations agree.
+
+\begin{proposition}[Literal Euler-to-source identity]\label{prop:euler-bridge}
+Let $q\ge1$, let $a+h\equiv b\pmod q$, and impose the parity condition
+$2\nmid q\Rightarrow2\mid h$. For the literal products in
+\eqref{eq:S_q}, \eqref{eq:A1q}, and \eqref{eq:B1q},
+\begin{equation}\label{eq:euler-source-bridge}
+ A_{1,q}(a,b;h)-B_{1,q}(a,b;h)
+ =A^{\mathrm{src}}_{1,q}(a;h)-B^{\mathrm{src}}_{1,q}(a,b;h).
+\end{equation}
+The identity retains the exceptional active primes, the inactive factors
+for $p\mid q$, and the complete centering of the boundary terms.
+\end{proposition}
+
+\begin{proof}
+We separate two points that are easy to conflate. For the anchored
+quotient, primewise division of the three-point and endpoint-pair
+factors requires the \emph{whole} endpoint product to be nonzero.
+The high-prime endpoint factors are of the form
+\[
+ 1-\frac{1}{(p-1)^2}
+\]
+when the two endpoints occupy distinct classes; their deviations from
+$1$ are summable. The finitely many exceptional factors, including the
+active prime $2$, are handled according to the parity/admissibility
+condition. Only after convergence and nonvanishing are established is
+it legitimate to identify the quotient of products with the product of
+local quotients. Each active factor then has an exact divisor-selector
+expansion. When summing those selectors over the admissible interior,
+the subtraction is the \emph{exact} cardinality $N_q(a;h)$, not a
+mean-density approximation.
+
+The boundary expression requires a different argument. At an active
+high prime the free-pair factor has the selector
+\[
+ c_1(p)\bigg(1+\frac{\mathbf1_{p\mid y}}{p-2}\bigg),
+ \qquad c_1(p)=\frac{p(p-2)}{(p-1)^2}.
+\]
+More explicitly, the high-prime divisor coefficient and constant are
+\[
+ \eta_q(e)=\mu^2(e)\mathbf1_{(e,6q)=1}
+       \prod_{p\mid e}\frac1{p-2},\qquad
+ C_{f,q}=\prod_{\substack{p\ge5\\p\nmid q}}
+       \frac{p(p-2)}{(p-1)^2}.
+\]
+All primes in the coefficient support are at least $5$ and do not
+divide $q$. The exact Euler normalization then gives
+\begin{equation}\label{eq:boundary-normalization}
+ C_{f,q}\sum_{e\ge1}\frac{\eta_q(e)}{e}=1.
+\end{equation}
+The complete first-anchor expression also carries the exceptional active
+primes $2$ and $3$. For a residue representative $r\pmod q$ define
+\begin{equation}\label{eq:free-low-weight}
+ w_{q,r}(t)=\mathbf1_{(r+t,q)=1}
+ \prod_{\substack{p\in\{2,3\}\\p\nmid q}}
+ \frac{1-\nu_p(\{0,t\})/p}{(1-1/p)^2},
+ \qquad
+ R^{w}_e(q,r;h)=\sum_{\substack{0<t<h\\e\mid t}}w_{q,r}(t).
+\end{equation}
+The exact centered \emph{first-anchor} identity is
+\begin{equation}\label{eq:boundary-infinite-tail}
+ \boxed{S_1(q,r;h)=C_{f,q}\sum_{e\ge1}\eta_q(e)
+     \left(R^w_e(q,r;h)-\frac{N_q(r;h)}e\right).}
+\end{equation}
+Here $S_1(q,r;h)=\sum_{0<t<h,\,(r+t,q)=1}
+(\SSer_q(\{0,t\})-1)$ is the literal first-boundary contribution.
+It is crucial that the \emph{positive mass is weighted but the
+negative centering is not}: replacing $N_q(r;h)/e$ by a weighted
+mean would give a different normalization. Equation
+\eqref{eq:boundary-normalization} supplies the full subtraction
+$-N_q(r;h)$, and the convergence argument justifies passage between
+the finite divisor-swapped numerator and the infinite centered series.
+The numerator vanishes for $e\ge h$; the negative tail does not.
+
+For a simple check, take $q=1,h=2$. The only interior displacement
+$t=1$ is annihilated by the active prime $2$, so the literal
+first-boundary sum is $-1$. Correspondingly $w_{1,0}(1)=0$ and
+\eqref{eq:boundary-normalization} makes
+\eqref{eq:boundary-infinite-tail} equal to $-1$. An unweighted
+progression count would instead give $C_{f,1}-1$, which is different.
+
+The second boundary must be treated by a separate reflection. Let
+$r_b$ represent $-b\pmod q$. Under $t\mapsto h-t$ and
+$a+h\equiv b\pmod q$, the conditions
+$(a+t,q)=1$ and $(r_b+h-t,q)=1$ agree. Translation of each
+restricted pair Euler factor then gives the \emph{exact} identity
+\begin{equation}\label{eq:two-boundary-weighted}
+ \boxed{B_{1,q}(a,b;h)=S_1(q,a;h)+S_1(q,r_b;h),}
+\end{equation}
+with each $S_1$ represented by \eqref{eq:boundary-infinite-tail} and
+its own (unweighted) admissible count. The exact reflection also
+identifies those two admissible counts on compatible heights. The
+A-side and both B-side Euler bridges, including their convergence
+and translation steps, establish \eqref{eq:euler-source-bridge}.
+\end{proof}
+
+It remains to estimate the right-hand side of
+\eqref{eq:euler-source-bridge}. The analytic proof does \emph{not}
+rederive \eqref{eq:euler-source-bridge} as an approximation; the two
+proof obligations remain separate until the final theorem.
+
+\section{The signed physical source and its exact partitions}
+\label{sec:signed-source}
+
+\subsection{The original finite signed source}
+
+Put $\Lambda=\log h$ and $\sigma_0=\frac23+\frac1{100}$, and define
+the actual source cutoff
+\begin{equation}\label{eq:source-Z}
+ Z(h)=2^{20(\lfloor\Lambda^{\sigma_0}\rfloor+1)}.
+\end{equation}
+A decoration $d$ is a subset of the prime divisors of $h$ which
+are at least $5$ and do not divide $q$. Write
+$D_d=\prod_{p\in d}p$, $H_d=h/D_d$, and
+$V_h(d)=\prod_{p\in d}(p-2)^{-1}$. The decorated sum retains only
+those $d$ for which
+\begin{equation}\label{eq:active-decoration}
+  Z(h)\exp(\Lambda^{1/4})<H_d.
+\end{equation}
+The corresponding finite high-prime support is
+\[
+ T_{q,h,d}=\{p\le H_d^2:p\text{ prime},\ p\ge5,\ p\nmid qH_d,
+                 \ p\notin d\}.
+\]
+The original quarter-parent family consists of sets of those primes,
+with its strict lower and weak upper product bounds:
+\begin{equation}\label{eq:quarter-parent-contract}
+ \mathcal Q_{q,h,d}=
+  \Bigl\{e\subseteq T_{q,h,d}:
+   Z(h)<\prod_{p\in e}p,\quad
+   4\prod_{p\in e}p\le H_d^2\Bigr\}.
+\end{equation}
+For each such $e$ we retain every \emph{proper, nonempty,
+ordered} split $e=B\sqcup C$, with
+$r=\prod_{p\in B}p$, $s=\prod_{p\in C}p$.
+The Central gate is exactly
+\begin{equation}\label{eq:central-contract}
+ rs\le H_d e^{-\Lambda^{1/4}},\qquad
+ s\le r^2,\qquad r\le s^2.
+\end{equation}
+The parent weight is $\omega(e)=\prod_{p\in e}(p-3)^{-1}$.
+The first condition in \eqref{eq:central-contract} is a genuine
+restriction on the ordered pair, not an optional asymptotic estimate.
+
+To specify the \emph{signed} row, let $a_d\equiv D_d^{-1}a\pmod q$
+(the inverse exists), and define the exceptional-prime occupied weight
+\[
+ \lambda_{q,a_d,H}(y)=\mathbf1_{(a_d+y,q)=1}
+ \prod_{\substack{p\in\{2,3\}\\p\nmid q}}
+ \frac{1-\nu_p(\{0,y,H\})/p}{1-\nu_p(\{0,H\})/p}
+ (1-1/p)^{-1}.
+\]
+The mean and centered weight over its source period $6q$ are
+\[
+ \mu_{q,a_d,H}=\frac1{6q}\sum_{y=0}^{6q-1}\lambda_{q,a_d,H}(y),
+ \qquad g_{q,a_d,H}(y)=\lambda_{q,a_d,H}(y)-\mu_{q,a_d,H}.
+\]
+For $n$ coprime to $M=6q$ define the periodic arithmetic potential
+\[
+ \mathcal P_{g,M,n}(y)=\sum_{j=0}^{[yn^{-1}]_M-1}g(jn),
+\]
+where $[\cdot]_M$ is the representative in $\{0,\ldots,M-1\}$.
+Let $\bar r_s$ be the inverse of $r$ modulo $s$ (the
+permitted source pairs are coprime), and define the CRT residue
+\[
+ c_{H;r,s}=r\,[H\bar r_s]_s,\qquad 0\le [H\bar r_s]_s<s,
+\]
+where $[\cdot]_s$ denotes the least nonnegative residue.  This
+is the source's literal \texttt{crtResidue}$(H,r,s)$, not a
+choice of arbitrary CRT representative.  With the
+source sawtooth $\psi(x)=\{x\}-\frac12$, including its
+integer convention, the folded row is
+\begin{equation}\label{eq:folded-row-contract}
+\begin{split}
+ \mathfrak f_{q,a,D_d}(H_d,r,s)
+   ={}&-2\mu_{q,a_d,H_d}\,
+      \psi\!\left(\frac{H_d\bar r_s}s\right)\\
+     &+\mathcal P_{g,6q,rs}(H_d+rs-c_{H_d;r,s})
+       -\mathcal P_{g,6q,rs}(c_{H_d;r,s}).
+\end{split}
+\end{equation}
+This expression is the exact folded combination of the oriented
+reciprocal sawtooth and the two CRT-potential evaluations. The
+mean subtraction in $g$ and the ordering of the two potentials
+are part of the analytic data.
+
+Finally the \emph{complete signed folded Central sum} is
+\begin{equation}\label{eq:physical-source-schema}
+\boxed{
+ \mathcal C_{\rm fold}(q,a,h)=
+ \sum_{\substack{d\subseteq\mathcal P_{q,h}\\Z(h)e^{\Lambda^{1/4}}<H_d}}
+ V_h(d)\!
+ \sum_{e\in\mathcal Q_{q,h,d}}
+ \sum_{\varnothing\ne B\subsetneq e}
+ \mathbf1_{\mathsf{Central}(H_d,r,s)}
+ \omega(e)\,\mathfrak f_{q,a,D_d}(H_d,r,s),
+}
+\end{equation}
+where $\mathcal P_{q,h}=\{p\mid h:p\text{ prime},p\ge5,p\nmid q\}$,
+$r=\prod_{p\in B}p$, and $s=\prod_{p\in e\setminus B}p$.
+This is the particular finite signed source to which the cell
+estimates apply; none is inferred for an arbitrary row function.
+The corresponding source definition initially ranges over all legal
+decoration subsets. Its lower-product gate forces the active condition
+\eqref{eq:active-decoration}; hence every inactive decoration term
+vanishes, proving that the active-only display and the all-decoration
+source are exactly equal. This is an identity of sums, not an
+asymptotic deletion of small terms.
+
+The original active Central source and folded Central have the
+independently proved exact identity
+\begin{equation}\label{eq:active-folded}
+ \mathcal C_{\rm active}=
+  \mathcal C_{\rm fold}+\mathcal R_{\rm inv}+\mathcal R_{\rm dens}.
+\end{equation}
+The error terms are separately bounded in \cref{sec:aggregation}.
+The source contract and its identity are recorded by the
+physical source definition, the signed-fold theorem, and the
+Central transfer. The present paper uses these \emph{exact}
+representations, not a schematic surrogate for a difficult sum.
+
+\subsection{An identity, not a cancellation estimate}
+
+Choose cutoff functions $J_\ell(h)\le J_u(h)$. Every finite
+parent has exactly one of the three cardinalities
+\[
+ |e|<J_\ell(h),\qquad
+ J_\ell(h)\le|e|<J_u(h),\qquad
+ J_u(h)\le|e|.
+\]
+Multiplying \eqref{eq:physical-source-schema} by the corresponding
+indicators and summing gives the exact signed equality
+\begin{equation}\label{eq:sector-partition}
+ \boxed{\mathcal C_{\rm fold}
+  =\mathcal C_{\rm LOW}+\mathcal C_{\rm MIDDLE}
+   +\mathcal C_{\rm HIGH}.}
+\end{equation}
+No absolute value, summation inequality, or large-height assumption
+has yet been used. This matters: the original signs, decorations and
+ordered pairs must remain attached to the summands on both sides.
+
+The middle population is split by the geometric test
+\begin{equation}\label{eq:long-guard}
+ \mathcal L_\delta(r,s):
+ \quad s^{1+\delta}<r\quad\text{or}\quad r^{1+\delta}<s,
+ \qquad 0<\delta<\frac13.
+\end{equation}
+CORE is the complement of \eqref{eq:long-guard} \emph{inside the
+same middle population}; LONG is its truth set. The two LONG
+orientations cannot both hold for positive $r,s$ and $\delta$.
+Hence a second exact equality holds:
+\begin{equation}\label{eq:middle-partition}
+ \boxed{\mathcal C_{\rm MIDDLE}
+   =\mathcal C_{\rm CORE}+\mathcal C_{\rm LONG}.}
+\end{equation}
+The proof is an indicator partition of every original summand,
+including the boundary case of equality in the strict tests.
+
+\begin{remark}[Why the lower cutoff may be zero]\label{rem:zero-low}
+The analytic bounds on CORE and LONG hold for \emph{arbitrary}
+cutoff functions. We therefore set $J_\ell\equiv0$. As
+$|e|\ge0$ for each finite parent, the LOW sum is empty and
+\begin{equation}\label{eq:low-zero}
+ \mathcal C_{\rm LOW}=0,\qquad
+ \mathcal C_{\rm fold}
+ =\mathcal C_{\rm MIDDLE}(0,J_u)+\mathcal C_{\rm HIGH}(J_u).
+\end{equation}
+This does \emph{not} assert that the parents previously assigned to
+LOW have zero weight. With the new partition their terms belong
+to MIDDLE, where the cutoff-uniform bounds apply. Equation
+\eqref{eq:sector-partition} is the conservation statement that
+makes this reallocation legitimate. We take $\delta=1/4$ at the
+final specialization.
+\end{remark}
+
+\section{Twelve physical cells and the methods they require}
+\label{sec:cells}
+
+The signed source is now partitioned a third time. The five CORE
+cells and seven LONG cells are masks on
+\eqref{eq:physical-source-schema}, not twelve unrelated
+model sums. They are disjoint and exhaustive before estimates.
+
+\begin{proposition}[Exact five- and seven-cell identities]
+\label{prop:physical-decomposition}
+At each allowed decoration $d$ and at every eligible choice of
+cutoffs, one has the exact signed identities
+\begin{align}
+ \mathcal C_{{\rm CORE},d}
+ &=W_d+C_d+R_d+\mathrm{ResA}_d+\mathrm{Band}_d,
+ \label{eq:core-five}\\
+ \mathcal C_{{\rm LONG},d}
+ &=WL_d+CL_d+RL_d+\mathrm{ManyL}_d
+    +\mathrm{EdgeL}_d+\mathrm{ResL}_d+WRL_d.
+ \label{eq:long-seven}
+\end{align}
+The original signed folded row, ordered orientation, source gate
+and decoration weight are unchanged in both identities.
+\end{proposition}
+
+\begin{proof}
+CORE tests successively for a prime packet on its first factor,
+for the complementary Parseval/Vaughan regime, and for a usable
+reciprocal-progression packet on its second factor. Its remaining
+parents fall into a rough residual or a near-diagonal band. LONG
+first distinguishes the orientation in \eqref{eq:long-guard}. The
+longer-left orientation splits into the packet and complementary
+Parseval cells. On the longer-right orientation, the tests proceed
+through a reciprocal packet, excessive prime-factor count, the
+square-root edge, and finally the presence or absence of a Weil
+packet. Each test is accompanied by its logical complement;
+therefore every admitted parent enters exactly one cell. At the
+source level these are the finite \texttt{split5} and
+\texttt{split7} identities, applied termwise before summation.
+\end{proof}
+
+\begin{table}[htbp]
+\centering\small
+\caption{CORE: the dominant positive exponent comes from the geometric band.}
+\label{tab:core-cells}
+\begin{tabular}{@{}lp{3.95in}r@{}}
+\toprule
+Cell & Applicable source mechanism & Eventual bound \\
+\midrule
+$W$ & First-factor prime packet; Ramar\'e extraction \cite{Ramare2010}, coupled Cauchy and CRT/Kloosterman & $\Lambda^{-80}$\\
+$C$ & Packet absent; Parseval and Vaughan/prime-sum bounds, with Rankin tail & $\Lambda^{-15}$\\
+$R$ & Reciprocal-progression packet; shifted Suzuki estimate and Abel summation & $\Lambda^{-75}$\\
+$\mathrm{ResA}$ & Neither packet; direct mass of two rough factors & $\Lambda^{1/10}$\\
+$\mathrm{Band}$ & Narrow logarithmic diagonal strip; weighted interval mass & $\Lambda^{499/500}$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption{LONG: geometric control and arithmetic cancellation have separate domains.}
+\label{tab:long-cells}
+\begin{tabular}{@{}lp{3.95in}r@{}}
+\toprule
+Cell & Applicable source mechanism & Eventual bound \\
+\midrule
+$WL$ & Longer-left orientation, packet extraction with Kloosterman control & $\Lambda^{-80}$\\
+$CL$ & Longer-left complement, Parseval/Vaughan and exceptional tail & $\Lambda^{-15}$\\
+$RL$ & Longer-right reciprocal packet, source-compatible Suzuki input & $\Lambda^{-75}$\\
+$\mathrm{ManyL}$ & Many prime factors, suppressed by a Rankin bound & $\Lambda^{-50}$\\
+$\mathrm{EdgeL}$ & Short cofactor at square-root edge, bounded by geometric mass & $\Lambda^{19/20}$\\
+$\mathrm{ResL}$ & Off edge without a Weil packet; rough-factor mass & $\Lambda^{7/10}$\\
+$WRL$ & Off edge with a Weil packet; general Kloosterman, gcd and Cauchy costs & $\Lambda^{-80}$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Here and below $\Lambda=\log h$. Each bound controls the
+\emph{complete signed masked source sum for a fixed decoration},
+uniformly in legal anchors and cutoffs at sufficiently large $h$.
+It does not bound the absolute value of every parent separately:
+doing so would erase the cancellation that the oscillatory cells
+are built to recover. The displayed bounds are the source's \emph{physical} estimates,
+with the common quarter-parent, ordered factorization, Central
+and cardinality gates inherited throughout. The accompanying
+analytic supplement supplies worked geometric and quantitative
+chains for the limiting cells, the full remaining cell-contract
+register and exact source anchors. That appendix is part of the
+mathematical presentation, not a newly claimed independent
+reproof of all deep analytic leaf estimates.
+
+\subsection{The physical leaf as a mathematical contract}
+\label{sec:leaf-contract}
+
+The operation inside a physical cell has three distinct stages.
+First an exact predicate selects terms from the \emph{original}
+signed double sum \eqref{eq:physical-source-schema}. Second the
+available analytic supplier controls either the resulting
+weighted mass or the oscillation of the \emph{whole masked sum};
+it is applied only when the packet, cofactor, frequency and
+coprimality hypotheses of that region are verified. Third,
+constants and any source outer-factor loss are absorbed into
+the displayed power of $\Lambda$.
+
+This order matters. In the near-diagonal CORE Band, the two
+negations of the earlier geometric tests imply
+\begin{equation}\label{eq:band-interval-paper}
+ r^{1/(1+\epsilon_p)}<s<r^{1+3\epsilon_p},
+ \qquad\epsilon_p=\Lambda^{-1/200}.
+\end{equation}
+The interval's logarithmic width is at most
+$1+4\Lambda^{199/200}$, before a separate roughness bound
+on the first factor. In LONG's EdgeL, by contrast, one
+\emph{fixes the second factor} and uses
+$s^{1/2}\le r<s^{1/2+3\eta}$, $\eta=\Lambda^{-1/10}$,
+only after excluding the reciprocal packet and large-factor-count
+cases. The geometric operation is not interchangeable with
+Weil completion. These two chains, including the floors and
+exact roughness/interval constants, are developed in the
+supplement rather than buried in the tables above.
+
+\subsection{The exact LONG-right decision chain}
+
+The most revealing comparison is between $\mathrm{EdgeL}$ and $WRL$.
+Their support is determined by a sequence of \emph{predicates} on
+the same source pairs, not just by a numerical inequality in $r,s$.
+Let $T=T_{q,h,d}$, let $J_R(h,T,B)$ be the actual reciprocal-progression
+prime window, put
+\[
+ K_0(h)=\lceil100\log\Lambda\rceil,\qquad
+ \eta=\Lambda^{-1/10},
+\]
+and let $X_p(h)$ and $Y_L(h,s)$ be the source's fixed
+packet-window endpoints. On LONG-right the following routing is exact:
+\begin{enumerate}[leftmargin=*,itemsep=0.12em]
+\item If $C\cap J_R(h,T,B)\ne\varnothing$, assign the pair to $RL$.
+\item Otherwise, if $|C|\ge K_0(h)$, assign it to $\mathrm{ManyL}$.
+\item Otherwise, if $r<s^{1/2+3\eta}$, assign it to $\mathrm{EdgeL}$.
+\item Otherwise, if $B$ meets the source packet
+ $\{p\in T\setminus C:X_p(h)\le p\le Y_L(h,s)\}$,
+ assign it to $WRL$; if not, assign it to $\mathrm{ResL}$.
+\end{enumerate}
+These tests inherit the source Central gate, proper ordered split,
+cardinality mask, and LONG-right condition; none of those is replaced
+by the four new predicates. Thus the short-cofactor strip
+\begin{equation}\label{eq:edge-strip}
+ s^{1/2}\le r<s^{1/2+3\eta}
+\end{equation}
+is the \emph{geometric consequence} of the EdgeL mask, not its
+entire definition.
+
+Within $\mathrm{EdgeL}$, the cofactor is too short for the
+Weil--Cauchy method. The proof uses the weighted logarithmic
+width $O(\eta\log s)$ and the roughness forced by missing the
+reciprocal packet. Its local cost is exactly
+\[
+ \underbrace{\tfrac9{10}}_{\rm width}
+ +\underbrace{\tfrac1{4000}+\tfrac1{40}+\tfrac1{100}}_{\rm roughness/weight}
+ =\tfrac{3741}{4000}<\tfrac{19}{20}.
+\]
+The final gap $59/4000$ absorbs a fixed coefficient; no Weil estimate
+is invoked in this region.
+
+On $WRL$ the prior gates ensure $r\ge s^{1/2+3\eta}$.
+Extracting the prime $p\le s^\eta$ leaves a cofactor of length
+at least on the scale $s^{1/2+2\eta}$. The available
+Kloosterman/Cauchy calculation now applies. Its complete-sum input is
+\begin{equation}\label{eq:kloosterman-bound}
+ |S(u,v;s)|\le\tau(s)\sqrt{s\,(u,v,s)},
+\end{equation}
+with its divisor factor and gcd penalty retained
+\cite{Weil1948,Estermann1961,IwaniecKowalski2004}.
+The coefficient-order reversal in the formal general-modulus
+normalization is an exact identity, not a hypothesis that the gcd
+factor may be discarded. The source's fixed-factor power
+$\Lambda^{-95}$ pays an outer $\Lambda^{10}$ mass, and the
+remaining margin absorbs the fixed coefficient to reach the physical
+$\Lambda^{-80}$ bound. If the packet is absent, the pair belongs to
+$\mathrm{ResL}$, not to $WRL$.
+
+This is the useful geometric principle: cancellation is used only
+where the factorization leaves enough range; a sufficiently thin
+failure region can be paid by geometric mass instead.
+
+
+The actual clipped reciprocal application underlying $R$ and $RL$
+is worth distinguishing from its final physical estimate. For fixed
+$Q=6qr$ and a residue $\rho$, the contributing progression is
+restricted \emph{simultaneously} by a dyadic interval and by both
+products $vu$ and $v'u$. The resulting natural-number endpoints
+$a_*,b_*$ determine $N=(a_*-\rho)\mathbin{\mathrm{div}}Q$ and
+$M=(b_*-\rho)\mathbin{\mathrm{div}}Q$. The source proves
+$1\le N<M\le2N$, $|Y/v-Y/v'|\ge2Q$ and an Abel
+variation norm at most $2$ for its nonconstant cotangent
+coefficient. The four signed main/class Fourier channels are
+checked separately, under the distinct CORE $5$ and LONG $4$
+logarithmic hypotheses. The complete clipped application lemma
+and those four coefficient contracts are given in the accompanying
+mathematical supplement. Its conclusion is an input to the
+source's deeper fixed-factor estimates, not a proof of those
+estimates by itself.
+
+\subsection{Why the reciprocal estimate has two versions}
+
+The $R$ and $RL$ cells both use a reciprocal phase of the type
+\[
+ \sum_{N<m\le U}\exp\!\left(2\pi i\frac{Y}{m+\vartheta}\right),
+ \qquad U\le2N.
+\]
+The source's shifted Suzuki/Karatsuba estimate has a bound of
+the shape
+\begin{equation}\label{eq:reciprocal-sum-bound}
+ \left|\sum_{N<m\le U}e\!\left(\frac{Y}{m+\vartheta}\right)\right|
+ \ll N\exp\!\left(-c\frac{(\log N)^3}{(\log Y)^2}\right)
+   +\frac{N^2}{Y},
+\end{equation}
+where $e(t)=\exp(2\pi i t)$ and the fixed constants and
+admissible parameter ranges are those of the source theorem.
+A low-frequency regime uses a telescoping derivative argument;
+a high-frequency regime uses selected derivative orders,
+Karatsuba's polynomialization and Vinogradov-type mean-value
+bounds. The actual $R$ and $RL$ applications additionally
+require progression reindexing, negative-frequency conjugation
+and Abel summation for the Fourier coefficients.
+
+The CORE $R$ estimate needs a lower logarithmic factor with
+constant $5$. The LONG-right geometry supplies only $4$.
+The LONG proof therefore proves the numerical implication
+again instead of citing a stronger hypothesis it does not have.
+Writing $\sigma_0=\tfrac23+\tfrac1{100}$, the exponent that
+matters is
+\begin{equation}\label{eq:R-RL-margin}
+ 3\sigma_0-\frac3{200}-2=\frac3{200}>0.
+\end{equation}
+The change from $5^3$ to $4^3$ affects the fixed coefficient
+but does not destroy this positive power. It is an instance of
+transporting a classical mechanism with its genuine quantitative
+price rather than treating theorem names as universally portable.
+
+\section{The logarithmic budget and the uniform terminal estimate}
+\label{sec:aggregation}
+
+\subsection{The largest cell controls the sector}
+
+\begin{proposition}[Physical source bounds]\label{prop:physical-rates}
+For each fixed $q>0$ and $0<\delta<1/3$, there exists
+$\Lambda_0(q,\delta)$ such that, whenever
+$\Lambda=\log h\ge\Lambda_0$, every permitted decoration $d$,
+every legal anchor, and every allowed cardinality cutoff obey
+\begin{equation}\label{eq:physical-rates}
+ |\mathcal C_{{\rm CORE},d}|\le5\Lambda^{499/500},\qquad
+ |\mathcal C_{{\rm LONG},d}|\le7\Lambda^{19/20}.
+\end{equation}
+\end{proposition}
+\begin{proof}
+Use the exact decompositions \eqref{eq:core-five} and
+\eqref{eq:long-seven} and apply the twelve physical estimates.
+For $\Lambda\ge1$, each CORE exponent is at most $499/500$,
+and each LONG exponent is at most $19/20$.
+The triangle inequality sums five or seven contributions, so it
+costs a factor $5$ or $7$, \emph{not a sum of their exponents}.
+The dominant CORE region is $\mathrm{Band}$; the dominant LONG
+region is $\mathrm{EdgeL}$. The precise source estimates are
+\texttt{core\_pair\_le} and \texttt{long\_pair\_le}.
+\end{proof}
+
+The positive exponents in \eqref{eq:physical-rates} are paid for
+by explicit geometric inequalities. For the CORE band the
+pre-constant exponent is
+\begin{equation}\label{eq:band-accounting}
+ \underbrace{\frac{199}{200}}_{\text{band width}}
+ +\underbrace{\frac1{4000}+\frac1{4000}}_{\text{roughness and weighted mass}}
+ =\frac{1991}{2000}
+ <\frac{499}{500},
+\end{equation}
+leaving $1/400$ to absorb a fixed coefficient. For LONG's
+square-root edge,
+\begin{equation}\label{eq:edge-accounting}
+ \underbrace{\frac9{10}}_{\text{thin width}}
+ +\underbrace{\frac1{4000}+\frac1{40}+\frac1{100}}_{\text{roughness and summation}}
+ =\frac{3741}{4000}<\frac{19}{20},
+\end{equation}
+leaving $59/4000$. These are checks on the actual cell bounds,
+not additional exponent charges after the physical estimates.
+
+\subsection{The decoration cost is charged once}
+
+The full CORE and LONG sectors sum the fixed-decoration pair
+sums against $V_h(d)\ge0$:
+\begin{equation}\label{eq:decoration-aggregate}
+ \mathcal C_{\rm sector}=
+ \sum_{d\in\mathcal D_{q,h}}V_h(d)
+       \mathcal C_{{\rm sector},d}.
+\end{equation}
+Thus \eqref{eq:physical-rates} gives the triangle-inequality
+bound with \emph{one} factor $\sum_dV_h(d)$. The exact
+source decoration estimate is
+\begin{equation}\label{eq:decoration-mass}
+ \sum_{d\in\mathcal D_{q,h}}V_h(d)
+ \le e^{10}\left(1+\frac{\log\Lambda}{\log2}\right)^8
+ \le256e^{10}\Lambda^{1/1000}
+\end{equation}
+for all sufficiently large $\Lambda$. Consequently:
+\begin{proposition}[Signed CORE/LONG rates]\label{prop:sector-sublog}
+For fixed positive squarefree $q$, $0<\delta<1/3$ and
+admissible cutoffs, the complete signed source sectors satisfy
+\begin{equation}\label{eq:core-long-final-bounds}
+ \boxed{\begin{aligned}
+ |\mathcal C_{\rm CORE}|&\le1280e^{10}\Lambda^{999/1000},\\
+ |\mathcal C_{\rm LONG}|&\le1792e^{10}\Lambda^{951/1000}.
+ \end{aligned}}
+\end{equation}
+These are eventual bounds uniform in the permitted anchor and
+cutoff choices.
+\end{proposition}
+\begin{proof}
+Multiply $5\Lambda^{499/500}$ and
+$7\Lambda^{19/20}$ from \eqref{eq:physical-rates} by the
+single decoration budget \eqref{eq:decoration-mass}. Then
+\[
+ \frac{499}{500}+\frac1{1000}=\frac{999}{1000},
+ \qquad
+ \frac{19}{20}+\frac1{1000}=\frac{951}{1000},
+\]
+and $5\cdot256=1280$, $7\cdot256=1792$.
+No decoration exponent is applied again at terminal assembly.
+\end{proof}
+
+The strict, very small $1/1000$ margin in CORE is genuine.
+For any $\varepsilon>0$, a large enough $\Lambda$ absorbs
+$1280e^{10}\Lambda^{999/1000}$ into
+$\varepsilon\Lambda$; LONG has margin $49/1000$.
+The source chooses the maximum of the cell threshold, the
+polylogarithmic decoration threshold and the constant-absorption
+threshold, then a sufficiently large integer $h_0$.
+These thresholds are demonstrably finite but potentially enormous.
+Neither \eqref{eq:core-long-final-bounds} nor the theorem that
+follows claims practically useful estimates at small $h$.
+
+\subsection{The signed Central input}
+
+At the source high-cardinality cutoff $J_u(h)$, the complete HIGH
+sector has the eventual estimate
+\begin{equation}\label{eq:high-bound}
+ |\mathcal C_{\rm HIGH}|\le 8e^{75}(4+48q),
+\end{equation}
+which is $o_q(\Lambda)$ without another decoration charge.
+LOW is exactly zero by \eqref{eq:low-zero}. Taking $\delta=1/4$,
+the exact partitions and \eqref{eq:core-long-final-bounds} give
+$\mathcal C_{\rm fold}=o_q(\Lambda)$.
+The independent correction in \eqref{eq:active-folded} obeys
+\begin{equation}\label{eq:folded-error-bound}
+ |\mathcal C_{\rm active}-\mathcal C_{\rm fold}|
+ \le(6q+2)\,\mathcal E(h),\qquad\mathcal E(h)\longrightarrow0,
+\end{equation}
+where the source gives an explicit nonnegative reciprocal/density
+majorant $\mathcal E(h)$. An $\varepsilon/2$ allowance for the folded
+sum and another for the correction prove a uniform signed Central
+rate. This is a \emph{Central estimate}, not yet the terminal
+inequality for $A^{\rm src}_{1,q}-B^{\rm src}_{1,q}$.
+
+\subsection{The independent shifted Suzuki and Vaaler input}
+
+The other two asymmetric regions are handled by a different analytic
+supplier. In its original variables, the sharp shifted Suzuki bound
+is uniform for $Y\ge2$, $N\ge1$, $0\le\vartheta\le1$, and
+$U\le2N$:
+\begin{equation}\label{eq:suzuki-supplier}
+ \left|\sum_{N<m\le U}e\!\left(\frac{Y}{m+\vartheta}\right)\right|
+ \le C\left(N\exp\!\left[-c\frac{(\log N)^3}{(\log Y)^2}\right]
+       +\frac{N^2}{Y}\right),\qquad c>0,\ C\ge0.
+\end{equation}
+The constants are independent of the varying source parameters.
+The proof treats low $Y$ by a discrete telescoping/Kusmin--Landau
+argument, and high $Y$ using Karatsuba's selected derivative orders
+and Vinogradov mean values \cite{Karatsuba1971}.
+
+The pointwise positive Vaaler input is separately established at the
+sawtooth jumps \cite{Vaaler1985}. It bounds a sharply clipped sawtooth
+sum by its nonzero Fourier modes \emph{plus a positive error
+majorant}. Combined with \eqref{eq:suzuki-supplier} and its
+quantified cutoff selection, this supplies the shifted-Karatsuba
+bound on the two asymmetric source regions. It cannot be inferred
+from Central's CORE/LONG rate.
+
+\subsection{Four complete regions and the native terminal}
+
+For clarity, let $\mathcal Q(q,a,h)$ denote the source's
+\emph{literal complete signed quarter-middle} at the original
+cutoff $Z(h)$. Its source-matched partition has four regions:
+\begin{equation}\label{eq:four-region-identity}
+ \boxed{\mathcal Q=\mathcal Q_{\rm left}+\mathcal Q_{\rm right}
+    +\mathcal Q_{\rm central}+\mathcal Q_{\rm upper}.}
+\end{equation}
+These are again complete decorated, signed, quarter-parent sums.
+The low-product guard is the exact condition
+\[
+ \mathsf{LP}_{h,H_d}(r,s):\quad
+ rs\le H_d\exp(-\Lambda^{1/4}).
+\]
+The four mutually exclusive masks are therefore
+\[
+\begin{array}{ll}
+ \mathrm{left}:&\mathsf{LP}\ \wedge\ r^2<s,\\
+ \mathrm{right}:&\mathsf{LP}\ \wedge\ s^2<r,\\
+ \mathrm{central}:&\mathsf{LP}\ \wedge\ s\le r^2\ \wedge\ r\le s^2,\\
+ \mathrm{upper}:&\neg\mathsf{LP}.
+\end{array}
+\]
+The equality cases remain in Central. These masks partition the
+entire original quarter-parent population; the definition of
+\(\mathsf{LP}\) changes with the reduced height of its decoration.
+The names \emph{four-region left/right} refer only to this outer
+partition. They use the opposite factor orientation from the
+\emph{LONG-left/right} convention within Central: LONG-left means
+$s^{1+\delta}<r$ (the $r$ factor is longer), whereas the four-region
+left means $r^2<s$ (the $s$ factor is longer). Likewise LONG-right
+means $r^{1+\delta}<s$, whereas four-region right means $s^2<r$.
+These are distinct partitions, not predicates intended to coincide.
+
+The established shifted Suzuki and positive Vaaler inputs imply the
+pointwise $o_q(\Lambda)$ estimates for $\mathcal Q_{\rm left}$
+and $\mathcal Q_{\rm right}$; the upper source has its separately
+proved rate. The signed Central construction of
+\cref{sec:signed-source,sec:cells,sec:aggregation} supplies precisely
+$\mathcal Q_{\rm central}=o_q(\Lambda)$ via the source-equality
+bridge, with its original cutoffs and decorations. Hence, for each
+$\varepsilon>0$, selecting a common threshold for the four source
+estimates requested at $\varepsilon/4$ yields
+\begin{equation}\label{eq:four-region-budget}
+ |\mathcal Q|\le
+ |\mathcal Q_{\rm left}|+|\mathcal Q_{\rm right}|+
+ |\mathcal Q_{\rm central}|+|\mathcal Q_{\rm upper}|
+ \le\varepsilon\log h.
+\end{equation}
+This triangle inequality is the actual meeting point of Suzuki,
+Vaaler, Central and the independently controlled upper region.
+
+There is one further source boundary: $\mathcal Q$ is the
+quarter-middle, not the entire exterior. The already-proved
+far-quarter estimate gives, after requesting the middle estimate
+at $\varepsilon/2$,
+\begin{equation}\label{eq:far-quarter-budget}
+ |\mathcal Q_{\rm exterior}|\le
+ |\mathcal Q_{\rm exterior}-\mathcal Q|+|\mathcal Q|
+ \le\frac\varepsilon2\log h+\frac\varepsilon2\log h.
+\end{equation}
+The exact fixed-$q$ source-to-kernel assembly then transports this
+complete exterior estimate to the native one. In particular the
+quantified implication now proved is
+\begin{equation}\label{eq:native-epsilon}
+ \boxed{\forall\,\varepsilon>0\ \exists h_0(q,\varepsilon)\ \forall
+ \text{ legal }a,b,h\ge h_0:\quad
+ |A^{\rm src}_{1,q}(a;h)-B^{\rm src}_{1,q}(a,b;h)|
+ \le\varepsilon\log h.}
+\end{equation}
+The source proof of this implication factors through the exact
+four-region identity, the far-quarter extension, and the
+fixed-$q$ kernel transport. The uniform threshold precedes all
+endpoint choices; splitting the tolerance does not charge another
+logarithmic exponent. The formal compositions are
+\texttt{paperB\_terminal\_of\_suzukiCore\_and\_central} and
+\texttt{paperB\_terminal\_of\_central\_only}, the latter
+supplying the independently proved Suzuki input rather than
+assuming it. The printed theorem then follows from the exact
+Euler identification \eqref{eq:euler-source-bridge}.
+
+\section{Proof of the transfer theorem and scope}\label{sec:proof-main}
+
+\begin{proof}[Proof of \cref{thm:fixed-q}]
+Fix positive squarefree $q$ and $\varepsilon>0$. Choose the
+height threshold in \eqref{eq:native-epsilon}. For every
+compatible pair of reduced endpoints and every sufficiently
+large eligible height, \cref{prop:euler-bridge} gives
+\[
+\begin{aligned}
+ |A_{1,q}(a,b;h)-B_{1,q}(a,b;h)|
+ &=|A^{\mathrm{src}}_{1,q}(a;h)
+      -B^{\mathrm{src}}_{1,q}(a,b;h)|\\
+ &\le\varepsilon\log h.
+\end{aligned}
+\]
+The threshold was chosen before the endpoints; hence it is
+uniform in their compatible residue classes. This is the claimed
+pointwise $o_q(\log h)$ estimate. The argument is arithmetic
+in the singular-series coefficients and invokes no conjecture
+about actual consecutive primes.
+\end{proof}
+
+\subsection{What has, and has not, been proved}
+
+The theorem is a fixed-conductor, level-one result. The proof
+does not control a growing modulus $q$, all ranks of a connected
+expansion, a resummation of an infinite rank hierarchy, or the
+actual frequencies of consecutive-prime residue pairs. The
+last question belongs to the conditional and conjectural
+framework of \cite{LemkeOliverSound2016}.
+
+The Boolean contraction identity is elementary but clarifies
+which quantity is transferred. The analytic work is the exact
+signed-source decomposition combined with estimates tailored
+to all its masks; the literal Euler bridges ensure that the
+controlled object is the one printed in the theorem, not an
+informally analogous kernel. These contributions should be distinguished from the classical
+foundations: M\"obius inversion and CRT, Vaaler's pointwise
+Fourier majorants \cite{Vaaler1985}, Karatsuba--Vinogradov
+exponential-sum methods \cite{Karatsuba1971}, Vaughan's prime-sum
+decomposition \cite{Vaughan1980}, and Weil--Estermann
+Kloosterman bounds \cite{Weil1948,Estermann1961}.
+The period-restricted context has substantial antecedents in
+consecutive-prime studies \cite{GoldstonLedoan2011,LemkeOliverSound2016}
+and constrained singular-series sums \cite{Kuperberg2025}.
+The novel statement claimed here is the particular fixed-$q$
+pointwise coefficient transfer and its exact signed-source proof,
+not priority over those general techniques.
+
+\subsection{Formal verification and reproducibility}
+
+The accompanying Lean development supplies exact definitions for the
+printed Euler products and the signed physical source, and proves the
+quantified theorem under its coprimality, compatibility, parity and
+positive-height hypotheses. Its two central branches are the literal
+Euler identification and the source-native analytic rate. The sealed R0003 source and reproduction instructions are maintained
+separately. On 2 November 2026, Alex Breakell independently reproduced
+the pinned-source Lean build on Ubuntu/WSL2 (9,599 jobs, status 0) and
+the printed-terminal axiom check (status 0; only standard Lean axioms).
+The author thanks him as independent verification reviewer; this is
+not independent handwritten mathematical or journal peer review. The analytic appendices in this article develop four
+worked mechanism chains with explicit intermediate inequalities,
+provides the complete physical-cell contract register, and
+tracks the exact costs in the eventual exponent accounting.
+It must not be confused with a second independently handwritten
+proof of all deep supplier lemmas: weighted rough-set estimates,
+source-specific completion bounds and reciprocal-source
+estimates remain identified, precisely scoped mathematical inputs
+from the sealed formal development.
+
+\paragraph{AI-assisted research and verification.}
+Generative AI systems contributed extensively to mathematical research,
+Lean proof development, manuscript drafting and internal critical review
+under human direction. These AI-assisted referee exercises do not constitute
+independent human journal peer review. The named human author is responsible
+for the final scholarly content, attributions and public submission.
+The status of the source build and the limits of the formal evidence are
+reported above and in the separately maintained release record.
+
+\medskip
+\appendix
+\phantomsection
+\pdfbookmark[1]{Analytic proof appendices}{technical-appendices}
+\section*{Analytic proof supplement: four mechanisms}
+These appendices expand the source applications singled out in the main text,
+identify their deep imported estimates precisely, and preserve the exact
+hypotheses under which those estimates are used. They integrate the separately
+reviewed analytic supplement into one mathematical publication. Source-locked
+formal declarations and a declaration-level obligation ledger permit the
+individual imports to be inspected; this editorial integration does not itself
+constitute another Lean replay.
+\section{What is being proved, and at what evidence level}\label{sec:contract}
+
+Fix an integer $q>0$ that is squarefree. The anchor $a$ is coprime
+to $q$, the height $h>0$ satisfies the required parity when $2\nmid q$,
+and the second endpoint class is compatible with $a+h$. Put
+\begin{equation}\label{eq:basic-parameters}
+ \Lam=\log h,\qquad \sigma_0=\frac23+\frac1{100},\qquad
+ \epsp=\Lam^{-1/200},\qquad \eta=\Lam^{-1/10},\qquad
+ 0<\delta<\frac13.
+\end{equation}
+The numbers $\epsp$ and $\eta$ are \emph{prescribed internal functions
+of $h$}; neither is the arbitrary accuracy parameter in the theorem's
+$\varepsilon\log h$ conclusion. The final proof takes $\delta=1/4$.
+Everything below is in the eventual range of sufficiently large $\Lam$.
+
+Let $d$ be a legal decoration by primes dividing $h$, and put
+\[
+ D=\prod_{p\in d}p,\qquad H=h/D,\qquad
+ V_h(d)=\prod_{p\in d}\frac1{p-2}.
+\]
+The original positive and high-prime restrictions are the ones in
+Paper B, not a freely chosen replacement: $Z(h)=2^{20(\lfloor
+\Lam^{\sigma_0}\rfloor+1)}$, and
+\begin{equation}\label{eq:physical-universe}
+ T=T_{q,h,d}=\{p\le H^2: p\text{ prime},\ p\ge5,
+       \ p\nmid qH,\ p\notin d\},\qquad
+ \omegaR(B)=\prod_{p\in B}(p-3)^{-1}.
+\end{equation}
+The \emph{ordered} pair $(B,C)$ consists of nonempty disjoint subsets
+of $T$, $r=\prod_{p\in B}p$, $s=\prod_{p\in C}p$,
+subject to the quarter-parent bounds
+$Z(h)<rs$, $4rs\le H^2$, the cardinality window
+$J_{\rm low}(h)\le |B|+|C|<J_{\rm high}(h)$, and the original Central gate
+\begin{equation}\label{eq:central-gate}
+ rs\le H\exp(-\Lam^{1/4}),\qquad s\le r^2,\qquad r\le s^2.
+\end{equation}
+Let $\F_{q,a,D}(H,r,s)$ denote the \emph{same ordered signed
+folded row} as in the main paper, including its reciprocal sawtooth
+and the ordered difference of its two CRT potentials. The sealed
+source establishes the uniform envelope
+\begin{equation}\label{eq:row-envelope}
+ |\F_{q,a,D}(H,r,s)|\le F_q:=4+48q.
+\end{equation}
+All results in this supplement involve the complete masked sum
+\begin{equation}\label{eq:masked-sum}
+ \mathcal P_d(\mathsf P)=
+ \sum_{\substack{B,C\subseteq T\ \,B\cap C=\varnothing\\B,C\ne\varnothing}}
+ \one_{\MR(B,C)\wedge\mathsf P(B,C)}\,
+ \omegaR(B)\omegaR(C)\F_{q,a,D}(H,r,s),
+\end{equation}
+where $\MR$ retains every preceding source gate and $\mathsf P$
+is the cell-specific predicate. In particular, a bound for
+$\mathcal P_d(\mathsf P)$ does \emph{not} assert a bound of the same
+size for every individual parent. For the two sectors, the source
+exactly proves
+\begin{align}
+\mathcal C_{\csmall,d}&=W_d+C_d+R_d+\mathrm{ResA}_d+\mathrm{Band}_d,\notag\\
+\mathcal C_{\clong,d}&=WL_d+CL_d+RL_d+\mathrm{ManyL}_d\notag\\
+&\quad+\mathrm{EdgeL}_d+\mathrm{ResL}_d+WRL_d.
+\label{eq:sector-identity}
+\end{align}
+Every summand on the right is an actual instance of
+\eqref{eq:masked-sum}; the identities use predicate complements
+\emph{before} any triangle inequality.
+
+\begin{remark}[What is proved on these pages]\label{rem:standing}
+The logical implications from the masks to geometric intervals,
+the exact logarithmic exponent calculations, the norm inequalities
+following from specified auxiliary bounds, and the finite
+centering algebra are derived below. Deep supplier estimates such
+as the weighted rough-set lemma, harmonic interval-mass lemma,
+physical reciprocal source estimate and the coupled Weil--Cauchy
+bound are \emph{imported mathematical lemmas} whose complete proofs
+reside in the sealed Lean modules. They are stated with explicit
+hypotheses and source positions so that a conventional referee can
+attack the right interface. Reproducing a theorem's numerical
+exponent here is not a second independent proof of that supplier.
+\end{remark}
+
+\section{The CORE Band: deriving the one-thousandth saving}\label{sec:band}
+
+In the CORE mask, write $\mathsf W(B,C)$ for the B-factor
+prime-packet test, and use the source's packet-width parameter
+$\epsp=\Lam^{-1/200}$. After excluding the earlier $W$ and $C$
+cells, the remaining decision distinguishes the $R/\mathrm{ResA}$
+ranges from the Band range. The Band predicate, in addition to the
+complete source selection in \eqref{eq:masked-sum}, is
+\begin{equation}\label{eq:band-mask}
+ \neg\mathsf W(B,C),\qquad
+ \neg(s^{1+\epsp}\le r),\qquad
+ \neg(r^{1+3\epsp}\le s).
+\end{equation}
+These are \emph{strict} complements of the preceding weak
+inequalities. No positivity or endpoint condition may be dropped
+in passing to the next statement.
+
+\begin{lemma}[The band is a short logarithmic interval]
+\label{lem:band-interval}
+For a Band-selected pair, $r,s>1$ and
+\begin{equation}\label{eq:band-window}
+ r^{1/(1+\epsp)}<s<r^{1+3\epsp}.
+\end{equation}
+For $A=r^{1/(1+\epsp)}$, $B_+=r^{1+3\epsp}$,
+$a_0=\lfloor A\rfloor$, $b_0=\lfloor B_+\rfloor$,
+the integer $s$ belongs to $(a_0,b_0]$ and, in the eventual
+range where $A\ge2$,
+\begin{equation}\label{eq:band-ratio}
+ \frac{b_0}{a_0}\le2r^{4\epsp},\qquad
+ \log\frac{b_0}{a_0}\le1+4\Lam^{199/200}.
+\end{equation}
+\end{lemma}
+\begin{proof}
+The first negation in \eqref{eq:band-mask} involving $s^{1+\epsp}$
+gives $r<s^{1+\epsp}$; raising both positive sides to
+$1/(1+\epsp)$ gives the first inequality in
+\eqref{eq:band-window}. The other negation gives the second.
+For $A\ge2$, $\lfloor A\rfloor\ge A/2$ and
+$\lfloor B_+\rfloor\le B_+$. Thus
+\[
+ \frac{b_0}{a_0}\le 2\frac{B_+}{A}
+  =2r^{1+3\epsp-1/(1+\epsp)}\le2r^{4\epsp},
+\]
+since $1-1/(1+u)=u/(1+u)\le u$ for $u>0$.
+The source gates imply $r\le h$, so $\log r\le\Lam$.
+Since $\epsp\Lam=\Lam^{199/200}$ and
+$\log2<1$, taking logarithms yields
+\eqref{eq:band-ratio}. The floor endpoints are retained:
+no continuous approximation has replaced the discrete interval.
+\end{proof}
+
+The relevant weighted counting supplier is much more precise
+than a bound by the number of integer points. For a finite set
+$T$ of primes at least five, let
+\(M_T(a,b)=\sum_{C\subseteq T:\,a<\prod C\le b}\omegaR(C)\).
+The source's harmonic interval-mass lemma gives, for $1\le a\le b$,
+\begin{equation}\label{eq:interval-mass-supplier}
+ M_T(a,b)\le e^{37.5}
+ \bigl(1+\log_2\log_2 b\bigr)^{30}
+ \bigl(1+\log(b/a)\bigr),
+\end{equation}
+where the double binary logarithm is the integer \texttt{Nat.log}
+operation, not an unqualified real logarithm. The proof uses
+injectivity of the prime-subset product and the harmonic interval
+bound after a pointwise omega majorant. For the present interval,
+$\log b_0\le5\Lam$ eventually. The source proves that the fixed
+polylogarithmic prefactor in \eqref{eq:interval-mass-supplier}
+is then at most $\Lam^{1/4000}$. Consequently,
+\begin{equation}\label{eq:band-C-bound}
+ \sum_{C:\,r^{1/(1+\epsp)}<s<r^{1+3\epsp}}\omegaR(C)
+ \le \Lam^{1/4000}(2+4\Lam^{199/200})
+ \le 6\Lam^{1/4000+199/200}.
+\end{equation}
+The $C$-sum here is over subsets of the actual $T$, and
+\eqref{eq:band-C-bound} is an \emph{upper bound} after dropping
+other source gates, not an equality of masks.
+
+
+\begin{lemma}[The missing $W$ packet pays for roughness]
+\label{lem:band-rough-transport}
+Write $Y_p=\lfloor s^{u_0(\delta)}\rfloor$ for the $W$-packet upper endpoint,
+where $u_0(\delta)>0$, and set $u=u_0(\delta)/2$.
+On the Band mask, every $p\in B$ satisfies
+\begin{equation}\label{eq:band-rough-bridge}
+ p<X_p(h)\quad\text{or}\quad p>r^u.
+\end{equation}
+Moreover the Band-specific product inequalities imply, eventually,
+\begin{equation}\label{eq:band-five-bridge}
+ \log r>\frac{20\log2}{2+3\epsp}\Lam^{\sigma_0}
+    \ge5\Lam^{\sigma_0},\qquad
+ r\ge\left\lceil\exp(5\Lam^{\sigma_0})\right\rceil.
+\end{equation}
+\end{lemma}
+\begin{proof}
+If the $W$ packet is absent, no prime in $B$ lies in the integer
+interval $[X_p(h),Y_p]$. Thus a prime not below $X_p(h)$ satisfies
+$p>\lfloor s^{u_0}\rfloor$; since $p$ is an integer, this implies
+$p>s^{u_0}$. The Band inequality $r<s^{1+\epsp}$ and
+$\epsp\le1$ give $r<s^2$, hence
+$s^{u_0}\ge r^{u_0/2}=r^u$. This proves
+\eqref{eq:band-rough-bridge} without replacing a missing packet by
+an assumed source prime.
+
+For the height threshold, the strict quarter-parent bound and the
+upper Band inequality give
+\[
+ Z(h)<rs<r^{2+3\epsp},\qquad
+ \log Z(h)=20\bigl(\lfloor\Lam^{\sigma_0}\rfloor+1\bigr)\log2
+    >20(\log2)\Lam^{\sigma_0}.
+\]
+Division by $2+3\epsp>0$ proves the first inequality of
+\eqref{eq:band-five-bridge}. The coefficient tends to
+$10\log2>5$ as $\epsp\to0$, so it is at least $5$ eventually.
+The ceiling follows because $r$ is an integer. This stronger
+$5$-threshold uses the \emph{refined Band interval}; the generic CORE
+gate $rs\le r^3$ alone does not yield it.
+\end{proof}
+
+In applying \eqref{eq:interval-mass-supplier}, the integer interval
+has $1\le a_0\le b_0$ in the eventual source range. It counts
+\emph{nonnegative} subset-product weights over the actual finite prime
+set, including the empty subset if its product lies in the interval;
+the source masks only restrict this population further. The rough
+supplier \eqref{eq:band-B-bound} is applied to products $r$ in the
+actual high-support window
+$\lceil e^{5\Lam^{\sigma_0}}\rceil\le r\le h$,
+with $u=u_0(\delta)/2$ \emph{fixed} after $\delta$ is chosen.
+The matching source contracts are
+\path{QuillonResidue.interval_mass},
+\path{QuillonResPhysical.rough_ev}, and
+\path{QuillonResPhysical.Band_physical}.
+
+The missing W packet also makes the \emph{$B$-factor} arithmetically
+sparse. Put $u=u_0(\delta)/2>0$ as in the source rough-set
+lemma and $R_0=\lceil e^{5\Lam^{\sigma_0}}\rceil$.
+On the Band-selected population the source proves
+\[
+ R_0\le r\le h,\qquad
+ \forall p\in B:\ p<X_p(h)\ \text{or}\ r^u<p.
+\]
+The weighted roughness lemma (with its explicit exponential
+eligibility condition) gives
+\begin{equation}\label{eq:band-B-bound}
+ \sum_{B:\,\text{these roughness tests}}\omegaR(B)
+ \le \Lam^{1/4000}(1+u^{-5}).
+\end{equation}
+Here $u>0$ is fixed when $\delta$ is fixed, while $\epsp$
+is a shrinking function of $h$; exchanging the two would
+change the argument.
+
+\begin{proposition}[Band estimate from its two supplier lemmas]
+\label{prop:band-chain}
+Assume \eqref{eq:row-envelope}, the source-valid mask implications
+above, and the interval and roughness bounds
+\eqref{eq:band-C-bound}--\eqref{eq:band-B-bound}.
+Then, for sufficiently large $\Lam$,
+\begin{equation}\label{eq:band-chain}
+ |\mathrm{Band}_d|
+ \le K_{q,\delta}\Lam^{1991/2000}
+ \le\Lam^{499/500},\qquad
+ K_{q,\delta}=6(4+48q)(1+u^{-5}).
+\end{equation}
+\end{proposition}
+\begin{proof}
+Apply the absolute triangle bound to the double sum
+\eqref{eq:masked-sum}, then enlarge the $C$-mask to the interval
+\eqref{eq:band-window} and the $B$-mask to the roughness
+set. The weights are nonnegative. Factoring the two independent
+upper bounds yields
+\[
+ |\mathrm{Band}_d|
+ \le F_q\Bigl[\Lam^{1/4000}(1+u^{-5})\Bigr]
+       \Bigl[6\Lam^{1/4000+199/200}\Bigr]
+ =K_{q,\delta}\Lam^{1991/2000},
+\]
+because $2/4000+199/200=1991/2000$. Finally
+\[
+ \frac{499}{500}-\frac{1991}{2000}=\frac1{400}>0.
+\]
+For fixed $q,\delta$, the constant $K_{q,\delta}$ is absorbed
+once $\Lam^{1/400}\ge K_{q,\delta}$. This is precisely
+the source's final \texttt{const\_le\_rpow} step, not an
+independent loss introduced by summing decorations.
+\end{proof}
+
+This calculation identifies the bottleneck: the signed CORE
+sum is eventually dominated by a \emph{positive} band-mass
+bound, even though its other source cells have strong negative
+powers. The margin available after full sector aggregation is
+smaller still, as shown in \cref{sec:accounting}.
+
+\section{The LONG square-root edge and the Weil region}\label{sec:edge}
+
+The LONG predicate is
+\[
+ \mathsf{Long}_{\delta}(r,s)\iff
+ s^{1+\delta}<r\ \text{or}\ r^{1+\delta}<s.
+\]
+The first orientation is called LONG-left; the second LONG-right.
+These are \emph{not} the left/right regions of the earlier
+four-region quarter-middle decomposition. Here we work only on
+LONG-right and retain the original common mask $\MR_L$.
+
+Write
+\begin{equation}\label{eq:jr-def}
+ \JR(h,T,B)=\{p\in T\setminus B:
+ X_p(h)<p\le 2^{K_v(h,r)}X_p(h)\},
+\qquad K_0(h)=\lceil100\log\Lam\rceil.
+\end{equation}
+On LONG-right the source tests in order whether $C\cap\JR$
+is nonempty, whether $|C|\ge K_0$, and then whether
+\begin{equation}\label{eq:edge-mask}
+ r<s^{1/2+3\eta}.
+\end{equation}
+If the first test is true the pair belongs to $RL$; if the
+second is true it belongs to $\mathrm{ManyL}$. Only the
+remaining pairs with \eqref{eq:edge-mask} enter $\mathrm{EdgeL}$.
+Off the edge, the presence or absence of a B-factor packet
+\[
+ \mathcal W_L(B,C)=
+ B\cap\{p\in T\setminus C:X_p(h)\le p\le\lfloor s^\eta\rfloor\}
+\]
+selects $WRL$ or $\mathrm{ResL}$, respectively. This ordered
+routing is exact, not an overlap of estimates.
+
+\subsection{EdgeL: a geometric estimate rather than cancellation}
+
+\begin{lemma}[Geometric edge strip]\label{lem:edge-strip}
+On the full EdgeL mask, the Central gate $s\le r^2$ and
+\eqref{eq:edge-mask} imply
+\begin{equation}\label{appendix:eq:edge-strip}
+ s^{1/2}\le r<s^{1/2+3\eta}.
+\end{equation}
+Fixing $C$ (and hence $s$) puts the possible $B$-products in
+\[
+ r\in\bigl(\lfloor s^{1/2}\rfloor-1,\,
+                   \lfloor s^{1/2+3\eta}\rfloor\bigr],
+\]
+with logarithmic width at most $1+3\Lam^{9/10}$
+up to the explicit endpoint-floor adjustment.
+\end{lemma}
+\begin{proof}
+Since $r,s\ge1$, the gate $s\le r^2$ implies
+$s^{1/2}\le r$. The opposite bound is exactly the EdgeL
+test. Put $u=s^{1/2}$ and $v=s^{1/2+3\eta}=u s^{3\eta}$.
+For sufficiently large $h$ in the selected source $u\ge8$;
+thus $a_0=\lfloor u\rfloor-1\ge u/2>0$ and
+$b_0=\lfloor v\rfloor\le v$. Consequently
+\[
+ b_0/a_0\le2s^{3\eta},\qquad
+ \log(b_0/a_0)\le\log2+3\eta\log s
+ \le1+3\Lam^{9/10},
+\]
+using $s\le h$. If $r\ge u$ is an integer then
+$r>\lfloor u\rfloor-1$; and $r<v$ implies
+$r\le\lfloor v\rfloor$. The indicated interval therefore
+contains every EdgeL B-product.
+\end{proof}
+
+
+\begin{lemma}[An absent reciprocal packet gives $B$-independent rough $C$]
+\label{lem:edge-rough-transport}
+On the ordered EdgeL mask, suppose $C\subseteq T\setminus B$,
+$C\cap\JR(h,T,B)=\varnothing$, $r\ge1$ and $s\le r^2$.
+For every $p\in C$ the following dichotomy holds:
+\begin{equation}\label{eq:edge-rough-bridge}
+ p<X_p(h)+1\qquad\text{or}\qquad p>s^{\epsp/2}.
+\end{equation}
+It is independent of $B$ once $s$ and $h$ are fixed.
+\end{lemma}
+\begin{proof}
+For a prime $p\in C$ with $p\le X_p(h)$, the first alternative
+is immediate. Otherwise $p>X_p(h)$; since $p\notin\JR(h,T,B)$,
+its integer packet upper endpoint is exceeded:
+\[
+ p>2^{K_v(h,r)}X_p(h)\ge r^{\epsp}
+       \ge s^{\epsp/2}.
+\]
+Here $X_p(h)\ge1$, the source's definition of $K_v$ guarantees
+$2^{K_v(h,r)}\ge r^{\epsp}$, and the last inequality follows from
+$s\le r^2$ with $\epsp>0$. Consequently the source's
+\texttt{rough\_ev4} is applied to a genuine $C$-only roughness
+population, not to a family still depending on the varying $B$.
+This is the mathematical content of
+\texttt{QuillonLRes.C\_rough\_of}.
+\end{proof}
+
+The integer lower endpoint in \cref{lem:edge-strip} is likewise
+paid by the actual selected source: on LONG-right $r<s$ and
+$Z(h)<rs<s^2$, so $s>\sqrt{Z(h)}$ and eventually
+$\sqrt s\ge8$. Thus
+$\lfloor\sqrt s\rfloor-1\ge1$ and the harmonic interval-mass
+lemma applies to its prescribed positive integer interval. The
+roughness sum for $C$ then has source lower support
+$\lceil e^{4\Lam^{\sigma_0}}\rceil\le s\le h$,
+not the stronger CORE $5$-threshold.
+
+The absent reciprocal packet makes $C$ rough in the precise
+sense required by the LONG source. The source's $\texttt{rough\_ev4}$
+then yields, at $R_0=\lceil e^{4\Lam^{\sigma_0}}\rceil$,
+\begin{equation}\label{eq:edge-C-bound}
+ \sum_{C:\,\mathrm{rough}}\omegaR(C)
+ \le\Lam^{1/4000}\bigl(1+(\epsp/2)^{-5}\bigr)
+ =\Lam^{1/4000}(1+32\Lam^{1/40})
+ \le33\Lam^{1/4000+1/40}.
+\end{equation}
+The equality $2^5\Lam^{5/200}=32\Lam^{1/40}$ is a
+real part of the quantitative cost, not a negligible constant.
+
+Fix one such $C$. Applying the same harmonic interval-mass
+supplier \eqref{eq:interval-mass-supplier}, now to the
+$B$-products in \cref{lem:edge-strip}, and using the
+source's bound $e^{37.5}(1+\log_2\log_2 b_0)^{30}\le
+\Lam^{1/100}$, yields
+\begin{equation}\label{eq:edge-B-bound}
+ \sum_{B:\,s^{1/2}\le r<s^{1/2+3\eta}}\omegaR(B)
+ \le\Lam^{1/100}(2+3\Lam^{9/10})
+ \le5\Lam^{1/100+9/10}.
+\end{equation}
+Again the enlargement forgets restrictions, never counts a
+term with a negative weight, and is valid because $\omegaR(B)\ge0$.
+
+\begin{proposition}[EdgeL estimate from geometric mass]
+\label{prop:edge-chain}
+Assume the source-valid roughness and interval supplier bounds
+\eqref{eq:edge-C-bound}--\eqref{eq:edge-B-bound} and
+\eqref{eq:row-envelope}. Then
+\begin{equation}\label{eq:edge-chain}
+ |\mathrm{EdgeL}_d|\le165(4+48q)
+ \Lam^{3741/4000}\le\Lam^{19/20}
+\end{equation}
+eventually, with no Kloosterman input.
+\end{proposition}
+\begin{proof}
+The proof reverses the order used for Band: fix $C$ first,
+apply the geometric interval bound to the sum over $B$,
+then sum over rough $C$. One obtains
+\[
+ |\mathrm{EdgeL}_d|
+ \le F_q[33\Lam^{1/4000+1/40}]
+          [5\Lam^{1/100+9/10}]
+ =165F_q\Lam^{3741/4000},
+\]
+where
+\[
+ \frac1{4000}+\frac1{40}+\frac1{100}+\frac9{10}
+ =\frac{3741}{4000},\qquad
+ \frac{19}{20}-\frac{3741}{4000}=\frac{59}{4000}.
+\]
+A fixed-coefficient absorption at exponent $59/4000$
+completes the stated physical bound. There is no cancellation
+estimate anywhere in this derivation beyond the source's
+weighted mass suppliers.
+\end{proof}
+
+\subsection{WRL: why the same interval cannot be treated by Weil}
+
+The off-edge test is $r\ge s^{1/2+3\eta}$, while $WRL$ requires
+an actual prime $p\in\mathcal W_L(B,C)$.
+That prime satisfies $p\le s^\eta$, so extraction leaves
+\begin{equation}\label{eq:weil-cofactor}
+ \frac rp\ge s^{1/2+2\eta}.
+\end{equation}
+The $s^{2\eta}$ gain above the square-root length is the room
+used by the source's completed bilinear argument; it is
+\emph{not} present uniformly on the edge strip
+\eqref{appendix:eq:edge-strip}. Merely asserting the existence of
+a strong complete-sum estimate cannot replace this range
+hypothesis.
+
+For a complete Kloosterman sum with the source coefficient
+convention, the genuine supplier is the general-modulus bound
+\begin{equation}\label{eq:weil-contract}
+ |K_s(u,v)|\le\tau(s)\sqrt{s\,\gcd(u,v,s)}.
+\end{equation}
+The equality transporting the physical $K_s$ to the general
+Kloosterman normalization reverses $u,v$. In the actual
+squarefree case $s=\prod_{p\in C}p$, $\tau(s)=2^{|C|}$;
+for the frequency-variable modulus the bound retains the
+product of primes annihilating the Fourier coefficient.
+The conductor-gcd penalty is not set to $1$.
+
+The coupled Cauchy estimate splits a square of a Fourier-row
+sum into three contributions: $y=y'$, $y\ne y'$ but
+$y\equiv y'\pmod s$, and the genuinely noncongruent pairs.
+In the third case the source has a factor of the form
+\[
+ 4^{|C|/2}s^{1/2}G_0^{1/2}
+ \bigl(L/s+1+\log s\bigr)
+ (1+\log Y)^2
+ \prod_{p\in C}(1+p^{-1/2}),
+\]
+where $G_0$ is the product of the source primes dividing the
+fixed phase coefficient. After taking the Cauchy square root,
+a factor $G_0^{1/4}$ remains and has to be summed using a
+\emph{separate} harmonic gcd-frequency moment. The row
+has four source Fourier contributions (two main and two
+class terms); all four must be controlled. These are genuine
+analytic obligations, not descriptive decoration.
+
+
+\begin{remark}[The discrete cofactor and the Weil hypothesis are paid]
+\label{rem:wrl-discrete-weil}
+The real inequality \eqref{eq:weil-cofactor} does not identify the
+\emph{integer} range in the subsequent Ramar\'e decomposition.
+For $Y_\eta=\lfloor s^\eta\rfloor$ and the source's lower
+cofactor cutoff $L_{w,\eta}$, the actual integer supplier gives,
+provided $0<\eta\le1/8$ and $s^\eta\ge8$,
+\begin{equation}\label{eq:wrl-integer-cofactor}
+ 1\le\left\lfloor\frac{L_{w,\eta}}{Y_\eta}\right\rfloor,
+ \qquad
+ \frac12s^{1/2+2\eta}
+ \le\left\lfloor\frac{L_{w,\eta}}{Y_\eta}\right\rfloor.
+\end{equation}
+The explicit factor $1/2$ protects the floor; it is not an
+unjustified replacement of the integer cofactor by $r/p$.
+The source's named \texttt{WeilHyp} is not a terminal axiom.
+It is supplied by \path{Orienne.CSC3.quillon_weilHyp} via
+\path{norm_quillon_K_weil}, whose exact identity is
+$K_s(u,v)=\mathrm{kSum}_s(v,u)$, reversing the two coefficients.
+The general-modulus input \eqref{eq:weil-contract} retains both
+$\tau(s)$ and the full conductor $\gcd(u,v,s)$.
+\end{remark}
+
+\begin{lemma}[The two conductor moments retained in WRL]
+\label{lem:wrl-moments}
+Let $P$ be a finite set of primes and let $Y,J\ge1$.
+The source's nonnegative harmonic-gcd estimates are
+\begin{align}
+&\sum_{1\le y\le Y}\ \sum_{\substack{1\le y'\le Y\\y'\ne y}}
+ \frac1{yy'}
+ \left(\prod_{\substack{p\in P\\p\mid(y-y')}}p\right)^{1/2}
+ \le 2(1+\log Y)^2\prod_{p\in P}(1+p^{-1/2}),
+ \label{eq:wrl-pair-moment}\\
+&\sum_{1\le j\le J}\frac1j
+ \left(\prod_{\substack{p\in P\\p\mid j}}p\right)^{1/4}
+ \le(1+\log J)\prod_{p\in P}(1+p^{-3/4}).
+ \label{eq:wrl-mode-moment}
+\end{align}
+Both bounds are supplied by the proved source lemmas
+\texttt{gcd\_moment\_half} (pair differences) and
+\texttt{gcd\_mode\_sum} (mode weights at exponent $1/4$);
+we do not re-prove those suppliers here.
+\end{lemma}
+
+\noindent
+For clarity, the source's completed proof expends these bounds in
+\emph{two separate places}. After decomposing the square into equal,
+distinct-congruent and noncongruent pairs, the off-diagonal
+$\gcd$ majorant contains a square-root product of primes dividing
+the pair difference. Equation \eqref{eq:wrl-pair-moment} pays that
+weighted pair difference. Taking the Cauchy square root retains
+$G_0^{1/4}$, and \eqref{eq:wrl-mode-moment} pays the surviving
+\emph{mode}-frequency weight rather than deleting it.
+Positive and negative main modes and both class modes are bounded
+separately with their actual coefficients. The two moments are
+nonnegative upper bounds; neither is asserted to equal the source
+signed sum. The physical \texttt{W\_final\_LR} leaf additionally
+proves the Fourier-window and coefficient conditions before yielding
+\eqref{eq:wrl-fixed-C}; the displayed moments alone are not a
+new proof of that deep leaf.
+
+The fixed-$C$ physical theorem applies under the proved
+Weil hypothesis and the required range, mode, and coefficient
+conditions. It gives
+\begin{equation}\label{eq:wrl-fixed-C}
+ \left|\sum_{\substack{B\subseteq T\setminus C\\\mathsf{WRL}(B,C)}}
+ \omegaR(B)\F_{q,a,D}(H,r,s)\right|
+ \le4\Lam^{-95}.
+\end{equation}
+This \emph{deep analytic leaf} is supplied by
+\texttt{GoldC.QuillonLWR.W\_final\_LR}; the preceding
+paragraphs expose its key mechanism but do not rederive
+its full completion argument.
+The remaining $C$-factor is nonnegative and the source's
+outer mass bound is
+\begin{equation}\label{eq:outer-mass}
+ \sum_{C\subseteq T}\omegaR(C)
+ \le e^{10}5^{10}\Lam^{10}.
+\end{equation}
+Thus $|WRL_d|\le4e^{10}5^{10}\Lam^{-85}$.
+For fixed constants and sufficiently large $\Lam$,
+$4e^{10}5^{10}\le\Lam$ and $\Lam^{-84}\le\Lam^{-80}$,
+so $|WRL_d|\le\Lam^{-80}$. The packet-absent complement
+belongs to $\mathrm{ResL}$ and is paid by rough mass, not
+by applying \eqref{eq:wrl-fixed-C} without its packet.
+
+\section{R and RL: the same reciprocal sum in two geometries}
+\label{sec:reciprocal}
+
+The moving prime packet in the $C$-factor is the actual set
+\begin{equation}\label{eq:Rpacket}
+ \JR(h,T,B)=\{p\in T\setminus B:\quad
+ X_p(h)<p\le2^{K_v(h,r)}X_p(h)\},
+ \quad K_v(h,r)=\lfloor\log_2\lceil r^{\epsp}\rceil\rfloor+1.
+\end{equation}
+The CORE $R$ mask requires
+\[
+ \neg\mathsf W(B,C),\quad
+ \neg(s^{1+\epsp}\le r),\quad
+ r^{1+3\epsp}\le s,\quad
+ C\cap\JR(h,T,B)\ne\varnothing,
+\]
+with the CORE source gate. LONG-right's $RL$ mask instead
+requires $r^{1+\delta}<s$ and the same nonempty reciprocal
+packet, together with the source's LONG mask. Eventually
+$3\epsp\le\delta$, so
+\begin{equation}\label{eq:RL-geometry}
+ r^{1+3\epsp}\le r^{1+\delta}<s.
+\end{equation}
+The geometry is enough for a common reciprocal strategy,
+but \emph{not} permission to reuse every CORE numerical
+hypothesis in LONG.
+
+\subsection{How the shifted Suzuki input enters the physical row}
+
+For $Y\ge2$, $N\ge1$, $0\le\vartheta\le1$ and $U\le2N$,
+the proved shifted reciprocal input is of the form
+\begin{equation}\label{appendix:eq:suzuki-supplier}
+ \left|\sum_{N<m\le U}e\left(\frac{Y}{m+\vartheta}\right)\right|
+ \le C\left[N\exp\left(-c\frac{(\log N)^3}{(\log Y)^2}\right)
+            +\frac{N^2}{Y}\right],\qquad e(x)=e^{2\pi ix},
+\end{equation}
+for fixed $c>0,C\ge0$ independent of the displayed
+variables. The small-$N$ and low-frequency cases are
+covered by the source's separate branch; no high-frequency
+hypothesis is silently imposed on all parameters.
+
+The physical residue class uses an integer modulus $Q=6qr$
+(when $r=\prod B$). For a residue $0\le\rho<Q$,
+writing $m=Qn+\rho$ gives the exact phase identity
+\begin{equation}\label{eq:ap-phase}
+ \frac{Y}{Qn+\rho}=
+ \frac{Y/Q}{n+\rho/Q},\qquad
+ \vartheta=\rho/Q\in[0,1).
+\end{equation}
+Only after the transformed $Y/Q$ and clipped interval satisfy
+the range hypotheses of \eqref{appendix:eq:suzuki-supplier} may the
+latter be invoked. A negative numerator is handled through
+$e(-x)=\overline{e(x)}$, which preserves absolute value.
+The Fourier coefficient attached to the source mode is
+not constant. If $S_t=\sum_{n=N+1}^t z_n$, Abel summation
+furnishes the exact identity
+\[
+ \sum_{n=N+1}^{U}c_nz_n
+ =c_US_U+\sum_{t=N+1}^{U-1}(c_t-c_{t+1})S_t
+\]
+and therefore
+\begin{equation}\label{eq:abel-cost}
+ \left|\sum_{n=N+1}^{U}c_nz_n\right|
+ \le \left(|c_U|+\sum_{t=N+1}^{U-1}|c_t-c_{t+1}|\right)
+     \max_{N<t\le U}|S_t|.
+\end{equation}
+Thus the physical Suzuki application spends both a
+progression translation and a \emph{variation norm} of the
+actual coefficients. Using \eqref{appendix:eq:suzuki-supplier} as if
+the source coefficients were all $1$ would be invalid.
+
+
+\begin{lemma}[The clipped, weighted $R/RL$ Suzuki application]
+\label{lem:clipped-suzuki}
+Let $Q\ge1$, $0\le\rho<Q$, $V_1\ge1$ and
+$V_1<v,v'\le2V_1$ with $v\ne v'$. Fix the source's outer
+interval $(U_0,U_1]$, its product clip $(S_0,S_1]$, and
+$j,L\ge1$. Assume the \emph{actual source inequalities}
+\begin{equation}\label{eq:suzuki-source-window}
+ 4Q\le U_0,\qquad U_1+2Q\le2U_0,
+ \qquad |Y|\ge8QV_1^2.
+\end{equation}
+Set, using integer divisions,
+\begin{align}
+ a_*&=\max\!\left\{U_0,\left\lfloor S_0/v\right\rfloor,
+                    \left\lfloor S_0/v'\right\rfloor\right\},
+ & b_*&=\min\!\left\{U_1,\left\lfloor S_1/v\right\rfloor,
+                    \left\lfloor S_1/v'\right\rfloor\right\},
+ \label{eq:suzuki-actual-clip}\\
+ N&=(a_*-\rho)\mathbin{\mathrm{div}}Q,
+ &M&=(b_*-\rho)\mathbin{\mathrm{div}}Q,\quad
+ \vartheta=\rho/Q,
+ \qquad Y'=Y/v-Y/v'.
+ \label{eq:suzuki-transformed}
+\end{align}
+Here $\mathrm{div}$ is natural-number quotient, as in the
+source. On every nonempty clipped residue interval,
+\begin{equation}\label{eq:suzuki-eligibility}
+ 4Q\le a_*,\qquad b_*+2Q\le2a_*,\qquad
+ 1\le N<M\le2N,\qquad
+ |Y'|\ge\frac{|Y|}{4V_1^2}\ge2Q.
+\end{equation}
+For $t\in(N,M]$ let
+\[
+ A_t=\mathrm{ampC}\bigl(j,vL(\rho+Qt)\bigr)\,
+     \mathrm{ampC}\bigl(j,v'L(\rho+Qt)\bigr).
+\]
+The actual cotangent amplitudes satisfy
+$0\le A_t\le1$ and are nondecreasing in $t$, so
+\begin{equation}\label{eq:suzuki-amplitude-variation}
+ \mathcal V(A):=|A_M|+\sum_{t=N+1}^{M-1}|A_{t+1}-A_t|
+     =2A_M-A_{N+1}\le2.
+\end{equation}
+For the constants $c>0,C\ge0$ of the source's unconditional
+shifted Suzuki theorem,
+\begin{equation}\label{eq:suzuki-clipped-conclusion}
+ \left|\sum_{t=N+1}^M A_t
+ e\!\left(\frac{Y'/Q}{t+\vartheta}\right)\right|
+ \le2C\left[N\exp\left(
+ -c\frac{(\log N)^3}{(\log(|Y'|/Q))^2}\right)
+       +\frac{N^2}{|Y'|/Q}\right].
+\end{equation}
+The empty interval contributes zero instead.
+\end{lemma}
+\begin{proof}
+The two product constraints $S_0<vu,v'u\le S_1$ and the
+outer clip $U_0<u\le U_1$ give exactly $(a_*,b_*]$.
+Because $a_*\ge U_0$ and $b_*\le U_1$, the first two
+inequalities in \eqref{eq:suzuki-eligibility} follow from
+\eqref{eq:suzuki-source-window}. For a nonempty residue interval,
+write $u=\rho+Qt$; natural division gives the exact endpoints
+$N,M$. The inequalities $4Q\le a_*$ and
+$b_*+2Q\le2a_*$ imply $N\ge1$ and $M\le2N$
+with the floor remainders retained. The difference phase satisfies
+\[
+ \frac{Y}{vu}-\frac{Y}{v'u}=\frac{Y'}{u},\qquad
+ |Y'|=\frac{|Y|\,|v-v'|}{vv'}
+       \ge\frac{|Y|}{4V_1^2};
+\]
+we used $|v-v'|\ge1$ for distinct integers and
+$vv'\le4V_1^2$. Hence $|Y'|/Q\ge2$ and
+$\vartheta\in[0,1)$, exactly the shifted-Suzuki
+range. If $Y'<0$, complex conjugation reduces to $|Y'|$
+without changing the norm.
+
+The source's cotangent amplitudes are nonnegative,
+nondecreasing on the positive clipped progression and at most
+one. Their product has the same properties. Its finite
+variation telescopes to \eqref{eq:suzuki-amplitude-variation}.
+Apply Abel summation to the very same $A_t$, not to a constant
+replacement; bound each partial interval by Suzuki and
+multiply by $\mathcal V(A)\le2$. This proves
+\eqref{eq:suzuki-clipped-conclusion}. In the formal source these
+moves are \texttt{QuillonRLemma.suzuki\_AP},
+\texttt{QuillonRMode.class\_amp\_bound},
+\texttt{QuillonCot.ampC\_abel\_factor} and
+\texttt{QuillonRPiece.R\_offdiag\_class}, which treats
+$M\le N$ separately as the empty sum.
+\end{proof}
+
+\begin{remark}[Four channels and the two physical thresholds]
+\label{rem:suzuki-four-channels}
+The \emph{outer Fourier coefficients} are not the varying
+$A_t$ in \cref{lem:clipped-suzuki}. The actual main and class
+rows, for each $k\ge1$, are
+\begin{center}
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+Channel & Physical phase parameter $Y_k$ & Outer coefficient\\
+\midrule
+Main $+$ & $kH/r$ & $-2\mu\,\beta_k$\\
+Main $-$ & $-kH/r$ & $+2\mu\,\beta_k$\\
+Class $+$ & $kH/(6qr)$ & $D_q\beta_k$\\
+Class $-$ & $-kH/(6qr)$ & $-D_q\beta_k$\\
+\bottomrule
+\end{tabular}
+\end{center}
+Here $D_q=2(6q)(48q)+1$, $|\mu|\le4$ and
+$|\beta_k|\le1/k$, so the source proves the common bound
+\begin{equation}\label{eq:suzuki-mode-coeff}
+ |\mathrm{coef}_k|\le\frac{600q^2+8}{k}
+\end{equation}
+for every one of the four calls. The residue modulus is
+$Q=6qr$ \emph{for all four rows}; the main and class phases
+still have their different displayed denominators.
+For each physical channel the source checks
+$|Y_k|\ge8QV_1^2$, the actual clipped geometry, and
+summability of \eqref{eq:suzuki-mode-coeff}. These
+additional proofs occur in \texttt{R\_final} and
+\texttt{R\_final\_L}, not in Abel's identity alone.
+CORE $R$ uses $\log r\ge5\Lam^{\sigma_0}$;
+LONG-right $RL$ proves its own $\log r\ge4\Lam^{\sigma_0}$.
+The resulting distinct $125c/18$ and $64c/18$ constants
+appear in \eqref{eq:vk-lower}. Neither the boxed clipped
+lemma nor the exponent algebra by itself proves the later
+fixed-$B$ bound \eqref{eq:r-fixed-B}; the full source also
+pays packet extraction, Cauchy, Fourier coefficients and
+exceptional/diagonal terms.
+\end{remark}
+
+\subsection{Exactly where CORE's 5 and LONG's 4 diverge}
+
+The source's eventual parameter proofs reduce the oscillatory
+part to $\exp\{-cL^3/(2L_m^2)\}$ with
+$0<L_m\le3\Lam$. CORE R has the admissible lower bound
+$L\ge5\Lam^{\sigma_0-1/200}$; LONG-right RL has only
+$L\ge4\Lam^{\sigma_0-1/200}$. In either case let
+$k\in\{4,5\}$. Then
+\begin{equation}\label{eq:vk-lower}
+ \frac{cL^3}{2L_m^2}
+ \ge\frac{ck^3}{18}\,
+ \Lam^{3\sigma_0-3/200-2}
+ =\frac{ck^3}{18}\Lam^{3/200},
+\end{equation}
+using exactly
+\begin{equation}\label{eq:positive-margin}
+ 3\left(\frac23+\frac1{100}\right)-\frac3{200}-2
+ =\frac3{200}>0.
+\end{equation}
+The lower constants are therefore $125c/18$ for CORE
+and $64c/18$ for LONG. For every $A>0$ and $d>0$,
+$\exp(-d\Lam^{3/200})\le\Lam^{-A}$ eventually,
+since $\Lam^{3/200}/\log\Lam\to\infty$.
+This proves the \emph{parameter implication} that both
+source settings can eventually pay $\Lam^{-200}$;
+it does not by itself re-prove the full source's $R$-cell
+estimate.
+
+The separately supplied fixed-$B$ source theorems
+\texttt{R\_final} and \texttt{R\_final\_L}, after the
+packet extraction, four Fourier-mode estimates, coefficient
+variation and source convexity, give
+\begin{equation}\label{eq:r-fixed-B}
+ \left|\sum_{C\text{ in physical }R\text{ or }RL\text{ mask}}
+     \omegaR(C)\F_{q,a,D}(H,r,s)\right|
+ \le4\Lam^{-90}.
+\end{equation}
+The same outer mass bound \eqref{eq:outer-mass} for the
+fixed-$B$ sum yields
+$4e^{10}5^{10}\Lam^{-80}$, absorbed into
+$\Lam^{-79}\le\Lam^{-75}$ at sufficiently large $\Lam$.
+The two physical results are consequently
+$|R_d|,|RL_d|\le\Lam^{-75}$.
+Crucially, \emph{$R\_final\_L$ is an independent LONG-specific
+quantitative port}; it is not an application of CORE's
+$R\_final$ after dropping its $5$-threshold hypothesis.
+
+\section{The B-boundary centering: a finite numerator, an infinite subtraction}
+\label{sec:centering}
+
+This mechanism is an identity, not a logarithmic estimate.
+Fix a first anchor representative $r\pmod q$, let
+$I_q(r;h)=\{0<t<h:(r+t,q)=1\}$ and
+$N_q(r;h)=|I_q(r;h)|$. Define the exact local exceptional-prime
+weight
+\begin{equation}\label{eq:low-weight}
+ w_{q,r}(t)=\one_{(r+t,q)=1}
+ \prod_{\substack{p\in\{2,3\}\\p\nmid q}}
+ \frac{1-\nu_p(\{0,t\})/p}{(1-1/p)^2}.
+\end{equation}
+For high primes put
+\begin{equation}\label{eq:eta-normalization}
+ \eta_q(e)=\mu^2(e)\one_{(e,6q)=1}
+    \prod_{p\mid e}\frac1{p-2},\quad
+ C_{f,q}=\prod_{\substack{p\ge5\\p\nmid q}}
+             \frac{p(p-2)}{(p-1)^2},\quad
+ C_{f,q}\sum_{e\ge1}\frac{\eta_q(e)}e=1.
+\end{equation}
+The normalization is an equality of a convergent product
+and an absolutely convergent reciprocal series. Define
+\[
+ R_e^w(q,r;h)=\sum_{\substack{0<t<h\\e\mid t}}w_{q,r}(t),
+ \qquad S_1(q,r;h)=\sum_{t\in I_q(r;h)}
+           \bigl(\SSer_q(\{0,t\})-1\bigr).
+\]
+The sealed Euler-bridge lemmas supply the exact expansion of
+its positive part and the nonvanishing/convergence facts
+needed to combine it with \eqref{eq:eta-normalization}.
+
+\begin{proposition}[Why centering cannot be truncated]
+\label{prop:centering-tail}
+Under these exact normalization and summability identities,
+\begin{equation}\label{eq:centering-identity}
+ \boxed{S_1(q,r;h)=C_{f,q}\sum_{e\ge1}\eta_q(e)
+     \left(R_e^w(q,r;h)-\frac{N_q(r;h)}e\right).}
+\end{equation}
+The positive term $R_e^w(q,r;h)$ is zero for $e\ge h$,
+whereas the negative centering term generally is not.
+If $N_q(r;h)>0$, truncating both pieces at $e<h$ omits
+exactly the negative correction
+\begin{equation}\label{eq:missing-negative-tail}
+ -C_{f,q}N_q(r;h)\sum_{e\ge h}\frac{\eta_q(e)}e.
+\end{equation}
+\end{proposition}
+\begin{proof}
+The primewise free-pair selector identity and finite
+positive divisor swap yield
+$S_1=C_{f,q}\sum_e\eta_q(e)R_e^w-N_q$.
+The full normalization in \eqref{eq:eta-normalization}
+allows the \emph{exact} substitution
+$N_q=C_{f,q}N_q\sum_{e\ge1}\eta_q(e)/e$.
+Absolute summability permits termwise subtraction, proving
+\eqref{eq:centering-identity}. For $e\ge h$, no integer
+$0<t<h$ is divisible by $e$, so the positive term is zero.
+The negative tail remains as \eqref{eq:missing-negative-tail},
+and does not become zero through that support argument.
+\end{proof}
+
+At $q=1,h=2$ there is just one possible interior $t=1$.
+Its active $p=2$ factor vanishes in \eqref{eq:low-weight},
+so $R_e^w=0$ for every $e$, while $N_1(0;2)=1$.
+By \eqref{eq:eta-normalization}, \eqref{eq:centering-identity}
+gives $S_1(1,0;2)=-1$. Omitting the exceptional-prime
+weight would produce the wrong positive progression mass.
+
+For the second endpoint one \emph{must} reflect $t\mapsto h-t$
+and use $r_b\equiv-b\pmod q$. The congruence
+$a+h\equiv b\pmod q$ converts the second admissibility
+condition into $(r_b+t,q)=1$. Thus the full printed B
+quantity is $S_1(q,a;h)+S_1(q,r_b;h)$, with separate
+low-prime weights and ordinary counts in both centered
+series. This is the precise content of the formal reflected
+Euler bridge, not a symmetry assumption imposed after
+centering.
+
+\section{The remaining physical cells: precise method contracts}
+\label{sec:contracts}
+
+The four demonstrations above treat five of the twelve physical
+cells in detail: Band, EdgeL, WRL, R and RL. Seven additional
+cells must be accounted for in the exact split; there is no
+need to force each into a chapter. Write $\mathsf M_0$
+for the inherited CORE predicate, $\mathsf M_L$ for
+LONG, and $\mathsf W$ for the original CORE B-prime
+packet. The tests
+\[
+ \mathsf G_C:\ s^{1+\epsp}\le r,
+ \qquad \mathsf G_R:\ r^{1+3\epsp}\le s
+\]
+have the displayed equality conventions. Every item below
+inherits the original decorated source, $B,C\ne\varnothing$,
+$B\cap C=\varnothing$, cardinality window, signed row,
+source prime exclusions and Central gate. The indicated bound
+holds for the \emph{complete selected sum at one decoration},
+eventually and uniformly in the remaining legal variables.
+
+\subsection{CORE: three oscillatory regimes and a rough residual}
+
+\paragraph{$W$ (first B packet; $\Lam^{-80}$).}
+The additional mask is $\mathsf M_0\wedge\mathsf W$.
+An eligible B-prime lies in the source packet
+$[X_p(h),Y_p(\delta,s)]$ with the true active support and
+coprimality. Ramar\'e extraction makes that prime the long
+variable; the source then applies a fourth-moment/CRT
+complete-sum estimate of square-root-of-fourth-moment
+strength, with the required four physical Fourier rows.
+This CORE input uses the source's $s^{3/4}$ modulus
+power; it is \emph{not} the general-modulus Weil input
+subsequently required by $WRL$.
+The fixed-factor saving and outer cost are $-95+10=-85$,
+then a constant absorbs five powers to reach $-80$.
+The leaf is \path{GoldC/QuillonWPhysical.lean}.
+
+\paragraph{$C$ (no B packet; $\Lam^{-15}$).}
+Its mask is $\mathsf M_0\wedge\neg\mathsf W
+\wedge\mathsf G_C$. The long first factor supplies a
+range in which Parseval and Vaughan's identity convert
+the relevant source Fourier sum to a suitable prime sum;
+the exceptional portion is paid by Rankin's inequality.
+The verified fixed-factor power $-30$ incurs the
+specified outer $+10$ cost and absorbs a fixed coefficient
+before the physical target $-15$.
+See \path{GoldC/QuillonCPhysical.lean}.
+
+\paragraph{$\mathrm{ResA}$ (no usable packet; $\Lam^{1/10}$).}
+The mask is $\mathsf M_0\wedge\neg\mathsf W
+\wedge\neg\mathsf G_C\wedge\mathsf G_R$
+with $C\cap\JR(h,T,B)=\varnothing$. The failure of both
+packet tests forces the two factors into distinct roughness
+classes. The source bounds their \emph{weighted masses},
+not the oscillation of a missing long variable. Its raw
+power is
+\[
+ \frac1{4000}+\frac1{4000}+\frac1{40}
+   =\frac{51}{2000}<\frac1{10},
+\]
+leaving $149/2000$ for constant absorption. There is no
+additional physical outer $+10$ charge here because the
+mass bound already covers the masked double sum.
+See \path{GoldC/QuillonResPhysical.lean}.
+
+The other two CORE cells, $R$ and Band, are treated in
+\cref{sec:reciprocal,sec:band}. Their complements make
+the five-way identity exhaustive; none of the above
+methods is asserted outside its assigned mask.
+
+\subsection{LONG-left: packet or Parseval}
+
+\paragraph{$WL$ (left B packet; $\Lam^{-80}$).}
+The mask retains LONG-left $s^{1+\delta}<r$ and the
+eligible source W-packet in B. The extraction and
+four-mode Fourier control are analogous to CORE $W$,
+\emph{but the LONG-specific intervals and lower bounds
+are reverified}; it is not a use of $W$ after discarding
+its CORE hypothesis. The fixed-factor $-95$, outer $+10$
+and fixed-constant absorption give $-80$.
+See \path{GoldC/QuillonLW.lean}.
+
+\paragraph{$CL$ (left with no packet; $\Lam^{-15}$).}
+Its mask is LONG-left with the complementary
+$\neg\mathsf W_L$. A dedicated long-range
+Parseval/Vaughan decomposition and Rankin remainder
+prove its version of $-30+10$, then absorb constants to
+$-15$. The source's ranges are different from CORE's.
+See \path{GoldC/QuillonLC.lean}.
+
+\subsection{LONG-right: factors too numerous or packets missing}
+
+\paragraph{$\mathrm{ManyL}$ (many C factors; $\Lam^{-50}$).}
+After excluding the reciprocal packet
+$C\cap\JR=\varnothing$, the criterion
+$|C|\ge K_0(h)=\lceil100\log\Lam\rceil$
+selects a Rankin factor-count estimate. Its factor
+suppression pays $-100$; the cubic moment costs $+30$,
+and the physical outer sum costs $+10$, leaving $-60$
+before constant absorption to $-50$. This is not a
+Kloosterman bound and does not require a W-prime packet.
+See \path{GoldC/QuillonLRP.lean}.
+
+\paragraph{$\mathrm{ResL}$ (off edge without W packet;
+$\Lam^{7/10}$).}
+The inherited tests are LONG-right, $C\cap\JR=\varnothing$,
+$|C|<K_0(h)$ and $r\ge s^{1/2+3\eta}$; the decisive
+additional test is $\mathcal W_L(B,C)=\varnothing$.
+The two factors are rough enough to count directly.
+The fixed-decoration raw power is
+\[
+ \frac1{2000}+\frac12+\frac1{40}
+  =\frac{1051}{2000}<\frac7{10},
+\]
+leaving $349/2000$ of absorption slack. The half-power
+is a genuine $(\eta)^{-5}=\Lam^{1/2}$ roughness
+expense, not the edge's geometric width. This
+physical mass already includes its outer cost.
+See \path{GoldC/QuillonLRP.lean}.
+
+The other LONG-right cases are $RL$ (the first reciprocal
+packet), EdgeL (the thin square-root strip) and $WRL$
+(the eligible off-edge B packet). They were derived in
+\cref{sec:reciprocal,sec:edge}. Every right-oriented
+parent is routed into exactly one of these five regions.
+
+\section{How the twelve cells pay for the theorem}\label{sec:accounting}
+
+For the leaf estimates supplied in the sealed source, the
+quantitative book has two levels. \emph{Fixed-factor inputs}
+may require outer source summation; the positive mass bounds
+already include their corresponding physical sums. This is
+why adding $+10$ to every row of the exponent table would
+be incorrect.
+
+\begin{center}\small
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Cell & Before constants & Physical target & Unused exponent\\\midrule
+$W,WL,WRL$ & $-85$ & $-80$ & $5$\\
+$C,CL$ & $-20$ & $-15$ & $5$\\
+$R,RL$ & $-80$ & $-75$ & $5$\\
+$\mathrm{ManyL}$ & $-60$ & $-50$ & $10$\\
+$\mathrm{ResA}$ & $51/2000$ & $1/10$ & $149/2000$\\
+$\mathrm{Band}$ & $1991/2000$ & $499/500$ & $1/400$\\
+$\mathrm{EdgeL}$ & $3741/4000$ & $19/20$ & $59/4000$\\
+$\mathrm{ResL}$ & $1051/2000$ & $7/10$ & $349/2000$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+For every fixed decoration, exact disjointness followed by
+the triangle inequality gives
+\begin{equation}\label{eq:per-decoration-conclusion}
+ |\mathcal C_{\csmall,d}|\le5\Lam^{499/500},
+ \qquad |\mathcal C_{\clong,d}|\le7\Lam^{19/20}.
+\end{equation}
+A difference of signs is preserved up to this step; one
+never multiplies the five or seven exponent losses.
+
+The decoration masses are nonnegative. Their separate
+supplier bound has the form
+\begin{equation}\label{eq:decor-bound}
+ \sum_dV_h(d)\le e^{10}\left(1+\frac{\log\Lam}{\log2}\right)^8
+ \le256e^{10}\Lam^{1/1000}
+\end{equation}
+eventually. Multiplying \emph{once} by this aggregate bound,
+\begin{equation}\label{eq:final-cost}
+ \boxed{
+ |\mathcal C_{\csmall}|\le1280e^{10}\Lam^{999/1000},\quad
+ |\mathcal C_{\clong}|\le1792e^{10}\Lam^{951/1000}.}
+\end{equation}
+Both exponents are strictly smaller than one. The source's
+positive fixed-$q$ HIGH contribution is $O_q(1)$ and the
+zero-cardinality LOW sector with $J_{\rm low}\equiv0$
+is \emph{exactly} zero. Every original parent not in HIGH
+is then in MIDDLE and is covered by CORE or LONG.
+
+The folded-to-active Central difference retains a separate
+inverse-row and density-row correction, bounded by
+\[
+ (6q+2)\,4(1+\Lam)^3Z(h)^{-1/2}e^{K_0(h)},
+\]
+which tends to zero in the proved eventual range. The
+independently paid positive Vaaler and shifted Suzuki
+premises then control the \emph{other} regions in the
+four-way quarter-middle decomposition, including Upper;
+the four regions are requested at tolerance
+$\varepsilon/4$. The source's far-quarter transport
+and source-to-kernel normalization use their own
+$\varepsilon/2+\varepsilon/2$ allocation. Those splits
+change the chosen tolerances, \emph{not} any physical
+logarithmic exponent. Finally the exact printed Euler
+identification transports the native coefficient difference
+to the literal statement
+\[
+ A_{1,q}(a,b;h)-B_{1,q}(a,b;h)=o_q(\log h).
+\]
+The height threshold depends on the fixed modulus and the
+requested error but is selected \emph{before} the endpoint
+classes. The method is asymptotic: the constant-absorption
+thresholds are not claimed to be numerically practical.
+
+\section{Source waypoints and independent obligations}
+\label{sec:sources}
+
+The sealed October 2026 R0003 development is the source for the
+imported analytic lemmas. The separate \emph{source-obligation ledger}
+provides exact archive and file hashes, declaration names, line ranges,
+assumptions and falsification questions. It distinguishes what has been
+derived in this supplement from what is supplied by the formal source;
+it is not presented as a compiler-extracted proof-term graph.
+
+\paragraph{Exact Euler identities.}
+The F-01 printed-literal bridge supplies the centered $S_1$ identity,
+the convergence of its series and the reflected-anchor normalization.
+Those are equalities, not estimates.
+
+\paragraph{Geometric mass and analytic cancellation.}
+For Band, the named inputs are \texttt{interval\_mass},
+\texttt{rough\_ev} and \texttt{Band\_physical}.
+For the edge, they are \texttt{rough\_ev4} and
+\texttt{EdgeL\_physical}; off the edge, the paid general
+Kloosterman estimate, \texttt{WeilHyp}, the coupled gcd moment and
+\texttt{W\_final\_LR} are required together. The shifted Suzuki
+input enters the two distinct physical estimates
+\texttt{R\_final} and \texttt{R\_final\_L}; neither supplies the
+other's source hypotheses for free.
+
+\paragraph{Aggregation and remaining review.}
+The exact five- and seven-cell identities and their decorated
+sublogarithmic estimates precede the zero-LOW specialization and
+literal printed terminal. A cold analyst should independently attack
+the roughness and harmonic-interval suppliers, the Weil cofactor/gcd
+contract, and the clipped-coefficient Abel/Suzuki interface. Those
+are real mathematical review tasks. The deep inputs are established
+in the sealed formal development, but they have \emph{not} all been
+independently re-proved by handwritten arguments here. The external
+Lean replay succeeded; handwritten mathematical audit remains open.
+
+
+\begingroup
+\small
+\begin{thebibliography}{12}
+\setlength{\itemsep}{1pt}
+
+\bibitem{MontgomerySoundararajan2004}
+H.~L.~Montgomery and K.~Soundararajan,
+\emph{Primes in short intervals},
+Commun. Math. Phys. \textbf{252} (2004), 589--617.
+DOI: 10.1007/s00220-004-1222-4.
+
+\bibitem{Vaaler1985}
+J.~D.~Vaaler,
+\emph{Some extremal functions in Fourier analysis},
+Bull. Amer. Math. Soc. (N.S.) \textbf{12} (1985), no.~2, 183--216.
+
+\bibitem{Weil1948}
+A.~Weil,
+\emph{On some exponential sums},
+Proc. Natl. Acad. Sci. USA \textbf{34} (1948), 204--207.
+
+\bibitem{Estermann1961}
+T.~Estermann,
+\emph{On Kloosterman's sum},
+Mathematika \textbf{8} (1961), no.~1, 83--86.
+
+\bibitem{IwaniecKowalski2004}
+H.~Iwaniec and E.~Kowalski,
+\emph{Analytic Number Theory},
+Amer. Math. Soc. Colloquium Publications, vol.~53,
+American Mathematical Society, Providence, 2004.
+
+\bibitem{Karatsuba1971}
+A.~A.~Karatsuba,
+\emph{Estimates for trigonometric sums by Vinogradov's method,
+and some applications},
+Proc. Steklov Inst. Math. \textbf{112} (1971), 251--265
+(English translation, 1973).
+
+\bibitem{Ramare2010}
+O.~Ramar\'e,
+\emph{On Bombieri's asymptotic sieve},
+J. Number Theory \textbf{130} (2010), no.~5, 1155--1189.
+
+\bibitem{Vaughan1980}
+R.~C.~Vaughan,
+\emph{An elementary method in prime number theory},
+Acta Arith. \textbf{37} (1980), 111--115.
+
+\bibitem{GoldstonLedoan2011}
+D.~A.~Goldston and A.~H.~Ledoan,
+\emph{On the differences between consecutive prime numbers, I},
+arXiv:1111.3380 (2011).
+
+\bibitem{LemkeOliverSound2016}
+R.~J.~Lemke Oliver and K.~Soundararajan,
+\emph{Unexpected biases in the distribution of consecutive primes},
+Proc. Natl. Acad. Sci. USA \textbf{113} (2016),
+no.~31, E4446--E4454.
+
+\bibitem{Kuperberg2025}
+V.~Kuperberg,
+\emph{Sums of singular series along arithmetic progressions
+and with smooth weights},
+Int. J. Number Theory \textbf{21} (2025), no.~1, 53--74.
+
+\end{thebibliography}
+\endgroup
+
+\end{document}

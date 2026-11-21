@@ -1,0 +1,10 @@
+{
+  "card": "CELL-RL",
+  "source": "LEAN/GoldC/QuillonLR.lean",
+  "historical_start": 540,
+  "historical_end": 645,
+  "verified_start": 540,
+  "corrected_end": 629,
+  "underlying_file_lines": 636,
+  "standing": "range label only; source unchanged"
+}

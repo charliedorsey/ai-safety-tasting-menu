@@ -1,0 +1,102 @@
+{
+  "diag": [
+    "0",
+    "0",
+    "0"
+  ],
+  "fuel": 10,
+  "hop": [
+    "1",
+    "1"
+  ],
+  "independent_checker_verdict": {
+    "accuracy": true,
+    "counts": {
+      "gap_left": 1,
+      "gap_right": 1,
+      "near_left": 1,
+      "near_right": 0
+    },
+    "eps": "1/32",
+    "lower": "7/3520",
+    "ok": true,
+    "upper": "1179/56320",
+    "width": "97/5120"
+  },
+  "initial_inner": "7/3520",
+  "initial_outer": "13659/704",
+  "input_sha256": "2a06eeba88d43c2ae526002d0e76dc6fa6d9e9c719e131a2c8266ca332ef18df",
+  "n": 3,
+  "scope": "Independent exact Python mirror; Lean export and checker proof must be recorded separately.",
+  "status": "regular",
+  "target": "7/5",
+  "tolerance": "1/32",
+  "trace": [
+    {
+      "action": "occupied",
+      "drop": 3,
+      "radius": "34151/3520",
+      "step": 1
+    },
+    {
+      "action": "occupied",
+      "drop": 3,
+      "radius": "17079/3520",
+      "step": 2
+    },
+    {
+      "action": "occupied",
+      "drop": 2,
+      "radius": "8543/3520",
+      "step": 3
+    },
+    {
+      "action": "occupied",
+      "drop": 1,
+      "radius": "855/704",
+      "step": 4
+    },
+    {
+      "action": "occupied",
+      "drop": 1,
+      "radius": "2141/3520",
+      "step": 5
+    },
+    {
+      "action": "occupied",
+      "drop": 1,
+      "radius": "537/1760",
+      "step": 6
+    },
+    {
+      "action": "occupied",
+      "drop": 1,
+      "radius": "1081/7040",
+      "step": 7
+    },
+    {
+      "action": "occupied",
+      "drop": 1,
+      "radius": "219/2816",
+      "step": 8
+    },
+    {
+      "action": "occupied",
+      "drop": 1,
+      "radius": "1123/28160",
+      "step": 9
+    },
+    {
+      "action": "occupied",
+      "drop": 1,
+      "radius": "1179/56320",
+      "step": 10
+    }
+  ],
+  "witness": {
+    "gap_left": "4921/3520",
+    "gap_right": "987/704",
+    "near_left": "77669/56320",
+    "near_right": "80027/56320"
+  }
+}
